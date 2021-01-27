@@ -425,6 +425,71 @@ class format_designer extends format_base {
         // Return everything (nothing to hide).
         return $this->get_format_options();
     }
+
+    /**
+     * Set any arbitrary/custom option on this format, for a section.
+     *
+     * @param int $sectionnumber Course section number to set option for.
+     * @param string $name Option name.
+     * @param string $value Option value.
+     * @return int Option record ID.
+     * @throws dml_exception
+     */
+    public function set_section_option(int $sectionnumber, string $name, string $value): int {
+        global $DB;
+
+        $common = [
+            'courseid' => $this->courseid,
+            'format' => 'designer',
+            'sectionid' => $sectionnumber,
+            'name' => $name
+        ];
+
+        if ($existingoption = $DB->get_record('course_format_options', $common)) {
+            $existingoption->value = $value;
+            $DB->update_record('course_format_options', $existingoption);
+            return $existingoption->id;
+        } else {
+            $option = (object)$common;
+            $option->value = $value;
+            return $DB->insert_record('course_format_options', $option);
+        }
+    }
+
+    /**
+     * Get section option.
+     *
+     * @param int $sectionnumber Course section number to get option for.
+     * @param string $name Option name.
+     * @return string|null
+     * @throws dml_exception
+     */
+    public function get_section_option(int $sectionnumber, string $name): ?string {
+        global $DB;
+
+        return $DB->get_field('course_format_options', 'value', [
+            'courseid' => $this->courseid,
+            'format' => 'designer',
+            'sectionid' => $sectionnumber,
+            'name' => $name
+        ]) ?: null;
+    }
+
+    /**
+     * Get all options for section.
+     *
+     * @param int $sectionnumber
+     * @return array Options array [name => value, ..]
+     */
+    public function get_section_options(int $sectionnumber): array {
+        global $DB;
+
+        return $DB->get_records_menu('course_format_options', [
+            'courseid' => $this->courseid,
+            'format' => 'designer',
+            'sectionid' => $sectionnumber
+        ], '', 'name, value');
+    }
 }
 
 /**
