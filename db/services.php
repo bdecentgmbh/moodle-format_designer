@@ -15,15 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details.
+ * External functions and service definitions.
  *
  * @package   format_designer
  * @copyright 2021 bdecent gmbh <https://bdecent.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version   = 2021012704;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2020110300;        // Requires this Moodle version.
-$plugin->component = 'format_designer';    // Full name of the plugin (used for diagnostics).
+$functions = [
+    'format_designer_set_section_options' => [
+        'classpath'     => '',
+        'classname'     => 'format_designer\external\external',
+        'methodname'    => 'set_section_options',
+        'description'   => 'Set section options.',
+        'type'          => 'write',
+        'ajax'          => true
+    ]
+];

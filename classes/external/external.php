@@ -13,17 +13,28 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
- * Version details.
+ * Web service and ajax functions.
  *
  * @package   format_designer
  * @copyright 2021 bdecent gmbh <https://bdecent.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace format_designer\external;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2021012704;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2020110300;        // Requires this Moodle version.
-$plugin->component = 'format_designer';    // Full name of the plugin (used for diagnostics).
+require_once($CFG->libdir.'/externallib.php');
+
+use external_api;
+
+/**
+ * Web service and ajax functions.
+ *
+ * Each external function is implemented in its own trait. This class
+ * aggregates them all.
+ */
+class external extends external_api {
+    use set_section_options;
+}

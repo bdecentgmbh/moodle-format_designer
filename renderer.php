@@ -98,6 +98,72 @@ class format_designer_renderer extends format_section_renderer_base {
     }
 
     /**
+     * Generate the edit control action menu
+     *
+     * @param array $controls The edit control items from section_edit_control_items
+     * @param stdClass $course The course entry from DB
+     * @param stdClass $section The course_section entry from DB
+     * @return string HTML to output.
+     */
+    protected function section_edit_control_menu($controls, $course, $section) {
+
+        /** @var format_designer $format */
+        $format = course_get_format($course);
+
+        $o = "";
+        if (!empty($controls)) {
+            $controllinks = [];
+            foreach ($controls as $value) {
+                $url = empty($value['url']) ? '' : $value['url'];
+                $icon = empty($value['icon']) ? '' : $value['icon'];
+                $name = empty($value['name']) ? '' : $value['name'];
+                $attr = empty($value['attr']) ? array() : $value['attr'];
+                $class = empty($value['pixattr']['class']) ? '' : $value['pixattr']['class'];
+
+                $attr = array_map(function($key, $value) {
+                    return [
+                        'name' => $key,
+                        'value' => $value
+                    ];
+                }, array_keys($attr), $attr);
+                $controllinks[] = [
+                    'url' => $url,
+                    'name' => $name,
+                    'icon' => $this->render(new pix_icon($icon, '', null, array('class' => "smallicon " . $class))),
+                    'attributes' => $attr
+                ];
+            }
+
+            $o = $this->render_from_template('format_designer/section_controls', [
+                'seciontypes' => [
+                    [
+                        'type' => 'default',
+                        'name' => 'Text links (Default)',
+                        'active' => empty($format->get_section_option($section->section, 'sectiontype')) || $format->get_section_option($section->section, 'sectiontype') == 'default'
+                    ],
+                    [
+                        'type' => 'list',
+                        'name' => 'List',
+                        'active' => $format->get_section_option($section->section, 'sectiontype') == 'list'
+                    ],
+                    [
+                        'type' => 'cards',
+                        'name' => 'Cards',
+                        'active' => $format->get_section_option($section->section, 'sectiontype') == 'cards'
+                    ],
+                ],
+                'sectionid' => $section->id,
+                'sectionnumber' => $section->section,
+                'courseid' => $course->id,
+                'sectionactionmenu' => $controllinks,
+                'hassectionactionmenu' => !empty($controllinks)
+            ]);
+        }
+
+        return $o;
+    }
+
+    /**
      * Generate the edit control items of a section.
      *
      * @param int|stdClass $course The course entry from DB

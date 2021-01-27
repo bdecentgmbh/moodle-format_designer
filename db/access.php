@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details.
+ * Designer format capabilities.
  *
  * @package   format_designer
  * @copyright 2021 bdecent gmbh <https://bdecent.de>
@@ -24,6 +24,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2021012704;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2020110300;        // Requires this Moodle version.
-$plugin->component = 'format_designer';    // Full name of the plugin (used for diagnostics).
+$capabilities = [
+    'format/designer:changesectionoptions' => [
+        'riskbitmask' => RISK_CONFIG,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ]
+    ],
+];

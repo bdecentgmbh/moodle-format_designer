@@ -58,3 +58,4 @@ if (!empty($displaysection)) {
 
 // Include course format js module.
 $PAGE->requires->js('/course/format/designer/format.js');
+

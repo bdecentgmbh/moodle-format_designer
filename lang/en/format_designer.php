@@ -24,15 +24,17 @@
 
 $string['addsections'] = 'Add designer sections';
 $string['currentsection'] = 'This designer section';
+$string['deletesection'] = 'Delete designer section';
+$string['designer:changesectionoptions'] = 'Change section options, such as type.';
 $string['editsection'] = 'Edit designer section';
 $string['editsectionname'] = 'Edit designer section name';
-$string['deletesection'] = 'Delete designer section';
+$string['hidefromothers'] = 'Hide designer section';
 $string['newsectionname'] = 'New name for designer section {$a}';
-$string['sectionname'] = 'Designer section';
-$string['pluginname'] = 'Designer format';
-$string['section0name'] = 'General';
 $string['page-course-view-designer'] = 'Any course main page in Designer format';
 $string['page-course-view-designer-x'] = 'Any course page in Designer format';
-$string['hidefromothers'] = 'Hide designer section';
-$string['showfromothers'] = 'Show designer section';
+$string['pluginname'] = 'Designer format';
 $string['privacy:metadata'] = 'The Designer format plugin does not store any personal data.';
+$string['sectionname'] = 'Designer section';
+$string['section0name'] = 'General';
+$string['sectiontype'] = 'Section type';
+$string['showfromothers'] = 'Show designer section';
