@@ -26,7 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
     'format/designer:changesectionoptions' => [
-        'riskbitmask' => RISK_CONFIG,
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [

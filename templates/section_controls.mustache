@@ -7,7 +7,7 @@
         </button>
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
             {{#seciontypes}}
-                <a class="dropdown-item {{#active}}active{{/active}}" href="#" data-action="set-section-option" data-option="sectiontype" data-value="{{type}}">{{name}}</a>
+                <a class="dropdown-item {{#active}}active{{/active}}" href="{{{url}}}" data-action="set-section-option" data-option="sectiontype" data-value="{{type}}">{{name}}</a>
             {{/seciontypes}}
         </div>
     </div>
@@ -27,7 +27,6 @@
 
 {{#js}}
     require(['format_designer/designer_section'], function(DesignerSection) {
-    console.log("HERE1");
         var ds = new DesignerSection('#section-{{sectionnumber}}', {{courseid}});
     });
 {{/js}}

@@ -139,17 +139,20 @@ class format_designer_renderer extends format_section_renderer_base {
                     [
                         'type' => 'default',
                         'name' => 'Text links (Default)',
-                        'active' => empty($format->get_section_option($section->section, 'sectiontype')) || $format->get_section_option($section->section, 'sectiontype') == 'default'
+                        'active' => empty($format->get_section_option($section->section, 'sectiontype')) || $format->get_section_option($section->section, 'sectiontype') == 'default',
+                        'url' => new moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $section->section)
                     ],
                     [
                         'type' => 'list',
                         'name' => 'List',
-                        'active' => $format->get_section_option($section->section, 'sectiontype') == 'list'
+                        'active' => $format->get_section_option($section->section, 'sectiontype') == 'list',
+                        'url' => new moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $section->section)
                     ],
                     [
                         'type' => 'cards',
                         'name' => 'Cards',
-                        'active' => $format->get_section_option($section->section, 'sectiontype') == 'cards'
+                        'active' => $format->get_section_option($section->section, 'sectiontype') == 'cards',
+                        'url' => new moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $section->section)
                     ],
                 ],
                 'sectionid' => $section->id,

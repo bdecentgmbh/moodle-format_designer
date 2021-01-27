@@ -6,11 +6,15 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
         this.courseId = courseId;
 
         this.root.on('click', '[data-action=set-section-option]', e => {
+            e.preventDefault();
             console.log("CLICK", $(e.currentTarget));
             this.setSectionOptions([{
                 name: $(e.currentTarget).data('option'),
                 value: $(e.currentTarget).data('value')
-            }]).fail(Notification.exception);
+            }]).done(() => {
+                window.location.href = $(e.currentTarget).attr('href');
+                window.location.reload();
+            }).fail(Notification.exception);
         });
     };
 
