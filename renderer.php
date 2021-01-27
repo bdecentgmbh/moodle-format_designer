@@ -239,4 +239,228 @@ class format_designer_renderer extends format_section_renderer_base {
             return array_merge($controls, $parentcontrols);
         }
     }
+
+    /**
+     * Output the html for a multiple section page
+     *
+     * @param stdClass $course The course entry from DB
+     * @param array $sections (argument not used)
+     * @param array $mods (argument not used)
+     * @param array $modnames (argument not used)
+     * @param array $modnamesused (argument not used)
+     */
+    public function print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused) {
+        $modinfo = get_fast_modinfo($course);
+        $course = course_get_format($course)->get_course();
+
+        $context = context_course::instance($course->id);
+        // Title with completion help icon.
+        $completioninfo = new completion_info($course);
+        echo $completioninfo->display_help_icon();
+        echo $this->output->heading($this->page_title(), 2, 'accesshide');
+
+        // Copy activity clipboard..
+        echo $this->course_activity_clipboard($course, 0);
+
+        // Now the list of sections..
+        echo $this->start_section_list();
+        $numsections = course_get_format($course)->get_last_section_number();
+
+        foreach ($modinfo->get_section_info_all() as $section => $thissection) {
+            if ($section == 0) {
+                // 0-section is displayed a little different then the others
+                if ($thissection->summary or !empty($modinfo->sections[0]) or $this->page->user_is_editing()) {
+                    echo $this->section_header($thissection, $course, false, 0);
+                    echo $this->courserenderer->course_section_cm_list($course, $thissection, 0);
+                    echo $this->courserenderer->course_section_add_cm_control($course, 0, 0);
+                    echo $this->section_footer();
+                }
+                continue;
+            }
+            if ($section > $numsections) {
+                // activities inside this section are 'orphaned', this section will be printed as 'stealth' below
+                continue;
+            }
+            // Show the section if the user is permitted to access it, OR if it's not available
+            // but there is some available info text which explains the reason & should display,
+            // OR it is hidden but the course has a setting to display hidden sections as unavilable.
+            $showsection = $thissection->uservisible ||
+                ($thissection->visible && !$thissection->available && !empty($thissection->availableinfo)) ||
+                (!$thissection->visible && !$course->hiddensections);
+            if (!$showsection) {
+                continue;
+            }
+
+            if (!$this->page->user_is_editing() && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
+                // Display section summary only.
+                echo $this->section_summary($thissection, $course, null);
+            } else {
+                echo $this->render_section($thissection, $course, false);
+            }
+        }
+
+        if ($this->page->user_is_editing() and has_capability('moodle/course:update', $context)) {
+            // Print stealth sections if present.
+            foreach ($modinfo->get_section_info_all() as $section => $thissection) {
+                if ($section <= $numsections or empty($modinfo->sections[$section])) {
+                    // this is not stealth section or it is empty
+                    continue;
+                }
+                echo $this->stealth_section_header($section);
+                echo $this->courserenderer->course_section_cm_list($course, $thissection, 0);
+                echo $this->stealth_section_footer();
+            }
+
+            echo $this->end_section_list();
+
+            echo $this->change_number_sections($course, 0);
+        } else {
+            echo $this->end_section_list();
+        }
+
+    }
+
+    public function render_section(section_info $section, stdClass $course, $onsectionpage, $sectionreturn = 0) {
+
+        /** @var format_designer $format */
+        $format = course_get_format($course);
+
+        $sectionstyle = '';
+        if ($section->section != 0) {
+            // Only in the non-general sections.
+            if (!$section->visible) {
+                $sectionstyle = ' hidden';
+            }
+            if (course_get_format($course)->is_section_current($section)) {
+                $sectionstyle = ' current';
+            }
+        }
+
+        $leftcontent = $this->section_left_content($section, $course, $onsectionpage);
+        $rightcontent = $this->section_right_content($section, $course, $onsectionpage);
+        $sectionname = html_writer::tag('span', $this->section_title($section, $course));
+        $sectionavailability = $this->section_availability($section);
+
+        // CM LIST
+
+        $cmlist = [];
+
+        $modinfo = get_fast_modinfo($course);
+        $displayoptions = [];
+        $completioninfo = new completion_info($course);
+
+        // Get the list of modules visible to user
+        if (!empty($modinfo->sections[$section->section])) {
+            foreach ($modinfo->sections[$section->section] as $modnumber) {
+                $mod = $modinfo->cms[$modnumber];
+
+                if (!$mod->is_visible_on_course_page()) {
+                    continue;
+                }
+
+                $indentclasses = 'mod-indent';
+                if (!empty($mod->indent)) {
+                    $indentclasses .= ' mod-indent-'.$mod->indent;
+                    if ($mod->indent > 15) {
+                        $indentclasses .= ' mod-indent-huge';
+                    }
+                }
+
+                $movehtml = '';
+                if ($this->page->user_is_editing()) {
+                    $movehtml = course_get_cm_move($mod, $sectionreturn);
+                }
+
+                $modclasses = 'activity ' . $mod->modname . ' modtype_' . $mod->modname . ' ' . $mod->extraclasses;
+
+                // If there is content but NO link (eg label), then display the
+                // content here (BEFORE any icons). In this case cons must be
+                // displayed after the content so that it makes more sense visually
+                // and for accessibility reasons, e.g. if you have a one-line label
+                // it should work similarly (at least in terms of ordering) to an
+                // activity.
+                $beforecontent = '';
+                $url = $mod->url;
+                if (empty($url)) {
+                    $beforecontent = $this->courserenderer->course_section_cm_text($mod, $displayoptions);
+                }
+
+                $modicons = '';
+                if ($this->page->user_is_editing()) {
+                    $editactions = course_get_cm_edit_actions($mod, $mod->indent, $sectionreturn);
+                    $modicons .= ' '. $this->courserenderer->course_section_cm_edit_actions($editactions, $mod, $displayoptions);
+                    $modicons .= $mod->afterediticons;
+                }
+
+                $modicons .= $this->courserenderer->course_section_cm_completion($course, $completioninfo, $mod, $displayoptions);
+
+                $availability = $this->courserenderer->course_section_cm_availability($mod, $displayoptions);
+
+                // If there is content AND a link, then display the content here
+                // (AFTER any icons). Otherwise it was displayed before
+                $aftercontent = '';
+                if (!empty($url)) {
+                    $aftercontent = $this->courserenderer->course_section_cm_text($mod, $displayoptions);
+                }
+
+                $cmlist[$modnumber] = [
+                    'id' => 'module-' . $mod->id,
+                    'modclasses' => $modclasses,
+                    'indentclasses' => $indentclasses,
+                    'movehtml' => $movehtml,
+                    'cmname' => $this->courserenderer->course_section_cm_name($mod, $displayoptions),
+                    'afterlink' => $mod->afterlink,
+                    'beforecontent' => $beforecontent,
+                    'aftercontent' => $aftercontent,
+                    'modicons' => $modicons,
+                    'availability' => $availability
+                ];
+            }
+        }
+        $cmlist = array_values($cmlist);
+
+        // END CM LIST
+        $cmcontrol = $this->courserenderer->course_section_add_cm_control($course, 0, 0);
+
+        $sectionsummary = '';
+        if ($section->uservisible || $section->visible) {
+            // Show summary if section is available or has availability restriction information.
+            // Do not show summary if section is hidden but we still display it because of course setting
+            // "Hidden sections are shown in collapsed form".
+            $sectionsummary = $this->format_summary_text($section);
+        }
+
+        $sectiontype = $format->get_section_option($section->section, 'sectiontype') ?: 'default';
+
+        $templatename = 'format_designer/section_layout_' . $sectiontype;
+        try {
+            $this->get_mustache()->loadTemplate($templatename);
+        } catch (Exception $exception) {
+            debugging('Missing section mustache template: ' . $templatename);
+            $templatename = 'format_designer/section_layout_default';
+        }
+
+        echo $this->render_from_template($templatename, [
+            'section' => $section,
+            'sectionstyle' => $sectionstyle,
+            'sectionreturn' => $sectionreturn,
+            'leftcontent' => $leftcontent,
+            'rightcontent' => $rightcontent,
+            'sectionname' => $sectionname,
+            'sectionavailability' => $sectionavailability,
+            'sectionsummary' => $sectionsummary,
+            'cmlist' => $cmlist,
+            'cmcontrol' => $cmcontrol
+        ]);
+
+        return;
+
+
+        echo $this->section_header($section, $course, false, 0);
+        if ($section->uservisible) {
+            echo $this->courserenderer->course_section_cm_list($course, $section, 0);
+            echo $this->courserenderer->course_section_add_cm_control($course, $section->section, 0);
+        }
+        echo $this->section_footer();
+    }
 }

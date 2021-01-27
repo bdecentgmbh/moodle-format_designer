@@ -1,0 +1,46 @@
+{{<format_designer/section_layout}}
+    {{$content}}
+        <h3 id="sectionid-{{section.id}}-title" class="sectionname">{{{sectionname}}}</h3>
+
+        <h4>LIST!</h4>
+
+        {{{sectionavailability}}}
+
+        <div class="summary">
+            {{{sectionsummary}}}
+        </div>
+
+        <ul class="section img-text">
+            {{#cmlist}}
+                <li id="{{id}}" class="{{modclasses}}">
+                    <div>
+                        {{{movehtml}}}
+                        <div class="mod-indent-outer w-100">
+                            <div class="{{indentclasses}}">
+                                <div>
+                                    {{#cmname}}
+                                        <div class="activityinstance">
+                                            {{{cmname}}}
+                                            {{{afterlink}}}
+                                        </div>
+                                    {{/cmname}}
+
+                                    {{{beforecontent}}}
+
+                                    {{#modicons}}
+                                        <div class="actions">
+                                            {{{modicons}}}
+                                        </div>
+                                    {{/modicons}}
+
+                                    {{{aftercontent}}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            {{/cmlist}}
+        </ul>
+        {{{cmcontrol}}}
+    {{/content}}
+{{/format_designer/section_layout}}
