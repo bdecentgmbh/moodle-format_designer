@@ -15,27 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Specialised restore for Topics course format.
+ * Specialised restore for Designer course format.
  *
- * @package   format_topics
- * @category  backup
- * @copyright 2017 Marina Glancy
+ * @package   format_designer
+ * @copyright 2021 bdecent gmbh <https://bdecent.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Specialised restore for Topics course format.
+ * Specialised restore for Designer course format.
  *
  * Processes 'numsections' from the old backup files and hides sections that used to be "orphaned".
  *
- * @package   format_topics
- * @category  backup
- * @copyright 2017 Marina Glancy
+ * @package   format_designer
+ * @copyright 2021 bdecent gmbh <https://bdecent.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class restore_format_topics_plugin extends restore_format_plugin {
+class restore_format_designer_plugin extends restore_format_plugin {
 
     /** @var int */
     protected $originalnumsections = 0;
@@ -101,7 +99,7 @@ class restore_format_topics_plugin extends restore_format_plugin {
 
         $data = $this->connectionpoint->get_data();
         $backupinfo = $this->step->get_task()->get_info();
-        if ($backupinfo->original_course_format !== 'topics' || !isset($data['tags']['numsections'])) {
+        if ($backupinfo->original_course_format !== 'designer' || !isset($data['tags']['numsections'])) {
             // Backup from another course format or backup file does not even have 'numsections'.
             return;
         }
