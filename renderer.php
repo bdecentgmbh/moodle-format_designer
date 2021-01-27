@@ -119,6 +119,7 @@ class format_designer_renderer extends format_section_renderer_base {
                 $name = empty($value['name']) ? '' : $value['name'];
                 $attr = empty($value['attr']) ? array() : $value['attr'];
                 $class = empty($value['pixattr']['class']) ? '' : $value['pixattr']['class'];
+                $class .= ' dropdown-item';
 
                 $attr = array_map(function($key, $value) {
                     return [
