@@ -443,6 +443,7 @@ class format_designer_renderer extends format_section_renderer_base {
 
         echo $this->render_from_template($templatename, [
             'section' => $section,
+            'sectiontype' => $sectiontype,
             'sectionstyle' => $sectionstyle,
             'sectionreturn' => $sectionreturn,
             'leftcontent' => $leftcontent,

@@ -1,3 +1,34 @@
+ul.designer .card.card-list {
+    border: none;
+    border-left: 10px solid #333;
+    box-shadow: 1px 1px 11px 2px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow: 1px 1px 11px 2px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: 1px 1px 11px 2px rgba(0, 0, 0, 0.2);
+}
+ul.designer .card.card-list.purple {
+    border-left-color: #5b40b0;
+}
+ul.designer .card.card-list.success {
+    border-left-color: #28a745;
+}
+ul.designer .card.card-list.warning {
+    border-left-color: #fd7e14;
+    background-color: #ffe4cf;
+}
+ul.designer .card.card-list.danger {
+    border-left-color: #dc3545;
+    background-color: #ffe6e8;
+}
+ul.designer .card.card-list.muted {
+    border-left-color: #d8d8d8;
+    color: #d8d8d8;
+}
+
+body.editing ul.designer .section .activity .editing_move {
+    left: -20px;
+    top: calc(50% - 12px);
+}
+
 /* format_topics CSS copied from boost to replicate basic styling for designer (based on topic) */
 .course-content ul.designer {
     padding: 0;

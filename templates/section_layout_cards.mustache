@@ -2,40 +2,34 @@
     {{$content}}
         <h3 id="sectionid-{{section.id}}-title" class="sectionname">{{{sectionname}}}</h3>
 
-        <h4>CARDS!</h4>
-
         {{{sectionavailability}}}
 
         <div class="summary">
             {{{sectionsummary}}}
         </div>
 
-        <ul class="section img-text">
+        <ul class="section img-text card-deck">
             {{#cmlist}}
-                <li id="{{id}}" class="{{modclasses}}">
-                    <div>
+                <li id="{{id}}" class="{{modclasses}} card">
+                    <div class="card-body">
                         {{{movehtml}}}
-                        <div class="mod-indent-outer w-100">
-                            <div class="{{indentclasses}}">
-                                <div>
-                                    {{#cmname}}
-                                        <div class="activityinstance">
-                                            {{{cmname}}}
-                                            {{{afterlink}}}
-                                        </div>
-                                    {{/cmname}}
-
-                                    {{{beforecontent}}}
-
-                                    {{#modicons}}
-                                        <div class="actions">
-                                            {{{modicons}}}
-                                        </div>
-                                    {{/modicons}}
-
-                                    {{{aftercontent}}}
+                        <div>
+                            {{#cmname}}
+                                <div class="activityinstance">
+                                    {{{cmname}}}
+                                    {{{afterlink}}}
                                 </div>
-                            </div>
+                            {{/cmname}}
+
+                            {{{beforecontent}}}
+
+                            {{#modicons}}
+                                <div class="actions">
+                                    {{{modicons}}}
+                                </div>
+                            {{/modicons}}
+
+                            {{{aftercontent}}}
                         </div>
                     </div>
                 </li>
