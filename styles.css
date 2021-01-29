@@ -27,10 +27,22 @@ ul.designer .card.card-list.muted {
 ul.designer .badge.badge-completion {
     min-width: 175px;
     line-height: 20px;
-    padding: 0;
     border-radius: 5px;
     text-align: left;
     padding: 0 0.5em;
+}
+
+ul.designer .module-icons {
+    top: 0;
+    right: 0;
+    position: absolute;
+}
+
+ul.designer .module-icons a.dropdown-toggle,
+ul.designer .module-icons .menubar > .action-menu-item > a {
+    color: #5b40b0;
+    font-weight: bold;
+    font-size: 0.75em;
 }
 
 ul.designer .badge.badge-purple {
