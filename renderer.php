@@ -388,15 +388,15 @@ class format_designer_renderer extends format_section_renderer_base {
                     $beforecontent = $this->courserenderer->course_section_cm_text($mod, $displayoptions);
                 }
 
-                $modicons = '';
-
+                $cmcompletion = '';
                 if (empty($displayoptions['hidecompletion'])) {
-                    $cmcompletion = new cm_completion($mod);
-                    if ($cmcompletion->is_visible()) {
-                        $modicons .= $this->render($cmcompletion);
+                    $cmc = new cm_completion($mod);
+                    if ($cmc->is_visible()) {
+                        $cmcompletion = $this->render($cmc);
                     }
                 }
 
+                $modicons = '';
                 if ($this->page->user_is_editing()) {
                     $editactions = course_get_cm_edit_actions($mod, $mod->indent, $sectionreturn);
                     $modicons .= ' '. $this->courserenderer->course_section_cm_edit_actions($editactions, $mod, $displayoptions);
@@ -418,6 +418,7 @@ class format_designer_renderer extends format_section_renderer_base {
                     'indentclasses' => $indentclasses,
                     'movehtml' => $movehtml,
                     'cmname' => $this->courserenderer->course_section_cm_name($mod, $displayoptions),
+                    'cmcompletion' => $cmcompletion,
                     'afterlink' => $mod->afterlink,
                     'beforecontent' => $beforecontent,
                     'aftercontent' => $aftercontent,

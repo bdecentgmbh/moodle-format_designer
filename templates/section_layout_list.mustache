@@ -16,24 +16,32 @@
                         <div class="card-body">
                             <div class="mod-indent-outer w-100">
                                 <div class="{{indentclasses}}">
-                                    <div>
-                                        {{#cmname}}
-                                            <div class="activityinstance">
-                                                {{{cmname}}}
-                                                {{{afterlink}}}
-                                            </div>
-                                            {{{availability}}}
-                                        {{/cmname}}
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            {{#cmname}}
+                                                <div class="activityinstance">
+                                                    {{{cmname}}}
+                                                    {{{afterlink}}}
+                                                </div>
+                                                {{{availability}}}
+                                            {{/cmname}}
+                                        </div>
 
-                                        {{{beforecontent}}}
+                                        <div class="col-md-4">
+                                            {{{cmcompletion}}}
+                                        </div>
 
-                                        {{#modicons}}
-                                            <div class="actions">
-                                                {{{modicons}}}
-                                            </div>
-                                        {{/modicons}}
+                                        <div class="col">
+                                            {{{beforecontent}}}
 
-                                        {{{aftercontent}}}
+                                            {{#modicons}}
+                                                <div class="actions">
+                                                    {{{modicons}}}
+                                                </div>
+                                            {{/modicons}}
+
+                                            {{{aftercontent}}}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

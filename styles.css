@@ -25,7 +25,12 @@ ul.designer .card.card-list.muted {
 }
 
 ul.designer .badge.badge-completion {
-    width: 175px;
+    min-width: 175px;
+    line-height: 20px;
+    padding: 0;
+    border-radius: 5px;
+    text-align: left;
+    padding: 0 0.5em;
 }
 
 ul.designer .badge.badge-purple {

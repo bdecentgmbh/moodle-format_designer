@@ -57,6 +57,8 @@ $string['timeagojustnow'] = 'just now';
 $string['overdue'] = 'Overdue';
 $string['duetoday'] = 'Due today';
 $string['completed'] = 'Completed on';
+$string['passed'] = 'Passed on';
+$string['failed'] = 'Failed on';
 
 $string['completion-alt-auto-enabled'] = 'The system marks this item complete according to conditions';
 $string['completion-alt-auto-fail'] = 'Completed (did not achieve pass grade)';
