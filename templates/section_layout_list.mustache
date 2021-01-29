@@ -12,7 +12,7 @@
             {{#cmlist}}
                 <li id="{{id}}" class="{{modclasses}} position-relative my-1">
                     {{{movehtml}}}
-                    <div class="card card-list purple">
+                    <div class="card card-list {{colorclass}}">
                         <div class="card-body">
                             <div class="mod-indent-outer w-100">
                                 <div class="{{indentclasses}}">
@@ -28,7 +28,11 @@
                                         </div>
 
                                         <div class="col-md-4">
-                                            {{{cmcompletion}}}
+                                            <div class="row h-100">
+                                                <div class="col align-self-center">
+                                                    {{{cmcompletionhtml}}}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="module-icons">

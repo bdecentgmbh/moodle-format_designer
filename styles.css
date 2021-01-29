@@ -23,6 +23,9 @@ ul.designer .card.card-list.muted {
     border-left-color: #d8d8d8;
     color: #d8d8d8;
 }
+ul.designer .card.card-list.secondary {
+    border-left-color: #d8d8d8;
+}
 
 ul.designer .badge.badge-completion {
     min-width: 175px;

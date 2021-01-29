@@ -303,6 +303,44 @@ class cm_completion implements renderable, templatable {
         return html_entity_decode($this->cm->get_formatted_name(), ENT_QUOTES, 'UTF-8');
     }
 
+    /**
+     * Get Bootstrap color class for this cm completion status.
+     *
+     * @return string
+     */
+    public final function get_color_class(): string {
+        if ($this->is_editing() || !$this->is_tracked_users()) {
+            if ($this->get_completion_mode() == COMPLETION_TRACKING_MANUAL) {
+                return 'secondary';
+            }
+            if ($this->get_completion_mode() == COMPLETION_TRACKING_AUTOMATIC) {
+                return 'info';
+            }
+        } else {
+            if ($this->get_completion_mode() == COMPLETION_TRACKING_NONE) {
+                return 'secondary';
+            }
+
+            if ($this->get_completion_state() == COMPLETION_INCOMPLETE) {
+                if ($this->is_due_today()) {
+                    return 'warning';
+                } else if ($this->is_overdue()) {
+                    return 'danger';
+                } else {
+                    return 'purple';
+                }
+            }
+            if (in_array($this->get_completion_state(), [COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS])) {
+                return 'success';
+            }
+            if ($this->get_completion_state() == COMPLETION_COMPLETE_FAIL) {
+                return 'danger';
+            }
+        }
+
+        return 'secondary';
+    }
+
     public function export_for_template(renderer_base $output) {
         $data = [
             'istrackeduser' => $this->is_tracked_users(),
@@ -313,6 +351,7 @@ class cm_completion implements renderable, templatable {
             'isoverdue' => $this->is_overdue(),
             'overdueby' => $this->get_overdue_by(),
             'duetoday' => $this->is_due_today(),
+            'colorclass' => $this->get_color_class(),
             'completioncheckbox' => $this->get_completion_checkbox(),
             'completiontrackingmanual' => $this->get_completion_mode() == COMPLETION_TRACKING_MANUAL,
             'completiontrackingautomatic' => $this->get_completion_mode() == COMPLETION_TRACKING_AUTOMATIC,

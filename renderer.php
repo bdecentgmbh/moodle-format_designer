@@ -388,11 +388,11 @@ class format_designer_renderer extends format_section_renderer_base {
                     $beforecontent = $this->courserenderer->course_section_cm_text($mod, $displayoptions);
                 }
 
-                $cmcompletion = '';
+                $cmcompletion = new cm_completion($mod);
+                $cmcompletionhtml = '';
                 if (empty($displayoptions['hidecompletion'])) {
-                    $cmc = new cm_completion($mod);
-                    if ($cmc->is_visible()) {
-                        $cmcompletion = $this->render($cmc);
+                    if ($cmcompletion->is_visible()) {
+                        $cmcompletionhtml = $this->render($cmcompletion);
                     }
                 }
 
@@ -416,9 +416,11 @@ class format_designer_renderer extends format_section_renderer_base {
                     'id' => 'module-' . $mod->id,
                     'modclasses' => $modclasses,
                     'indentclasses' => $indentclasses,
+                    'colorclass' => $cmcompletion->get_color_class(),
                     'movehtml' => $movehtml,
                     'cmname' => $this->courserenderer->course_section_cm_name($mod, $displayoptions),
                     'cmcompletion' => $cmcompletion,
+                    'cmcompletionhtml' => $cmcompletionhtml,
                     'afterlink' => $mod->afterlink,
                     'beforecontent' => $beforecontent,
                     'aftercontent' => $aftercontent,
