@@ -2,10 +2,10 @@
     {{#ispreview}}
         {{! Show preview for admin or editing teacher }}
         {{#completiontrackingmanual}}
-            <span class="badge badge-secondary"><i class="fa fa-check-square-o"></i> {{#str}}completiontrackingmanual, format_designer{{/str}}</span>
+            <span class="badge badge-completion badge-secondary"><i class="fa fa-check-square-o"></i> {{#str}}completiontrackingmanual, format_designer{{/str}}</span>
         {{/completiontrackingmanual}}
         {{#completiontrackingautomatic}}
-            <span class="badge badge-info"><i class="fa fa-check-circle"></i> {{#str}}completiontrackingautomatic, format_designer{{/str}}</span>
+            <span class="badge badge-completion badge-info"><i class="fa fa-check-circle"></i> {{#str}}completiontrackingautomatic, format_designer{{/str}}</span>
         {{/completiontrackingautomatic}}
     {{/ispreview}}
     {{^ispreview}}
