@@ -1,0 +1,69 @@
+<div class="completion-info">
+    {{#ispreview}}
+        {{! Show preview for admin or editing teacher }}
+        {{#completiontrackingmanual}}
+            <span class="badge badge-secondary"><i class="fa fa-check-square-o"></i> {{#str}}completiontrackingmanual, format_designer{{/str}}</span>
+        {{/completiontrackingmanual}}
+        {{#completiontrackingautomatic}}
+            <span class="badge badge-info"><i class="fa fa-check-circle"></i> {{#str}}completiontrackingautomatic, format_designer{{/str}}</span>
+        {{/completiontrackingautomatic}}
+    {{/ispreview}}
+    {{^ispreview}}
+        {{! Show completion info for users/students }}
+        {{#completiontrackingmanual}}
+            {{#completionincomplete}}
+                {{#duetoday}}
+                    <span class="badge badge-completion badge-warning">{{{completioncheckbox}}} <span><i class="fa fa-exclamation"></i> {{#str}}duetoday, format_designer{{/str}}<span></span>
+                {{/duetoday}}
+                {{^duetoday}}
+                    {{#isoverdue}}
+                        <span class="badge badge-completion badge-danger">{{{completioncheckbox}}} <span><i class="fa fa-exclamation-triangle"></i> {{#str}}overdue, format_designer{{/str}} {{overdueby}}</span></span>
+                    {{/isoverdue}}
+                    {{^isoverdue}}
+                        <span class="badge badge-completion badge-purple">{{{completioncheckbox}}} <span><i class="fa fa-calendar"></i> {{#str}}completeby, format_designer{{/str}} {{completionexpected}}</span></span>
+                    {{/isoverdue}}
+                {{/duetoday}}
+                {{#isoverridden}}
+                    (override)
+                {{/isoverridden}}
+            {{/completionincomplete}}
+            {{#completioncomplete}}
+                <span class="badge badge-completion badge-success">{{{completioncheckbox}}} <span>{{#str}}completed, format_designer{{/str}} {{completiondate}}<span></span>
+                    {{#isoverridden}}
+                        (override)
+                    {{/isoverridden}}
+                </span>
+            {{/completioncomplete}}
+        {{/completiontrackingmanual}}
+        {{^completiontrackingmanual}}
+            {{#completionincomplete}}
+                <span class="badge badge-purple"><i class=""></i> Incomplete
+                    {{#isoverridden}}
+                        (override)
+                    {{/isoverridden}}
+                </span>
+            {{/completionincomplete}}
+            {{#completioncomplete}}
+                <span class="badge badge-success"><i class=""></i> Complete
+                    {{#isoverridden}}
+                        (override)
+                    {{/isoverridden}}
+                </span>
+            {{/completioncomplete}}
+            {{#completionincompletepass}}
+                <span class="badge badge-success"><i class=""></i> Passed
+                    {{#isoverridden}}
+                        (override)
+                    {{/isoverridden}}
+                </span>
+            {{/completionincompletepass}}
+            {{#completionincompletefail}}
+                <span class="badge badge-danger"><i class=""></i> Failed
+                    {{#isoverridden}}
+                        (override)
+                    {{/isoverridden}}
+                </span>
+            {{/completionincompletefail}}
+        {{/completiontrackingmanual}}
+    {{/ispreview}}
+</div>

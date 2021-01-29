@@ -22,6 +22,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use format_designer\output\cm_completion;
+
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/course/format/renderer.php');
 
@@ -387,13 +389,19 @@ class format_designer_renderer extends format_section_renderer_base {
                 }
 
                 $modicons = '';
+
+                if (empty($displayoptions['hidecompletion'])) {
+                    $cmcompletion = new cm_completion($mod);
+                    if ($cmcompletion->is_visible()) {
+                        $modicons .= $this->render($cmcompletion);
+                    }
+                }
+
                 if ($this->page->user_is_editing()) {
                     $editactions = course_get_cm_edit_actions($mod, $mod->indent, $sectionreturn);
                     $modicons .= ' '. $this->courserenderer->course_section_cm_edit_actions($editactions, $mod, $displayoptions);
                     $modicons .= $mod->afterediticons;
                 }
-
-                $modicons .= $this->courserenderer->course_section_cm_completion($course, $completioninfo, $mod, $displayoptions);
 
                 $availability = $this->courserenderer->course_section_cm_availability($mod, $displayoptions);
 

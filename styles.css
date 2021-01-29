@@ -24,6 +24,27 @@ ul.designer .card.card-list.muted {
     color: #d8d8d8;
 }
 
+ul.designer .badge.badge-completion {
+    width: 175px;
+}
+
+ul.designer .badge.badge-purple {
+    background-color: #5b40b0;
+    color: white;
+}
+
+/* Style Moodle completion checkbox */
+ul.designer .togglecompletion {
+    float: left;
+}
+ul.designer .togglecompletion .btn {
+    line-height: 1;
+}
+ul.designer .togglecompletion .btn img {
+    background-color: white;
+    border-radius: 5px;
+}
+
 body.editing ul.designer .section .activity .editing_move {
     left: -20px;
     top: calc(50% - 12px);

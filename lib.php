@@ -510,3 +510,22 @@ function format_designer_inplace_editable($itemtype, $itemid, $newvalue) {
         return course_get_format($section->course)->inplace_editable_update_section_name($section, $itemtype, $newvalue);
     }
 }
+
+/**
+ * Format date based on format defined in settings.
+ *
+ * @param int $timestamp
+ * @return string
+ * @throws coding_exception
+ * @throws dml_exception
+ */
+function format_designer_format_date(int $timestamp) {
+    if ($format = get_config('format_designer', 'dateformat')) {
+        $component = strpos($format, 'strf') === 0 ? '' : 'format_designer';
+    } else {
+        $format = 'usstandarddate';
+        $component = 'format_designer';
+    }
+
+    return userdate($timestamp, get_string($format, $component));
+}
