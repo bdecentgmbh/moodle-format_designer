@@ -7,7 +7,6 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
 
         this.root.on('click', '[data-action=set-section-option]', e => {
             e.preventDefault();
-            console.log("CLICK", $(e.currentTarget));
             this.setSectionOptions([{
                 name: $(e.currentTarget).data('option'),
                 value: $(e.currentTarget).data('value')
@@ -15,6 +14,12 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
                 window.location.href = $(e.currentTarget).attr('href');
                 window.location.reload();
             }).fail(Notification.exception);
+        });
+
+        this.root.on('click', '[data-action=go-to-url]', e => {
+            if ($(e.target).prop('tagName') === 'DIV') {
+                window.location.href = $(e.currentTarget).data('url');
+            }
         });
     };
 

@@ -19,3 +19,10 @@
         {{/content}}
     </div>
 </li>
+
+{{#js}}
+    require(['format_designer/designer_section'], function(DesignerSection) {
+        console.log("HERE");
+        var ds = new DesignerSection('#section-{{section.section}}', {{courseid}});
+    });
+{{/js}}

@@ -27,6 +27,10 @@ ul.designer .card.card-list.secondary {
     border-left-color: #d8d8d8;
 }
 
+ul.designer .text-purple {
+    color: #5b40b0;
+}
+
 ul.designer .badge.badge-completion {
     min-width: 175px;
     line-height: 20px;
@@ -39,6 +43,14 @@ ul.designer .module-icons {
     top: 0;
     right: 0;
     position: absolute;
+}
+
+ul.designer .show-on-hover {
+    opacity: 0;
+}
+
+ul.designer li.activity > .card:hover .show-on-hover {
+    opacity: 1;
 }
 
 ul.designer .module-icons a.dropdown-toggle,

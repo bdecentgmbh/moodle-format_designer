@@ -24,9 +24,3 @@
         </div>
     {{/hassectionactionmenu}}
 </div>
-
-{{#js}}
-    require(['format_designer/designer_section'], function(DesignerSection) {
-        var ds = new DesignerSection('#section-{{sectionnumber}}', {{courseid}});
-    });
-{{/js}}

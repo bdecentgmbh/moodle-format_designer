@@ -59,6 +59,11 @@ $string['duetoday'] = 'Due today';
 $string['completed'] = 'Completed on';
 $string['passed'] = 'Passed on';
 $string['failed'] = 'Failed on';
+$string['start'] = 'Start';
+$string['calltoactionview'] = 'View <i class="fa fa-chevron-circle-right"></i>';
+$string['calltoactioncontinue'] = 'Continue <i class="fa fa-chevron-circle-right"></i>';
+$string['calltoactionstart'] = 'Start <i class="fa fa-chevron-circle-right"></i>';
+$string['calltoactionrestricted'] = '<i class="fa fa-lock"></i> Restricted';
 
 $string['completion-alt-auto-enabled'] = 'The system marks this item complete according to conditions';
 $string['completion-alt-auto-fail'] = 'Completed (did not achieve pass grade)';

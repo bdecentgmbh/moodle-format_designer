@@ -22,6 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use format_designer\output\call_to_action;
 use format_designer\output\cm_completion;
 
 defined('MOODLE_INTERNAL') || die();
@@ -407,13 +408,16 @@ class format_designer_renderer extends format_section_renderer_base {
 
                 // If there is content AND a link, then display the content here
                 // (AFTER any icons). Otherwise it was displayed before
-                $aftercontent = '';
+                $cmtext = '';
                 if (!empty($url)) {
-                    $aftercontent = $this->courserenderer->course_section_cm_text($mod, $displayoptions);
+                    $cmtext = $this->courserenderer->course_section_cm_text($mod, $displayoptions);
                 }
+
+                $calltoactionhtml = $this->render(new call_to_action($mod));
 
                 $cmlist[$modnumber] = [
                     'id' => 'module-' . $mod->id,
+                    'cm' => $mod,
                     'modclasses' => $modclasses,
                     'indentclasses' => $indentclasses,
                     'colorclass' => $cmcompletion->get_color_class(),
@@ -421,11 +425,13 @@ class format_designer_renderer extends format_section_renderer_base {
                     'cmname' => $this->courserenderer->course_section_cm_name($mod, $displayoptions),
                     'cmcompletion' => $cmcompletion,
                     'cmcompletionhtml' => $cmcompletionhtml,
+                    'calltoactionhtml' => $calltoactionhtml,
                     'afterlink' => $mod->afterlink,
                     'beforecontent' => $beforecontent,
-                    'aftercontent' => $aftercontent,
+                    'cmtext' => $cmtext,
                     'modicons' => $modicons,
-                    'availability' => $availability
+                    'availability' => $availability,
+                    'isrestricted' => !$mod->uservisible && !empty($mod->availableinfo)
                 ];
             }
         }

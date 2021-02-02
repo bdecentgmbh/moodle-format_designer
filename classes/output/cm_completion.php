@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Privacy Subsystem implementation for Designer course format.
+ * Displays completion information badge for a cm.
  *
  * @package   format_designer
  * @copyright 2021 bdecent gmbh <https://bdecent.de>
@@ -41,7 +41,7 @@ require_once("$CFG->dirroot/course/format/designer/lib.php");
 
 
 /**
- * Privacy Subsystem for Designer course format implementing null_provider.
+ * Displays completion information badge for a cm.
  *
  * @package   format_designer
  * @copyright 2021 bdecent gmbh <https://bdecent.de>
@@ -54,6 +54,9 @@ class cm_completion implements renderable, templatable {
      */
     private $cm;
 
+    /**
+     * @var completion_info[]
+     */
     private static $completioninfos = [];
 
     /**
@@ -63,6 +66,15 @@ class cm_completion implements renderable, templatable {
      */
     public function __construct(cm_info $cm) {
         $this->cm = $cm;
+    }
+
+    /**
+     * Get course module.
+     *
+     * @return cm_info
+     */
+    protected final function get_cm(): cm_info {
+        return $this->cm;
     }
 
     /**
@@ -140,7 +152,7 @@ class cm_completion implements renderable, templatable {
      * @param int|null $userid
      * @return bool
      */
-    public final function is_tracked_users(int $userid = null): bool {
+    public final function is_tracked_user(int $userid = null): bool {
         global $USER;
 
         if (is_null($userid)) {
@@ -309,7 +321,7 @@ class cm_completion implements renderable, templatable {
      * @return string
      */
     public final function get_color_class(): string {
-        if ($this->is_editing() || !$this->is_tracked_users()) {
+        if ($this->is_editing() || !$this->is_tracked_user()) {
             if ($this->get_completion_mode() == COMPLETION_TRACKING_MANUAL) {
                 return 'secondary';
             }
@@ -341,11 +353,20 @@ class cm_completion implements renderable, templatable {
         return 'secondary';
     }
 
+    /**
+     * Check if cm is restricted from the user.
+     *
+     * @return bool
+     */
+    public final function is_restricted(): bool {
+        return !$this->cm->uservisible && !empty($this->cm->availableinfo);
+    }
+
     public function export_for_template(renderer_base $output) {
         $data = [
-            'istrackeduser' => $this->is_tracked_users(),
+            'istrackeduser' => $this->is_tracked_user(),
             'isediting' => $this->is_editing(),
-            'ispreview' => $this->is_editing() || !$this->is_tracked_users(),
+            'ispreview' => $this->is_editing() || !$this->is_tracked_user(),
             'isoverridden' => $this->is_overridden(),
             'overrideuser' => $this->get_override_user(),
             'isoverdue' => $this->is_overdue(),
