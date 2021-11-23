@@ -1,0 +1,57 @@
+{{#showmovehere}}
+<p>{{movingstr}} (<a href="{{{cancelcopyurl}}}">{{#str}} cancel {{/str}}</a>)</p>
+{{/showmovehere}}
+
+<ul id="designer-section-content" class="section img-text {{sectionlayoutclass}} {{#hascms}} d-block {{/hascms}}" data-for="cmlist">
+    {{#hascms}}
+        {{#showmovehere}}
+        <li class="movehere">
+            <a href="{{{moveurl}}}" title="{{strmovefull}}" class="movehere"></a>
+        </li>
+        {{/showmovehere}}
+
+        {{#cms}}
+            {{#.}}
+                {{#cmitem}}
+                    <li
+                        class="activity {{module}} modtype_{{module}} {{extraclasses}} {{#hasinfo}}hasinfo{{/hasinfo}}"
+                        id="module-{{id}}"
+                        data-for="cmitem"
+                        data-id="{{id}}"
+                    >
+                        {{{movehtml}}}
+                        <div class="mod-indent-outer w-100">
+                            <div class="mod-indent {{#indent}}mod-indent-{{indent}}{{/indent}} {{#hugeindent}}mod-indent-huge{{/hugeindent}}"></div>
+                            <div>
+                                {{#hasname}}
+                                <div class="activityinstance">
+                                    {{#cmname}} {{> core/inplace_editable }} {{/cmname}}
+                                    {{{beforecontent}}}
+                                    {{{groupinglabel}}}
+                                    {{{afterlink}}}
+                                </div>
+                                {{{availabilityrestrict}}}
+                                {{/hasname}}
+
+                                {{#modicons}}
+                                    <div class="actions">
+                                        {{{modicons}}}
+                                    </div>
+                                {{/modicons}}
+
+                                {{{aftercontent}}}
+                            </div>
+                        </div>
+                    </li>
+                {{/cmitem}}
+            {{/.}}
+        {{/cms}}
+    {{/hascms}}
+    {{#showmovehere}}
+        <li class="movehere">
+            <a href="{{{movetosectionurl}}}" title="{{strmovefull}}" class="movehere"></a>
+        </li>
+    {{/showmovehere}}
+</ul>
+
+

@@ -1,118 +1,813 @@
-ul.designer .card.card-list {
-    border: none;
-    border-left: 10px solid #333;
-    box-shadow: 1px 1px 11px 2px rgba(0, 0, 0, 0.2);
-    -webkit-box-shadow: 1px 1px 11px 2px rgba(0, 0, 0, 0.2);
-    -moz-box-shadow: 1px 1px 11px 2px rgba(0, 0, 0, 0.2);
-}
-ul.designer .card.card-list.purple {
-    border-left-color: #5b40b0;
-}
-ul.designer .card.card-list.success {
-    border-left-color: #28a745;
-}
-ul.designer .card.card-list.warning {
-    border-left-color: #fd7e14;
-    background-color: #ffe4cf;
-}
-ul.designer .card.card-list.danger {
-    border-left-color: #dc3545;
-    background-color: #ffe6e8;
-}
-ul.designer .card.card-list.muted {
-    border-left-color: #d8d8d8;
-    color: #d8d8d8;
-}
-ul.designer .card.card-list.secondary {
-    border-left-color: #d8d8d8;
+@media (min-width: 1200px) {
+    .pagelayout-course.format-designer #page-wrapper #page.drawers .main-inner {
+        max-width: none;
+    }
 }
 
-ul.designer .text-purple {
-    color: #5b40b0;
+ul.designer .card.card-list {
+
+    min-height: 101px;
+
+    border: none;
+
+
+
+    border-left: 10px solid #333;
+
+
+
+    box-shadow: 1px 1px 11px 2px rgba(0, 0, 0, 0.2);
+
+
+
+    -webkit-box-shadow: 1px 1px 11px 2px rgba(0, 0, 0, 0.2);
+
+
+
+    -moz-box-shadow: 1px 1px 11px 2px rgba(0, 0, 0, 0.2);
+
+
+
 }
+ul.designer .restricted .card.card-list {
+    border-color: #ccc;
+}
+
+ul.designer .card.card-list.restricted .row .col-md-7 {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+ul.designer .card.card-list.restricted .row .col-md-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+}
+ul.designer .card.card-list.restricted .row .col-md-2 {
+    flex: 0 0 25%;
+    max-width: 25%;
+}
+ul.designer .card.card-list .card-body .mod-indent-outer .completion-info {
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+ul.designer .card-layout .card.card-list .card-body {
+    padding: 10px 10px 60px 10px;
+    position: relative;
+}
+
+ul.designer .card.card-list .card-body .mod-indent-outer .mod-indent .row div:nth-child(2) .col {
+
+    padding: 0;
+
+    flex-basis: auto;
+
+}
+
+ul.designer .card.card-list .card-body .mod-indent-outer .mod-indent .row div:nth-child(2) .pull-right {
+
+    float: none;
+
+}
+
+ul.designer .card.card-list .card-body .mod-indent-outer .mod-indent .mod-visits-block {
+
+    display: none;
+
+    transition: all .5s ease;
+
+}
+
+ul.designer .card.card-list .card-body .mod-indent-outer .mod-indent .mod-visits-block p {
+
+    margin-bottom: 0;
+
+}
+
+ul.designer .card.card-list:hover .card-body .mod-indent-outer .mod-indent .row div:nth-child(2) .col + .mod-visits-block {
+
+    display: inline-block;
+
+    transition: all .5s ease;
+
+}
+
+ul.designer .card.card-list.purple {
+
+    border-left-color: #5b40b0;
+
+}
+
+
+
+ul.designer .card.card-list.success {
+
+    border-left-color: #28a745;
+
+}
+
+
+
+ul.designer .card.card-list.warning {
+
+    border-left-color: #fd7e14;
+
+    background-color: #ffe4cf;
+
+}
+
+
+
+ul.designer .card.card-list.danger {
+
+    border-left-color: #dc3545;
+
+    background-color: #ffe6e8;
+
+}
+
+
+
+ul.designer .card.card-list.muted {
+
+    border-left-color: #d8d8d8;
+
+    color: #d8d8d8;
+
+}
+
+
+
+ul.designer .card.card-list.secondary {
+
+    min-height: 150px;
+
+    border-left-color: #d8d8d8;
+    padding: 10px;
+
+
+
+}
+ul.designer .list-layout .card.card-list.secondary {
+    min-height: auto;
+}
+
+
+.designer .section .activity .module-icons .actions {
+    top: 5px;
+    right: 5px;
+}
+ul.designer .text-purple {
+
+
+
+    color: #5b40b0;
+
+
+
+}
+
+
+
+
+
+
 
 ul.designer .badge.badge-completion {
-    min-width: 175px;
+
+
+
+    min-width: 125px;
+
+
+
     line-height: 20px;
+
+
+
     border-radius: 5px;
+
+
+
     text-align: left;
+
+
+
     padding: 0 0.5em;
+
+
+
 }
+
+
+
+
+
+
 
 ul.designer .module-icons {
+
+
+
     top: 0;
+
+
+
     right: 0;
+
+
+
     position: absolute;
+
+
+
 }
+
+
+
+
+
+
 
 ul.designer .show-on-hover {
+
+
+
     opacity: 0;
+
+
+
 }
 
+
+
+
+
+
+
 ul.designer li.activity > .card:hover .show-on-hover {
+
+
+
+    opacity: 1;
+
+    transition: all .5s ease;
+
+
+
+}
+ul.designer li.activity > .card .show-on-hover .col a,
+ul.designer li.activity > .card:hover .show-on-hover .col a {
+    font-size: 12px;
+    text-decoration: none;
+    box-shadow: none;
+}
+
+ul.designer li.activity > .card .show-on-hover .col .restricted a,
+ul.designer li.activity > .card:hover .show-on-hover .col .restricted a  {
+    font-size: 20px;
+    text-decoration: none;
+    display: inline-block;
+    margin-left: 5px;
+    vertical-align: top;
+    color: #ccc;
+    height: auto;
+    line-height: normal;
+}
+
+
+
+
+.editing ul.designer .section .activity .contentwithoutlink,
+.editing ul.designer .section .activity .activityinstance {
+    padding-right: 0;
+}
+
+
+
+ul.designer .module-icons a.dropdown-toggle,
+
+
+
+ul.designer .module-icons .menubar > .action-menu-item > a {
+
+
+
+    color: #5b40b0;
+
+
+
+    font-weight: bold;
+
+
+
+    font-size: 0.75em;
+
+
+
+}
+
+
+
+
+
+
+
+ul.designer .badge.badge-purple {
+
+
+
+    background-color: #5b40b0;
+
+
+
+    color: white;
+
+
+
+}
+
+
+
+
+
+
+
+/* Style Moodle completion checkbox */
+
+
+
+ul.designer .togglecompletion {
+
+
+
+    float: left;
+
+
+
+}
+
+
+
+ul.designer .togglecompletion .btn {
+
+
+
+    line-height: 1;
+
+
+
+}
+
+
+
+ul.designer .togglecompletion .btn img {
+
+
+
+    background-color: white;
+
+
+
+    border-radius: 5px;
+
+
+
+}
+
+
+
+
+
+
+
+body.editing ul.designer .section .activity .editing_move {
+
+
+
+    left: -20px;
+
+
+
+    top: calc(50% - 12px);
+
+
+
+}
+
+@media (min-width: 767px) and (max-width: 991px) {
+    ul.designer .togglecompletion {
+        float: none;
+    }
+}
+
+
+
+
+
+
+
+/* format_topics CSS copied from boost to replicate basic styling for designer (based on topic) */
+
+
+
+.course-content ul.designer {
+
+
+
+    padding: 0;
+
+
+
+    margin: 0;
+
+
+
+    list-style: none;
+
+
+
+}
+
+
+
+.course-content ul.designer li.section {
+
+
+
+    margin-top: 1rem;
+
+
+
+    padding-bottom: 1rem;
+
+
+
+}
+
+
+
+.course-content ul.designer li.section .content {
+
+
+
+    margin: 0;
+
+
+
+    padding: 0;
+
+
+
+}
+
+
+
+
+
+
+
+@media (min-width: 576px) {
+
+
+
+    .course-content ul.designer li.section .summary,
+
+
+
+    .course-content ul.designer li.section .content > .availabilityinfo {
+
+
+
+        margin-left: 25px;
+
+
+
+    }
+
+
+
+}
+
+
+
+.course-content ul.designer li.section .left,
+
+
+
+.course-content ul.designer li.section .right {
+
+
+
+    padding: 0 6px 0;
+
+
+
+    text-align: right;
+
+
+
+    width: auto;
+
+
+
+}
+.course-content ul.designer li.section .right {
+    position: relative;
+}
+.course-content ul.designer li.section .right .icon-loader-block {
+    position: absolute;
+    right: 0
+}
+.course-content ul.designer li.section .right .btn-group .action-menu .menubar {
+    height: 100%;
+    margin-left: 10px;
+    align-items: center;
+}
+
+
+
+
+
+
+
+@media (max-width: 767.98px) {
+
+
+
+    body:not(.editing) .course-content ul.designer li.section .left,
+
+
+
+    body:not(.editing) .course-content ul.designer li.section .right {
+
+
+
+        display: none;
+
+
+
+    }
+
+
+
+}
+
+
+.designer .section.img-text .activity .row > div .pull-right {
+    text-align: center;
+    float: none;
+}
+.designer .section.img-text .activity .restrict-block .info-content-block .availabilityinfo.isrestricted {
+    font-size: 12px;
+    color: #000;
+    border: 2px solid #333;
+    opacity: .7;
+    margin: 0;
+    padding: 5px;
+    vertical-align: middle;
+    display: none;
+}
+.designer .section.img-text .activity .restrict-block.show .info-content-block .availabilityinfo.isrestricted {
+    display: inline-block;
+}
+.designer .section.img-text .activity .availabilityinfo .badge-info {
+    display: none;
+}
+.designer .section.img-text .activity .availabilityinfo strong {
+    font-size: 12px;
+    margin-left: 5px;
+    display: inline-block;
+}
+.designer .section.img-text .activity .call-action-block {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 5px;
+    float: right;
+}
+.designer .section.img-text .activity .restrict-block.show .call-action-block {
+    margin-top: 3px;
+}
+.designer .section.img-text .activity .restrict-block .call-action-block {
+    margin-top: 0;
+}
+.designer .section.img-text .activity .call-action-block a > span {
+    text-indent: -999em;
+    display: inline-block;
+    line-height: 20px;
+    vertical-align: top;
+}
+.designer .section.img-text .activity .call-action-block a > span i {
+    font-size: 25px;
+    color: #ccc;
+    text-indent: 0;
+    float: left;
+}
+.designer .section.img-text.list-layout .activity .activityinstance,
+.designer .section.img-text.list-layout .activity .availabilityinfo,
+.designer .section.img-text.card-layout .activity .activityinstance,
+.designer .section.img-text.card-layout .activity .availabilityinfo {
+
+    margin-left: 50px;
+
+}
+.designer .section.img-text.list-layout .activity .availabilityinfo {
+    opacity: .5;
+}
+
+.designer .section.list-layout .activity .actions,
+.designer .section.card-layout .activity .actions {
+    top: 5px;
+    right: 5px;
+}
+
+.designer .section.list-layout .activity img.activityicon,
+.designer .section.card-layout .activity img.activityicon {
+
+    width: 40px;
+
+    height: 40px;
+
+    position: absolute;
+
+    top: 10px;
+
+    left: 10px;
+
+}
+.designer .section.list-layout .activity.restricted .instancename {
+    color: #6a737b;
+}
+.designer .section.card-layout .activity img.activityicon {
+    top: 30px;
+}
+.designer .section.img-text.card-layout .activity .activityinstance,
+.designer .section.img-text.card-layout .activity .availabilityinfo {
+    margin-left: 50px;
+}
+.designer .section.img-text.card-layout .activity .activityinstance .instancename {
+    color: #6a737b;
+}
+
+
+
+.designer .section .content .section.card-layout {
+
+    display: block;
+
+}
+
+.designer .section .content .section.card-layout li.activity {
+
+    width: 48%;
+
+    min-height: 150px;
+
+    padding: 10px 5px 5px;
+
+    margin-right: 15px;
+
+    margin-bottom: 15px;
+
+    display: inline-block;
+
+    vertical-align: top;
+    background: none;
+
+}
+
+.designer .section .content .section.card-layout li.activity:nth-child(2n) {
+
+    margin-right: 0;
+
+}
+
+.designer .section .content .section li.activity .activityinstance .activity-type {
+
+    display: block;
+
+}
+
+.designer .section .content .section li.activity .activityinstance .activity-type p {
+    font-size: 11px;
+    font-weight: bold;
+    color: #666;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+.designer .section .content .section li.activity.restricted .activityinstance .activity-type p {
+    color: #6a737b;
+}
+.designer .section .content .section li.activity .activityinstance .aalink {
+    font-size: 20px;
+    color: rgb(59, 59, 59);
+    text-decoration: none;
+}
+.designer .section .content .section li.activity .activityinstance .aalink .instancename {
+    font-weight: bold;
+}
+.designer .section .content .section li.activity .mod-content {
+
+    margin-top: 10px;
+
+    margin-left: 50px;
+
+}
+.designer .section .content .section.list-layout li.activity.hasinfo {
+    border-bottom: 0;
+}
+.designer .section .content .section.list-layout li.activity:hover {
+    background: none;
+}
+.designer .section .content .section li.activity.restricted .mod-content {
+    opacity: .5;
+}
+
+.designer .section .content .section li.activity.restricted .mod-content p {
+    color: #6a737b;
+}
+
+.designer .section .content .section li.activity .completion-html-card {
+
+    margin-left: 50px;
+    margin-bottom: 10px;
+
+}
+.designer .section .content .section.card-layout li.activity .completion-html-card {
+    margin-bottom: 10px;
+}
+.designer .section .content .section.card-layout li.activity .restricted .completion-html-card .completion-info .badge-restricted span {
+    color: #6a737b;
+}
+.designer .section .content .section li.activity .mod-visits-block {
+
+    
+    min-height: 20px;
+    transition: all .5s ease;
+
+}
+.designer .section .content .section.card-layout li.activity .mod-visits-block {
+    margin-left: 50px;
+}
+
+.designer .section .content .section li.activity .mod-visits-block p {
+    font-size: 12px;
+    font-weight: normal;
+    display: none;
+}
+.designer .section .content .section li.activity:hover .mod-visits-block p {
+    display: block;
+}
+
+
+.designer .section .content .section li.activity .action-html-card {
+
+    text-align: center;
+
+    margin-top: 10px;
+
+    margin-left: 50px;
+
+    display: none;
+
+}
+.designer .section .content .section.card-layout li.activity .action-html-card {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+}
+.designer .section .content .section li.activity .card.restricted .show-on-hover {
     opacity: 1;
 }
 
-ul.designer .module-icons a.dropdown-toggle,
-ul.designer .module-icons .menubar > .action-menu-item > a {
-    color: #5b40b0;
-    font-weight: bold;
-    font-size: 0.75em;
+.designer .section .content .section li.activity .action-html-card a {
+    font-size: 12px;
+    text-decoration: none;
+}
+.designer .section .content .section li.activity:hover .action-html-card {
+
+    display: block;
+
 }
 
-ul.designer .badge.badge-purple {
-    background-color: #5b40b0;
-    color: white;
-}
-
-/* Style Moodle completion checkbox */
-ul.designer .togglecompletion {
-    float: left;
-}
-ul.designer .togglecompletion .btn {
-    line-height: 1;
-}
-ul.designer .togglecompletion .btn img {
-    background-color: white;
-    border-radius: 5px;
-}
-
-body.editing ul.designer .section .activity .editing_move {
-    left: -20px;
-    top: calc(50% - 12px);
-}
-
-/* format_topics CSS copied from boost to replicate basic styling for designer (based on topic) */
-.course-content ul.designer {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-}
-.course-content ul.designer li.section {
-    margin-top: 1rem;
-    padding-bottom: 1rem;
-}
-.course-content ul.designer li.section .content {
-    margin: 0;
-    padding: 0;
-}
-
-@media (min-width: 576px) {
-    .course-content ul.designer li.section .summary,
-    .course-content ul.designer li.section .content > .availabilityinfo {
-        margin-left: 25px;
+@media (min-width: 1200px) {
+    .designer .section .content .section.card-layout li.activity {
+        width: 48%;
     }
 }
-.course-content ul.designer li.section .left,
-.course-content ul.designer li.section .right {
-    padding: 0 6px 0;
-    text-align: right;
-    width: auto;
+
+@media (min-width: 768px) {
+    .designer .section .content .section.card-layout li.activity .card.card-list {
+        min-height: 200px;
+    }
 }
 
-@media (max-width: 767.98px) {
-    body:not(.editing) .course-content ul.designer li.section .left,
-    body:not(.editing) .course-content ul.designer li.section .right {
-        display: none;
+@media (max-width: 767px) {
+    .designer .section .content .section.card-layout li.activity {
+        width: 100%;
+        margin-right: 0;
     }
+}
+
+.section li.activity {
+    position: relative;
 }

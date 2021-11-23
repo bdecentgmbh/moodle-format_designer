@@ -73,8 +73,17 @@ class cm_completion implements renderable, templatable {
      *
      * @return cm_info
      */
-    protected final function get_cm(): cm_info {
+    final protected function get_cm(): cm_info {
         return $this->cm;
+    }
+
+    /**
+     * Get course module url.
+     *
+     * @return cm_info
+     */
+    final protected function get_cm_url() {
+        return isset($this->cm->url) ? $this->cm->url : '#';
     }
 
     /**
@@ -83,9 +92,14 @@ class cm_completion implements renderable, templatable {
      * @return bool
      * @throws coding_exception
      */
-    public final function is_visible(): bool {
-        if (!isloggedin() || isguestuser() || !$this->cm->uservisible ||
-            $this->get_completion_mode() == COMPLETION_TRACKING_NONE) {
+    final public function is_visible(): bool {
+
+        if (!$this->cm->uservisible) {
+            if (!$this->is_restricted()) {
+                return false;
+            }
+        }
+        if (!isloggedin() || isguestuser() || $this->get_completion_mode() == COMPLETION_TRACKING_NONE) {
             return false;
         }
 
@@ -101,7 +115,7 @@ class cm_completion implements renderable, templatable {
      *
      * @return completion_info
      */
-    public final function get_completion_info(): completion_info {
+    final public function get_completion_info(): completion_info {
         if (!isset(self::$completioninfos[$this->cm->course])) {
             self::$completioninfos[$this->cm->course] = new completion_info($this->cm->get_course());
         }
@@ -114,7 +128,7 @@ class cm_completion implements renderable, templatable {
      *
      * @return stdClass
      */
-    public final function get_completion_data(): stdClass {
+    final public function get_completion_data(): stdClass {
         return $this->get_completion_info()->get_data($this->cm, true);
     }
 
@@ -127,7 +141,7 @@ class cm_completion implements renderable, templatable {
      *
      * @return int
      */
-    public final function get_completion_mode(): int {
+    final public function get_completion_mode(): int {
         $mode = $this->get_completion_info()->is_enabled($this->cm);
         return $mode;
     }
@@ -142,8 +156,21 @@ class cm_completion implements renderable, templatable {
      *
      * @return int
      */
-    public final function get_completion_state(): int {
+    final public function get_completion_state(): int {
         return $this->get_completion_data()->completionstate;
+    }
+
+    /**
+     * Get pass grade:
+     *
+     * @return int
+     */
+    final public function get_pass_grade() : int {
+        if (isset($this->get_completion_data()->passgrade)) {
+            return $this->get_completion_data()->passgrade;
+        } else {
+            return COMPLETION_INCOMPLETE;
+        }
     }
 
     /**
@@ -152,7 +179,7 @@ class cm_completion implements renderable, templatable {
      * @param int|null $userid
      * @return bool
      */
-    public final function is_tracked_user(int $userid = null): bool {
+    final public function is_tracked_user(int $userid = null): bool {
         global $USER;
 
         if (is_null($userid)) {
@@ -167,7 +194,7 @@ class cm_completion implements renderable, templatable {
      *
      * @return bool
      */
-    public final function is_editing(): bool {
+    final public function is_editing(): bool {
         global $PAGE;
         return $PAGE->user_is_editing();
     }
@@ -177,7 +204,7 @@ class cm_completion implements renderable, templatable {
      *
      * @return bool
      */
-    public final function is_overridden(): bool {
+    final public function is_overridden(): bool {
         return isset($this->get_completion_data()->overrideby) && !empty($this->get_completion_data()->overrideby);
     }
 
@@ -186,7 +213,7 @@ class cm_completion implements renderable, templatable {
      *
      * @return int
      */
-    public final function get_completion_date(): int {
+    final public function get_completion_date(): int {
         return $this->get_completion_data()->timemodified;
     }
 
@@ -195,7 +222,7 @@ class cm_completion implements renderable, templatable {
      *
      * @return int
      */
-    public final function get_completion_expected(): int {
+    final public function get_completion_expected(): int {
         return $this->cm->completionexpected;
     }
 
@@ -207,7 +234,7 @@ class cm_completion implements renderable, templatable {
      * @return stdClass|null
      * @throws \dml_exception
      */
-    public final function get_override_user(): ?stdClass {
+    final public function get_override_user(): ?stdClass {
         if ($user = \core_user::get_user($this->get_completion_data()->overrideby, '*', IGNORE_MISSING)) {
             $user->fullname = fullname($user);
             return $user;
@@ -220,7 +247,7 @@ class cm_completion implements renderable, templatable {
      *
      * @return bool
      */
-    public final function is_overdue(): bool {
+    final public function is_overdue(): bool {
         return $this->get_completion_expected() > 0 && $this->get_completion_expected() + 86400 < time();
     }
 
@@ -229,7 +256,7 @@ class cm_completion implements renderable, templatable {
      *
      * @return string
      */
-    public final function get_overdue_by(): string {
+    final public function get_overdue_by(): string {
         return $this->get_time_ago($this->get_completion_expected());
     }
 
@@ -238,7 +265,7 @@ class cm_completion implements renderable, templatable {
      *
      * @return bool
      */
-    public final function is_due_today(): bool {
+    final public function is_due_today(): bool {
         return $this->get_completion_expected() > 0 && $this->get_completion_expected() > time() &&
              $this->get_completion_expected() - time() < 86400;
     }
@@ -250,15 +277,15 @@ class cm_completion implements renderable, templatable {
      * @throws \dml_exception
      * @throws coding_exception
      */
-    public final function get_completion_checkbox(): string {
-        global $OUTPUT;
+    final public function get_completion_checkbox(): string {
+        global $OUTPUT, $CFG;
 
         if ($this->get_completion_state() == COMPLETION_INCOMPLETE) {
             $completionicon = 'manual-n' . ($this->get_completion_data()->overrideby ? '-override' : '');
-        } elseif ($this->get_completion_state() == COMPLETION_COMPLETE) {
+        } else if ($this->get_completion_state() == COMPLETION_COMPLETE ||
+            $this->get_completion_state() == COMPLETION_COMPLETE_PASS) {
             $completionicon = 'manual-y' . ($this->get_completion_data()->overrideby ? '-override' : '');
         }
-
         if ($this->is_overridden()) {
             $args = new stdClass();
             $args->modname = $this->get_cm_formatted_name();
@@ -302,7 +329,6 @@ class cm_completion implements renderable, templatable {
             array('class' => 'btn btn-link', 'aria-live' => 'assertive'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('form');
-
         return $output;
     }
 
@@ -311,7 +337,7 @@ class cm_completion implements renderable, templatable {
      *
      * @return string
      */
-    public final function get_cm_formatted_name(): string {
+    final public function get_cm_formatted_name(): string {
         return html_entity_decode($this->cm->get_formatted_name(), ENT_QUOTES, 'UTF-8');
     }
 
@@ -320,8 +346,12 @@ class cm_completion implements renderable, templatable {
      *
      * @return string
      */
-    public final function get_color_class(): string {
+    final public function get_color_class(): string {
         if ($this->is_editing() || !$this->is_tracked_user()) {
+
+            if ($this->is_restricted()) {
+                return 'restricted';
+            }
             if ($this->get_completion_mode() == COMPLETION_TRACKING_MANUAL) {
                 return 'secondary';
             }
@@ -329,10 +359,19 @@ class cm_completion implements renderable, templatable {
                 return 'info';
             }
         } else {
+            if ($this->is_restricted()) {
+                return 'restricted';
+            }
             if ($this->get_completion_mode() == COMPLETION_TRACKING_NONE) {
                 return 'secondary';
             }
-
+            if ($this->get_pass_grade()) {
+                if ($this->get_pass_grade() == COMPLETION_COMPLETE_PASS) {
+                    return 'success';
+                } else if ($this->get_pass_grade() == COMPLETION_COMPLETE_FAIL) {
+                    return 'danger';
+                }
+            }
             if ($this->get_completion_state() == COMPLETION_INCOMPLETE) {
                 if ($this->is_due_today()) {
                     return 'warning';
@@ -342,6 +381,7 @@ class cm_completion implements renderable, templatable {
                     return 'purple';
                 }
             }
+
             if (in_array($this->get_completion_state(), [COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS])) {
                 return 'success';
             }
@@ -358,10 +398,16 @@ class cm_completion implements renderable, templatable {
      *
      * @return bool
      */
-    public final function is_restricted(): bool {
-        return !$this->cm->uservisible && !empty($this->cm->availableinfo);
+    final public function is_restricted(): bool {
+        return !empty($this->cm->availableinfo);
     }
 
+    /**
+     * Export this data so it can be used as the context for a mustache template.
+     *
+     * @param renderer_base $output typically, the renderer that's calling this function
+     * @return stdClass data context for a mustache template
+     */
     public function export_for_template(renderer_base $output) {
         $data = [
             'istrackeduser' => $this->is_tracked_user(),
@@ -378,10 +424,11 @@ class cm_completion implements renderable, templatable {
             'completiontrackingautomatic' => $this->get_completion_mode() == COMPLETION_TRACKING_AUTOMATIC,
             'completionincomplete' => $this->get_completion_state() == COMPLETION_INCOMPLETE,
             'completioncomplete' => $this->get_completion_state() == COMPLETION_COMPLETE,
-            'completionincompletepass' => $this->get_completion_state() == COMPLETION_COMPLETE_PASS,
-            'completionincompletefail' => $this->get_completion_state() == COMPLETION_COMPLETE_FAIL
+            'completionincompletepass' => $this->get_pass_grade() == COMPLETION_COMPLETE_PASS,
+            'completionincompletefail' => $this->get_pass_grade() == COMPLETION_COMPLETE_FAIL,
+            'completiongradebase' => $this->get_pass_grade() == COMPLETION_COMPLETE_PASS ||
+                                    $this->get_pass_grade() == COMPLETION_COMPLETE_FAIL,
         ];
-
         if ($completiondate = $this->get_completion_date()) {
             $data['completiondate'] = format_designer_format_date($completiondate);
         }
@@ -389,10 +436,13 @@ class cm_completion implements renderable, templatable {
         if ($completionexpected = $this->get_completion_expected()) {
             $data['completionexpected'] = format_designer_format_date($completionexpected);
         }
-
         return $data;
     }
 
+    /**
+     * Get the completion past time.
+     * @param int $timestamp
+     */
     private function get_time_ago(int $timestamp): string {
         $now = new \DateTime();
         $ago = new \DateTime('@' . $timestamp);
@@ -419,6 +469,7 @@ class cm_completion implements renderable, templatable {
         }
 
         $string = array_slice($string, 0, 1);
-        return $string ? implode(', ', $string) . ' ' . get_string('timeago', 'format_designer') : get_string('timeagojustnow', 'format_designer');
+        return $string ? implode(', ', $string) . ' ' . get_string('timeago', 'format_designer')
+            : get_string('timeagojustnow', 'format_designer');
     }
 }

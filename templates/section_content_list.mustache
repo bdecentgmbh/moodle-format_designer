@@ -1,0 +1,64 @@
+<ul class="section img-text list-layout" id="designer-section-content">
+    {{#cmlist}}
+        <li id="{{id}}" class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}} position-relative my-1">
+            {{{movehtml}}}
+            <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{cm.url}}" style="cursor: pointer">
+                <div class="card-body">
+                    <div class="mod-indent-outer w-100">
+                        <div class="{{indentclasses}}">
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    {{#cmname}}
+                                        <div class="activityinstance">
+                                            <div class="activity-type">
+                                                <p>{{modtype}}</p>
+                                            </div>
+                                            {{{cmname}}}
+                                            {{{afterlink}}}
+                                        </div>
+                                        {{{availability}}}
+                                    {{/cmname}}
+                                    {{#modcontent}}
+                                    <div class="mod-content">
+                                        <p>{{{modcontent}}}</p>
+                                    </div>
+                                    {{/modcontent}}
+                                </div>
+
+                                <div class="col-8 col-md-4">
+                                    <div class="row h-100 pull-right">
+                                        <div class="col align-self-center">
+                                            {{{cmcompletionhtml}}}
+                                        </div>
+                                        {{#modvisits}}
+                                        <div class="mod-visits-block">
+                                            <p>{{modvisits}}</p>
+                                        </div>
+                                        {{/modvisits}}
+                                    </div>
+                                </div>
+
+                                <div class="col-4 col-md-2 show-on-hover">
+                                    <div class="row h-100 pull-right">
+                                        <div class="col align-self-center">
+                                            {{{calltoactionhtml}}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="module-icons">
+                                {{{beforecontent}}}
+
+                                {{#modicons}}
+                                    <div class="actions">
+                                        {{{modicons}}}
+                                    </div>
+                                {{/modicons}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
+    {{/cmlist}}
+</ul>

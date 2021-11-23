@@ -14,22 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace format_designer\output;
+
+use core_courseformat\output\section_renderer;
+
 /**
- * External functions and service definitions.
+ * Basic renderer for designer format.
  *
  * @package   format_designer
  * @copyright 2021 bdecent gmbh <https://bdecent.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
+class renderer extends section_renderer {
 
-$functions = [
-    'format_designer_set_section_options' => [
-        'classpath'     => '',
-        'classname'     => 'format_designer\external\external',
-        'methodname'    => 'set_section_options',
-        'description'   => 'Set section options.',
-        'type'          => 'write',
-        'ajax'          => true
-    ]
-];
+    /**
+     * Renders the content widget.
+     * @param renderable $widget instance with renderable interface
+     * @return string the widget HTML
+     */
+    public function render_content($widget) {
+        $data = $widget->export_for_template($this);
+        return $this->render_from_template('format_designer/courseformat/content',
+        $widget->export_for_template($this));
+    }
+}

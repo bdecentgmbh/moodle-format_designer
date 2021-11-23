@@ -1,0 +1,90 @@
+{{#showmovehere}}
+<p>{{movingstr}} (<a href="{{{cancelcopyurl}}}">{{#str}} cancel {{/str}}</a>)</p>
+{{/showmovehere}}
+
+
+<ul id="designer-section-content" class="section img-text {{sectionlayoutclass}} {{#hascms}} d-block {{/hascms}}" data-for="cmlist">
+{{#hascms}}
+    {{#showmovehere}}
+    <li class="movehere">
+        <a href="{{{moveurl}}}" title="{{strmovefull}}" class="movehere"></a>
+    </li>
+    {{/showmovehere}}
+    {{#cms}}
+        {{#.}}
+            {{#cmitem}}
+                <li
+                    class="activity {{module}} modtype_{{module}} {{extraclasses}} {{#hasinfo}}hasinfo{{/hasinfo}}
+                    {{#isrestricted}}restricted{{/isrestricted}} position-relative my-1"
+                    id="module-{{id}}"
+                    data-for="cmitem"
+                    data-id="{{id}}"
+                >
+                    {{{movehtml}}}
+                    <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{url}}" style="cursor: pointer">
+                        <div class="card-body">
+                            <div class="mod-indent-outer w-100">
+                                <div class="mod-indent {{#indent}}mod-indent-{{indent}}{{/indent}} {{#hugeindent}}mod-indent-huge{{/hugeindent}}"></div>
+                                <div class="row">
+
+                                    <div class="col-12 col-md-7">
+                                        <div class="activityinstance">
+                                            <div class="activity-type">
+                                                <p>{{module}}</p>
+                                            </div>
+                                            {{#cmname}} {{> core/inplace_editable }} {{/cmname}}
+                                            {{{beforecontent}}}
+                                            {{{afterlink}}}
+                                        </div>
+                                        {{{availability}}}
+
+                                        {{#modcontent}}
+                                        <div class="mod-content">
+                                            <p>{{{modcontent}}}</p>
+                                        </div>
+                                        {{/modcontent}}
+                                    </div>
+
+                                    <div class="col-8 col-md-3">
+                                        <div class="row h-100 pull-right">
+                                            <div class="col align-self-center">
+                                                {{{cmcompletionhtml}}}
+                                                {{#modvisits}}
+                                                <div class="mod-visits-block">
+                                                    <p>{{modvisits}}</p>
+                                                </div>
+                                                {{/modvisits}}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-4 col-md-2 show-on-hover">
+                                        <div class="row h-100 pull-right">
+                                            <div class="col align-self-center">
+                                                {{{calltoactionhtml}}}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="module-icons">
+                            {{#modicons}}
+                                <div class="actions">
+                                    {{{modicons}}}
+                                </div>
+                            {{/modicons}}
+                        </div>
+                    </div>
+                </li>
+            {{/cmitem}}
+        {{/.}}
+    {{/cms}}
+{{/hascms}}
+{{#showmovehere}}
+    <li class="movehere">
+        <a href="{{{movetosectionurl}}}" title="{{strmovefull}}" class="movehere"></a>
+    </li>
+{{/showmovehere}}
+</ul>

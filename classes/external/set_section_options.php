@@ -59,40 +59,33 @@ trait set_section_options {
     /**
      * Set section options web service function.
      *
-     * @param int $sectionid
+     * @param int $courseid course id
+     * @param int $sectionnumber section id
      * @param array $options
      */
     public static function set_section_options(int $courseid, int $sectionnumber, array $options) {
-        global $DB;
-
+        global $DB, $PAGE;
+        $context = context_course::instance($courseid);
+        $PAGE->set_context($context);
         $params = self::validate_parameters(self::set_section_options_parameters(), [
             'courseid' => $courseid,
             'sectionnumber' => $sectionnumber,
             'options' => $options
         ]);
-
-        if (!$sectionrecord = $DB->get_record('course_sections', ['id' => $params['sectionid']])) {
-
-        }
-
-        if (!$course = $DB->get_record('course', ['id' => $params['courseid']])) {
-
-        }
-
+        $course = $DB->get_record('course', ['id' => $params['courseid']]);
         /** @var format_designer $format */
         $format = course_get_format($course);
-
-        if (!$format instanceof format_designer) {
-
-        }
-
-        require_capability('format/designer:changesectionoptions', context_course::instance($course->id));
-
+        require_capability('format/designer:changesectionoptions', $context);
         foreach ($params['options'] as $option) {
             $format->set_section_option($params['sectionnumber'], $option['name'], $option['value']);
         }
 
-        return null;
+        $modinfo = get_fast_modinfo($course);
+        $thissection = $modinfo->get_section_info($sectionnumber);
+        $cmlistclass = $format->get_output_classname('content\\section\\cmlist');
+        $cmlist = new $cmlistclass($format, $thissection);
+        $output = $PAGE->get_renderer('format_designer');
+        return $cmlist->render_section_content($output, true);
     }
 
     /**
@@ -101,6 +94,6 @@ trait set_section_options {
      * @return external_single_structure
      */
     public static function set_section_options_returns() {
-        return null;
+        return new external_value(PARAM_RAW, 'Section html');
     }
 }

@@ -17,7 +17,7 @@
 /**
  * Topics course format related unit tests.
  *
- * @package    format_topics
+ * @package    format_designer
  * @copyright  2015 Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,14 +30,14 @@ require_once($CFG->dirroot . '/course/lib.php');
 /**
  * Topics course format related unit tests.
  *
- * @package    format_topics
+ * @package    format_designer
  * @copyright  2015 Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class format_topics_testcase extends advanced_testcase {
+class format_designer_testcase extends advanced_testcase {
 
     /**
-     * Tests for format_topics::get_section_name method with default section names.
+     * Tests for format_designer::get_section_name method with default section names.
      *
      * @return void
      */
@@ -63,7 +63,7 @@ class format_topics_testcase extends advanced_testcase {
     }
 
     /**
-     * Tests for format_topics::get_section_name method with modified section names.
+     * Tests for format_designer::get_section_name method with modified section names.
      *
      * @return void
      */
@@ -97,7 +97,7 @@ class format_topics_testcase extends advanced_testcase {
     }
 
     /**
-     * Tests for format_topics::get_default_section_name.
+     * Tests for format_designer::get_default_section_name.
      *
      * @return void
      */
@@ -118,10 +118,10 @@ class format_topics_testcase extends advanced_testcase {
         $courseformat = course_get_format($course);
         foreach ($coursesections as $section) {
             if ($section->section == 0) {
-                $sectionname = get_string('section0name', 'format_topics');
+                $sectionname = get_string('section0name', 'format_designer');
                 $this->assertEquals($sectionname, $courseformat->get_default_section_name($section));
             } else {
-                $sectionname = get_string('sectionname', 'format_topics') . ' ' . $section->section;
+                $sectionname = get_string('sectionname', 'format_designer') . ' ' . $section->section;
                 $this->assertEquals($sectionname, $courseformat->get_default_section_name($section));
             }
         }
@@ -145,7 +145,7 @@ class format_topics_testcase extends advanced_testcase {
 
         // Call webservice without necessary permissions.
         try {
-            core_external::update_inplace_editable('format_topics', 'sectionname', $section->id, 'New section name');
+            core_external::update_inplace_editable('format_designer', 'sectionname', $section->id, 'New section name');
             $this->fail('Exception expected');
         } catch (moodle_exception $e) {
             $this->assertEquals('Course or activity not accessible. (Not enrolled)',
@@ -156,7 +156,7 @@ class format_topics_testcase extends advanced_testcase {
         $teacherrole = $DB->get_record('role', ['shortname' => 'editingteacher']);
         $this->getDataGenerator()->enrol_user($user->id, $course->id, $teacherrole->id);
 
-        $res = core_external::update_inplace_editable('format_topics', 'sectionname', $section->id, 'New section name');
+        $res = core_external::update_inplace_editable('format_designer', 'sectionname', $section->id, 'New section name');
         $res = external_api::clean_returnvalue(core_external::update_inplace_editable_returns(), $res);
         $this->assertEquals('New section name', $res['value']);
         $this->assertEquals('New section name', $DB->get_field('course_sections', 'name', ['id' => $section->id]));
@@ -180,8 +180,8 @@ class format_topics_testcase extends advanced_testcase {
 
         $section = $DB->get_record('course_sections', ['course' => $course->id, 'section' => 2]);
 
-        // Call callback format_topics_inplace_editable() directly.
-        $tmpl = component_callback('format_topics', 'inplace_editable', ['sectionname', $section->id, 'Rename me again']);
+        // Call callback format_designer_inplace_editable() directly.
+        $tmpl = component_callback('format_designer', 'inplace_editable', ['sectionname', $section->id, 'Rename me again']);
         $this->assertInstanceOf('core\output\inplace_editable', $tmpl);
         $res = $tmpl->export_for_template($PAGE->get_renderer('core'));
         $this->assertEquals('Rename me again', $res['value']);

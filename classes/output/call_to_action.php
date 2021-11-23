@@ -45,19 +45,20 @@ require_once("$CFG->dirroot/course/format/designer/lib.php");
 class call_to_action extends cm_completion {
 
     /**
+     * Get the call action label html.
      * @return string
      * @throws \coding_exception
      */
-    public final function get_call_to_action_label(): string {
+    final public function get_call_to_action_label(): string {
         global $USER;
+
+        if ($this->is_restricted()) {
+            return get_string('calltoactionrestricted', 'format_designer');
+        }
 
         if (!$this->is_tracked_user($USER->id) ||
             !$this->get_completion_info()->is_enabled($this->get_cm())) {
             return get_string('calltoactionview', 'format_designer');
-        }
-
-        if ($this->is_restricted()) {
-            return get_string('calltoactionrestricted', 'format_designer');
         }
 
         if ($this->get_completion_state() == COMPLETION_INCOMPLETE) {
@@ -69,10 +70,17 @@ class call_to_action extends cm_completion {
         return get_string('calltoactionview', 'format_designer');
     }
 
+    /**
+     * Export this data so it can be used as the context for a mustache template.
+     *
+     * @param renderer_base $output typically, the renderer that's calling this function
+     * @return stdClass data context for a mustache template
+     */
     public function export_for_template(renderer_base $output) {
         return [
             'calltoactionlabel' => $this->get_call_to_action_label(),
-            'colorclass' => $this->get_color_class()
+            'colorclass' => $this->get_color_class(),
+            'modurl' => $this->get_cm_url(),
         ];
     }
 }

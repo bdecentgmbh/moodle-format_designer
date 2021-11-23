@@ -35,6 +35,7 @@
             {{/completioncomplete}}
         {{/completiontrackingmanual}}
         {{^completiontrackingmanual}}
+        {{^completiongradebase}}
             {{#completionincomplete}}
                 {{#duetoday}}
                     <span class="badge badge-completion badge-{{colorclass}}"><span><i class="fa fa-exclamation"></i> {{#str}}duetoday, format_designer{{/str}}</span></span>
@@ -57,6 +58,9 @@
                     (override)
                 {{/isoverridden}}
             {{/completioncomplete}}
+        {{/completiongradebase}}
+
+        {{#completiongradebase}}
             {{#completionincompletepass}}
                 <span class="badge badge-completion badge-{{colorclass}}"><span><i class="fa fa-check"></i> {{#str}}passed, format_designer{{/str}} {{completiondate}}</span></span>
                 {{#isoverridden}}
@@ -69,6 +73,7 @@
                     (override)
                 {{/isoverridden}}
             {{/completionincompletefail}}
+        {{/completiongradebase}}
         {{/completiontrackingmanual}}
     {{/ispreview}}
 </div>

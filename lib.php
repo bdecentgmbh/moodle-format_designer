@@ -34,7 +34,7 @@ use core\output\inplace_editable;
  * @copyright 2021 bdecent gmbh <https://bdecent.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class format_designer extends format_base {
+class format_designer extends core_courseformat\base {
 
     /**
      * Returns true if this course format uses sections.
@@ -42,6 +42,18 @@ class format_designer extends format_base {
      * @return bool
      */
     public function uses_sections() {
+        return true;
+    }
+
+    /**
+     * Returns true if this course format uses course index
+     *
+     * This function may be called without specifying the course id
+     * i.e. in course_index_drawer()
+     *
+     * @return bool
+     */
+    public function uses_course_index() {
         return true;
     }
 
@@ -274,7 +286,7 @@ class format_designer extends format_base {
     /**
      * Adds format options elements to the course/section edit form.
      *
-     * This function is called from {@link course_edit_form::definition_after_data()}.
+     * This function is called from {@see course_edit_form::definition_after_data()}.
      *
      * @param MoodleQuickForm $mform form the elements are added to.
      * @param bool $forsection 'true' if this is a section edit form, 'false' if this is course edit form.
@@ -308,8 +320,8 @@ class format_designer extends format_base {
      * In case if course format was changed to 'designer', we try to copy options
      * 'coursedisplay' and 'hiddensections' from the previous format.
      *
-     * @param stdClass|array $data return value from {@link moodleform::get_data()} or array with data
-     * @param stdClass $oldcourse if this function is called from {@link update_course()}
+     * @param stdClass|array $data return value from {@see moodleform::get_data()} or array with data
+     * @param stdClass $oldcourse if this function is called from {@see update_course()}
      *     this object contains information about the course before update
      * @return bool whether there were any changes to the options values
      */
@@ -332,7 +344,7 @@ class format_designer extends format_base {
     /**
      * Whether this format allows to delete sections.
      *
-     * Do not call this function directly, instead use {@link course_can_delete_section()}
+     * Do not call this function directly, instead use {@see course_can_delete_section()}
      *
      * @param int|stdClass|section_info $section
      * @return bool
@@ -490,6 +502,7 @@ class format_designer extends format_base {
             'sectionid' => $sectionnumber
         ], '', 'name, value');
     }
+
 }
 
 /**
@@ -528,4 +541,49 @@ function format_designer_format_date(int $timestamp) {
     }
 
     return userdate($timestamp, get_string($format, $component));
+}
+
+/**
+ * Cut the Course content.
+ *
+ * @param string $str
+ * @param int $n
+ * @param string $endchar
+ * @return string
+ */
+function format_designer_modcontent_trim_char($str, $n = 500, $endchar = '&#8230;') {
+    if (strlen($str) < $n) {
+        return $str;
+    }
+
+    $str = preg_replace("/\s+/", ' ', str_replace(array("\r\n", "\r", "\n"), ' ', $str));
+    if (strlen($str) <= $n) {
+        return $str;
+    }
+
+    $out = "";
+    $small = substr($str, 0, $n);
+    $out = $small.$endchar;
+    return $out;
+}
+
+/**
+ * Get section modules info.
+ * @param array $args page arguments
+ * @return string Display the html section modules.
+ */
+function format_designer_output_fragment_get_section_modules($params) {
+    global $DB, $PAGE;
+    $context = context_course::instance($params['courseid']);
+    $course = $DB->get_record('course', ['id' => $params['courseid']]);
+    /** @var format_designer $format */
+    $format = course_get_format($course);
+    require_capability('format/designer:changesectionoptions', $context);
+    $format->set_section_option($params['sectionnumber'], $params['sectioncol'], $params['sectioncolvalue']);
+    $modinfo = get_fast_modinfo($course);
+    $thissection = $modinfo->get_section_info($params['sectionnumber']);
+    $cmlistclass = $format->get_output_classname('content\\section\\cmlist');
+    $cmlist = new $cmlistclass($format, $thissection);
+    $output = $PAGE->get_renderer('format_designer');
+    return $cmlist->render_section_content($output, true);
 }

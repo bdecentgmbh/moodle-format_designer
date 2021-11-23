@@ -63,7 +63,7 @@ $string['start'] = 'Start';
 $string['calltoactionview'] = 'View <i class="fa fa-chevron-circle-right"></i>';
 $string['calltoactioncontinue'] = 'Continue <i class="fa fa-chevron-circle-right"></i>';
 $string['calltoactionstart'] = 'Start <i class="fa fa-chevron-circle-right"></i>';
-$string['calltoactionrestricted'] = '<i class="fa fa-lock"></i> Restricted';
+$string['calltoactionrestricted'] = 'Restricted <i class="fa fa-lock"></i>';
 
 $string['completion-alt-auto-enabled'] = 'The system marks this item complete according to conditions';
 $string['completion-alt-auto-fail'] = 'Completed (did not achieve pass grade)';
@@ -102,3 +102,4 @@ $string['completion-shorthand-n-override'] = 'Not completed <i class="fa fa-excl
 $string['completion-shorthand-pass'] = 'Completed (achieved pass grade)';
 $string['completion-shorthand-y'] = 'Completed';
 $string['completion-shorthand-y-override'] = 'Completed <i class="fa fa-exclamation-triangle text-white"></i>';
+$string['modvisit'] = 'Visited {$a} times';
