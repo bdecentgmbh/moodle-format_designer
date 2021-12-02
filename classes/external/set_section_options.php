@@ -48,7 +48,7 @@ trait set_section_options {
     public static function set_section_options_parameters() {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
-            'sectionnumber' => new external_value(PARAM_INT, 'Section number'),
+            'sectionid' => new external_value(PARAM_INT, 'Section Id'),
             'options' => new \external_multiple_structure(new external_single_structure([
                 'name' => new external_value(PARAM_TEXT, 'Option name to set on section'),
                 'value' => new external_value(PARAM_RAW, 'Value for option')
@@ -60,16 +60,16 @@ trait set_section_options {
      * Set section options web service function.
      *
      * @param int $courseid course id
-     * @param int $sectionnumber section id
+     * @param int $sectionid section id
      * @param array $options
      */
-    public static function set_section_options(int $courseid, int $sectionnumber, array $options) {
+    public static function set_section_options(int $courseid, int $sectionid, array $options) {
         global $DB, $PAGE;
         $context = context_course::instance($courseid);
         $PAGE->set_context($context);
         $params = self::validate_parameters(self::set_section_options_parameters(), [
             'courseid' => $courseid,
-            'sectionnumber' => $sectionnumber,
+            'sectionid' => $sectionid,
             'options' => $options
         ]);
         $course = $DB->get_record('course', ['id' => $params['courseid']]);
@@ -77,15 +77,9 @@ trait set_section_options {
         $format = course_get_format($course);
         require_capability('format/designer:changesectionoptions', $context);
         foreach ($params['options'] as $option) {
-            $format->set_section_option($params['sectionnumber'], $option['name'], $option['value']);
+            $format->set_section_option($params['sectionid'], $option['name'], $option['value']);
         }
-
-        $modinfo = get_fast_modinfo($course);
-        $thissection = $modinfo->get_section_info($sectionnumber);
-        $cmlistclass = $format->get_output_classname('content\\section\\cmlist');
-        $cmlist = new $cmlistclass($format, $thissection);
-        $output = $PAGE->get_renderer('format_designer');
-        return $cmlist->render_section_content($output, true);
+        return null;
     }
 
     /**

@@ -279,12 +279,13 @@ class cm_completion implements renderable, templatable {
      */
     final public function get_completion_checkbox(): string {
         global $OUTPUT, $CFG;
-
         if ($this->get_completion_state() == COMPLETION_INCOMPLETE) {
             $completionicon = 'manual-n' . ($this->get_completion_data()->overrideby ? '-override' : '');
         } else if ($this->get_completion_state() == COMPLETION_COMPLETE ||
             $this->get_completion_state() == COMPLETION_COMPLETE_PASS) {
             $completionicon = 'manual-y' . ($this->get_completion_data()->overrideby ? '-override' : '');
+        } else if ($this->get_completion_state() == COMPLETION_COMPLETE_FAIL) {
+            $completionicon = 'manual-n' . ($this->get_completion_data()->overrideby ? '-override' : '');
         }
         if ($this->is_overridden()) {
             $args = new stdClass();

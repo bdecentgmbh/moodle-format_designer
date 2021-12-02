@@ -58,6 +58,23 @@ class format_designer extends core_courseformat\base {
     }
 
     /**
+     * Returns true if this course format uses activity indentation.
+     *
+     * Indentation is not supported by core formats anymore and may be deprecated in the future.
+     * This method will keep a default return "true" for legacy reasons but new formats should override
+     * it with a return false to prevent future deprecations.
+     *
+     * A message in a bottle: if indentation is finally deprecated, both behat steps i_indent_right_activity
+     * and i_indent_left_activity should be removed as well. Right now no core behat uses them but indentation
+     * is not officially deprecated so they are still available for the contrib formats.
+     *
+     * @return bool if the course format uses indentation.
+     */
+    public function uses_indentation(): bool {
+        return false;
+    }
+
+    /**
      * Returns the display name of the given section that the course prefers.
      *
      * Use section name is specified by user. Otherwise use default ("Topic #").
@@ -155,6 +172,20 @@ class format_designer extends core_courseformat\base {
         $ajaxsupport = new stdClass();
         $ajaxsupport->capable = true;
         return $ajaxsupport;
+    }
+
+    /**
+     * Returns true if this course format is compatible with content components.
+     *
+     * Using components means the content elements can watch the frontend course state and
+     * react to the changes. Formats with component compatibility can have more interactions
+     * without refreshing the page, like having drag and drop from the course index to reorder
+     * sections and activities.
+     *
+     * @return bool if the format is compatible with components.
+     */
+    public function supports_components() {
+        return true;
     }
 
     /**
@@ -315,6 +346,42 @@ class format_designer extends core_courseformat\base {
     }
 
     /**
+     * Definitions of the additional options that this course format uses for section
+     *
+     * See course_format::course_format_options() for return array definition.
+     *
+     * Additionally section format options may have property 'cache' set to true
+     * if this option needs to be cached in get_fast_modinfo(). The 'cache' property
+     * is recommended to be set only for fields used in course_format::get_section_name(),
+     * course_format::extend_course_navigation() and course_format::get_view_url()
+     *
+     * For better performance cached options are recommended to have 'cachedefault' property
+     * Unlike 'default', 'cachedefault' should be static and not access get_config().
+     *
+     * Regardless of value of 'cache' all options are accessed in the code as
+     * $sectioninfo->OPTIONNAME
+     * where $sectioninfo is instance of section_info, returned by
+     * get_fast_modinfo($course)->get_section_info($sectionnum)
+     * or get_fast_modinfo($course)->get_section_info_all()
+     *
+     * All format options for particular section are returned by calling:
+     * $this->get_format_options($section);
+     *
+     * @param bool $foreditform
+     * @return array
+     */
+    public function section_format_options($foreditform = false) {
+        return array(
+            'sectiontype' => array(
+                'type' => PARAM_ALPHA,
+                'label' => '',
+                'element_type' => 'hidden',
+                 'default' => 'default',
+            ),
+        );
+    }
+
+    /**
      * Updates format options for a course.
      *
      * In case if course format was changed to 'designer', we try to copy options
@@ -412,19 +479,19 @@ class format_designer extends core_courseformat\base {
      */
     public function section_action($section, $action, $sr) {
         global $PAGE;
-
-        if ($section->section && ($action === 'setmarker' || $action === 'removemarker')) {
-            // Format 'designer' allows to set and remove markers in addition to common section actions.
-            require_capability('moodle/course:setcurrentsection', context_course::instance($this->courseid));
-            course_set_marker($this->courseid, ($action === 'setmarker') ? $section->section : 0);
-            return null;
+        $modinfo = $this->get_modinfo();
+        if (!($section instanceof section_info)) {
+            $section = $modinfo->get_section_info($section->section);
         }
 
-        // For show/hide actions call the parent method and return the new content for .section_availability element.
-        $rv = parent::section_action($section, $action, $sr);
-        $renderer = $PAGE->get_renderer('format_designer');
-        $rv['section_availability'] = $renderer->section_availability($this->get_section($section));
-        return $rv;
+        if ($action == 'refresh') {
+            $renderer = $this->get_renderer($PAGE);
+            return [
+                'content' => $renderer->course_section_updated($this, $section),
+            ];
+        } else {
+            return parent::section_action($section, $action, $sr);
+        }
     }
 
     /**
@@ -441,19 +508,19 @@ class format_designer extends core_courseformat\base {
     /**
      * Set any arbitrary/custom option on this format, for a section.
      *
-     * @param int $sectionnumber Course section number to set option for.
+     * @param int $sectionid Course section Id.
      * @param string $name Option name.
      * @param string $value Option value.
      * @return int Option record ID.
      * @throws dml_exception
      */
-    public function set_section_option(int $sectionnumber, string $name, string $value): int {
+    public function set_section_option(int $sectionid, string $name, string $value): int {
         global $DB;
 
         $common = [
             'courseid' => $this->courseid,
             'format' => 'designer',
-            'sectionid' => $sectionnumber,
+            'sectionid' => $sectionid,
             'name' => $name
         ];
 
@@ -471,18 +538,18 @@ class format_designer extends core_courseformat\base {
     /**
      * Get section option.
      *
-     * @param int $sectionnumber Course section number to get option for.
+     * @param int $sectionid Course section number to get option for.
      * @param string $name Option name.
      * @return string|null
      * @throws dml_exception
      */
-    public function get_section_option(int $sectionnumber, string $name): ?string {
+    public function get_section_option(int $sectionid, string $name): ?string {
         global $DB;
 
         return $DB->get_field('course_format_options', 'value', [
             'courseid' => $this->courseid,
             'format' => 'designer',
-            'sectionid' => $sectionnumber,
+            'sectionid' => $sectionid,
             'name' => $name
         ]) ?: null;
     }
@@ -490,16 +557,16 @@ class format_designer extends core_courseformat\base {
     /**
      * Get all options for section.
      *
-     * @param int $sectionnumber
+     * @param int $sectionid
      * @return array Options array [name => value, ..]
      */
-    public function get_section_options(int $sectionnumber): array {
+    public function get_section_options(int $sectionid): array {
         global $DB;
 
         return $DB->get_records_menu('course_format_options', [
             'courseid' => $this->courseid,
             'format' => 'designer',
-            'sectionid' => $sectionnumber
+            'sectionid' => $sectionid
         ], '', 'name, value');
     }
 
@@ -555,35 +622,13 @@ function format_designer_modcontent_trim_char($str, $n = 500, $endchar = '&#8230
     if (strlen($str) < $n) {
         return $str;
     }
-
     $str = preg_replace("/\s+/", ' ', str_replace(array("\r\n", "\r", "\n"), ' ', $str));
     if (strlen($str) <= $n) {
         return $str;
     }
-
     $out = "";
     $small = substr($str, 0, $n);
     $out = $small.$endchar;
     return $out;
 }
 
-/**
- * Get section modules info.
- * @param array $args page arguments
- * @return string Display the html section modules.
- */
-function format_designer_output_fragment_get_section_modules($params) {
-    global $DB, $PAGE;
-    $context = context_course::instance($params['courseid']);
-    $course = $DB->get_record('course', ['id' => $params['courseid']]);
-    /** @var format_designer $format */
-    $format = course_get_format($course);
-    require_capability('format/designer:changesectionoptions', $context);
-    $format->set_section_option($params['sectionnumber'], $params['sectioncol'], $params['sectioncolvalue']);
-    $modinfo = get_fast_modinfo($course);
-    $thissection = $modinfo->get_section_info($params['sectionnumber']);
-    $cmlistclass = $format->get_output_classname('content\\section\\cmlist');
-    $cmlist = new $cmlistclass($format, $thissection);
-    $output = $PAGE->get_renderer('format_designer');
-    return $cmlist->render_section_content($output, true);
-}

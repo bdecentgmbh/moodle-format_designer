@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template format_designer/courseformat/content/section
+    @template format_designer/section_info
 
     Displays a course section.
 
@@ -73,51 +73,46 @@
         "cmcontrols": "[Add an activity or resource]",
         "iscoursedisplaymultipage": true,
         "sectionreturnid": 0,
-        "contentexpanded": true,
-        "insertafter": true,
-        "numsections": 42,
+        "isactive": true,
         "sitehome": false
     }
 }}
-{{<format_designer/courseformat/content}}
-    {{$content}}
-        <li id="section-{{num}}"
-            class="section main {{#restrictsection}} restricted {{/restrictsection}} {{#onlysummary}} section-summary {{/onlysummary}} clearfix
-                    {{#ishidden}} hidden {{/ishidden}} {{#iscurrent}} current {{/iscurrent}}
-                    {{#isstealth}} orphaned {{/isstealth}}"
-            data-sectionid="{{num}}"
-            data-sectionreturnid="{{sectionreturnid}}"
-            data-for="section"
-            data-id="{{id}}"
-            data-number="{{num}}"
-        >
-            {{#singleheader}} {{> format_designer/courseformat/content/section/header }} {{/singleheader}}
-            <div class="left side">{{#iscurrent}} {{{currentlink}}} {{/iscurrent}}</div>
-            <div class="right side">
-            {{#controlmenu}}
-                    {{> format_designer/courseformat/content/section/controlmenu }}
-            {{/controlmenu}}
-            <div class="icon-loader-block"></div>
-            </div>
-            {{#header}} {{> format_designer/courseformat/content/section/header }} {{/header}}
-            <div id="coursecontentcollapse{{num}}"
-                class="content {{^iscoursedisplaymultipage}}
-                    {{^sitehome}}course-content-item-content collapse {{#contentexpanded}}show{{/contentexpanded}}{{/sitehome}}
-                {{/iscoursedisplaymultipage}}">
-                <div class="summary">
-                {{#summary}}
-                    {{> core_courseformat/local/content/section/summary }}
-                {{/summary}}
-                </div>
-                {{#cmsummary}} {{> core_courseformat/local/content/section/cmsummary }} {{/cmsummary}}
-                {{#cmlist}} {{> format_designer/courseformat/content/section/cmlist }} {{/cmlist}}
-                {{{cmcontrols}}}
-                {{#insertafter}}
-                    {{#numsections}}
-                        {{> core_courseformat/local/content/addsection}}
-                    {{/numsections}}
-                {{/insertafter}}
-            </div>
-        </li>
-    {{/content}}
-{{/format_designer/courseformat/content}}
+
+    <li id="section-{{num}}"
+    class="section main {{#restrictsection}} restricted {{/restrictsection}} {{#onlysummary}} section-summary {{/onlysummary}} clearfix
+            {{#ishidden}} hidden {{/ishidden}} {{#iscurrent}} current {{/iscurrent}}
+            {{#isstealth}} orphaned {{/isstealth}}"
+    data-sectionid="{{num}}"
+    data-sectionreturnid="{{sectionreturnid}}"
+    data-for="section"
+    data-id="{{id}}"
+    data-number="{{num}}"
+    >
+    {{#singleheader}} {{> format_designer/courseformat/content/section/header }} {{/singleheader}}
+    <div class="left side">{{#iscurrent}} {{{currentlink}}} {{/iscurrent}}</div>
+    <div class="right side">
+    {{#controlmenu}}
+            {{> format_designer/courseformat/content/section/controlmenu }}
+    {{/controlmenu}}
+    <div class="icon-loader-block"></div>
+    </div>
+    {{#header}} {{> format_designer/courseformat/content/section/header }} {{/header}}
+    <div id="coursecontentcollapse{{num}}"
+        class="content {{^iscoursedisplaymultipage}}
+            {{^sitehome}}course-content-item-content collapse {{#contentexpanded}}show{{/contentexpanded}}{{/sitehome}}
+        {{/iscoursedisplaymultipage}}">
+        <div class="summary">
+        {{#summary}}
+            {{> core_courseformat/local/content/section/summary }}
+        {{/summary}}
+        </div>
+        {{#cmsummary}} {{> core_courseformat/local/content/section/cmsummary }} {{/cmsummary}}
+        {{#cmlist}} {{> format_designer/courseformat/content/section/cmlist }} {{/cmlist}}
+        {{{cmcontrols}}}
+        {{#insertafter}}
+            {{#numsections}}
+                {{> core_courseformat/local/content/addsection}}
+            {{/numsections}}
+        {{/insertafter}}
+    </div>
+    </li>

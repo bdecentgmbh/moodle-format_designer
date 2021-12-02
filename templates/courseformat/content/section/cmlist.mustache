@@ -15,42 +15,14 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template core_courseformat/local/content/section/cmlist
+    @template format_designer/courseformat/content/section/cmlist
 
     Displays the course module list inside a course section.
 
     Example context (json):
     {
-        "cms": [
-            {
-                "cmitem": {
-                    "cmformat": {
-                        "cmname": "<a class=\"aalink\" href=\"#\"><span class=\"instancename\">Forum example</span></a>",
-                        "hasname": "true"
-                    },
-                    "id": 3,
-                    "module": "forum",
-                    "extraclasses": "newmessages"
-                }
-            },
-            {
-                "cmitem": {
-                    "cmformat": {
-                        "cmname": "<a class=\"aalink\" href=\"#\"><span class=\"instancename\">Assign example</span></a>",
-                        "hasname": "true"
-                    },
-                    "id": 3,
-                    "module": "assign",
-                    "extraclasses": ""
-                }
-            }
-        ],
-        "hascms": true,
-        "showmovehere": true,
-        "movingstr": "Moving this activity: folder example",
-        "cancelcopyurl": "#",
-        "movetosectionurl": "#",
-        "strmovefull": "Move 'folder example' to this location"
+        "cmscontent" : "course module content html"
+
     }
 }}
 

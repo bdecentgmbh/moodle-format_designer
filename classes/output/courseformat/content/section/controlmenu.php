@@ -18,7 +18,7 @@
  * Contains the default section controls output class.
  *
  * @package   format_designer
- * @copyright 2020 Ferran Recio <ferran@moodle.com>
+ * @copyright 2021 bdecent gmbh <https://bdecent.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -36,7 +36,7 @@ use pix_icon;
  * Base class to render section controls.
  *
  * @package   format_designer
- * @copyright 2020 Ferran Recio <ferran@moodle.com>
+ * @copyright 2021 bdecent gmbh <https://bdecent.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class controlmenu extends controlmenu_base {
@@ -97,21 +97,21 @@ class controlmenu extends controlmenu_base {
         $sectiontypes = [
             [
                 'type' => 'default',
-                'name' => 'Text links (Default)',
-                'active' => empty($this->format->get_section_option($section->section, 'sectiontype'))
-                    || $this->format->get_section_option($section->section, 'sectiontype') == 'default',
+                'name' => get_string('link', 'format_designer'),
+                'active' => empty($this->format->get_section_option($section->id, 'sectiontype'))
+                    || $this->format->get_section_option($section->id, 'sectiontype') == 'default',
                 'url' => new moodle_url('/course/view.php', ['id' => $this->course->id], 'section-' . $section->section)
             ],
             [
                 'type' => 'list',
-                'name' => 'List',
-                'active' => $this->format->get_section_option($section->section, 'sectiontype') == 'list',
+                'name' => get_string('list', 'format_designer'),
+                'active' => $this->format->get_section_option($section->id, 'sectiontype') == 'list',
                 'url' => new moodle_url('/course/view.php', ['id' => $this->course->id], 'section-' . $section->section)
             ],
             [
                 'type' => 'cards',
-                'name' => 'Cards',
-                'active' => $this->format->get_section_option($section->section, 'sectiontype') == 'cards',
+                'name' => get_string('cards', 'format_designer'),
+                'active' => $this->format->get_section_option($section->id, 'sectiontype') == 'cards',
                 'url' => new moodle_url('/course/view.php', ['id' => $this->course->id], 'section-' . $section->section)
             ],
         ];

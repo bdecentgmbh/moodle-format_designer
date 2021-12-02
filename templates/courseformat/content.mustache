@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template core_courseformat/local/content
+    @template format_designer/courseformat/content
 
     Displays the complete course format.
 
@@ -45,65 +45,7 @@
                     "summarytext": "Summary text!"
                 }
             },
-        "sections": [
-            {
-                "num": 1,
-                "id": 35,
-                "header": {
-                    "name": "Section title",
-                    "url": "#"
-                },
-                "cmlist": {
-                    "cms": [
-                        {
-                            "cmitem": {
-                                "cmformat": {
-                                    "cmname": "<a class=\"aalink\" href=\"#\"><span class=\"instancename\">Another forum</span></a>",
-                                    "hasname": "true"
-                                },
-                                "id": 3,
-                                "module": "forum",
-                                "extraclasses": "newmessages"
-                            }
-                        }
-                    ],
-                    "hascms": true
-                },
-                "iscurrent": true,
-                "summary": {
-                    "summarytext": "Summary text!"
-                }
-            },
-            {
-                "num": 4,
-                "id": 36,
-                "header": {
-                    "name": "Section 2 title",
-                    "url": "#"
-                },
-                "cmlist": {
-                    "cms": [
-                        {
-                            "cmitem": {
-                                "cmformat": {
-                                    "cmname": "<a class=\"aalink\" href=\"#\"><span class=\"instancename\">Forum example</span></a>",
-                                    "hasname": "true"
-                                },
-                                "id": 5,
-                                "module": "forum",
-                                "extraclasses": "newmessages"
-                            }
-                        }
-                    ],
-                    "hascms": true
-                },
-                "iscurrent": true,
-                "summary": {
-                    "summarytext": "Summary text!"
-                }
-            }
-        ],
-        "format": "topics",
+        "format": "designer",
         "title": "Course title example",
             "hasnavigation": true,
             "sectionnavigation": {
@@ -158,14 +100,20 @@
     }
 }}
 <div id="{{uniqid}}-course-format">
-    <h2 class="accesshide">{{{title}}}</h2>
+    {{#title}}
+        <h2 class="accesshide">{{{title}}}</h2>
+    {{/title}}
     {{{completionhelp}}}
     <ul class="{{format}}" data-for="course_sectionlist">
         {{#initialsection}}
-        {{> format_designer/courseformat/content/section }}
+            {{$content}}
+
+            {{/content}}
         {{/initialsection}}
         {{#sections}}
-            {{> format_designer/courseformat/content/section }}
+            {{$content}}
+
+            {{/content}}
         {{/sections}}
     </ul>
     {{#hasnavigation}}
@@ -173,7 +121,9 @@
         {{#sectionnavigation}} {{> core_courseformat/local/content/sectionnavigation }} {{/sectionnavigation}}
         <ul class="{{format}}">
         {{#singlesection}}
-            {{> core_courseformat/local/content/section }}
+            {{$content}}
+
+            {{/content}}
         {{/singlesection}}
         </ul>
         {{#sectionselector}} {{> core_courseformat/local/content/sectionselector }} {{/sectionselector}}
