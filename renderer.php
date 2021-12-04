@@ -142,20 +142,21 @@ class format_designer_renderer extends format_section_renderer_base {
                 'seciontypes' => [
                     [
                         'type' => 'default',
-                        'name' => 'Text links (Default)',
-                        'active' => empty($format->get_section_option($section->section, 'sectiontype')) || $format->get_section_option($section->section, 'sectiontype') == 'default',
+                        'name' => get_string('link', 'format_designer'),
+                        'active' => empty($format->get_section_option($section->id, 'sectiontype'))
+                            || $format->get_section_option($section->id, 'sectiontype') == 'default',
                         'url' => new moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $section->section)
                     ],
                     [
                         'type' => 'list',
-                        'name' => 'List',
-                        'active' => $format->get_section_option($section->section, 'sectiontype') == 'list',
+                        'name' => get_string('list', 'format_designer'),
+                        'active' => $format->get_section_option($section->id, 'sectiontype') == 'list',
                         'url' => new moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $section->section)
                     ],
                     [
                         'type' => 'cards',
-                        'name' => 'Cards',
-                        'active' => $format->get_section_option($section->section, 'sectiontype') == 'cards',
+                        'name' => get_string('cards', 'format_designer'),
+                        'active' => $format->get_section_option($section->id, 'sectiontype') == 'cards',
                         'url' => new moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $section->section)
                     ],
                 ],
@@ -203,7 +204,7 @@ class format_designer_renderer extends format_section_renderer_base {
                     'name' => $highlightoff,
                     'pixattr' => ['class' => ''],
                     'attr' => [
-                        'class' => 'editing_highlight',
+                        'class' => 'dropdown-item editing_highlight menu-action',
                         'data-action' => 'removemarker'
                     ],
                 ];
@@ -216,14 +217,14 @@ class format_designer_renderer extends format_section_renderer_base {
                     'name' => $highlight,
                     'pixattr' => ['class' => ''],
                     'attr' => [
-                        'class' => 'editing_highlight',
+                        'class' => 'dropdown-item editing_highlight menu-action',
                         'data-action' => 'setmarker'
                     ],
                 ];
             }
         }
 
-        $parentcontrols = parent::section_edit_control_items($course, $section, $onsectionpage);
+        $parentcontrols = $this->parentsection_edit_control_items($course, $section, $onsectionpage);
 
         // If the edit key exists, we are going to insert our controls after it.
         if (array_key_exists("edit", $parentcontrols)) {
@@ -245,6 +246,127 @@ class format_designer_renderer extends format_section_renderer_base {
     }
 
     /**
+     * Generate the edit control items of a section
+     *
+     * @param stdClass $course The course entry from DB
+     * @param stdClass $section The course_section entry from DB
+     * @param bool $onsectionpage true if being printed on a section page
+     * @return array of edit control items
+     */
+    public function parentsection_edit_control_items($course, $section, $onsectionpage = false) {
+        if (!$this->page->user_is_editing()) {
+            return array();
+        }
+
+        $sectionreturn = $onsectionpage ? $section->section : null;
+
+        $coursecontext = context_course::instance($course->id);
+        $numsections = course_get_format($course)->get_last_section_number();
+        $isstealth = $section->section > $numsections;
+
+        $baseurl = course_get_url($course, $sectionreturn);
+        $baseurl->param('sesskey', sesskey());
+
+        $controls = array();
+
+        if (!$isstealth && has_capability('moodle/course:update', $coursecontext)) {
+            if ($section->section > 0
+                && get_string_manager()->string_exists('editsection', 'format_'.$course->format)) {
+                $streditsection = get_string('editsection', 'format_'.$course->format);
+            } else {
+                $streditsection = get_string('editsection');
+            }
+
+            $controls['edit'] = array(
+                'url'   => new moodle_url('/course/editsection.php', array('id' => $section->id, 'sr' => $sectionreturn)),
+                'icon' => 'i/settings',
+                'name' => $streditsection,
+                'pixattr' => array('class' => ''),
+                'attr' => array('class' => 'dropdown-item edit menu-action'));
+        }
+
+        if ($section->section) {
+            $url = clone($baseurl);
+            if (!$isstealth) {
+                if (has_capability('moodle/course:sectionvisibility', $coursecontext)) {
+                    if ($section->visible) { // Show the hide/show eye.
+                        $strhidefromothers = get_string('hidefromothers', 'format_'.$course->format);
+                        $url->param('hide', $section->section);
+                        $controls['visiblity'] = array(
+                            'url' => $url,
+                            'icon' => 'i/hide',
+                            'name' => $strhidefromothers,
+                            'pixattr' => array('class' => ''),
+                            'attr' => array('class' => 'dropdown-item editing_showhide menu-action',
+                                'data-sectionreturn' => $sectionreturn, 'data-action' => 'hide'));
+                    } else {
+                        $strshowfromothers = get_string('showfromothers', 'format_'.$course->format);
+                        $url->param('show',  $section->section);
+                        $controls['visiblity'] = array(
+                            'url' => $url,
+                            'icon' => 'i/show',
+                            'name' => $strshowfromothers,
+                            'pixattr' => array('class' => ''),
+                            'attr' => array('class' => 'dropdown-item editing_showhide menu-action',
+                                'data-sectionreturn' => $sectionreturn, 'data-action' => 'show'));
+                    }
+                }
+
+                if (!$onsectionpage) {
+                    if (has_capability('moodle/course:movesections', $coursecontext)) {
+                        $url = clone($baseurl);
+                        if ($section->section > 1) { // Add a arrow to move section up.
+                            $url->param('section', $section->section);
+                            $url->param('move', -1);
+                            $strmoveup = get_string('moveup');
+                            $controls['moveup'] = array(
+                                'url' => $url,
+                                'icon' => 'i/up',
+                                'name' => $strmoveup,
+                                'pixattr' => array('class' => ''),
+                                'attr' => array('class' => 'dropdown-item moveup menu-action'));
+                        }
+
+                        $url = clone($baseurl);
+                        if ($section->section < $numsections) { // Add a arrow to move section down.
+                            $url->param('section', $section->section);
+                            $url->param('move', 1);
+                            $strmovedown = get_string('movedown');
+                            $controls['movedown'] = array(
+                                'url' => $url,
+                                'icon' => 'i/down',
+                                'name' => $strmovedown,
+                                'pixattr' => array('class' => ''),
+                                'attr' => array('class' => 'dropdown-item movedown menu-action'));
+                        }
+                    }
+                }
+            }
+
+            if (course_can_delete_section($course, $section)) {
+                if (get_string_manager()->string_exists('deletesection', 'format_'.$course->format)) {
+                    $strdelete = get_string('deletesection', 'format_'.$course->format);
+                } else {
+                    $strdelete = get_string('deletesection');
+                }
+                $url = new moodle_url('/course/editsection.php', array(
+                    'id' => $section->id,
+                    'sr' => $sectionreturn,
+                    'delete' => 1,
+                    'sesskey' => sesskey()));
+                $controls['delete'] = array(
+                    'url' => $url,
+                    'icon' => 'i/delete',
+                    'name' => $strdelete,
+                    'pixattr' => array('class' => ''),
+                    'attr' => array('class' => 'dropdown-item editing_delete menu-action'));
+            }
+        }
+
+        return $controls;
+    }
+
+    /**
      * Output the html for a multiple section page
      *
      * @param stdClass $course The course entry from DB
@@ -254,6 +376,7 @@ class format_designer_renderer extends format_section_renderer_base {
      * @param array $modnamesused (argument not used)
      */
     public function print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused) {
+
         $modinfo = get_fast_modinfo($course);
         $course = course_get_format($course)->get_course();
 
@@ -269,20 +392,9 @@ class format_designer_renderer extends format_section_renderer_base {
         // Now the list of sections..
         echo $this->start_section_list();
         $numsections = course_get_format($course)->get_last_section_number();
-
         foreach ($modinfo->get_section_info_all() as $section => $thissection) {
-            if ($section == 0) {
-                // 0-section is displayed a little different then the others
-                if ($thissection->summary or !empty($modinfo->sections[0]) or $this->page->user_is_editing()) {
-                    echo $this->section_header($thissection, $course, false, 0);
-                    echo $this->courserenderer->course_section_cm_list($course, $thissection, 0);
-                    echo $this->courserenderer->course_section_add_cm_control($course, 0, 0);
-                    echo $this->section_footer();
-                }
-                continue;
-            }
             if ($section > $numsections) {
-                // activities inside this section are 'orphaned', this section will be printed as 'stealth' below
+                // Activities inside this section are 'orphaned', this section will be printed as 'stealth' below.
                 continue;
             }
             // Show the section if the user is permitted to access it, OR if it's not available
@@ -301,17 +413,18 @@ class format_designer_renderer extends format_section_renderer_base {
             } else {
                 echo $this->render_section($thissection, $course, false);
             }
-        }
 
+        }
         if ($this->page->user_is_editing() and has_capability('moodle/course:update', $context)) {
+
             // Print stealth sections if present.
             foreach ($modinfo->get_section_info_all() as $section => $thissection) {
                 if ($section <= $numsections or empty($modinfo->sections[$section])) {
-                    // this is not stealth section or it is empty
+                    // This is not stealth section or it is empty.
                     continue;
                 }
                 echo $this->stealth_section_header($section);
-                echo $this->courserenderer->course_section_cm_list($course, $thissection, 0);
+                echo $this->render_section($thissection, $course, false);
                 echo $this->stealth_section_footer();
             }
 
@@ -319,13 +432,153 @@ class format_designer_renderer extends format_section_renderer_base {
 
             echo $this->change_number_sections($course, 0);
         } else {
+
             echo $this->end_section_list();
         }
 
     }
 
-    public function render_section(section_info $section, stdClass $course, $onsectionpage, $sectionreturn = 0) {
+    /**
+     * Output the html for a single section page .
+     *
+     * @param stdClass $course The course entry from DB
+     * @param array $sections (argument not used)
+     * @param array $mods (argument not used)
+     * @param array $modnames (argument not used)
+     * @param array $modnamesused (argument not used)
+     * @param int $displaysection The section number in the course which is being displayed
+     */
+    public function print_single_section_page($course, $sections, $mods, $modnames, $modnamesused, $displaysection) {
+        $modinfo = get_fast_modinfo($course);
+        $course = course_get_format($course)->get_course();
+        $context = context_course::instance($course->id);
+        // Can we view the section in question?
+        if (!($sectioninfo = $modinfo->get_section_info($displaysection)) || !$sectioninfo->uservisible) {
+            // This section doesn't exist or is not available for the user.
+            // We actually already check this in course/view.php but just in case exit from this function as well.
+            throw new moodle_exception('unknowncoursesection', 'error', course_get_url($course),
+                format_string($course->fullname));
+        }
 
+        // Copy activity clipboard..
+        echo $this->start_section_list();
+
+        $thissection = $modinfo->get_section_info(0);
+        if ($thissection->summary or !empty($modinfo->sections[0]) or $this->page->user_is_editing()) {
+            $this->render_section($thissection, $course, false);
+        }
+        if ($this->page->user_is_editing() and has_capability('moodle/course:update', $context)) {
+            echo $this->end_section_list();
+            echo $this->change_number_sections($course, 0);
+
+        } else {
+            echo $this->end_section_list();
+        }
+
+        // Start single-section div.
+        echo html_writer::start_tag('div', array('class' => 'single-section'));
+
+        // The requested section page.
+        $thissection = $modinfo->get_section_info($displaysection);
+
+        // Title with section navigation links.
+        $sectionnavlinks = $this->get_nav_links($course, $modinfo->get_section_info_all(), $displaysection);
+        $sectiontitle = '';
+        $sectiontitle .= html_writer::start_tag('div', array('class' => 'section-navigation navigationtitle'));
+        $sectiontitle .= html_writer::tag('span', $sectionnavlinks['previous'], array('class' => 'mdl-left'));
+        $sectiontitle .= html_writer::tag('span', $sectionnavlinks['next'], array('class' => 'mdl-right'));
+        // Title attributes.
+        $classes = 'sectionname';
+        if (!$thissection->visible) {
+            $classes .= ' dimmed_text';
+        }
+
+        echo $sectiontitle;
+
+        // Now the list of sections..
+        echo $this->start_section_list();
+        echo $this->render_section($thissection, $course, false);
+        echo $this->end_section_list();
+
+        // Display section bottom navigation.
+        $sectionbottomnav = '';
+        $sectionbottomnav .= html_writer::start_tag('div', array('class' => 'section-navigation mdl-bottom'));
+        $sectionbottomnav .= html_writer::tag('span', $sectionnavlinks['previous'], array('class' => 'mdl-left'));
+        $sectionbottomnav .= html_writer::tag('span', $sectionnavlinks['next'], array('class' => 'mdl-right'));
+        $sectionbottomnav .= html_writer::tag('div', $this->section_nav_selection($course, $sections, $displaysection),
+            array('class' => 'mdl-align'));
+        $sectionbottomnav .= html_writer::end_tag('div');
+        echo $sectionbottomnav;
+
+        // Close single-section div.
+        echo html_writer::end_tag('div');
+    }
+
+    /**
+     * If section is not visible, display the message about that ('Not available
+     * until...', that sort of thing). Otherwise, returns blank.
+     *
+     * For users with the ability to view hidden sections, it shows the
+     * information even though you can view the section and also may include
+     * slightly fuller information (so that teachers can tell when sections
+     * are going to be unavailable etc). This logic is the same as for
+     * activities.
+     *
+     * @param section_info $section The course_section entry from DB
+     * @param bool $canviewhidden True if user can view hidden sections
+     * @return string HTML to output
+     */
+    public function section_availability_message($section, $canviewhidden) {
+        global $CFG;
+        $o = '';
+        if (!$section->visible) {
+            if ($canviewhidden) {
+                $o .= $this->courserenderer->availability_info(get_string('hiddenfromstudents'), 'ishidden');
+            } else {
+                // We are here because of the setting "Hidden sections are shown in collapsed form".
+                // Student can not see the section contents but can see its name.
+                $o .= $this->courserenderer->availability_info(get_string('notavailable'), 'ishidden');
+            }
+        } else if (!$section->uservisible || $canviewhidden && !empty($CFG->enableavailability)) {
+            if (!$section->uservisible && $section->availableinfo) {
+                // Note: We only get to this function if availableinfo is non-empty,
+                // so there is definitely something to print.
+                $formattedinfo = \core_availability\info::format_info(
+                        $section->availableinfo, $section->course);
+                $o .= $this->courserenderer->availability_info($formattedinfo, 'isrestricted');
+                $o .= html_writer::start_tag('div', array('class' => 'section-restricted-action'));
+                $o .= html_writer::tag('i', '', array('class' => 'fa fa-lock'));
+                $o .= html_writer::end_tag('div');
+            } else {
+                 // Check if there is an availability restriction.
+                $ci = new \core_availability\info_section($section);
+                $fullinfo = $ci->get_full_information();
+                if ($fullinfo) {
+                    $formattedinfo = \core_availability\info::format_info(
+                            $fullinfo, $section->course);
+                    $o .= $this->courserenderer->availability_info($formattedinfo, 'isrestricted isfullinfo');
+                    $o .= html_writer::start_tag('div', array('class' => 'section-restricted-action'));
+                    $o .= html_writer::tag('i', '', array('class' => 'fa fa-lock'));
+                    $o .= html_writer::end_tag('div');
+                }
+            }
+        }
+        return $o;
+    }
+
+    /**
+     * Render the section info.
+     *
+     * @param \section_info $section
+     * @param stdClass $course
+     * @param bool $onsectionpage
+     * @param int $sectionreturn
+     * @param bool $sectioncontent
+     * @return void|string
+     */
+    public function render_section(section_info $section, stdClass $course, $onsectionpage,
+        $sectionreturn = 0, $sectioncontent = false) {
+        global $DB, $USER, $CFG;
         /** @var format_designer $format */
         $format = course_get_format($course);
 
@@ -344,100 +597,25 @@ class format_designer_renderer extends format_section_renderer_base {
         $rightcontent = $this->section_right_content($section, $course, $onsectionpage);
         $sectionname = html_writer::tag('span', $this->section_title($section, $course));
         $sectionavailability = $this->section_availability($section);
+        $sectionrestrict = (!$section->uservisible && $section->availableinfo) ? true : false;
 
-        // CM LIST
-
+        // CM LIST.
         $cmlist = [];
-
         $modinfo = get_fast_modinfo($course);
         $displayoptions = [];
         $completioninfo = new completion_info($course);
 
-        // Get the list of modules visible to user
-        if (!empty($modinfo->sections[$section->section])) {
+        // Get the list of modules visible to user.
+        if (!empty($modinfo->sections[$section->section]) && $section->uservisible) {
             foreach ($modinfo->sections[$section->section] as $modnumber) {
                 $mod = $modinfo->cms[$modnumber];
-
-                if (!$mod->is_visible_on_course_page()) {
-                    continue;
-                }
-
-                $indentclasses = 'mod-indent';
-                if (!empty($mod->indent)) {
-                    $indentclasses .= ' mod-indent-'.$mod->indent;
-                    if ($mod->indent > 15) {
-                        $indentclasses .= ' mod-indent-huge';
-                    }
-                }
-
-                $movehtml = '';
-                if ($this->page->user_is_editing()) {
-                    $movehtml = course_get_cm_move($mod, $sectionreturn);
-                }
-
-                $modclasses = 'activity ' . $mod->modname . ' modtype_' . $mod->modname . ' ' . $mod->extraclasses;
-
-                // If there is content but NO link (eg label), then display the
-                // content here (BEFORE any icons). In this case cons must be
-                // displayed after the content so that it makes more sense visually
-                // and for accessibility reasons, e.g. if you have a one-line label
-                // it should work similarly (at least in terms of ordering) to an
-                // activity.
-                $beforecontent = '';
-                $url = $mod->url;
-                if (empty($url)) {
-                    $beforecontent = $this->courserenderer->course_section_cm_text($mod, $displayoptions);
-                }
-
-                $cmcompletion = new cm_completion($mod);
-                $cmcompletionhtml = '';
-                if (empty($displayoptions['hidecompletion'])) {
-                    if ($cmcompletion->is_visible()) {
-                        $cmcompletionhtml = $this->render($cmcompletion);
-                    }
-                }
-
-                $modicons = '';
-                if ($this->page->user_is_editing()) {
-                    $editactions = course_get_cm_edit_actions($mod, $mod->indent, $sectionreturn);
-                    $modicons .= ' '. $this->courserenderer->course_section_cm_edit_actions($editactions, $mod, $displayoptions);
-                    $modicons .= $mod->afterediticons;
-                }
-
-                $availability = $this->courserenderer->course_section_cm_availability($mod, $displayoptions);
-
-                // If there is content AND a link, then display the content here
-                // (AFTER any icons). Otherwise it was displayed before
-                $cmtext = '';
-                if (!empty($url)) {
-                    $cmtext = $this->courserenderer->course_section_cm_text($mod, $displayoptions);
-                }
-
-                $calltoactionhtml = $this->render(new call_to_action($mod));
-
-                $cmlist[$modnumber] = [
-                    'id' => 'module-' . $mod->id,
-                    'cm' => $mod,
-                    'modclasses' => $modclasses,
-                    'indentclasses' => $indentclasses,
-                    'colorclass' => $cmcompletion->get_color_class(),
-                    'movehtml' => $movehtml,
-                    'cmname' => $this->courserenderer->course_section_cm_name($mod, $displayoptions),
-                    'cmcompletion' => $cmcompletion,
-                    'cmcompletionhtml' => $cmcompletionhtml,
-                    'calltoactionhtml' => $calltoactionhtml,
-                    'afterlink' => $mod->afterlink,
-                    'beforecontent' => $beforecontent,
-                    'cmtext' => $cmtext,
-                    'modicons' => $modicons,
-                    'availability' => $availability,
-                    'isrestricted' => !$mod->uservisible && !empty($mod->availableinfo)
-                ];
+                $cminfo = $this->render_course_module($mod, $sectionreturn, $displayoptions);
+                $cmlist[$modnumber] = $cminfo;
+                $cmlist[$modnumber]['modstatus'] = !empty($cminfo) ? true : false;
             }
         }
         $cmlist = array_values($cmlist);
-
-        // END CM LIST
+        // END CM LIST.
         $cmcontrol = $this->courserenderer->course_section_add_cm_control($course, 0, 0);
 
         $sectionsummary = '';
@@ -447,17 +625,40 @@ class format_designer_renderer extends format_section_renderer_base {
             // "Hidden sections are shown in collapsed form".
             $sectionsummary = $this->format_summary_text($section);
         }
-
-        $sectiontype = $format->get_section_option($section->section, 'sectiontype') ?: 'default';
-
+        $sectionlayoutclass = 'link-layout';
+        $sectiontype = $format->get_section_option($section->id, 'sectiontype') ?: 'default';
+        if ($sectiontype == 'list') {
+            $sectionlayoutclass = "list-layout";
+        } else if ($sectiontype == 'cards') {
+            $sectionlayoutclass = 'card-layout';
+        }
         $templatename = 'format_designer/section_layout_' . $sectiontype;
+
         try {
             $this->get_mustache()->loadTemplate($templatename);
         } catch (Exception $exception) {
             debugging('Missing section mustache template: ' . $templatename);
             $templatename = 'format_designer/section_layout_default';
         }
-
+        if ($sectioncontent) {
+            $contenttemplatename = 'format_designer/section_content_' . $sectiontype;
+            return $this->render_from_template($contenttemplatename, [
+                'section' => $section,
+                'sectiontype' => $sectiontype,
+                'sectionlayoutclass' => $sectionlayoutclass,
+                'sectionstyle' => $sectionstyle,
+                'sectionreturn' => $sectionreturn,
+                'leftcontent' => $leftcontent,
+                'rightcontent' => $rightcontent,
+                'sectionname' => $sectionname,
+                'sectionavailability' => $sectionavailability,
+                'sectionrestrict' => $sectionrestrict,
+                'sectionsummary' => $sectionsummary,
+                'cmlist' => $cmlist,
+                'courseid' => $course->id,
+                'cmcontrol' => $cmcontrol
+            ]);
+        }
         echo $this->render_from_template($templatename, [
             'section' => $section,
             'sectiontype' => $sectiontype,
@@ -467,19 +668,136 @@ class format_designer_renderer extends format_section_renderer_base {
             'rightcontent' => $rightcontent,
             'sectionname' => $sectionname,
             'sectionavailability' => $sectionavailability,
+            'sectionrestrict' => $sectionrestrict,
             'sectionsummary' => $sectionsummary,
             'cmlist' => $cmlist,
+            'courseid' => $course->id,
             'cmcontrol' => $cmcontrol
         ]);
+    }
 
-        return;
 
-
-        echo $this->section_header($section, $course, false, 0);
-        if ($section->uservisible) {
-            echo $this->courserenderer->course_section_cm_list($course, $section, 0);
-            echo $this->courserenderer->course_section_add_cm_control($course, $section->section, 0);
+    /**
+     * Render the mod info.
+     *
+     * @param object $mod
+     * @param int $sectionreturn
+     * @param array $displayoptions
+     * @return void|string
+     */
+    public function render_course_module($mod, $sectionreturn, $displayoptions = []) {
+        global $DB, $USER;
+        if (!$mod->is_visible_on_course_page()) {
+            return [];
         }
-        echo $this->section_footer();
+
+        $indentclasses = 'mod-indent';
+        if (!empty($mod->indent)) {
+            $indentclasses .= ' mod-indent-'.$mod->indent;
+            if ($mod->indent > 15) {
+                $indentclasses .= ' mod-indent-huge';
+            }
+        }
+
+        $movehtml = '';
+        if ($this->page->user_is_editing()) {
+            $movehtml = course_get_cm_move($mod, $sectionreturn);
+        }
+
+        $modclasses = 'activity ' . $mod->modname . ' modtype_' . $mod->modname . ' ' . $mod->extraclasses;
+
+        // If there is content but NO link (eg label), then display the
+        // content here (BEFORE any icons). In this case cons must be
+        // displayed after the content so that it makes more sense visually
+        // and for accessibility reasons, e.g. if you have a one-line label
+        // it should work similarly (at least in terms of ordering) to an
+        // activity.
+        $beforecontent = '';
+        $url = $mod->url;
+        if (empty($url)) {
+            $beforecontent = $this->courserenderer->course_section_cm_text($mod, $displayoptions);
+        }
+
+        $cmcompletion = new cm_completion($mod);
+        $cmcompletionhtml = '';
+        if (empty($displayoptions['hidecompletion'])) {
+            if ($cmcompletion->is_visible()) {
+                $cmcompletionhtml = $this->render($cmcompletion);
+            }
+        }
+        $modicons = '';
+        if ($this->page->user_is_editing()) {
+            $editactions = course_get_cm_edit_actions($mod, $mod->indent, $sectionreturn);
+            $modicons .= ' '. $this->courserenderer->course_section_cm_edit_actions($editactions, $mod, $displayoptions);
+            $modicons .= $mod->afterediticons;
+        }
+
+        $availability = $this->courserenderer->course_section_cm_availability($mod, $displayoptions);
+        // If there is content AND a link, then display the content here.
+        // (AFTER any icons). Otherwise it was displayed before.
+        $cmtext = '';
+        if (!empty($url)) {
+            $cmtext = $this->courserenderer->course_section_cm_text($mod, $displayoptions);
+            $cmtextcontent = format_string($cmtext);
+            $modcontent = '';
+            if (!empty($cmtextcontent)) {
+                if (strlen($cmtextcontent) >= 160) {
+                    $modcontenthtml = '';
+                    $modcontenthtml .= html_writer::start_tag('div', array('class' => 'fullcontent-summary summary-hide'));
+                    $modcontenthtml .= $cmtextcontent;
+                    $modurl = \html_writer::link('javascript:void(0)', get_string('more'),
+                        array('class' => 'mod-description-action'));
+                    $modcontenthtml .= $modurl;
+                    $modcontenthtml .= html_writer::end_tag('div');
+                    $modcontent = $modcontenthtml;
+                } else {
+                    $modcontent = html_writer::tag('p', $cmtextcontent);;
+                }
+            }
+        }
+
+        $modvisits = $DB->count_records('logstore_standard_log', array('contextinstanceid' => $mod->id,
+            'userid' => $USER->id, 'action' => 'viewed', 'target' => 'course_module'));
+        $modvisits = !empty($modvisits) ? get_string('modvisit', 'format_designer', $modvisits) : false;
+        $calltoactionhtml = $this->render(new call_to_action($mod));
+        $availabilityrestrict = '';
+        if ($mod->availableinfo) {
+            $availabilityhtml = $availability;
+            $restricthtml = html_writer::start_tag('div', array('class' => 'restrict-block'));
+            $restricthtml .= html_writer::start_tag('div', array('class' => 'info-content-block'));
+            $restricthtml .= $availabilityhtml;
+            $restricthtml .= html_writer::start_tag('div', array('class' => 'call-action-block'));
+            $restricthtml .= $calltoactionhtml;
+            $restricthtml .= html_writer::end_tag('div');
+            $restricthtml .= html_writer::end_tag('div');
+            $restricthtml .= html_writer::end_tag('div');
+            $calltoactionhtml = $restricthtml;
+            $availabilityrestrict = $availability;
+            $availability = '';
+        }
+
+        $cmlist = [
+            'id' => 'module-' . $mod->id,
+            'cm' => $mod,
+            'modtype' => $mod->get_module_type_name(),
+            'modclasses' => $modclasses,
+            'indentclasses' => $indentclasses,
+            'colorclass' => $cmcompletion->get_color_class(),
+            'movehtml' => $movehtml,
+            'cmname' => $this->courserenderer->course_section_cm_name($mod, $displayoptions),
+            'cmcompletion' => $cmcompletion,
+            'cmcompletionhtml' => $cmcompletionhtml,
+            'calltoactionhtml' => $calltoactionhtml,
+            'afterlink' => $mod->afterlink,
+            'beforecontent' => $beforecontent,
+            'cmtext' => $cmtext,
+            'modicons' => $modicons,
+            'availability' => $availability,
+            'isrestricted' => !empty($mod->availableinfo),
+            'modcontent' => isset($modcontent) ? $modcontent : '',
+            'modvisits' => $modvisits,
+            'availabilityrestrict' => $availabilityrestrict
+        ];
+        return $cmlist;
     }
 }
