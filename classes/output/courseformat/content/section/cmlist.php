@@ -225,7 +225,7 @@ class cmlist extends cmlist_base {
             if (!empty($cmtextcontent)) {
                 if (strlen($cmtextcontent) >= 160) {
                     $modcontenthtml = '';
-                    $modcontenthtml .= html_writer::start_tag('div', array('class' => 'fullcontent-summary hide'));
+                    $modcontenthtml .= html_writer::start_tag('div', array('class' => 'fullcontent-summary summary-hide'));
                     $modcontenthtml .= $cmtextcontent;
                     $modurl = \html_writer::link('javascript:void(0)', get_string('more'),
                         array('class' => 'mod-description-action'));

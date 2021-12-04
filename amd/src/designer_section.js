@@ -132,11 +132,11 @@
     DesignerSection.prototype.modcontentHandler = function(event) {
         var THIS = $(event.currentTarget);
         var fullContent = $(THIS).parent();
-        if (fullContent.hasClass('hide')) {
-            fullContent.removeClass('hide');
+        if (fullContent.hasClass('summary-hide')) {
+            fullContent.removeClass('summary-hide');
             $(THIS).text("Less");
         } else {
-            fullContent.addClass('hide');
+            fullContent.addClass('summary-hide');
             $(THIS).text("More");
         }
     };
