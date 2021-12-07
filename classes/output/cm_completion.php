@@ -310,6 +310,10 @@ class cm_completion implements renderable, templatable {
             info::completion_value_used($this->cm->get_course(), $this->cm->id)) {
             $extraclass = ' preventjs';
         }
+        $buttonclass = 'btn btn-link';
+        if ($this->is_restricted()) {
+            $buttonclass .= ' disabled';
+        }
         $output .= html_writer::start_tag('form', array('method' => 'post',
             'action' => new moodle_url('/course/togglecompletion.php'),
             'class' => 'togglecompletion'. $extraclass));
@@ -324,7 +328,7 @@ class cm_completion implements renderable, templatable {
             'type' => 'hidden', 'name' => 'completionstate', 'value' => $newstate));
         $output .= html_writer::tag('button',
             $OUTPUT->pix_icon('i/completion-' . $completionicon, $imgalt),
-            array('class' => 'btn btn-link', 'aria-live' => 'assertive'));
+            array('class' => $buttonclass, 'aria-live' => 'assertive'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('form');
         return $output;

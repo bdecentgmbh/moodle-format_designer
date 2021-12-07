@@ -46,7 +46,12 @@ ul.designer .card.card-list:hover .card-body .mod-indent-outer .mod-indent .row 
     transition: all .5s ease;
 }
 .course-content ul.designer li.section h3.sectionname {
+    max-width: 90%;
     margin-bottom: 20px;
+    display: inline-block;
+}
+.course-content ul.designer li.section.section-summary h3 {
+    max-width: 90%;
     display: inline-block;
 }
 .course-content ul.designer li.section.restricted h3.sectionname {
@@ -61,6 +66,7 @@ ul.designer .card.card-list:hover .card-body .mod-indent-outer .mod-indent .row 
 .course-content ul.designer li.section .availability-section-block .section_availability .availabilityinfo {
     font-size: 12px;
     border: 1px solid #ccc;
+    background: #fff;
     padding: 5px;
     margin-right: 5px;
     vertical-align: middle;
@@ -294,6 +300,7 @@ body.editing ul.designer .section .activity .editing_move {
         max-width: 25%;
     }
     ul.designer .list-layout .card.card-list .row .col-lg-2 .pull-right {
+        width: 100%;
         text-align: center;
         float: none;
     }
@@ -375,6 +382,11 @@ body.editing ul.designer .section .activity .editing_move {
     margin: 0;
     display: none;
     opacity: .7;
+}
+.designer .section.img-text .activity .restrict-block .info-content-block .availabilityinfo.isrestricted ul {
+    text-align: left;
+    list-style: none;
+    padding: 0;
 }
 .designer .section.img-text .activity .restrict-block.show .info-content-block .availabilityinfo.isrestricted {
     display: inline-block;
@@ -550,8 +562,8 @@ ul li {
     vertical-align: middle;
 }
 .designer .section .content .section.link-layout li.activity .action-html-card {
-    width: 21%;
-    margin-top: 0;
+    width: 20%;
+    margin-top: 10px;
     margin-left: 0;
     display: inline-block;
     vertical-align: middle;
@@ -713,6 +725,7 @@ ul li {
 .designer .section .content .section.list-layout li.activity .activityinstance .aalink.quickeditlink,
 .designer .section .content .section.card-layout li.activity .activityinstance .aalink.quickeditlink {
     width: auto;
+    float: right;
 }
 
 
@@ -754,6 +767,9 @@ ul li {
     .designer .section.img-text.card-layout .activity .activityinstance {
         padding-right: 0;
     }
+    .designer .section .content .section.link-layout li.activity .action-html-card {
+        float: none;
+    }
 }
 
 @media (min-width: 768px) {
@@ -763,6 +779,12 @@ ul li {
 }
 
 @media (min-width: 768px) and (max-width: 991px) {
+    .designer .section .content .section.link-layout li.activity .activityinstance {
+        width: 54%;
+    }
+    .designer .section .content .section.link-layout li.activity .action-html-card {
+        float: none;
+    }
     .designer .section .content .section.link-layout li.activity .activityinstance .aalink,
     .designer .section .content .section.list-layout li.activity .activityinstance .aalink,
     .designer .section .content .section.card-layout li.activity .activityinstance .aalink {
@@ -802,6 +824,24 @@ ul li {
     .designer .section .content .section.list-layout li.activity .activityinstance .aalink .instancename,
     .designer .section .content .section.card-layout li.activity .activityinstance .aalink .instancename {
         width: 80%;
+    }
+}
+
+@media (max-width: 575px) {
+    .designer .section .content .section.link-layout li.activity .activityinstance {
+        width: auto;
+    }
+    .designer .section .content .section.link-layout li.activity .center-reports-block {
+        width: auto;
+    }
+    .designer .section .content .section.link-layout li.activity .action-html-card {
+        float: right;
+    }
+    .designer .section .content .section.link-layout li.activity .activityinstance .aalink .instancename {
+        width: auto;
+    }
+    .designer .section .content .section.link-layout li.activity .activityinstance .aalink.quickeditlink {
+        float: none;
     }
 }
 

@@ -108,3 +108,4 @@ $string['list'] = "List";
 $string['cards'] = "Cards";
 $string['notyetcompleted'] = "Not yet completed";
 $string['less'] = "Less";
+
