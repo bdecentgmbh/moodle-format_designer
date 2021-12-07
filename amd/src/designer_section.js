@@ -36,7 +36,8 @@
         $('body').delegate(self.SectionController, 'click', self.sectionLayoutaction.bind(this));
         $('body').delegate(self.sectionRestricted, "click", this.sectionRestrictHandler.bind(this));
         $('body').delegate(self.moduleBlock, "click", self.moduleHandler.bind(this));
-        $('body').delegate(self.moduleDescription, "click", self.modcontentHandler.bind(this));
+        $('body').delegate(self.fullDescription, "click", self.fullmodcontentHandler.bind(this));
+        $('body').delegate(self.trimDescription, "click", self.trimmodcontentHandler.bind(this));
     };
 
         /**
@@ -62,6 +63,8 @@
 
         DesignerSection.prototype.moduleBlock = ".designer #designer-section-content li.activity";
         DesignerSection.prototype.moduleDescription = ".designer #designer-section-content li .mod-description-action";
+        DesignerSection.prototype.fullDescription = "#designer-section-content li .fullcontent-summary .mod-description-action";
+        DesignerSection.prototype.trimDescription = "#designer-section-content li .trim-summary .mod-description-action";
 
     DesignerSection.prototype.sectionRestrictHandler = function(event) {
         var sectionRestrictInfo = $(event.currentTarget).parent();
@@ -129,15 +132,23 @@
         }
     };
 
-    DesignerSection.prototype.modcontentHandler = function(event) {
+    DesignerSection.prototype.fullmodcontentHandler = function(event) {
         var THIS = $(event.currentTarget);
-        var fullContent = $(THIS).parent();
+        let fullContent = $(THIS).closest('li.activity').find('.fullcontent-summary');
+        let trimcontent = $(THIS).closest('li.activity').find('.trim-summary');
+        if (trimcontent.hasClass('summary-hide')) {
+            trimcontent.removeClass('summary-hide');
+            fullContent.addClass('summary-hide');
+        }
+    };
+
+    DesignerSection.prototype.trimmodcontentHandler = function(event) {
+        var THIS = $(event.currentTarget);
+        let fullContent = $(THIS).closest('li.activity').find('.fullcontent-summary');
+        let trimcontent = $(THIS).closest('li.activity').find('.trim-summary');
         if (fullContent.hasClass('summary-hide')) {
             fullContent.removeClass('summary-hide');
-            $(THIS).text("Less");
-        } else {
-            fullContent.addClass('summary-hide');
-            $(THIS).text("More");
+            trimcontent.addClass('summary-hide');
         }
     };
 

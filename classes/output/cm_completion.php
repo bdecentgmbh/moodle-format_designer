@@ -99,11 +99,8 @@ class cm_completion implements renderable, templatable {
                 return false;
             }
         }
-        if (!isloggedin() || isguestuser() || $this->get_completion_mode() == COMPLETION_TRACKING_NONE) {
-            return false;
-        }
 
-        if ($this->get_completion_state() == COMPLETION_INCOMPLETE && !$this->get_completion_expected()) {
+        if (!isloggedin() || isguestuser() || $this->get_completion_mode() == COMPLETION_TRACKING_NONE) {
             return false;
         }
 
@@ -309,6 +306,10 @@ class cm_completion implements renderable, templatable {
         // conditional activities system, we need to turn
         // off the JS.
         $extraclass = '';
+        $buttonclass = 'btn btn-link';
+        if ($this->is_restricted()) {
+            $buttonclass .= ' disabled';
+        }
         if (!empty($CFG->enableavailability) &&
             info::completion_value_used($this->cm->get_course(), $this->cm->id)) {
             $extraclass = ' preventjs';
@@ -327,7 +328,7 @@ class cm_completion implements renderable, templatable {
             'type' => 'hidden', 'name' => 'completionstate', 'value' => $newstate));
         $output .= html_writer::tag('button',
             $OUTPUT->pix_icon('i/completion-' . $completionicon, $imgalt),
-            array('class' => 'btn btn-link', 'aria-live' => 'assertive'));
+            array('class' => $buttonclass, 'aria-live' => 'assertive'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('form');
         return $output;
@@ -379,7 +380,7 @@ class cm_completion implements renderable, templatable {
                 } else if ($this->is_overdue()) {
                     return 'danger';
                 } else {
-                    return 'purple';
+                    return 'notstarted';
                 }
             }
 
@@ -421,6 +422,7 @@ class cm_completion implements renderable, templatable {
             'duetoday' => $this->is_due_today(),
             'colorclass' => $this->get_color_class(),
             'completioncheckbox' => $this->get_completion_checkbox(),
+            'completionexpected' => ($this->get_completion_expected()) ? true : false,
             'completiontrackingmanual' => $this->get_completion_mode() == COMPLETION_TRACKING_MANUAL,
             'completiontrackingautomatic' => $this->get_completion_mode() == COMPLETION_TRACKING_AUTOMATIC,
             'completionincomplete' => $this->get_completion_state() == COMPLETION_INCOMPLETE,

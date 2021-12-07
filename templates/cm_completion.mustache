@@ -47,7 +47,12 @@
                         <span class="badge badge-completion badge-{{colorclass}}">{{{completioncheckbox}}} <span><i class="fa fa-exclamation-triangle"></i> {{#str}}overdue, format_designer{{/str}} {{overdueby}}</span></span>
                     {{/isoverdue}}
                     {{^isoverdue}}
-                        <span class="badge badge-completion badge-{{colorclass}}">{{{completioncheckbox}}} <span><i class="fa fa-calendar"></i> {{#str}}completeby, format_designer{{/str}} {{completionexpected}}</span></span>
+                        {{#completionexpected}}
+                            <span class="badge badge-completion badge-{{colorclass}}">{{{completioncheckbox}}} <span><i class="fa fa-calendar"></i> {{#str}}completeby, format_designer{{/str}} {{completionexpected}}</span></span>
+                        {{/completionexpected}}
+                        {{^completionexpected}}
+                            <span class="badge badge-completion badge-{{colorclass}}">{{{completioncheckbox}}} <span><i class="fa fa-circle-o"></i> {{#str}}notyetcompleted, format_designer{{/str}}</span></span>
+                        {{/completionexpected}}
                     {{/isoverdue}}
                 {{/duetoday}}
                 {{#isoverridden}}
@@ -72,7 +77,12 @@
                         <span class="badge badge-completion badge-{{colorclass}}"><span><i class="fa fa-exclamation-triangle"></i> {{#str}}overdue, format_designer{{/str}} {{overdueby}}</span></span>
                     {{/isoverdue}}
                     {{^isoverdue}}
-                        <span class="badge badge-completion badge-{{colorclass}}"><span><i class="fa fa-calendar"></i> {{#str}}completeby, format_designer{{/str}} {{completionexpected}}</span></span>
+                        {{#completionexpected}}
+                            <span class="badge badge-completion badge-{{colorclass}}"><span><i class="fa fa-calendar"></i> {{#str}}completeby, format_designer{{/str}} {{completionexpected}}</span></span>
+                        {{/completionexpected}}
+                        {{^completionexpected}}
+                            <span class="badge badge-completion badge-{{colorclass}}"><span><i class="fa fa-circle-o"></i> {{#str}}notyetcompleted, format_designer{{/str}}</span></span>
+                        {{/completionexpected}}
                     {{/isoverdue}}
                 {{/duetoday}}
                 {{#isoverridden}}

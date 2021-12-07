@@ -48,7 +48,7 @@ Feature: Sections can be check activity completion element in designer format
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I check the activity "assign1" to element "/descendant::div[contains(@class, 'purple')]"
+    And I check the activity "assign1" to element "/descendant::div[contains(@class, 'notstarted')]"
     And I click on activity "assign1"
     When I toggle the manual completion state of "Test assignment name"
     Then the manual completion button of "Test assignment name" is displayed as "Done"
@@ -68,7 +68,7 @@ Feature: Sections can be check activity completion element in designer format
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    Then I check the activity "assign2" to element "/descendant::div[contains(@class, 'purple')]"
+    Then I check the activity "assign2" to element "/descendant::div[contains(@class, 'notstarted')]"
     Then I check the activity "assign2" to element "/descendant::div[contains(@class, 'completion-info')]/descendant::i[contains(@class, 'fa-calendar')]"
     And I should see designerinfo "assign2" "Complete by " "##last day of +5 days##%d %B %Y##"
     And I click on activity "assign2"

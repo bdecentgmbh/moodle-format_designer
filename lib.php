@@ -615,20 +615,16 @@ function format_designer_format_date(int $timestamp) {
  *
  * @param string $str
  * @param int $n
- * @param string $endchar
  * @return string
  */
-function format_designer_modcontent_trim_char($str, $n = 500, $endchar = '&#8230;') {
-    if (strlen($str) < $n) {
+function format_designer_modcontent_trim_char($str, $n = 25) {
+    if (str_word_count($str) < $n) {
         return $str;
     }
-    $str = preg_replace("/\s+/", ' ', str_replace(array("\r\n", "\r", "\n"), ' ', $str));
-    if (strlen($str) <= $n) {
-        return $str;
-    }
-    $out = "";
-    $small = substr($str, 0, $n);
-    $out = $small.$endchar;
-    return $out;
+    $arrstr = explode(" ", $str);
+    $slicearr = array_slice($arrstr, 0, $n);
+    $strarr = implode(" ", $slicearr);
+    $strarr .= '...';
+    return $strarr;
 }
 

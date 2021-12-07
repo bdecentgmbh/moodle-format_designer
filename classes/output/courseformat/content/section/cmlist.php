@@ -223,17 +223,21 @@ class cmlist extends cmlist_base {
             $cmtextcontent = format_string($cmtext);
             $modcontent = '';
             if (!empty($cmtextcontent)) {
-                if (strlen($cmtextcontent) >= 160) {
+                if (str_word_count($cmtextcontent) > 23) {
                     $modcontenthtml = '';
+                    $modcontenthtml .= html_writer::start_tag('div', array('class' => 'trim-summary'));
+                    $modcontenthtml .= format_designer_modcontent_trim_char($cmtextcontent, 24);
+                    $modcontenthtml .= \html_writer::link('javascript:void(0)', get_string('more'),
+                    array('class' => 'mod-description-action'));
+                    $modcontenthtml .= html_writer::end_tag('div');
                     $modcontenthtml .= html_writer::start_tag('div', array('class' => 'fullcontent-summary summary-hide'));
                     $modcontenthtml .= $cmtextcontent;
-                    $modurl = \html_writer::link('javascript:void(0)', get_string('more'),
-                        array('class' => 'mod-description-action'));
-                    $modcontenthtml .= $modurl;
+                    $modcontenthtml .= " " .\html_writer::link('javascript:void(0)', get_string('less', 'format_designer'),
+                    array('class' => 'mod-description-action'));
                     $modcontenthtml .= html_writer::end_tag('div');
                     $modcontent = $modcontenthtml;
                 } else {
-                    $modcontent = html_writer::tag('p', $cmtextcontent);;
+                    $modcontent = html_writer::tag('p', $cmtextcontent);
                 }
             }
         }
