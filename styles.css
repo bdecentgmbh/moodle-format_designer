@@ -54,7 +54,7 @@ ul.designer .card.card-list:hover .card-body .mod-indent-outer .mod-indent .row 
 }
 .course-content ul.designer li.section .availability-section-block {
     float: right;
-    margin-top: 10px;
+    margin-top: 0;
     margin-bottom: 10px;
     margin-right: 10px;
 }
@@ -87,8 +87,8 @@ ul.designer .card.card-list:hover .card-body .mod-indent-outer .mod-indent .row 
     line-height: 30px;
     color: #ccc;
 }
-ul.designer .card.card-list.purple {
-    border-left-color: #0f6fc5;
+ul.designer .card.card-list.notstarted {
+    border-left-color: var(--primary);
 }
 ul.designer .card.card-list.success {
     border-left-color: #28a745;
@@ -106,7 +106,6 @@ ul.designer .card.card-list.muted {
     border-left-color: #d8d8d8;
 }
 ul.designer .card.card-list.secondary {
-    /* min-height: 150px; */
     border-left-color: #d8d8d8;
 }
 .editing ul.designer .section .list-layout li.activity {
@@ -127,8 +126,8 @@ ul.designer .card.card-list.secondary {
     top: 5px;
     right: 5px;
 }
-ul.designer .text-purple {
-    color: #0f6fc5;
+ul.designer .text-notstarted {
+    color: var(--primary);
 }
 ul.designer .badge.badge-completion {
     min-width: 125px;
@@ -138,9 +137,6 @@ ul.designer .badge.badge-completion {
     padding: 0 0.5em;
 }
 ul.designer .module-icons {
-    /* top: 0;
-    right: 0;
-    position: absolute; */
     margin-left: 20px;
 }
 ul.designer li.activity .activity-block .card:hover .show-on-hover {
@@ -173,13 +169,13 @@ ul.designer li.activity .activity-block .card:hover .show-on-hover .col .restric
 }
 ul.designer .module-icons a.dropdown-toggle,
 ul.designer .module-icons .menubar > .action-menu-item > a {
-    color: #0f6fc5;
+    color: var(--primary);
     font-weight: bold;
     font-size: 0.75em;
 }
-ul.designer .badge.badge-purple {
+ul.designer .badge.badge-notstarted {
     color: white;
-    background-color: #0f6fc5;
+    background-color: var(--primary);
 }
 
 @media (max-width: 991px) {
@@ -253,7 +249,7 @@ body.editing ul.designer .section .activity .editing_move {
     margin: 0;
     list-style: none;
 }
-.course-content ul.designer li.section {
+.course-content ul.designer li.section.main {
     padding-bottom: 1rem;
     margin-top: 1.5rem;
     border: 0;
@@ -315,9 +311,6 @@ body.editing ul.designer .section .activity .editing_move {
 }
 
 @media (max-width: 767px) {
-    /* .course-content ul.designer li.section > .d-flex {
-        display: block !important;
-    } */
     .course-content ul.designer li.section > .d-flex a.btn-icon {
         display: inline-block;
     }
@@ -459,15 +452,9 @@ ul li {
 .designer .section.list-layout .activity .restricted .instancename {
     color: #6a737b;
 }
-/* .designer .section.card-layout .activity img.activityicon {
-    top: 30px;
-} */
 .designer .section.img-text .activity .activityinstance .instancename {
     font-size: 20px;
 }
-/* .designer .section.img-text.card-layout .activity .activityinstance .instancename {
-    color: #6a737b;
-} */
 .designer .section.img-text.card-layout .activity .restricted .activityinstance .instancename {
     color: #ccc;
 }
@@ -541,9 +528,6 @@ ul li {
 .designer .section .content .section.link-layout li.activity .mod-indent-outer {
     padding-top: 30px;
 }
-/* .designer .section .content .section.list-layout li.activity .mod-indent-outer {
-    padding-top: 10px;
-} */
 .designer .section .content .section.list-layout li.activity .mod-indent-outer > .icon {
     position: absolute;
 }
@@ -580,7 +564,7 @@ ul li {
 .designer .section .content .section.link-layout li.activity .center-reports-block {
     width: 23%;
     display: inline-block;
-    vertical-align: top;
+    vertical-align: middle;
 }
 .designer .section .content .section.link-layout li.activity .center-reports-block .pull-right {
     float: none;
@@ -655,49 +639,6 @@ ul li {
 }
 .designer .section .content .section li.activity .restricted .mod-content {
     opacity: .5;
-}
-.designer .section .content .section li.activity .mod-content .fullcontent-summary.summary-hide,
-.designer .section .content .section li.activity .restricted .mod-content {
-    height: 70px;
-    text-overflow: ellipsis;
-    -webkit-line-clamp: 3;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    position: relative;
-}
-.designer .section .content .section li.activity .mod-content .fullcontent-summary.summary-hide:before {
-    content: '...';
-    position: absolute;
-    right: 80px;
-    bottom: 2px;
-    z-index: 2;
-}
-.designer .section .content .section li.activity .mod-content .fullcontent-summary a.mod-description-action {
-    margin-left: 10px;
-}
-.designer .section .content .section li.activity .mod-content .fullcontent-summary.summary-hide
-a.mod-description-action {
-    position: absolute;
-    bottom: 2px;
-    right: 40px;
-    z-index: 2;
-}
-.designer .section .content .section li.activity .mod-content .fullcontent-summary.summary-hide:after {
-    width: 90px;
-    content: '';
-    height: 23px;
-    background: #fff;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    z-index: 1;
-}
-.designer .section .content .section li.activity .danger .mod-content .fullcontent-summary.summary-hide:after {
-    background: #ffe6e8;
-}
-.designer .section .content .section li.activity .warning .mod-content .fullcontent-summary.summary-hide:after {
-    background: #ffe4cf;
 }
 .designer .section .content .section li.activity .restricted .mod-content p {
     color: #6a737b;
@@ -864,3 +805,9 @@ a.mod-description-action {
     }
 }
 
+.designer .section .content .section li.activity .mod-content .trim-summary.summary-hide {
+    display: none;
+}
+.designer .section .content .section li.activity  .mod-content .fullcontent-summary.summary-hide {
+    display: none;
+}

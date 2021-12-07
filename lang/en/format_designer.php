@@ -106,3 +106,5 @@ $string['modvisit'] = 'Visited {$a} times';
 $string['link'] = "Text links (Default)";
 $string['list'] = "List";
 $string['cards'] = "Cards";
+$string['notyetcompleted'] = "Not yet completed";
+$string['less'] = "Less";

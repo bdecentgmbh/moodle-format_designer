@@ -51,7 +51,8 @@
         $('body').delegate(self.SectionController, 'click', self.sectionLayoutaction.bind(this));
         $("body").delegate(self.RestrictInfo, "click", self.moduleHandler.bind(this));
         $("body").delegate(self.sectionRestricted, "click", this.sectionRestrictHandler.bind(this));
-        $("body").delegate(self.moduleDescription, "click", this.modcontentHandler.bind(this));
+        $('body').delegate(self.fullDescription, "click", self.fullmodcontentHandler.bind(this));
+        $('body').delegate(self.trimDescription, "click", self.trimmodcontentHandler.bind(this));
         $('body').on('click keypress', SELECTOR.ACTIVITYLI + ' ' +
         SELECTOR.ACTIVITYACTION + '[data-action]', this.editModuleRenderer.bind(this));
     };
@@ -70,6 +71,10 @@
     DesignerSection.prototype.sectionRestricted = ".designer .availability-section-block .section-restricted-action";
 
     DesignerSection.prototype.moduleDescription = ".designer #designer-section-content li .mod-description-action";
+
+    DesignerSection.prototype.fullDescription = "#designer-section-content li .fullcontent-summary .mod-description-action";
+
+    DesignerSection.prototype.trimDescription = "#designer-section-content li .trim-summary .mod-description-action";
 
     DesignerSection.prototype.addSectionSpinner = function(sectioninfo) {
         var sectionelement = $(sectioninfo).addClass('editinprogress');
@@ -177,15 +182,23 @@
         }
     };
 
-    DesignerSection.prototype.modcontentHandler = function(event) {
+    DesignerSection.prototype.fullmodcontentHandler = function(event) {
         var THIS = $(event.currentTarget);
-        var fullContent = $(THIS).parent();
+        let fullContent = $(THIS).closest('li.activity').find('.fullcontent-summary');
+        let trimcontent = $(THIS).closest('li.activity').find('.trim-summary');
+        if (trimcontent.hasClass('summary-hide')) {
+            trimcontent.removeClass('summary-hide');
+            fullContent.addClass('summary-hide');
+        }
+    };
+
+    DesignerSection.prototype.trimmodcontentHandler = function(event) {
+        var THIS = $(event.currentTarget);
+        let fullContent = $(THIS).closest('li.activity').find('.fullcontent-summary');
+        let trimcontent = $(THIS).closest('li.activity').find('.trim-summary');
         if (fullContent.hasClass('summary-hide')) {
             fullContent.removeClass('summary-hide');
-            $(THIS).text("Less");
-        } else {
-            fullContent.addClass('summary-hide');
-            $(THIS).text("More");
+            trimcontent.addClass('summary-hide');
         }
     };
 
@@ -259,7 +272,7 @@
                     $('#' + sectionId).find('ul.section').removeClass(ULClasses.cards);
                     $('#' + sectionId).find('ul.section').removeClass(ULClasses.list);
                     $('#' + sectionId).find('ul.section').removeClass(ULClasses.default);
-                    $('#' + sectionId).find('ul.section').addClass(ULClasses.layout);
+                    $('#' + sectionId).find('ul.section').addClass(ULClasses[layout]);
                 }
             });
         Loadingicon.addIconToContainerRemoveOnCompletion(iconBlock, promises);

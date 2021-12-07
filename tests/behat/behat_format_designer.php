@@ -161,6 +161,29 @@ class behat_format_designer extends behat_base {
     }
 
     /**
+     * Manual completion for designer format.
+     *
+     * @Given /^I toggle assignment manual completion designer "(?P<acti_id>(?:[^"]|\\")*)" "(?P<acti_type>(?:[^"]|\\")*)"$/
+     * @throws DriverException The step is not available when Javascript is disabled
+     * @param string $activityname
+     * @param string $activityidendifier
+     */
+    public function i_toggle_assignment_manual_completion_designer($activityname, $activityidendifier) {
+        global $CFG;
+        if (round($CFG->version) > 2020111000) {
+            // Moodle-3.11 and above.
+            $this->i_click_on_activity($activityidendifier);
+            $this->execute("behat_completion::toggle_the_manual_completion_state", [$activityname]);
+            $this->execute("behat_completion::manual_completion_button_displayed_as", [$activityname, "Done"]);
+        } else {
+            // Moodle-3.11 below.
+            $element = "Not completed: $activityname. Select to mark as complete.";
+            $this->execute("behat_general::i_click_on", [$element, "icon"]);
+            $this->execute("behat_completion::activity_marked_as_complete", [$activityname, "assign", "manual"]);
+        }
+    }
+
+    /**
      * Get activity xpath selector
      *
      * @param string $activityidendifier
@@ -178,4 +201,5 @@ class behat_format_designer extends behat_base {
         $this->find('xpath', $xpath, $exception);
         return $xpath;
     }
+
 }
