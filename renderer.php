@@ -650,9 +650,6 @@ class format_designer_renderer extends format_section_renderer_base {
                 $sectionstyle = ' current';
             }
         }
-
-       
-
         $leftcontent = $this->section_left_content($section, $course, $onsectionpage);
         $rightcontent = $this->section_right_content($section, $course, $onsectionpage);
         $sectionname = html_writer::tag('span', $this->section_title($section, $course));

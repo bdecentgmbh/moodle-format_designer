@@ -35,6 +35,8 @@ use context_module;
 use coding_exception;
 use moodle_exception;
 use completion_info;
+use html_writer;
+
 require_once($CFG->libdir.'/externallib.php');
 require_once($CFG->dirroot.'/course/format/lib.php');
 
@@ -155,7 +157,13 @@ trait set_section_options {
         $format = course_get_format($course);
         $sectiontype = $format->get_section_option($sectionid, 'sectiontype') ?: 'default';
         $templatename = 'format_designer/cm/module_layout_' . $sectiontype;
-        return $OUTPUT->render_from_template($templatename, $cmlistdata);
+        $liclass = $sectiontype;
+        $liclass .= ' '.$cmlistdata['modclasses'];
+        $liclass .= (isset($cmlistdata['isrestricted']) && $cmlistdata['isrestricted']) ? ' restricted' : '';
+        $html = \html_writer::start_tag('li', ['class' => $liclass, 'id' => $cmlistdata['id']]);
+        $html .= $OUTPUT->render_from_template($templatename, $cmlistdata);
+        $html .= \html_writer::end_tag('li');
+        return $html;
     }
 
     /**

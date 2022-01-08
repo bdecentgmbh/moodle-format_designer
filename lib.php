@@ -489,10 +489,10 @@ class format_designer extends format_base {
                 $moduledata = $courserenderer->render_course_module($cm, $sr, []);
                 $liclass = $sectiontype;
                 $liclass .= ' '.$moduledata['modclasses'];
-                $liclass .= (isset($moduledata['isrestricted']) && $moduledata['isrestricted']) ? ' restricted' :'';
+                $liclass .= (isset($moduledata['isrestricted']) && $moduledata['isrestricted']) ? ' restricted' : '';
                 $html = html_writer::start_tag('li', ['class' => $liclass, 'id' => $moduledata['id']]);
                 $html .= $courserenderer->render_from_template($templatename, $moduledata);
-                $html .= '</li>';
+                $html .= html_writer::end_tag('li');
                 $modules[] = $html;
             }
         }
