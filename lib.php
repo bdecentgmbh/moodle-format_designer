@@ -274,7 +274,7 @@ class format_designer extends format_base {
     /**
      * Adds format options elements to the course/section edit form.
      *
-     * This function is called from {@link course_edit_form::definition_after_data()}.
+     * This function is called from {@see course_edit_form::definition_after_data()}.
      *
      * @param MoodleQuickForm $mform form the elements are added to.
      * @param bool $forsection 'true' if this is a section edit form, 'false' if this is course edit form.
@@ -303,13 +303,49 @@ class format_designer extends format_base {
     }
 
     /**
+     * Definitions of the additional options that this course format uses for section
+     *
+     * See course_format::course_format_options() for return array definition.
+     *
+     * Additionally section format options may have property 'cache' set to true
+     * if this option needs to be cached in get_fast_modinfo(). The 'cache' property
+     * is recommended to be set only for fields used in course_format::get_section_name(),
+     * course_format::extend_course_navigation() and course_format::get_view_url()
+     *
+     * For better performance cached options are recommended to have 'cachedefault' property
+     * Unlike 'default', 'cachedefault' should be static and not access get_config().
+     *
+     * Regardless of value of 'cache' all options are accessed in the code as
+     * $sectioninfo->OPTIONNAME
+     * where $sectioninfo is instance of section_info, returned by
+     * get_fast_modinfo($course)->get_section_info($sectionnum)
+     * or get_fast_modinfo($course)->get_section_info_all()
+     *
+     * All format options for particular section are returned by calling:
+     * $this->get_format_options($section);
+     *
+     * @param bool $foreditform
+     * @return array
+     */
+    public function section_format_options($foreditform = false) {
+        return array(
+            'sectiontype' => array(
+                'type' => PARAM_ALPHA,
+                'label' => '',
+                'element_type' => 'hidden',
+                'default' => 'default',
+            ),
+        );
+    }
+
+    /**
      * Updates format options for a course.
      *
      * In case if course format was changed to 'designer', we try to copy options
      * 'coursedisplay' and 'hiddensections' from the previous format.
      *
-     * @param stdClass|array $data return value from {@link moodleform::get_data()} or array with data
-     * @param stdClass $oldcourse if this function is called from {@link update_course()}
+     * @param stdClass|array $data return value from {@see moodleform::get_data()} or array with data
+     * @param stdClass $oldcourse if this function is called from {@see update_course()}
      *     this object contains information about the course before update
      * @return bool whether there were any changes to the options values
      */
@@ -332,7 +368,7 @@ class format_designer extends format_base {
     /**
      * Whether this format allows to delete sections.
      *
-     * Do not call this function directly, instead use {@link course_can_delete_section()}
+     * Do not call this function directly, instead use {@see course_can_delete_section()}
      *
      * @param int|stdClass|section_info $section
      * @return bool
@@ -409,10 +445,53 @@ class format_designer extends format_base {
         }
 
         // For show/hide actions call the parent method and return the new content for .section_availability element.
-        $rv = parent::section_action($section, $action, $sr);
+        $rv = $this->section_action_module($section, $action, $sr);
         $renderer = $PAGE->get_renderer('format_designer');
         $rv['section_availability'] = $renderer->section_availability($this->get_section($section));
         return $rv;
+    }
+
+    /**
+     * Get the section cm info return to ajax.
+     * @param section_info|stdClass $section
+     * @param string $action
+     * @param int $sr
+     * @return null|array any data for the Javascript post-processor (must be json-encodeable)
+     */
+    public function section_action_module($section, $action, $sr) {
+        global $PAGE;
+        $course = $this->get_course();
+        $coursecontext = context_course::instance($course->id);
+        switch($action) {
+            case 'hide':
+            case 'show':
+                require_capability('moodle/course:sectionvisibility', $coursecontext);
+                $visible = ($action === 'hide') ? 0 : 1;
+                course_update_section($course, $section, array('visible' => $visible));
+                break;
+            case 'setsectionoption':
+                break;
+            default:
+                throw new moodle_exception('sectionactionnotsupported', 'core', null, s($action));
+        }
+
+        $modules = [];
+
+        $modinfo = get_fast_modinfo($course);
+        $coursesections = $modinfo->sections;
+        $sectiontype = $this->get_section_option($section->id, 'sectiontype') ?: 'default';
+        $templatename = 'format_designer/cm/module_layout_' . $sectiontype;
+        if (array_key_exists($section->section, $coursesections)) {
+            $courserenderer = $PAGE->get_renderer('format_designer');
+            $completioninfo = new completion_info($course);
+            foreach ($coursesections[$section->section] as $cmid) {
+                $cm = $modinfo->get_cm($cmid);
+                $moduledata = $courserenderer->render_course_module($cm, $sr, []);
+                $modules[] = $courserenderer->render_from_template($templatename, $moduledata);
+            }
+        }
+
+        return ['modules' => $modules];
     }
 
     /**
@@ -429,19 +508,19 @@ class format_designer extends format_base {
     /**
      * Set any arbitrary/custom option on this format, for a section.
      *
-     * @param int $sectionnumber Course section number to set option for.
+     * @param int $sectionid Course section number to set option for.
      * @param string $name Option name.
      * @param string $value Option value.
      * @return int Option record ID.
      * @throws dml_exception
      */
-    public function set_section_option(int $sectionnumber, string $name, string $value): int {
+    public function set_section_option(int $sectionid, string $name, string $value): int {
         global $DB;
 
         $common = [
             'courseid' => $this->courseid,
             'format' => 'designer',
-            'sectionid' => $sectionnumber,
+            'sectionid' => $sectionid,
             'name' => $name
         ];
 
@@ -459,18 +538,18 @@ class format_designer extends format_base {
     /**
      * Get section option.
      *
-     * @param int $sectionnumber Course section number to get option for.
+     * @param int $sectionid Course section number to get option for.
      * @param string $name Option name.
      * @return string|null
      * @throws dml_exception
      */
-    public function get_section_option(int $sectionnumber, string $name): ?string {
+    public function get_section_option(int $sectionid, string $name): ?string {
         global $DB;
 
         return $DB->get_field('course_format_options', 'value', [
             'courseid' => $this->courseid,
             'format' => 'designer',
-            'sectionid' => $sectionnumber,
+            'sectionid' => $sectionid,
             'name' => $name
         ]) ?: null;
     }
@@ -478,16 +557,16 @@ class format_designer extends format_base {
     /**
      * Get all options for section.
      *
-     * @param int $sectionnumber
-     * @return array Options array [name => value, ..]
+     * @param int $sectionid
+     * @return array Options
      */
-    public function get_section_options(int $sectionnumber): array {
+    public function get_section_options(int $sectionid): array {
         global $DB;
 
         return $DB->get_records_menu('course_format_options', [
             'courseid' => $this->courseid,
             'format' => 'designer',
-            'sectionid' => $sectionnumber
+            'sectionid' => $sectionid
         ], '', 'name, value');
     }
 }
@@ -528,4 +607,22 @@ function format_designer_format_date(int $timestamp) {
     }
 
     return userdate($timestamp, get_string($format, $component));
+}
+
+/**
+ * Cut the Course content.
+ *
+ * @param string $str
+ * @param int $n
+ * @return string
+ */
+function format_designer_modcontent_trim_char($str, $n = 25) {
+    if (str_word_count($str) < $n) {
+        return $str;
+    }
+    $arrstr = explode(" ", $str);
+    $slicearr = array_slice($arrstr, 0, $n);
+    $strarr = implode(" ", $slicearr);
+    $strarr .= '...';
+    return $strarr;
 }

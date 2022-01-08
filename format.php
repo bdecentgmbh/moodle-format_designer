@@ -55,7 +55,9 @@ if (!empty($displaysection)) {
 } else {
     $renderer->print_multiple_section_page($course, null, null, null, null);
 }
-
+$PAGE->requires->js_call_amd('format_designer/designer_section', 'init',
+    array('courseid' => $course->id, 'contextid' => $context->id));
+$PAGE->requires->js_call_amd('format_designer/designer_ordering', 'init');
 // Include course format js module.
 $PAGE->requires->js('/course/format/designer/format.js');
 

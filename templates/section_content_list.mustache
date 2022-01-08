@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template format_designer/section_layout_cards
+    @template format_designer/section_content_list
 
     Displays the course module card layout
 
@@ -24,18 +24,10 @@
         "reactionurl_dislike": "http://moodleurl/course/format/designer/renderer.php"
     }
 }}
-{{<format_designer/section_layout}}
-    {{$content}}
-
-    {{#sectionname}}
-        <h3 id="sectionid-{{section.id}}-title" class="sectionname">{{{sectionname}}}</h3>
-    {{/sectionname}}
-       {{> format_designer/section_availability}}
-
-        <div class="summary">
-            {{{sectionsummary}}}
-        </div>
-        {{> format_designer/section_content_cards}}
-        {{{cmcontrol}}}
-    {{/content}}
-{{/format_designer/section_layout}}
+<ul class="section img-text list-layout" id="designer-section-content" data-sectionlayout="{{sectionlayoutclass}}">
+    {{#cmlist}}
+        {{#modstatus}}
+            {{> format_designer/cm/module_layout_list}}
+        {{/modstatus}}
+    {{/cmlist}}
+</ul>

@@ -1,8 +1,35 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template format_designer/section_layout
+
+    Displays the course module card layout
+
+    Example context (json):
+    {
+        "reactionurl_dislike": "http://moodleurl/course/format/designer/renderer.php"
+    }
+}}
 <li id="section-{{section.section}}"
-    class="section section-type-{{sectiontype}} main clearfix {{sectionstyle}}"
+    class="section section-type-{{sectiontype}} main clearfix {{sectionstyle}} {{#sectionrestrict}} restricted {{/sectionrestrict}}"
     role="region"
     aria-labelledby="sectionid-{{section.id}}-title"
     data-sectionid="{{section.section}}"
+    data-id="{{section.id}}"
     data-sectionreturnid="{{sectionreturn}}">
 
     <div class="left side">
@@ -11,6 +38,7 @@
 
     <div class="right side">
         {{{rightcontent}}}
+        <div class="icon-loader-block"></div>
     </div>
 
     <div class="content">
@@ -19,10 +47,3 @@
         {{/content}}
     </div>
 </li>
-
-{{#js}}
-    require(['format_designer/designer_section'], function(DesignerSection) {
-        console.log("HERE");
-        var ds = new DesignerSection('#section-{{section.section}}', {{courseid}});
-    });
-{{/js}}
