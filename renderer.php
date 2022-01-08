@@ -651,6 +651,8 @@ class format_designer_renderer extends format_section_renderer_base {
             }
         }
 
+       
+
         $leftcontent = $this->section_left_content($section, $course, $onsectionpage);
         $rightcontent = $this->section_right_content($section, $course, $onsectionpage);
         $sectionname = html_writer::tag('span', $this->section_title($section, $course));
@@ -717,6 +719,20 @@ class format_designer_renderer extends format_section_renderer_base {
                 'cmcontrol' => $cmcontrol
             ]);
         }
+
+        $sectionclass = 'section-type-'.$sectiontype.' '.$sectionstyle;
+        $sectionclass .= ($sectionrestrict) ? 'restricted' : '';
+        $sectionhead = html_writer::start_tag('li', [
+            'id' => 'section-'.$section->section,
+            'class' => 'section main clearfix'.$sectionclass,
+            'role' => 'region',
+            'aria-labelledby' => "sectionid-{$section->id}-title",
+            'data-sectionid' => $section->section,
+            'data-sectionreturnid' => $sectionreturn,
+            'data-id' => $section->id
+        ]);
+
+        echo $sectionhead;
         echo $this->render_from_template($templatename, [
             'section' => $section,
             'sectiontype' => $sectiontype,
@@ -733,6 +749,7 @@ class format_designer_renderer extends format_section_renderer_base {
             'courseid' => $course->id,
             'cmcontrol' => $cmcontrol
         ]);
+        echo html_writer::end_tag('li');
     }
 
 

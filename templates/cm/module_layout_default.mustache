@@ -29,45 +29,43 @@
 
     }
 }}
-<li id="{{id}}" class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}}">
-    <div class="activity-block designer">
-        {{{movehtml}}}
-        <div class="mod-indent-outer w-100">
-            <div class="{{indentclasses}}"></div>
-                <div>
-                    {{#cmname}}
-                        <div class="activityinstance">
-                            {{{cmname}}}
-                            {{{afterlink}}}
-                        </div>
-                    {{/cmname}}
-                    {{{beforecontent}}}
-
-                    <div class="center-reports-block">
-                        <div class="row h-100 pull-right">
-                            <div class="col align-self-center">
-                                {{{cmcompletionhtml}}}
-                                {{#modvisits}}
-                                <div class="mod-visits-block text-muted">
-                                    <p>{{modvisits}}</p>
-                                </div>
-                                {{/modvisits}}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="action-html-card">
-                        {{{calltoactionhtml}}}
-                    </div>
-
-                    {{#modicons}}
-                        <div class="actions">
-                            {{{modicons}}}
-                        </div>
-                    {{/modicons}}
-
-                    {{{aftercontent}}}
+<div class="activity-block designer">
+    {{{movehtml}}}
+    <div class="mod-indent-outer w-100">
+        <div class="{{indentclasses}}"></div>
+        <div>
+            {{#cmname}}
+                <div class="activityinstance">
+                    {{{cmname}}}
+                    {{{afterlink}}}
                 </div>
+            {{/cmname}}
+            {{{beforecontent}}}
+
+            <div class="center-reports-block">
+                <div class="row h-100 pull-right">
+                    <div class="col align-self-center">
+                        {{{cmcompletionhtml}}}
+                        {{#modvisits}}
+                        <div class="mod-visits-block text-muted">
+                            <p>{{modvisits}}</p>
+                        </div>
+                        {{/modvisits}}
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-html-card">
+                {{{calltoactionhtml}}}
+            </div>
+
+            {{#modicons}}
+                <div class="actions">
+                    {{{modicons}}}
+                </div>
+            {{/modicons}}
+
+            {{{aftercontent}}}
         </div>
     </div>
-</li>
+</div>

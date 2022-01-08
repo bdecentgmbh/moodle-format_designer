@@ -27,7 +27,9 @@
 <ul class="section img-text card-deck card-layout" id="designer-section-content" data-sectionlayout="{{sectionlayoutclass}}">
     {{#cmlist}}
         {{#modstatus}}
+            <li id="{{id}}" class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}} card">
                 {{> format_designer/cm/module_layout_cards}}
+            </li>
         {{/modstatus}}
     {{/cmlist}}
 </ul>

@@ -29,55 +29,54 @@
 
     }
 }}
-<li id="{{id}}" class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}} card">
-    <div class="activity-block designer">
-        {{{movehtml}}}
-        <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{cm.url}}" style="cursor: pointer">
-            <div class="card-body">
-                <div class="mod-indent-outer w-100">
-                    <div class="{{indentclasses}}"></div>
-                    <div>
-                        {{#cmname}}
-                            <div class="activityinstance">
-                                <div class="activity-type">
-                                    <p>{{modtype}}</p>
-                                </div>
-                                {{{cmname}}}
-                                {{{afterlink}}}
-                            </div>
-                        {{/cmname}}
-                        {{{beforecontent}}}
 
-                        {{#modcontent}}
-                            <div class="mod-content">
-                                {{{modcontent}}}
+<div class="activity-block designer">
+    {{{movehtml}}}
+    <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{cm.url}}" style="cursor: pointer">
+        <div class="card-body">
+            <div class="mod-indent-outer w-100">
+                <div class="{{indentclasses}}"></div>
+                <div>
+                    {{#cmname}}
+                        <div class="activityinstance">
+                            <div class="activity-type">
+                                <p>{{modtype}}</p>
                             </div>
-                        {{/modcontent}}
-
-                        {{#cmcompletionhtml}}
-                            <div class="completion-html-card">
-                                {{{cmcompletionhtml}}}
-                            </div>
-                        {{/cmcompletionhtml}}
-
-                        {{#modvisits}}
-                        <div class="mod-visits-block">
-                            <p>{{modvisits}}</p>
+                            {{{cmname}}}
+                            {{{afterlink}}}
                         </div>
-                        {{/modvisits}}
+                    {{/cmname}}
+                    {{{beforecontent}}}
 
-                        <div class="action-html-card">
-                            {{{calltoactionhtml}}}
+                    {{#modcontent}}
+                        <div class="mod-content">
+                            {{{modcontent}}}
                         </div>
-                        {{{aftercontent}}}
+                    {{/modcontent}}
+
+                    {{#cmcompletionhtml}}
+                        <div class="completion-html-card">
+                            {{{cmcompletionhtml}}}
+                        </div>
+                    {{/cmcompletionhtml}}
+
+                    {{#modvisits}}
+                    <div class="mod-visits-block">
+                        <p>{{modvisits}}</p>
                     </div>
+                    {{/modvisits}}
+
+                    <div class="action-html-card">
+                        {{{calltoactionhtml}}}
+                    </div>
+                    {{{aftercontent}}}
                 </div>
             </div>
-            {{#modicons}}
-                <div class="actions">
-                    {{{modicons}}}
-                </div>
-            {{/modicons}}
         </div>
+        {{#modicons}}
+            <div class="actions">
+                {{{modicons}}}
+            </div>
+        {{/modicons}}
     </div>
-</li>
+</div>

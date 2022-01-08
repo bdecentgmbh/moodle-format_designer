@@ -27,7 +27,9 @@
 <ul class="section img-text list-layout" id="designer-section-content" data-sectionlayout="{{sectionlayoutclass}}">
     {{#cmlist}}
         {{#modstatus}}
-            {{> format_designer/cm/module_layout_list}}
+            <li id="{{id}}" class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}} position-relative">
+                {{> format_designer/cm/module_layout_list}}
+            </li>
         {{/modstatus}}
     {{/cmlist}}
 </ul>
