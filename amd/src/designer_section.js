@@ -250,7 +250,8 @@
         var ULClasses = {
             'cards': 'card-deck card-layout',
             'list': 'list-layout',
-            'default': 'link-layout'
+            'default': 'link-layout',
+            'circles' : 'circles-layout'
         };
         var promises = Ajax.call([{
                 methodname: 'format_designer_set_section_options',
@@ -272,6 +273,7 @@
                     $('#' + sectionId).find('ul.section').removeClass(ULClasses.cards);
                     $('#' + sectionId).find('ul.section').removeClass(ULClasses.list);
                     $('#' + sectionId).find('ul.section').removeClass(ULClasses.default);
+                    $('#' + sectionId).find('ul.section').removeClass(ULClasses.circles);
                     $('#' + sectionId).find('ul.section').addClass(ULClasses[layout]);
                 }
             });

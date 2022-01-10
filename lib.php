@@ -328,7 +328,8 @@ class format_designer extends format_base {
      * @return array
      */
     public function section_format_options($foreditform = false) {
-        return array(
+        global $CFG;
+        $sectionoptions = array(
             'sectiontype' => array(
                 'type' => PARAM_ALPHA,
                 'label' => '',
@@ -336,6 +337,47 @@ class format_designer extends format_base {
                 'default' => 'default',
             ),
         );
+        if (format_designer_has_pro()) {
+            require_once($CFG->dirroot."/local/designer/lib.php");
+            $prosectionoptions = get_pro_section_options();
+            $sectionoptions = array_merge($sectionoptions, $prosectionoptions);
+        }
+        return $sectionoptions;
+    }
+
+    /**
+     * Updates format options for a section
+     *
+     * Section id is expected in $data->id (or $data['id'])
+     * If $data does not contain property with the option name, the option will not be updated
+     *
+     * @param stdClass|array $data return value from {@see moodleform::get_data()} or array with data
+     * @return bool whether there were any changes to the options values
+     */
+    public function update_section_format_options($data) {
+        global $COURSE;
+        $data = (array)$data;
+        $coursecontext = context_course::instance($COURSE->id);
+        if (format_designer_has_pro()) {
+            if (empty($data['sectioncategoriseheader'])) {
+                $data['sectioncategoriseheader'] = get_string('categoriseheader', 'format_designer');
+            }
+            if (empty($data['sectionbackgroundheader'])) {
+                $data['sectionbackgroundheader'] = get_string('sectionbackdesignheader', 'format_designer');
+            }
+            if (empty($data['sectionlayoutheader'])) {
+                $data['sectionlayoutheader'] = get_string('sectionlayouts', 'format_designer');
+            }
+            if (!empty($data['sectiondesignerbackgroundimage'])) {
+                $itemid = $data['sectiondesignerbackgroundimage'];
+                $filearea = 'sectiondesignbackground';
+                $record = new stdClass();
+                $record->designerbackground_filemanager = $itemid;
+                file_postupdate_standard_filemanager($record, 'designerbackground', array('accepted_types' => 'images',
+                'maxfiles' => 1), $coursecontext, 'format_designer', $filearea, $itemid);
+            }
+        }
+        return $this->update_format_options($data, $data['id']);
     }
 
     /**
@@ -389,6 +431,11 @@ class format_designer extends format_base {
      */
     public function inplace_editable_render_section_name($section, $linkifneeded = true,
             $editable = null, $edithint = null, $editlabel = null) {
+        global $USER;
+        if ($editable === null) {
+            $editable = !empty($USER->editing) && has_capability('moodle/course:update',
+                    context_course::instance($section->course));
+        }
         if (empty($edithint)) {
             $edithint = new lang_string('editsectionname', 'format_designer');
         }
@@ -396,7 +443,30 @@ class format_designer extends format_base {
             $title = get_section_name($section->course, $section);
             $editlabel = new lang_string('newsectionname', 'format_designer', $title);
         }
-        return parent::inplace_editable_render_section_name($section, $linkifneeded, $editable, $edithint, $editlabel);
+        $style = '';
+        if (format_designer_has_pro()) {
+            if (isset($section->sectiondesignertextcolor)) {
+                if ($section->sectiondesignertextcolor) {
+                    $style = "color: $section->sectiondesignertextcolor" . ";";
+                }
+            }
+        }
+        $displayvalue = $title = get_section_name($section->course, $section);
+        if ($linkifneeded) {
+            // Display link under the section name if the course format setting is to display one section per page.
+            $url = course_get_url($section->course, $section->section, array('navigation' => true));
+            if ($url) {
+                $displayvalue = html_writer::link($url, $title, array('style' => $style));
+            }
+            $itemtype = 'sectionname';
+        } else {
+            // If $linkifneeded==false, we never display the link (this is used when rendering the section header).
+            // Itemtype 'sectionnamenl' (nl=no link) will tell the callback that link should not be rendered -
+            // there is no other way callback can know where we display the section name.
+            $itemtype = 'sectionnamenl';
+        }
+        return new \core\output\inplace_editable('format_' . $this->format, $itemtype, $section->id, $editable,
+            $displayvalue, $section->name, $edithint, $editlabel);
     }
 
     /**
@@ -476,11 +546,16 @@ class format_designer extends format_base {
         }
 
         $modules = [];
-
+        $prolayouts = get_pro_layouts();
         $modinfo = get_fast_modinfo($course);
         $coursesections = $modinfo->sections;
         $sectiontype = $this->get_section_option($section->id, 'sectiontype') ?: 'default';
         $templatename = 'format_designer/cm/module_layout_' . $sectiontype;
+        if (in_array($sectiontype, $prolayouts)) {
+            if (format_designer_has_pro()) {
+                $templatename = 'layouts_' . $sectiontype . '/cm/module_layout_' . $sectiontype;
+            }
+        }
         if (array_key_exists($section->section, $coursesections)) {
             $courserenderer = $PAGE->get_renderer('format_designer');
             $completioninfo = new completion_info($course);
@@ -625,4 +700,79 @@ function format_designer_modcontent_trim_char($str, $n = 25) {
     $strarr = implode(" ", $slicearr);
     $strarr .= '...';
     return $strarr;
+}
+
+/**
+ * Check if Designer Pro is installed.
+ *
+ * @return bool
+ */
+function format_designer_has_pro() {
+    return array_key_exists('designer', core_component::get_plugin_list('local'));
+}
+
+/**
+ * Get the designer format custom layouts.
+ */
+function get_pro_layouts() {
+    $layouts = array_keys(core_component::get_plugin_list('layouts'));
+    return $layouts;
+}
+
+/**
+ * Get section background image url.
+ * @param \section_info $section
+ * @param int $courseid
+ */
+function get_section_designer_background_image($section, $courseid) {
+    if (!empty($section->sectiondesignerbackgroundimage)) {
+        $coursecontext = context_course::instance($courseid);
+        $itemid = $section->sectiondesignerbackgroundimage;
+        $filearea = 'sectiondesignbackground';
+        $files = get_file_storage()->get_area_files(
+            $coursecontext->id, 'format_designer', $filearea,
+            $itemid, 'itemid, filepath, filename', false);
+        if (empty($files)) {
+            return '';
+        }
+        $file = current($files);
+        $fileurl = moodle_url::make_pluginfile_url(
+            $file->get_contextid(),
+            $file->get_component(),
+            $file->get_filearea(),
+            $file->get_itemid(),
+            $file->get_filepath(),
+            $file->get_filename(), false);
+        return $fileurl->out(false);
+    }
+}
+
+
+/**
+ * Serves file from sectiondesignbackground_filearea
+ *
+ * @param mixed $course course or id of the course
+ * @param mixed $cm course module or id of the course module
+ * @param context $context
+ * @param string $filearea
+ * @param array $args
+ * @param bool $forcedownload
+ * @param array $options additional options affecting the file serving
+ * @return bool false if file not found, does not return if found - just send the file
+ */
+function format_designer_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = array()) {
+    require_login();
+    if ($context->contextlevel != CONTEXT_COURSE) {
+        return false;
+    }
+
+    if ($filearea !== 'sectiondesignbackground') {
+        return false;
+    }
+    $fs = get_file_storage();
+    $file = $fs->get_file($context->id, 'format_designer', 'sectiondesignbackground', $args[0], '/', $args[1]);
+    if (!$file) {
+        return false;
+    }
+    send_stored_file($file, 0, 0, 0, $options);
 }

@@ -25,12 +25,21 @@
     }
 }}
 <li id="section-{{section.section}}"
-    class="section section-type-{{sectiontype}} main clearfix {{sectionstyle}} {{#sectionrestrict}} restricted {{/sectionrestrict}}"
+    class="section section-type-{{sectiontype}} main clearfix {{sectionstyle}} {{#sectionrestrict}} restricted {{/sectionrestrict}} {{sectioncontainerlayout}}"
     role="region"
     aria-labelledby="sectionid-{{section.id}}-title"
     data-sectionid="{{section.section}}"
     data-id="{{section.id}}"
-    data-sectionreturnid="{{sectionreturn}}">
+    data-sectionreturnid="{{sectionreturn}}"
+    style="{{#sectiondesignwhole}} {{sectionbackgroundstyle}} {{/sectiondesignwhole}} {{#sectioncontainerwidth}} {{sectioncontainerwidth}} {{/sectioncontainerwidth}}">
+
+    
+    {{#bgoverlay}}
+    {{#sectiondesignwhole}}
+    <div class="bg-overlay" style="{{bgoverlay}}">
+    </div>
+    {{/sectiondesignwhole}}
+    {{/bgoverlay}}
 
     <div class="left side">
         {{{leftcontent}}}
@@ -41,7 +50,7 @@
         <div class="icon-loader-block"></div>
     </div>
 
-    <div class="content">
+    <div class="content {{sectioncontentlayout}}" style="{{#sectioncontentwidth}} {{sectioncontentwidth}} {{/sectioncontentwidth}}">
         {{$content}}
 
         {{/content}}

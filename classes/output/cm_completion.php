@@ -83,7 +83,7 @@ class cm_completion implements renderable, templatable {
      * @return cm_info
      */
     final protected function get_cm_url() {
-        return isset($this->cm->url) ? $this->cm->url : '#';
+        return isset($this->cm->url) ? $this->cm->url : '';
     }
 
     /**

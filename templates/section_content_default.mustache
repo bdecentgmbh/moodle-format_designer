@@ -24,7 +24,8 @@
         "reactionurl_dislike": "http://moodleurl/course/format/designer/renderer.php"
     }
 }}
-<ul class="section img-text link-layout" id="designer-section-content" data-sectionlayout="{{sectionlayoutclass}}">
+<ul class="section img-text link-layout {{sectioncontentlayout}}" id="designer-section-content" data-sectionlayout="{{sectionlayoutclass}}"
+    style="{{#sectioncontentwidth}} {{sectioncontentwidth}} {{/sectioncontentwidth}}">
     {{#cmlist}}
         {{#modstatus}}
             {{> format_designer/cm/module_layout_default}}

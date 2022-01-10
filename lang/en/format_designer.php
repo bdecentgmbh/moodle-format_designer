@@ -60,9 +60,9 @@ $string['completed'] = 'Completed on';
 $string['passed'] = 'Passed on';
 $string['failed'] = 'Failed on';
 $string['start'] = 'Start';
-$string['calltoactionview'] = 'View <i class="fa fa-chevron-circle-right"></i>';
-$string['calltoactioncontinue'] = 'Continue <i class="fa fa-chevron-circle-right"></i>';
-$string['calltoactionstart'] = 'Start <i class="fa fa-chevron-circle-right"></i>';
+$string['calltoactionview'] = 'Review {$a} <i class="fa fa-angle-double-right"></i>';
+$string['calltoactioncontinue'] = 'Review {$a} <i class="fa fa-angle-double-right"></i>';
+$string['calltoactionstart'] = 'Open {$a} <i class="fa fa-angle-double-right"></i>';
 $string['calltoactionrestricted'] = '<i class="fa fa-lock"></i>';
 
 $string['completion-alt-auto-enabled'] = 'The system marks this item complete according to conditions';
@@ -108,4 +108,34 @@ $string['list'] = "List";
 $string['cards'] = "Cards";
 $string['notyetcompleted'] = "Not yet completed";
 $string['less'] = "Less";
-
+$string['sectioncompleted'] = "Section completed";
+$string['circles'] = "Circles";
+$string['categoriseheader'] = "Section type";
+$string['title'] = "Title";
+$string['backgroundcolor'] = "Background color";
+$string['backgroundgradient'] = "Background gradient";
+$string['textcolor'] = "Text color";
+$string['sectionbackdesignheader'] = "Design";
+$string['applyto'] = "Apply to";
+$string['wholesection'] = "Whole section";
+$string['sectionheader']  = "Section header";
+$string['sectionbackgroundtype_help'] = "<b> Section header selected </b>, The background and the text color shall be applied only to the header content.
+<b> Whole section selected </b>, The background shall be applied to the whole section ";
+$string['sectionbackgroundtype'] = "<b> Section header selected </b>, The background and the text color shall be applied only to the header content.
+<b> Whole section selected </b>, The background shall be applied to the whole section ";
+$string['backgroundimage'] = "Background image";
+$string['backgroundgradient'] = "Background gradient";
+$string['textcolor'] = "Text color";
+$string['sectiondesignertextcolor_help'] = "Text color shall be only applied to the section title and section summary";
+$string['hidesectiontitle'] = "Hide section title";
+$string['sectiondesignertextcolor'] = "Text color shall be only applied to the section title and section summary";
+$string['sectionlayouts'] = "Layouts";
+$string['sectioncontainer'] = "Section container";
+$string['full'] = 'Full';
+$string['normal'] = 'Normal';
+$string['boxed'] = 'Boxed';
+$string['sectioncontent'] = 'Section content';
+$string['sectioncontainerwidth'] = 'Section container width';
+$string['sectioncontentwidth'] = 'Section content width';
+$string['activitydesign'] = "Design";
+$string['notvisit'] = "Not visited yet";

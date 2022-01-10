@@ -29,45 +29,65 @@
 
     }
 }}
-<li id="{{id}}" class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}}">
+<li id="{{id}}" class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}}"
+    style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
     <div class="activity-block designer">
         {{{movehtml}}}
         <div class="mod-indent-outer w-100">
             <div class="{{indentclasses}}"></div>
-                <div>
-                    {{#cmname}}
-                        <div class="activityinstance">
-                            {{{cmname}}}
-                            {{{afterlink}}}
+            <div>
+                <div class="activityinstance {{modcontentclass}}">
+                    {{#modiconurl}}
+                        <div class="img-block">
+                            {{{modiconurl}}}
                         </div>
+                    {{/modiconurl}}
+                    {{#cmname}}
+                        {{{cmname}}}
                     {{/cmname}}
-                    {{{beforecontent}}}
+                    {{{afterlink}}}
+                </div>
 
-                    <div class="center-reports-block">
-                        <div class="row h-100 pull-right">
-                            <div class="col align-self-center">
-                                {{{cmcompletionhtml}}}
-                                {{#modvisits}}
-                                <div class="mod-visits-block text-muted">
-                                    <p>{{modvisits}}</p>
-                                </div>
-                                {{/modvisits}}
+                {{#modrestricted}}
+                    <div class="availability-info">
+                        {{{calltoactionhtml}}}
+                    </div>
+                {{/modrestricted}}
+                {{{beforecontent}}}
+
+                <div class="center-reports-block">
+                    <div class="row h-100 pull-right">
+                        <div class="col align-self-center">
+                            {{#modvisits}}
+                            <div class="mod-visits-block text-muted">
+                                <p class="text-capitalize" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">{{modvisits}}</p>
                             </div>
+                            {{/modvisits}}
+                            {{{cmcompletionhtml}}}
                         </div>
                     </div>
+                </div>
 
+                {{#modcontent}}
+                    <div class="mod-content" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">
+                        {{{modcontent}}}
+                    </div>
+                {{/modcontent}}
+
+                {{^modrestricted}}
                     <div class="action-html-card">
                         {{{calltoactionhtml}}}
                     </div>
+                {{/modrestricted}}
 
-                    {{#modicons}}
-                        <div class="actions">
-                            {{{modicons}}}
-                        </div>
-                    {{/modicons}}
+                {{#modicons}}
+                    <div class="actions">
+                        {{{modicons}}}
+                    </div>
+                {{/modicons}}
 
-                    {{{aftercontent}}}
-                </div>
+                {{{aftercontent}}}
+            </div>
         </div>
     </div>
 </li>

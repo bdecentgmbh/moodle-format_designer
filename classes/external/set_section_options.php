@@ -155,6 +155,12 @@ trait set_section_options {
         $format = course_get_format($course);
         $sectiontype = $format->get_section_option($sectionid, 'sectiontype') ?: 'default';
         $templatename = 'format_designer/cm/module_layout_' . $sectiontype;
+        $prolayouts = get_pro_layouts();
+        if (in_array($sectiontype, $prolayouts)) {
+            if (format_designer_has_pro()) {
+                $templatename = 'layouts_' . $sectiontype . '/cm/module_layout_' . $sectiontype;
+            }
+        }
         return $OUTPUT->render_from_template($templatename, $cmlistdata);
     }
 

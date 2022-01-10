@@ -39,11 +39,11 @@
         {{#completiontrackingmanual}}
             {{#completionincomplete}}
                 {{#duetoday}}
-                    <span class="badge badge-completion badge-{{colorclass}}">{{{completioncheckbox}}} <span><i class="fa fa-exclamation"></i> {{#str}}duetoday, format_designer{{/str}}</span></span>
+                    <span class="badge badge-completion badge-{{colorclass}}">{{{completioncheckbox}}} <span><i class="fa fa-exclamation-triangle"></i> {{#str}}duetoday, format_designer{{/str}}</span></span>
                 {{/duetoday}}
                 {{^duetoday}}
                     {{#isoverdue}}
-                        <span class="badge badge-completion badge-{{colorclass}}">{{{completioncheckbox}}} <span><i class="fa fa-exclamation-triangle"></i> {{#str}}overdue, format_designer{{/str}} {{overdueby}}</span></span>
+                        <span class="badge badge-completion badge-{{colorclass}}">{{{completioncheckbox}}} <span><i class="fa fa-exclamation-circle"></i> {{#str}}overdue, format_designer{{/str}} {{overdueby}}</span></span>
                     {{/isoverdue}}
                     {{^isoverdue}}
                         {{#completionexpected}}
@@ -68,11 +68,11 @@
         {{^completiontrackingmanual}}
             {{#completionincomplete}}
                 {{#duetoday}}
-                    <span class="badge badge-completion badge-{{colorclass}}"><span><i class="fa fa-exclamation"></i> {{#str}}duetoday, format_designer{{/str}}</span></span>
+                    <span class="badge badge-completion badge-{{colorclass}}"><span><i class="fa fa-exclamation-triangle"></i> {{#str}}duetoday, format_designer{{/str}}</span></span>
                 {{/duetoday}}
                 {{^duetoday}}
                     {{#isoverdue}}
-                        <span class="badge badge-completion badge-{{colorclass}}"><span><i class="fa fa-exclamation-triangle"></i> {{#str}}overdue, format_designer{{/str}} {{overdueby}}</span></span>
+                        <span class="badge badge-completion badge-{{colorclass}}"><span><i class="fa fa-exclamation-circle"></i> {{#str}}overdue, format_designer{{/str}} {{overdueby}}</span></span>
                     {{/isoverdue}}
                     {{^isoverdue}}
                         {{#completionexpected}}
@@ -88,13 +88,13 @@
                 {{/isoverridden}}
             {{/completionincomplete}}
             {{#completioncomplete}}
-                <span class="badge badge-completion badge-{{colorclass}}"><span><i class="fa fa-check"></i> {{#str}}completed, format_designer{{/str}} {{completiondate}}</span></span>
+                <span class="badge badge-completion badge-{{colorclass}}"><span><i class="fa fa-check-circle"></i> {{#str}}completed, format_designer{{/str}} {{completiondate}}</span></span>
                 {{#isoverridden}}
                     (override)
                 {{/isoverridden}}
             {{/completioncomplete}}
             {{#completionincompletepass}}
-                <span class="badge badge-completion badge-{{colorclass}}"><span><i class="fa fa-check"></i> {{#str}}passed, format_designer{{/str}} {{completiondate}}</span></span>
+                <span class="badge badge-completion badge-{{colorclass}}"><span><i class="fa fa-check-circle"></i> {{#str}}passed, format_designer{{/str}} {{completiondate}}</span></span>
                 {{#isoverridden}}
                     (override)
                 {{/isoverridden}}

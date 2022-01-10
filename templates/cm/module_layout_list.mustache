@@ -33,48 +33,60 @@
     <div class="activity-block designer">
         {{{movehtml}}}
         <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{cm.url}}" style="cursor: pointer">
-            <div class="card-body">
+            <div class="card-body" style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
                 <div class="mod-indent-outer w-100">
                     <div class="{{indentclasses}}"></div>
                         <div class="row">
-                            <div class="col-12 col-lg-7">
-                                {{#cmname}}
-                                    <div class="activityinstance">
-                                        <div class="activity-type">
-                                            <p>{{modtype}}</p>
+                            <div class="col-12 col-md-7">
+                                <div class="activityinstance {{modcontentclass}}">
+                                    {{#modiconurl}}
+                                        <div class="img-block">
+                                            {{{modiconurl}}}
                                         </div>
-                                        {{{cmname}}}
-                                        {{{afterlink}}}
+                                    {{/modiconurl}}
+                                    <div class="activity-element">
+                                        <div class="activity-type">
+                                            <p class="text-capitalize" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">{{modtype}}</p>
+                                        </div>
+                                        {{#cmname}}
+                                            {{{cmname}}}
+                                        {{/cmname}}
                                     </div>
-                                    {{{availability}}}
-                                {{/cmname}}
+
+                                    {{#modrestricted}}
+                                    <div class="availability-info">
+                                        {{{calltoactionhtml}}}
+                                    </div>
+                                    {{/modrestricted}}
+                                    {{{afterlink}}}
+                                </div>
                                 {{{beforecontent}}}
                                 {{#modcontent}}
-                                <div class="mod-content">
+                                <div class="mod-content" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">
                                     {{{modcontent}}}
                                 </div>
                                 {{/modcontent}}
                             </div>
-
-                            <div class="col-5 col-lg-3">
+                            <div class="col-6 col-md-3">
                                 <div class="row h-100 pull-right">
                                     <div class="col align-self-center">
-                                        {{{cmcompletionhtml}}}
                                         {{#modvisits}}
                                         <div class="mod-visits-block">
-                                            <p>{{modvisits}}</p>
+                                            <p style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">{{modvisits}}</p>
                                         </div>
                                         {{/modvisits}}
+                                        {{{cmcompletionhtml}}}
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="col-7 col-lg-2 show-on-hover">
+                            <div class="col-6 col-md-2 show-on-hover">
+                                {{^modrestricted}}
                                 <div class="row h-100 pull-right">
                                     <div class="col align-self-center">
                                         {{{calltoactionhtml}}}
                                     </div>
                                 </div>
+                                {{/modrestricted}}
                             </div>
                         </div>
                 </div>
