@@ -59,7 +59,7 @@ Feature: Sections can be check activity completion element in designer format
     And I click on activity "assign2"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
-      | Completion tracking           | Show activity a s complete when conditions are met |
+      | Completion tracking           | Show activity as complete when conditions are met |
       | completionview                | 1    |
     And I press "Save and return to course"
     And I log out
