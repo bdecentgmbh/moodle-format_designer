@@ -690,6 +690,7 @@ class format_designer_renderer extends format_section_renderer_base {
         // Calculate to the section progress.
         $cmcompleted = 0;
         $totalmods = 0;
+        $issectioncompletion = 0;
         if (!empty($modinfo->sections[$section->section]) && $section->uservisible) {
             foreach ($modinfo->sections[$section->section] as $modnumber) {
                 $mod = $modinfo->cms[$modnumber];
@@ -707,6 +708,7 @@ class format_designer_renderer extends format_section_renderer_base {
         }
         if ($totalmods) {
             $sectionprogress = $cmcompleted / $totalmods * 100;
+            $issectioncompletion = 1;
         } else {
             $sectionprogress = 0;
         }
@@ -728,6 +730,8 @@ class format_designer_renderer extends format_section_renderer_base {
         $sectioncontentlayout = '';
         $bgoverlay = false;
         if (format_designer_has_pro()) {
+
+            $sectionstyle .= local_designer_layout_columnclasses($section);
             // Get section designer background image.
             $sectiondesignerbackimageurl = get_section_designer_background_image($section, $course->id);
             if ($section->sectionbackgroundtype == 'header') {
@@ -737,29 +741,35 @@ class format_designer_renderer extends format_section_renderer_base {
                 $sectiondesignwhole = true;
                 $sectionstyle .= ' section-design-whole ';
             }
-
             // Section designer background styles.
+            $backgradient = (isset($section->sectiondesignerbackgradient) && ($section->sectiondesignerbackgradient))
+                            ? str_replace(';', '', $section->sectiondesignerbackgradient) : null;
+
             // Background color.
             if ($section->sectiondesignerbackgroundcolor) {
                 $overlaycolor = "background-color: $section->sectiondesignerbackgroundcolor" . ";";
                 $sectionbackgroundstyle .= $overlaycolor;
             }
             if ($sectiondesignerbackimageurl) {
+                if ($backgradient) {
+                    $sectionbackgroundstyle .= sprintf('background-image: url(%s);', $sectiondesignerbackimageurl);
+                    $overlaycolor = sprintf('background: %s;', $backgradient );
+                } else {
+                    $sectionbackgroundstyle .= "background-image: url('" . $sectiondesignerbackimageurl . "');";
+                }
                 $bgoverlay = (isset($overlaycolor)) ? $overlaycolor : false;
                 $sectionstyle .= (isset($overlaycolor)) ? ' bg-color-overlay' : '';
-                $sectionbackgroundstyle .= "background-image: url('" . $sectiondesignerbackimageurl . "');";
-            } else if ($section->sectiondesignerbackgradient1 || $section->sectiondesignerbackgradient2) {
-                $gradient1 = $section->sectiondesignerbackgradient1;
-                $gradient2 = $section->sectiondesignerbackgradient2;
-                $sectionbackgroundstyle .= "background-image: linear-gradient($gradient1, $gradient2);";
+            } else if ($section->sectiondesignerbackgradient) {
+                $gradient = $section->sectiondesignerbackgradient;
+                $sectionbackgroundstyle .= sprintf('background: %s;', $gradient);
             }
 
             if ($section->sectiondesignertextcolor) {
-                $sectiondesigntextcolor = "color: $section->sectiondesignertextcolor" . ";";
+                $sectiondesigntextcolor = "color: $section->sectiondesignertextcolor"
+                    . ";--sectioncolor:  $section->sectiondesignertextcolor;";
             }
 
             // Section container & content layout.
-
             $containerlayout = $section->layoutcontainer;
             if ($containerlayout == 'full') {
                 $sectioncontainerlayout = 'container-full';
@@ -831,12 +841,30 @@ class format_designer_renderer extends format_section_renderer_base {
             'sectioncontentlayout' => $sectioncontentlayout,
             'sectionheader' => $sectionheader,
             'bgoverlay' => $bgoverlay,
+            'issectioncompletion' => $issectioncompletion
         ];
         if ($sectioncontent) {
             $contenttemplatename = 'format_designer/section_content_' . $sectiontype;
             return $this->render_from_template($contenttemplatename, $templatecontext);
         }
+        $sectionclass = 'section-type-'.$sectiontype.' '.$sectionstyle.' '.$sectioncontainerlayout;
+        $sectionclass .= ($sectionrestrict) ? 'restricted' : '';
+        $style = ($sectiondesignwhole) ? $sectionbackgroundstyle : '';
+        $style .= ($sectioncontainerwidth) ? ' '.$sectioncontainerwidth : '';
+        $sectionhead = html_writer::start_tag('li', [
+            'id' => 'section-'.$section->section,
+            'class' => 'section main clearfix'.$sectionclass,
+            'role' => 'region',
+            'aria-labelledby' => "sectionid-{$section->id}-title",
+            'data-sectionid' => $section->section,
+            'data-sectionreturnid' => $sectionreturn,
+            'data-id' => $section->id,
+            'style' => $style
+        ]);
+
+        echo $sectionhead;
         echo $this->render_from_template($templatename, $templatecontext);
+        echo html_writer::end_tag('li');
     }
 
 
@@ -979,16 +1007,20 @@ class format_designer_renderer extends format_section_renderer_base {
         if (format_designer_has_pro()) {
             require_once($CFG->dirroot. "/local/designer/lib.php");
             $promodcontent = [];
-            $modulebackdesign = $DB->get_record('module_designer_fields', array('cmid' => $mod->id));
+            $modulebackdesign = $DB->get_record('local_designer_fields', array('cmid' => $mod->id));
             if ($modulebackdesign) {
                 $modulebackimageurl = get_module_designer_background_image($mod, $modulebackdesign->backimage);
-                if ($modulebackdesign->backcolor) {
-                    $modulebackgroundstyle = "background-color: $modulebackdesign->backcolor" . ";";
-                } else if ($modulebackimageurl) {
+                $backgradient = (isset($modulebackdesign->backgradient) && ($modulebackdesign->backgradient))
+                            ? str_replace(';', '', $modulebackdesign->backgradient) : null;
+
+                if ($modulebackimageurl) {
                     $modulebackgroundstyle = "background-image: url('" . $modulebackimageurl . "');";
-                } else if ($modulebackdesign->backgradient1 || $modulebackdesign->backgradient2) {
-                    $modulebackgroundstyle = "background-image: linear-gradient($modulebackdesign->backgradient1,
-                        $modulebackdesign->backgradient2);";
+                    if ($backgradient) {
+                        $promodcontent['modbackoverlaycolor'] = sprintf('background: %s;', $backgradient );
+                        $cmlist['modclasses'] .= ' bg-color-overlay ';
+                    }
+                } else if ($modulebackdesign->backgradient) {
+                    $modulebackgroundstyle = sprintf('background: %s;', $backgradient );
                 } else {
                     $modulebackgroundstyle = '';
                 }
@@ -1021,7 +1053,7 @@ class format_designer_renderer extends format_section_renderer_base {
             $output = '';
             $style = '';
             if (format_designer_has_pro()) {
-                $modulebackdesign = $DB->get_record('module_designer_fields', array('cmid' => $mod->id));
+                $modulebackdesign = $DB->get_record('local_designer_fields', array('cmid' => $mod->id));
                 if ($modulebackdesign) {
                     if ($modulebackdesign->textcolor) {
                         $style = "color: $modulebackdesign->textcolor" . ";";
@@ -1031,9 +1063,7 @@ class format_designer_renderer extends format_section_renderer_base {
             $onclick = htmlspecialchars_decode($mod->onclick, ENT_QUOTES);
             $url = $mod->url;
             $instancename = $mod->get_formatted_name();
-            $altname = $mod->modfullname;
-            $activitylink = html_writer::tag('span', $instancename . $altname, array('class' => 'instancename',
-                'style' => $style));
+            $activitylink = html_writer::tag('span', $instancename, array('class' => 'instancename', 'style' => $style));
             if ($mod->uservisible) {
                 $output .= html_writer::link($url, $activitylink, array('class' => 'aalink' . $linkclasses, 'onclick' => $onclick));
             } else {

@@ -124,7 +124,6 @@ $string['sectionbackgroundtype_help'] = "<b> Section header selected </b>, The b
 $string['sectionbackgroundtype'] = "<b> Section header selected </b>, The background and the text color shall be applied only to the header content.
 <b> Whole section selected </b>, The background shall be applied to the whole section ";
 $string['backgroundimage'] = "Background image";
-$string['backgroundgradient'] = "Background gradient";
 $string['textcolor'] = "Text color";
 $string['sectiondesignertextcolor_help'] = "Text color shall be only applied to the section title and section summary";
 $string['hidesectiontitle'] = "Hide section title";
@@ -139,3 +138,15 @@ $string['sectioncontainerwidth'] = 'Section container width';
 $string['sectioncontentwidth'] = 'Section content width';
 $string['activitydesign'] = "Design";
 $string['notvisit'] = "Not visited yet";
+
+$string['onecolumn'] = 'Single column';
+$string['twocolumn'] = 'Two column';
+$string['threecolumn'] = 'Three column';
+$string['fourcolumn'] = 'Four column';
+$string['fivecolumn'] = 'Five column';
+$string['desktopcolumn'] = 'Layout columns - Desktop';
+$string['tabletcolumn'] = 'Layout columns - Tablet';
+$string['mobilecolumn'] = 'Layout columns - Mobile';
+$string['backgroundgradient_help'] = "Generate a gradient: <a href=' https://cssgradient.io/'>https://cssgradient.io/</a>. Paste the background property (linear-gradient).";
+$string['markasdone'] = "Mark as done";
+$string['done'] = "Done";

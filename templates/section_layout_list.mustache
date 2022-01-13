@@ -31,8 +31,10 @@
                 >
 
             {{#bgoverlay}}
+            {{^sectiondesignwhole}}
             <div class="bg-overlay" style="{{bgoverlay}}">
             </div>
+            {{/sectiondesignwhole}}
             {{/bgoverlay}}
             
             {{^section.hidesectiontitle}}
@@ -47,6 +49,7 @@
                     <span class="badge" style="color:{{section.categorisetextcolor}}; background-color:{{section.categorisebackcolor}};">{{section.categorisetitle}}</span>
                 </div>
             {{/section.categorisetitle}}
+            {{#issectioncompletion}}
             <div class="section-progress-info">
                 {{^sectionprogresscomp}}
                 <div class="section-progress-bar">
@@ -63,6 +66,7 @@
                     </div>
                 {{/sectionprogresscomp}}
             </div>
+            {{/issectioncompletion}}
             {{> format_designer/section_availability}}
 
             <div class="summary" style="{{#sectiondesigntextcolor}} {{sectiondesigntextcolor}} {{/sectiondesigntextcolor}}">

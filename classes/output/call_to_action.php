@@ -51,7 +51,7 @@ class call_to_action extends cm_completion {
      */
     final public function get_call_to_action_label(): string {
         global $USER;
-        $modtype = $this->get_cm()->modname;
+        $modtype = $this->get_cm()->get_module_type_name();
         if ($this->is_restricted()) {
             return get_string('calltoactionrestricted', 'format_designer');
         }
@@ -80,7 +80,7 @@ class call_to_action extends cm_completion {
         $cmid = $this->get_cm()->id;
         $actiontextcolor = '';
         if (format_designer_has_pro()) {
-            $moduledesign = $DB->get_record('module_designer_fields', array('cmid' => $cmid));
+            $moduledesign = $DB->get_record('local_designer_fields', array('cmid' => $cmid));
             if ($moduledesign) {
                 $actiontextcolor = !empty($moduledesign->textcolor) ? "color: ". $moduledesign->textcolor . ";" : '';
             }

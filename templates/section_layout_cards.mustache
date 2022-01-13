@@ -29,10 +29,9 @@
         <div class="section-header-content"
         style="{{#sectiondesignheader}} {{sectionbackgroundstyle}} {{/sectiondesignheader}}"
         >
-        {{#bgoverlay}}
-        <div class="bg-overlay" style="{{bgoverlay}}">
-        </div>
-        {{/bgoverlay}}
+            {{#bgoverlay}}
+            {{^sectiondesignwhole}}<div class="bg-overlay" style="{{bgoverlay}}"></div>{{/sectiondesignwhole}}
+            {{/bgoverlay}}
         
             {{^section.hidesectiontitle}}
                 {{#sectionname}}
@@ -48,6 +47,7 @@
                 </div>
             {{/section.categorisetitle}}
 
+            {{#issectioncompletion}}
             <div class="section-progress-info">
                 {{^sectionprogresscomp}}
                 <div class="section-progress-bar">
@@ -64,6 +64,7 @@
                     </div>
                 {{/sectionprogresscomp}}
             </div>
+            {{/issectioncompletion}}
             {{> format_designer/section_availability}}
 
             <div class="summary" style="{{#sectiondesigntextcolor}} {{sectiondesigntextcolor}} {{/sectiondesigntextcolor}}">

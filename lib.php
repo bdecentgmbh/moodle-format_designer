@@ -281,7 +281,7 @@ class format_designer extends format_base {
      * @return array array of references to the added form elements.
      */
     public function create_edit_form_elements(&$mform, $forsection = false) {
-        global $COURSE;
+        global $COURSE, $PAGE;
         $elements = parent::create_edit_form_elements($mform, $forsection);
 
         if (!$forsection && (empty($COURSE->id) || $COURSE->id == SITEID)) {
@@ -297,7 +297,32 @@ class format_designer extends format_base {
                 $mform->setDefault('numsections', $courseconfig->numsections);
             }
             array_unshift($elements, $element);
+
         }
+        if ($forsection) {
+            $options = $this->section_format_options(true);
+        } else {
+            $options = $this->course_format_options(true);
+        }
+        foreach ($options as $optionname => $option) {
+            if (isset($option['disabledif'])) {
+                $disabledif = $option['disabledif'];
+                if (isset($disabledif[2])) {
+                    $mform->disabledif($optionname, $disabledif[0], $disabledif[1], $disabledif[2]);
+                }
+            }
+        }
+
+        $PAGE->requires->js_init_code('
+            require(["core/config"], function(CFG) {
+                document.querySelectorAll("input[name$=\"width\"]").forEach((v) => {
+                    var px = document.createElement("label");
+                    px.classList.add("px-string");
+                    px.innerHTML = "Px";
+                    v.parentNode.append(px);
+                })
+            })
+        ');
 
         return $elements;
     }
@@ -562,7 +587,14 @@ class format_designer extends format_base {
             foreach ($coursesections[$section->section] as $cmid) {
                 $cm = $modinfo->get_cm($cmid);
                 $moduledata = $courserenderer->render_course_module($cm, $sr, []);
-                $modules[] = $courserenderer->render_from_template($templatename, $moduledata);
+                $liclass = $sectiontype;
+                $liclass .= ' '.$sectiontype.'-layout';
+                $liclass .= ' '.$moduledata['modclasses'];
+                $liclass .= (isset($moduledata['isrestricted']) && $moduledata['isrestricted']) ? ' restricted' : '';
+                $html = html_writer::start_tag('li', ['class' => $liclass, 'id' => $moduledata['id']]);
+                $html .= $courserenderer->render_from_template($templatename, $moduledata);
+                $html .= '</li>';
+                $modules[] = $html;
             }
         }
 

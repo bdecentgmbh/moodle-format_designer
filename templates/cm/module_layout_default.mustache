@@ -29,9 +29,11 @@
 
     }
 }}
-<li id="{{id}}" class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}}"
-    style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
-    <div class="activity-block designer">
+{{! <div class="default-style" > }}
+    <div class="activity-block designer" style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
+        {{#modbackoverlaycolor}}
+        <div class="bg-overlay" style="{{modbackoverlaycolor}}"></div>
+        {{/modbackoverlaycolor}}
         {{{movehtml}}}
         <div class="mod-indent-outer w-100">
             <div class="{{indentclasses}}"></div>
@@ -90,4 +92,4 @@
             </div>
         </div>
     </div>
-</li>
+{{! </div> }}

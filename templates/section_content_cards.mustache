@@ -28,7 +28,9 @@
     style="{{#sectioncontentwidth}} {{sectioncontentwidth}} {{/sectioncontentwidth}}">
     {{#cmlist}}
         {{#modstatus}}
-                {{> format_designer/cm/module_layout_cards}}
+        <li id="{{id}}" class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}} card">
+            {{> format_designer/cm/module_layout_cards}}
+        </li>
         {{/modstatus}}
     {{/cmlist}}
 </ul>
