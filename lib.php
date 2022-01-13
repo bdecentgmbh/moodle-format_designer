@@ -590,7 +590,7 @@ class format_designer extends format_base {
                 $liclass = $sectiontype;
                 $liclass .= ' '.$sectiontype.'-layout';
                 $liclass .= ' '.$moduledata['modclasses'];
-                $liclass .= (isset($moduledata['isrestricted']) && $moduledata['isrestricted']) ? ' restricted' :'';
+                $liclass .= (isset($moduledata['isrestricted']) && $moduledata['isrestricted']) ? ' restricted' : '';
                 $html = html_writer::start_tag('li', ['class' => $liclass, 'id' => $moduledata['id']]);
                 $html .= $courserenderer->render_from_template($templatename, $moduledata);
                 $html .= '</li>';

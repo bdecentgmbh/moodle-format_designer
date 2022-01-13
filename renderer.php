@@ -741,8 +741,6 @@ class format_designer_renderer extends format_section_renderer_base {
                 $sectiondesignwhole = true;
                 $sectionstyle .= ' section-design-whole ';
             }
-
-
             // Section designer background styles.
             $backgradient = (isset($section->sectiondesignerbackgradient) && ($section->sectiondesignerbackgradient))
                             ? str_replace(';', '', $section->sectiondesignerbackgradient) : null;
@@ -767,7 +765,8 @@ class format_designer_renderer extends format_section_renderer_base {
             }
 
             if ($section->sectiondesignertextcolor) {
-                $sectiondesigntextcolor = "color: $section->sectiondesignertextcolor" . ";--sectioncolor:  $section->sectiondesignertextcolor;";
+                $sectiondesigntextcolor = "color: $section->sectiondesignertextcolor"
+                    . ";--sectioncolor:  $section->sectiondesignertextcolor;";
             }
 
             // Section container & content layout.
@@ -1011,9 +1010,6 @@ class format_designer_renderer extends format_section_renderer_base {
             $modulebackdesign = $DB->get_record('local_designer_fields', array('cmid' => $mod->id));
             if ($modulebackdesign) {
                 $modulebackimageurl = get_module_designer_background_image($mod, $modulebackdesign->backimage);
-                /* if ($modulebackdesign->backcolor) {
-                    $modulebackgroundstyle = "background-color: $modulebackdesign->backcolor" . ";";
-                } */ 
                 $backgradient = (isset($modulebackdesign->backgradient) && ($modulebackdesign->backgradient))
                             ? str_replace(';', '', $modulebackdesign->backgradient) : null;
 

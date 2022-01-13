@@ -59,7 +59,7 @@ Feature: Sections can be check activity completion element in designer format
     And I click on activity "assign2"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
-      | Completion tracking           | Show activity as complete when conditions are met |
+      | Completion tracking           | Show activity a s complete when conditions are met |
       | completionview                | 1    |
     And I press "Save and return to course"
     And I log out
@@ -86,5 +86,5 @@ Feature: Sections can be check activity completion element in designer format
     And I log in as "student1"
     And I am on "Course 1" course homepage
     Then I check the activity "assign3" to element "/descendant::div[contains(@class, 'danger')]"
-    Then I check the activity "assign3" to element "/descendant::div[contains(@class, 'completion-info')]/descendant::i[contains(@class, 'fa-exclamation-triangle')]"
+    Then I check the activity "assign3" to element "/descendant::div[contains(@class, 'completion-info')]/descendant::i[contains(@class, 'fa-exclamation-circle')]"
     And I should see designerinfo "assign3" "Overdue " "5 days ago"
