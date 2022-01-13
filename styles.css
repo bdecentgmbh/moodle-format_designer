@@ -1,3 +1,7 @@
+:root {
+    --sectioncolor: #0f6cbf;
+}
+
 @media (min-width: 1200px) {
     .pagelayout-course.format-designer #page-wrapper #page.drawers .main-inner {
         max-width: none;
@@ -7,23 +11,28 @@
 ul.designer .card.card-list {
     min-height: 101px;
     border: none;
-    border-left: 10px solid #333;
-    box-shadow: 1px 1px 11px 2px rgba(0, 0, 0, 0.2);
-    -webkit-box-shadow: 1px 1px 11px 2px rgba(0, 0, 0, 0.2);
-    -moz-box-shadow: 1px 1px 11px 2px rgba(0, 0, 0, 0.2);
+    border-left: 6px solid #333;
+    box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.10);
 }
 ul.designer .card.card-list.restricted {
     border-color: #ccc;
 }
+ul.designer .card-layout .card.card-list .card-body .mod-indent-outer > div {
+    display: table-cell;
+    position: relative;
+}
 ul.designer .card.card-list .card-body .mod-indent-outer .completion-info {
     text-align: center;
     margin-bottom: 5px;
+    display: inline-block;
 }
 ul.designer .card-layout .card.card-list .card-body .mod-indent-outer .completion-info {
     text-align: left;
 }
 ul.designer .card-layout .card.card-list .card-body {
-    padding: 15px 10px 10px;
+    padding: 15px;
+    background-repeat: no-repeat;
+    background-size: cover;
     position: relative;
 }
 ul.designer .card.card-list .card-body .mod-indent-outer .mod-indent .row div:nth-child(2) .col {
@@ -49,6 +58,18 @@ ul.designer .card.card-list:hover .card-body .mod-indent-outer .mod-indent .row 
     max-width: 90%;
     margin-bottom: 20px;
     display: inline-block;
+    vertical-align: middle;
+}
+.course-content ul.designer li.section .categorise-section-block {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 10px;
+    margin-bottom: 20px;
+}
+.course-content ul.designer li.section .categorise-section-block span.badge {
+    font-size: 12px;
+    line-height: 13px;
+    border-radius: 3px;
 }
 .course-content ul.designer li.section.section-summary h3 {
     max-width: 90%;
@@ -58,7 +79,9 @@ ul.designer .card.card-list:hover .card-body .mod-indent-outer .mod-indent .row 
     opacity: .6;
 }
 .course-content ul.designer li.section .availability-section-block {
-    float: right;
+    /* float: right; */
+    display: inline-block;
+    vertical-align: top;
     margin-top: 0;
     margin-bottom: 10px;
     margin-right: 10px;
@@ -66,7 +89,6 @@ ul.designer .card.card-list:hover .card-body .mod-indent-outer .mod-indent .row 
 .course-content ul.designer li.section .availability-section-block .section_availability .availabilityinfo {
     font-size: 12px;
     border: 1px solid #ccc;
-    background: #fff;
     padding: 5px;
     margin-right: 5px;
     vertical-align: middle;
@@ -74,7 +96,10 @@ ul.designer .card.card-list:hover .card-body .mod-indent-outer .mod-indent .row 
 }
 .course-content ul.designer li.section .availability-section-block .section_availability
 .availabilityinfo.isrestricted {
+    background: #fff;
     display: none;
+    position: absolute;
+    margin-left: 20px;
 }
 .course-content ul.designer li.section .availability-section-block .section_availability
 .availabilityinfo.isrestricted.show {
@@ -89,7 +114,7 @@ ul.designer .card.card-list:hover .card-body .mod-indent-outer .mod-indent .row 
     cursor: pointer;
 }
 .course-content ul.designer li.section .availability-section-block .section-restricted-action i {
-    font-size: 20px;
+    font-size: 26px;
     line-height: 30px;
     color: #ccc;
 }
@@ -132,6 +157,12 @@ ul.designer .card.card-list.secondary {
     top: 5px;
     right: 5px;
 }
+.designer .bg-success {
+    background-color: #28a744 !important;
+}
+.designer .badge-success {
+    background-color: #28a744;
+}
 ul.designer .text-notstarted {
     color: var(--primary);
 }
@@ -142,6 +173,13 @@ ul.designer .badge.badge-completion {
     text-align: left;
     padding: 0 0.5em;
 }
+ul.designer .mform .fcontainer .fitem.gradient {
+    display: inline-block;
+    vertical-align: top;
+}
+/* ul.designer .mform .fcontainer .fitem .gradient:nth-of-type(1) {
+    margin-left: 150px;
+} */
 ul.designer .module-icons {
     margin-left: 20px;
 }
@@ -152,12 +190,13 @@ ul.designer li.activity .activity-block .card:hover .show-on-hover {
 ul.designer li.activity .activity-block .card .show-on-hover .col a,
 ul.designer li.activity .activity-block .card:hover .show-on-hover .col a {
     font-size: 12px;
+    color: #000;
     text-decoration: none;
     box-shadow: none;
 }
-ul.designer li.activity .activity-block .card .show-on-hover .col .font-weight-bold {
+/* ul.designer li.activity .activity-block .card .show-on-hover .col .font-weight-bold {
     display: none;
-}
+} */
 ul.designer li.activity .activity-block .card .show-on-hover .col .call-action-block .font-weight-bold,
 ul.designer li.activity:hover .activity-block .card .show-on-hover .col .font-weight-bold {
     display: inline-block;
@@ -184,13 +223,13 @@ ul.designer .badge.badge-notstarted {
     background-color: var(--primary);
 }
 
-@media (max-width: 991px) {
+/* @media (max-width: 991px) {
     ul.designer li.activity .activity-block .card:hover .show-on-hover {
         position: absolute;
         bottom: 20px;
         right: 20px;
     }
-}
+} */
 
 @media (min-width: 768px) {
     ul.designer .card.card-list .card-body .mod-indent-outer {
@@ -220,15 +259,20 @@ ul.designer .togglecompletion .btn img {
     border-radius: 5px;
 }
 body.editing ul.designer .section .activity .editing_move {
-    left: -20px;
+    left: 0;
     top: calc(50% - 12px);
+    z-index: 1;
+}
+body.editing ul.designer .section .circles-layout .activity .editing_move {
+    top: 0;
+    left: 20px;
 }
 
-@media (max-width: 767px) {
+/* @media (max-width: 767px) {
     ul.designer .section .content .section.card-layout li.activity .mod-content {
         padding-bottom: 40px;
     }
-}
+} */
 
 @media (max-width: 575px) {
     .editing ul.designer .section .activity .contentwithoutlink,
@@ -256,9 +300,40 @@ body.editing ul.designer .section .activity .editing_move {
     list-style: none;
 }
 .course-content ul.designer li.section.main {
+    width: 100%;
+    padding: 0;
     padding-bottom: 1rem;
-    margin-top: 1.5rem;
+    margin: 1.5rem auto 0;
+    margin-top: 0;
     border: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.course-content ul.designer li.section.main.bg-color-overlay,
+.course-content ul.designer li.section.bg-color-overlay.section-design-header .content .section-header-content,
+.course-content ul.designer li.bg-color-overlay .card .card-body {
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+    z-index: 0;
+}
+.course-content ul.designer li.section.main.bg-color-overlay.section-design-whole .bg-overlay,
+.course-content ul.designer li.section.main.bg-color-overlay.section-design-header .bg-overlay,
+.course-content ul.designer li.section.main.section-design-whole .bg-color-overlay .bg-overlay,
+.course-content ul.designer li.section.main.section-design-header .bg-color-overlay .bg-overlay {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: .5;
+    z-index: -1;
+}
+.course-content ul.designer li.section.main.bg-color-overlay.section-design-whole .img-block .bg-overlay,
+.course-content ul.designer li.section.main.section-design-whole .bg-color-overlay .img-block .bg-overlay,
+.course-content ul.designer li.section.main.bg-color-overlay.section-design-header .img-block .bg-overlay,
+.course-content ul.designer li.section.main.section-design-header .bg-color-overlay .img-block .bg-overlay {
+    border-radius: 50%;
 }
 .course-content ul.designer li.section.main.restricted {
     opacity: .4;
@@ -269,25 +344,56 @@ body.editing ul.designer .section .activity .editing_move {
 }
 .course-content ul.designer li.section .content {
     padding: 0;
-    margin: 0;
+    margin: 0 auto;
     clear: both;
+}
+.course-content ul.designer li.section .content .section-header-content {
+    padding: 10px;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.course-content ul.designer li.section .content .section-header-content.boxed-block,
+.course-content ul.designer li.section .content .section.boxed-block {
+    margin: 0 auto;
+}
+.course-content ul.designer li.section .content .section-progress-info {
+    max-width: 300px;
+    width: 100%;
+    text-align: right;
+    float: right;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+.course-content ul.designer li.section .content .section-progress-info .progress {
+    border-radius: 25px;
 }
 .course-content ul.designer li.section .content .summary .no-overflow {
     width: 100%;
     margin-top: 20px;
+    margin-bottom: 20px;
+}
+.course-content ul.designer li.section.section-design-header .content .summary .no-overflow a,
+.course-content ul.designer li.section.section-design-whole .content .summary .no-overflow a {
+    color: var(--sectioncolor);
 }
 .path-course-view ul.designer li.activity form.togglecompletion .btn {
     height: auto;
     display: inline-block;
-    vertical-align: middle;
+    vertical-align: top;
 }
 .path-course-view ul.designer li.activity > span {
     display: inline-block;
     vertical-align: middle;
 }
 
+@media (min-width: 1200px) {
+    .course-content ul.designer li.section.main.container {
+        max-width: 1240px;
+    }
+}
+
 @media (min-width: 992px) {
-    ul.designer .list-layout .card.card-list .row .col-lg-7 {
+    /* ul.designer .list-layout .card.card-list .row .col-lg-7 {
         flex: 0 0 50%;
         max-width: 50%;
     }
@@ -298,9 +404,8 @@ body.editing ul.designer .section .activity .editing_move {
     ul.designer .list-layout .card.card-list .row .col-lg-2 {
         flex: 0 0 25%;
         max-width: 25%;
-    }
+    } */
     ul.designer .list-layout .card.card-list .row .col-lg-2 .pull-right {
-        width: 100%;
         text-align: center;
         float: none;
     }
@@ -310,11 +415,11 @@ body.editing ul.designer .section .activity .editing_move {
     .designer .section.img-text .activity .row > div .pull-right {
         margin-top: 10px;
     }
-    ul.designer .list-layout .card.card-list .row .show-on-hover {
+    /* ul.designer .list-layout .card.card-list .row .show-on-hover {
         position: absolute;
         right: 20px;
         bottom: 20px;
-    }
+    } */
 }
 
 @media (max-width: 767px) {
@@ -332,6 +437,15 @@ body.editing ul.designer .section .activity .editing_move {
     .course-content ul.designer li.section .summary,
     .course-content ul.designer li.section .content > .availabilityinfo {
         margin-left: 25px;
+        margin-bottom: 20px;
+    }
+    /* .format-designer.path-course-view.pagelayout-course #page #page-content section#region-main {
+        padding: 0;
+        border: 0;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    } */
+    .format-designer.path-course-view.pagelayout-course #page #page-content section#region-main {
+        padding: 0;
     }
 }
 
@@ -368,28 +482,58 @@ body.editing ul.designer .section .activity .editing_move {
 .designer .list-layout .section .content .section li.activity .mod-visits-block {
     display: block;
 }
+.designer .section.img-text .activity-block .availability-info {
+    position: relative;
+}
+.designer .section.img-text.link-layout .activity-block .availability-info {
+    /* width: 25%; */
+    display: inline-block;
+}
+.designer .section.img-text.list-layout .activity-block .availability-info {
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+}
+.designer .section.img-text.card-layout .activity-block .availability-info {
+    float: right;
+}
 .designer .section.img-text .activity .restrict-block .info-content-block {
-    text-align: right;
+    text-align: left;
     margin-right: 10px;
 }
+.designer .section.img-text.card-layout .activity .restrict-block .info-content-block {
+    margin-right: 0;
+}
 .designer .section.img-text .activity .restrict-block .info-content-block .availabilityinfo.isrestricted {
+    min-width: 220px;
     font-size: 12px;
     color: #000;
     border: 2px solid #333;
     background: #fff;
-    vertical-align: middle;
     padding: 5px;
     margin: 0;
+    vertical-align: middle;
     display: none;
     opacity: .7;
+    position: absolute;
+    top: 0;
+    left: 20px;
+    opacity: 1;
+    z-index: 1;
 }
-.designer .section.img-text .activity .restrict-block .info-content-block .availabilityinfo.isrestricted ul {
-    text-align: left;
-    list-style: none;
-    padding: 0;
+.designer .section.img-text.card-layout .activity .restrict-block .info-content-block .availabilityinfo.isrestricted {
+    position: absolute;
+    right: 55px;
 }
 .designer .section.img-text .activity .restrict-block.show .info-content-block .availabilityinfo.isrestricted {
     display: inline-block;
+}
+.designer .section.img-text.card-layout .activity .restrict-block.show .info-content-block .availabilityinfo.isrestricted {
+    left: auto;
+    right: 25px;
+}
+.designer .section.img-text.circles-layout .activity .restrict-block .info-content-block .availabilityinfo.isrestricted {
+    top: 30px;
 }
 .designer .section.img-text .activity .restrict-block.show .info-content-block .availabilityinfo.isrestricted
 ul {
@@ -410,12 +554,17 @@ ul li {
     display: inline-block;
 }
 .designer .section.img-text .activity .call-action-block {
+    display: inline-block;
     vertical-align: middle;
-    margin-left: 5px;
-    float: right;
+    margin-right: 5px;
+    /* float: right; */
+}
+.designer .section.img-text .activity .call-action-block a:focus {
+    border: 0;
+    background: none;
+    box-shadow: none;
 }
 .designer .section.img-text .activity .restrict-block.show .call-action-block {
-    margin-right: 0;
     display: inline-block;
     float: none;
 }
@@ -429,20 +578,43 @@ ul li {
     line-height: 27px;
 }
 .designer .section.img-text .activity .call-action-block a > span i {
-    font-size: 20px;
+    font-size: 26px;
     color: #ccc;
     line-height: 32px;
     text-indent: 0;
     float: left;
+}
+.designer .section.img-text.circles-layout .activity .call-action-block a > span i {
+    margin-top: 30px;
 }
 .designer .section.img-text .activity .activityinstance {
     width: 100%;
     padding-right: 30px;
     margin-bottom: 10px;
 }
+.designer .section.img-text.card-layout .activity .activity-block .activityinstance {
+    padding-right: 0;
+}
+.designer .section.img-text .activity .activityinstance .img-block {
+    background: #eee;
+    border-radius: 5px;
+    padding: 15px;
+    margin-right: 10px;
+}
+.designer .section.img-text.link-layout .activity .activityinstance .img-block {
+    display: inline-block;
+}
+.designer .section.img-text .activity .activityinstance .img-block img {
+    width: 20px;
+    height: 20px;
+    margin: 0 auto;
+}
 .designer .section.img-text .activity .activityinstance .inplaceeditable {
     width: 100%;
     display: inline-block;
+}
+.designer .section.img-text.card-layout .activity .activityinstance .inplaceeditable {
+    width: 90%;
 }
 .designer .section.img-text.list-layout .activity .activityinstance {
     padding-right: 30px;
@@ -453,36 +625,47 @@ ul li {
 .designer .section.list-layout .activity .actions,
 .designer .section.card-layout .activity .actions {
     top: 15px;
-    right: 5px;
+    right: 40px;
 }
-.designer .section.list-layout .activity img.activityicon,
-.designer .section.card-layout .activity img.activityicon {
+/* .designer .section .activity .dimmed img.activityicon {
+    display: none;
+} */
+.designer .section.list-layout .activity .aalink img.activityicon,
+.designer .section.card-layout .activity .aalink img.activityicon {
     width: 40px;
     height: 40px;
     margin-right: 10px;
+    display: none;
 }
 .designer .section.list-layout .activity .restricted .instancename {
     color: #6a737b;
 }
 .designer .section.img-text .activity .activityinstance .instancename {
-    font-size: 20px;
+    font-size: 16px;
 }
-.designer .section.img-text.card-layout .activity .restricted .activityinstance .instancename {
+.designer .section.img-text.card-layout .activity .restricted .activityinstance .aalink {
     color: #ccc;
 }
 .designer .section .content .section.card-layout {
+    text-align: left;
     padding-left: 0;
+    margin: 0;
     display: block;
+}
+.designer .section .content .section.card-layout.circles-layout {
+    text-align: center;
 }
 .designer .section .content .section.card-layout li.activity {
     width: 48%;
     min-height: 150px;
+    text-align: left;
     border: 0;
     background: none;
     padding: 0.25rem 5px 0.25rem;
     margin-top: 10px;
     margin-bottom: 0;
     margin-right: 15px;
+    display: inline-block;
     vertical-align: top;
     position: relative;
 }
@@ -498,11 +681,30 @@ ul li {
 .designer .section .content .section.card-layout li.activity:nth-child(2n) {
     margin-right: 0;
 }
+.designer .section .content .section.list-layout {
+    padding: 0;
+    margin: 0;
+}
+.designer .section .content .section.circles-layout {
+    text-align: center;
+    display: block;
+    padding: 0;
+    margin: 0;
+}
 .designer .section .content .section li.activity {
-    padding-top: 0;
-    padding-bottom: 0;
+    padding: 10px 10px 0 10px;
     margin-bottom: 15px;
     border: 0;
+}
+.designer .section .content .section.circles-layout li.activity {
+    padding-bottom: 10px;
+    margin: 10px 0;
+    /* background: rgba(0,0,0,.05); */
+}
+.designer .section .content .section.list-layout li.activity {
+    padding-top: 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 .designer .section .content .section li.activity .activity-block {
     display: none;
@@ -512,32 +714,50 @@ ul li {
 }
 .designer .section .content .section li.activity .activity-block.designer {
     display: block;
+    padding: 0;
 }
 .designer .section .content .section li.activity .activity-block.designer .contentwithoutlink {
+    /* width: 67%; */
+    padding: 0;
     display: inline-block;
 }
-.designer .section .content .section.card-layout li.activity {
-    display: inline-block;
-}
-.designer .section .content .section.card-layout li.activity .activity-block {
+/* .designer .section .content .section.card-layout li.activity .activity-block {
     display: none;
 }
 .designer .section .content .section.card-layout li.activity .activity-block.designer {
     display: block;
-}
+} 
+.designer .section .content .section.card-layout li.activity .activity-block.designer .card.card-list {
+    min-height: 260px;
+}*/
 .designer .section .content .section li.activity.hasinfo {
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
 }
-.designer .section .content .section.link-layout li.activity {
-    margin-bottom: 0;
+.designer .section .content .section.link-layout {
+    padding: 0;
+    margin: 0;
 }
+.designer .section .content .section.link-layout li.activity {
+    padding-bottom: 10px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    /* background: #fff; */
+    position: relative;
+    z-index: 0;
+}
+/* .designer .section .content .section.link-layout li.activity {
+    margin-bottom: 0;
+} */
 .designer .section .content .section.link-layout li.activity .mod-indent-outer > i.icon {
     position: absolute;
     top: 20px;
     left: 5px;
 }
 .designer .section .content .section.link-layout li.activity .mod-indent-outer {
+    padding-top: 0;
+}
+.editing .designer .section .content .section.link-layout li.activity .mod-indent-outer {
     padding-top: 30px;
 }
 .designer .section .content .section.list-layout li.activity .mod-indent-outer > .icon {
@@ -558,31 +778,51 @@ ul li {
     display: inline-block;
 }
 .designer .section .content .section.link-layout li.activity .activityinstance {
-    width: 55%;
+    width: 75%;
     vertical-align: middle;
+    margin-bottom: 0;
+}
+.designer .section .content .section.link-layout li.activity .activityinstance.ismodcontent {
+    display: block;
+}
+.designer .section .content .section.link-layout li.activity.restricted .activityinstance.ismodcontent {
+    display: inline-block;
+}
+.designer .section .content .section.link-layout li.activity .activityinstance .aalink {
+    width: 70%;
+    display: inline-flex;
+    padding-left: 0;
 }
 .designer .section .content .section.link-layout li.activity .action-html-card {
-    width: 20%;
-    margin-top: 10px;
+    max-width: 100px;
+    width: 100%;
+    text-align: right;
+    margin-top: 0;
     margin-left: 0;
     display: inline-block;
     vertical-align: middle;
+    float: none;
     opacity: 0;
+    display: none;
 }
 .designer .section .content .section.link-layout li.activity.restricted .action-html-card {
     width: auto;
     opacity: 1;
 }
 .designer .section .content .section.link-layout li.activity .center-reports-block {
-    width: 23%;
+    width: 22%;
     display: inline-block;
     vertical-align: middle;
+    float: right;
+    margin-top: 10px;
+    margin-right: 10px;
 }
 .designer .section .content .section.link-layout li.activity .center-reports-block .pull-right {
     float: none;
 }
 .designer .section .content .section.link-layout li.activity .center-reports-block .pull-right .completion-info {
     text-align: center;
+    display: inline-block;
 }
 .designer .section .content .section li.activity .availability-block-content .availabilityinfo {
     width: 100%;
@@ -604,7 +844,7 @@ ul li {
     text-align: center;
 }
 .designer .section .content .section li.activity .activityinstance .activity-type {
-    margin-left: 50px;
+    /* margin-left: 50px; */
     display: block;
 }
 .designer .section .content .section li.activity .activityinstance .no-overflow > h2,
@@ -615,10 +855,9 @@ ul li {
     text-decoration: none;
 }
 .designer .section .content .section li.activity .activityinstance .activity-type p {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: bold;
-    color: #666;
-    text-transform: uppercase;
+    color: #999;
     margin-bottom: 0;
 }
 .designer .section .content .section li.activity .restricted .activityinstance .activity-type p {
@@ -630,6 +869,9 @@ ul li {
     text-decoration: none;
     text-indent: 0;
 }
+.designer .section .content .section.list-layout li.activity .activityinstance .aalink {
+    display: flex;
+}
 .designer .section .content .section.list-layout li.activity .activityinstance .aalink,
 .designer .section .content .section.card-layout li.activity .activityinstance .aalink {
     text-indent: 0;
@@ -637,20 +879,26 @@ ul li {
     display: inline-block;
     vertical-align: top;
 }
-.designer .section .content .section li.activity .activityinstance .aalink .instancename {
+.designer .section .content .section li.activity .activityinstance .instancename {
+    line-height: 30px;
     font-weight: bold;
     display: inline-block;
     vertical-align: top;
 }
-.designer .section .content .section li.activity .mod-content {
+/*.designer .section .content .section li.activity .mod-content {
     margin-left: 30px;
 }
-.designer .section .content .section.card-layout li.activity .mod-content,
+ .designer .section .content .section.card-layout li.activity .mod-content,
 .designer .section .content .section.list-layout li.activity .mod-content {
-    margin-left: 50px;
-}
+    margin-left: 60px;
+} */
 .designer .section .content .section li.activity .restricted .mod-content {
     opacity: .5;
+}
+.designer .section .content .section.list-layout li.activity .mod-content {
+    /* width: 80%; */
+    margin-left: 65px;
+    margin-bottom: 20px;
 }
 .designer .section .content .section li.activity .restricted .mod-content p {
     color: #6a737b;
@@ -659,39 +907,68 @@ ul li {
     display: none;
 }
 .designer .section .content .section li.activity .completion-html-card {
-    margin-left: 30px;
     margin-bottom: 10px;
-}
-.designer .section .content .section li.activity .completion-html-card {
-    margin-left: 50px;
+    /* margin-left: 60px; */
 }
 .designer .section .content .section.card-layout li.activity .completion-html-card {
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 0;
+    margin-bottom: 30px;
 }
 .designer .section .content .section.card-layout li.activity .restricted .completion-html-card
 .completion-info .badge-restricted span {
     color: #6a737b;
 }
+.designer .section .content .section li.activity .mod-indent-outer .row {
+    margin: 0;
+}
+.designer .section .content .section li.activity .mod-indent-outer .col.align-self-center {
+    text-align: right;
+    padding: 0;
+}
+.designer .section .content .section li.activity .mod-indent-outer .pull-right {
+    float: none;
+}
+.designer .section .content .section li.activity .mod-indent-outer .show-on-hover .col.align-self-center {
+    text-align: center;
+}
+.designer .section .content .section.list-layout li.activity .mod-indent-outer .show-on-hover .col.align-self-center {
+    text-align: right;
+}
 .designer .section .content .section li.activity .mod-visits-block {
     min-height: 20px;
+    margin-right: 10px;
     transition: all .5s ease;
+    display: inline-block;
+    /* display: none; */
+}
+.designer .section .content .section.link-layout li.activity .mod-visits-block {
+    display: inline-block;
+}
+.designer .section .content .section.list-layout li.activity .mod-visits-block {
+    margin-right: 4px;
 }
 .designer .section .content .section.card-layout li.activity .mod-visits-block {
-    margin-left: 50px;
+    position: absolute;
+    left: 0;
+    bottom: 0;
 }
+/* .designer .section .content .section li.activity:hover .mod-visits-block {
+    margin-bottom: 0;
+    display: inline-block;
+}
+.designer .section .content .section.card-layout li.activity .mod-visits-block {
+    margin-left: 60px;
+} */
 .designer .section .content .section.card-layout li.activity .mod-visits-block p {
     text-align: left;
+    margin-bottom: 0;
 }
 .designer .section .content .section li.activity .mod-visits-block p {
     font-size: 12px;
     font-weight: normal;
-    color: #ccc;
+    color: #999;
     text-align: center;
-    display: none;
-}
-.designer .section .content .section li.activity:hover .mod-visits-block p {
-    display: block;
+    margin-bottom: 0;
 }
 .designer .section .content .section li.activity .action-html-card {
     text-align: center;
@@ -699,26 +976,34 @@ ul li {
     margin-left: 50px;
     float: right;
 }
+.designer .section .content .section.card-layout li.activity .mod-content {
+    margin-bottom: 20px;
+}
 .designer .section .content .section.card-layout li.activity .action-html-card {
     position: absolute;
     right: 20px;
-    bottom: 20px;
+    bottom: 0;
     margin-top: 0;
     margin-left: 0;
-    opacity: 0;
+    /* opacity: 0; */
 }
 .designer .section .content .section.card-layout li.activity .restricted .action-html-card {
     opacity: 1;
 }
-.designer .section .content .section li.activity:hover .action-html-card {
+/* .designer .section .content .section li.activity:hover .action-html-card {
     opacity: 1;
-}
+} */
 .designer .section .content .section li.activity .action-html-card a {
     font-size: 12px;
+    color: #000;
     text-decoration: none;
     box-shadow: none;
 }
+.designer .section .content .section li.activity .action-html-card a span i {
+    margin-left: 5px;
+}
 .designer .section .content .section.card-layout li.activity .editing_move {
+    left: 20px;
     z-index: 1;
 }
 .designer .section .content .section.link-layout li.activity .activityinstance .aalink.quickeditlink,
@@ -727,81 +1012,270 @@ ul li {
     width: auto;
     float: right;
 }
+.designer .section.img-text.list-layout .activity .activityinstance .activity-element {
+    max-width: 370px;
+    width: 100%;
+}
+.editing .designer .section .content .section.card-layout li.activity .activityinstance .activity-element .cmname-block {
+    display: block;
+}
+.editing .designer .section .content .section.link-layout li.activity .activityinstance .aalink .instancename,
+.editing .designer .section .content .section.list-layout li.activity .activityinstance .aalink .instancename,
+.editing .designer .section .content .section.card-layout li.activity .activityinstance .aalink .instancename {
+    width: 100%;
+}
+.designer .section .content .section.card-layout li.activity .activityinstance .activity-element {
+    vertical-align: top;
+}
+.designer .section .content .section.link-layout li.activity .mod-content {
+    margin-left: 65px;
+}
+
+.designer .section.desktop-one-column .content .section.card-layout li.activity {
+    width: 100%;
+    margin-right: 0;
+}
+.designer .section.desktop-two-column .content .section.card-layout li.activity {
+    width: 49.5%;
+    margin-right: 0;
+}
+.designer .section.desktop-three-column .content .section.card-layout li.activity {
+    width: 33%;
+    margin-right: 0;
+}
+.designer .section.desktop-four-column .content .section.card-layout li.activity {
+    width: 24.5%;
+    margin-right: 0;
+}
+.designer .section.desktop-five-column .content .section.card-layout li.activity {
+    width: 19.5%;
+    margin-right: 0;
+}
 
 
-@media (min-width: 1200px) {
-    .designer .section .content .section.card-layout li.activity,
+.designer .section.desktop-one-column .content .section.circles-layout li.activity {
+    width: 100%;
+}
+.designer .section.desktop-two-column .content .section.circles-layout li.activity {
+    width: 49.5%;
+}
+.designer .section.desktop-three-column .content .section.circles-layout li.activity {
+    width: 33%;
+}
+.designer .section.desktop-four-column .content .section.circles-layout li.activity {
+    width: 24%;
+}
+.designer .section.desktop-five-column .content .section.circles-layout li.activity {
+    width: 19.5%;
+}
+
+@media (min-width: 1500px) {
+/*     .designer .section.container-full .content .section.card-layout li.activity {
+        width: 33%;
+        margin-right: 0;
+    }
+    .designer .section.container-full .content.show .section.card-layout li.activity {
+        width: 24.5%;
+        padding-right: 0;
+        margin-right: 0;
+    }
+    .designer .section.container-full .content .section.card-layout li.activity:nth-child(2n) {
+        margin-right: 0;
+    }
+    .designer .section.container-full .content .section.card-layout li.activity:nth-child(3n) {
+        margin-right: 0;
+    }
+    .designer .section.container-full .content .section.card-layout li.activity:nth-child(4n) {
+        margin-right: 0;
+    } */
+}
+
+@media (min-width: 1500px) {
+    /* .designer .section.container-full .content .section.circles-layout li.activity,*/
+    .designer .section.container-full .content.show .section.circles-layout li.activity {
+        width: 19%;
+    } 
+}
+
+@media (min-width: 1367px) and (max-width: 1499px) {
+    /* .designer .section.container-full .content .section.card-layout li.activity,*/
+    .designer .section.container-full .content.show .section.card-layout li.activity {
+        width: 32%;
+    }
+    /*.designer .section.container-full .content .section.circles-layout li.activity,*/
+    .designer .section.container-full .content.show .section.circles-layout li.activity {
+        width: 24%;
+    } 
+    /* .designer .section.container-full .content .section.card-layout li.activity:nth-child(2n) {
+        margin-right: 15px;
+    }
+    .designer .section.container-full .content .section.card-layout li.activity:nth-child(3n) {
+        margin-right: 0;
+    } */
+    /* .designer .section.desktop-five-column .content .section.card-layout li.activity {
+        width: 24.5%;
+    } */
+}
+
+@media (min-width: 1200px) and (max-width: 1366px) {
+    /* .designer .section.desktop-five-column .content .section.card-layout li.activity {
+        width: 33%;
+    } */
+    /* .designer .section .content .section.card-layout li.activity, */
     .designer .section .content.show .section.card-layout li.activity {
         width: 48%;
     }
-    .designer .section .content .section.link-layout li.activity .activityinstance .aalink,
+}
+
+@media (min-width: 1200px) {
+    /* .designer .section.img-text .activity .activityinstance .activity-element {
+        width: 80%;
+    } */
+    /* .designer .section .content .section.link-layout li.activity .activityinstance .aalink,
     .designer .section .content .section.list-layout li.activity .activityinstance .aalink,
     .designer .section .content .section.card-layout li.activity .activityinstance .aalink {
         width: 80%;
-    }
-    .designer .section .content .section.link-layout li.activity .activityinstance .aalink .instancename,
-    .designer .section .content .section.list-layout li.activity .activityinstance .aalink .instancename,
-    .designer .section .content .section.card-layout li.activity .activityinstance .aalink .instancename {
+    } */
+    .editing .designer .section .content .section.link-layout li.activity .activityinstance .aalink .instancename,
+    .editing .designer .section .content .section.list-layout li.activity .activityinstance .aalink .instancename,
+    .editing .designer .section .content .section.card-layout li.activity .activityinstance .aalink .instancename {
         width: 80%;
+    }
+    .editing .designer .section .content .section.link-layout li.activity .activityinstance .aalink.quickeditlink,
+    .editing .designer .section .content .section.list-layout li.activity .activityinstance .aalink.quickeditlink,
+    .editing .designer .section .content .section.card-layout li.activity .activityinstance .aalink.quickeditlink {
+        width: auto;
     }
 }
 
-@media (min-width: 992px) {
-    .designer .section .content .section.link-layout li.activity .activityinstance .aalink,
-    .designer .section .content .section.list-layout li.activity .activityinstance .aalink,
-    .designer .section .content .section.card-layout li.activity .activityinstance .aalink {
-        width: 90%;
+@media (max-width: 1199px) {
+    .designer .section.img-text.list-layout .activity .activityinstance .activity-element {
+        max-width: 320px;
+        width: 100%;
     }
-    .designer .section .content .section.link-layout li.activity .activityinstance .aalink .instancename,
-    .designer .section .content .section.list-layout li.activity .activityinstance .aalink .instancename,
-    .designer .section .content .section.card-layout li.activity .activityinstance .aalink .instancename {
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+    /* .designer .section.desktop-five-column .content .section.circles-layout li.activity {
+        width: 33%;
+    }
+    .designer .section.desktop-five-column .content .section.card-layout li.activity {
+        width: 33%;
+    } */
+}
+
+@media (min-width: 992px) {
+    .designer .section .content .section.card-layout li.activity .card.card-list {
+        min-height: 220px;
+    }
+    .designer .section .content .section.card-layout li.activity .card.card-list .mod-indent-outer {
+        min-height: 190px;
+    }
+    .editing .designer .section .content .section.link-layout li.activity .activityinstance .aalink,
+    .editing .designer .section .content .section.list-layout li.activity .activityinstance .aalink,
+    .editing .designer .section .content .section.card-layout li.activity .activityinstance .aalink {
         width: 80%;
+    }
+    .editing .designer .section .content .section.link-layout li.activity .activityinstance .aalink.quickeditlink,
+    .editing .designer .section .content .section.list-layout li.activity .activityinstance .aalink.quickeditlink,
+    .editing .designer .section .content .section.card-layout li.activity .activityinstance .aalink.quickeditlink {
+        width: auto;
+    }
+    .editing .designer .section .content .section.link-layout li.activity .activityinstance .aalink .instancename,
+    .editing .designer .section .content .section.list-layout li.activity .activityinstance .aalink .instancename,
+    .editing .designer .section .content .section.card-layout li.activity .activityinstance .aalink .instancename {
+        width: 80%;
+    }
+    .designer .section .content .section.card-layout li.activity .activityinstance .activity-element {
+        width: 80%;
+    }
+    .designer .section .content .section.list-layout li.activity .card .card-body {
+        padding-bottom: 0;
+    }
+    .designer .section.desktop-three-column .content .section.card-layout li.activity {
+        width: 33%;
     }
 }
 
 @media (max-width: 991px) {
-    ul.designer .section.img-text.list-layout .card.card-list {
+    /* ul.designer .section.img-text.list-layout .card.card-list {
         min-height: 150px;
-    }
+    } */
     .designer .section.img-text.list-layout .activity .activityinstance,
     .designer .section.img-text.card-layout .activity .activityinstance {
         padding-right: 0;
     }
-    .designer .section .content .section.link-layout li.activity .action-html-card {
-        float: none;
+    .designer .section .content .section.card-layout li.activity .activityinstance .activity-element {
+        width: 80%;
+    }
+    .designer .section.tablet-two-column .content .section.card-layout li.activity {
+        width: 49.5%;
+        margin-right: 0;
+    }
+    .designer .section.tablet-three-column .content .section.circles-layout li.activity {
+        width: 32%;
+    }
+    .designer .section.tablet-three-column .content .section.card-layout li.activity {
+        width: 32%;
     }
 }
 
 @media (min-width: 768px) {
-    .designer .section .content .section.card-layout li.activity .card.card-list {
-        min-height: 260px;
+    .designer .section .content .section.card-layout li.activity .activityinstance .activity-element {
+        width: 64%;
     }
 }
 
 @media (min-width: 768px) and (max-width: 991px) {
-    .designer .section .content .section.link-layout li.activity .activityinstance {
-        width: 54%;
+    .designer .section .content .section.card-layout li.activity .card.card-list {
+        min-height: 250px;
     }
-    .designer .section .content .section.link-layout li.activity .action-html-card {
-        float: none;
+    .designer .section .content .section.card-layout li.activity .card.card-list .mod-indent-outer {
+        min-height: 220px;
     }
-    .designer .section .content .section.link-layout li.activity .activityinstance .aalink,
-    .designer .section .content .section.list-layout li.activity .activityinstance .aalink,
-    .designer .section .content .section.card-layout li.activity .activityinstance .aalink {
+    .editing .designer .section .content .section.link-layout li.activity .activityinstance .aalink,
+    .editing .designer .section .content .section.list-layout li.activity .activityinstance .aalink,
+    .editing .designer .section .content .section.card-layout li.activity .activityinstance .aalink {
         width: 80%;
     }
-    .designer .section .content .section.link-layout li.activity .activityinstance .aalink .instancename,
-    .designer .section .content .section.list-layout li.activity .activityinstance .aalink .instancename,
-    .designer .section .content .section.card-layout li.activity .activityinstance .aalink .instancename {
+    .editing .designer .section .content .section.link-layout li.activity .activityinstance .aalink.quickeditlink,
+    .editing .designer .section .content .section.list-layout li.activity .activityinstance .aalink.quickeditlink,
+    .editing .designer .section .content .section.card-layout li.activity .activityinstance .aalink.quickeditlink {
+        width: auto;
+    }
+    .editing .designer .section .content .section.link-layout li.activity .activityinstance .aalink .instancename,
+    .editing .designer .section .content .section.list-layout li.activity .activityinstance .aalink .instancename,
+    .editing .designer .section .content .section.card-layout li.activity .activityinstance .aalink .instancename {
         width: 70%;
+    }
+    .designer .section.img-text.list-layout .activity .activityinstance .activity-element {
+        max-width: 230px;
+        width: 100%;
+    }
+    .designer .section.tablet-two-column .content .section.circles-layout li.activity,
+    .designer .section.tablet-two-column .content .section.card-layout li.activity {
+        width: 49.5%;
+    }
+    .designer .section.tablet-one-column .content .section.card-layout li.activity,
+    .designer .section.tablet-one-column .content .section.circles-layout li.activity {
+        width: 100%;
     }
 }
 
 @media (max-width: 767px) {
     .designer .section .content .section.card-layout li.activity {
         width: 100%;
-        min-height: auto;
+        padding: 0;
         margin-right: 0;
+    }
+    .designer .section .content .section.link-layout li.activity .activityinstance {
+        width: 100%;
+    }
+    .designer .section .content .section.card-layout li.activity .card-list {
+        min-height: 150px;
+    }
+    .designer .section .content .section.card-layout li.activity .card.card-list .mod-indent-outer {
+        min-height: 120px;
     }
     .designer .section .content.collapse .section.card-layout li.activity,
     .designer .section .content.collapsing .section.card-layout li.activity,
@@ -813,35 +1287,148 @@ ul li {
         left: 30px;
         z-index: 1;
     }
-    .designer .section .content .section.link-layout li.activity .activityinstance .aalink,
-    .designer .section .content .section.list-layout li.activity .activityinstance .aalink,
-    .designer .section .content .section.card-layout li.activity .activityinstance .aalink {
+    .designer .section.img-text.list-layout .activity .activityinstance .activity-element {
+        max-width: none;
+        width: 70%;
+    }
+    .designer .section .content .section li.activity .mod-indent-outer .col.align-self-center {
+        text-align: left;
+    }
+    .editing .designer .section .content .section.link-layout li.activity .activityinstance .aalink,
+    .editing .designer .section .content .section.list-layout li.activity .activityinstance .aalink,
+    .editing .designer .section .content .section.card-layout li.activity .activityinstance .aalink {
         width: 90%;
     }
-    .designer .section .content .section.link-layout li.activity .activityinstance .aalink .instancename {
+    .editing .designer .section .content .section.link-layout li.activity .activityinstance .aalink.quickeditlink,
+    .editing .designer .section .content .section.list-layout li.activity .activityinstance .aalink.quickeditlink,
+    .editing .designer .section .content .section.card-layout li.activity .activityinstance .aalink.quickeditlink {
+        width: auto;
+    }
+    .editing .designer .section .content .section.link-layout li.activity .activityinstance .aalink .instancename {
         width: 63%;
     }
-    .designer .section .content .section.list-layout li.activity .activityinstance .aalink .instancename,
-    .designer .section .content .section.card-layout li.activity .activityinstance .aalink .instancename {
+    .editing .designer .section .content .section.list-layout li.activity .activityinstance .aalink .instancename,
+    .editing .designer .section .content .section.card-layout li.activity .activityinstance .aalink .instancename {
         width: 80%;
+    }
+    .designer .section.img-text .activity .restrict-block .info-content-block .availabilityinfo.isrestricted {
+        left: auto;
+        right: 40px;
+    }
+    .designer .section .content .section.link-layout li.activity .mod-content {
+        width: auto;
+        display: block;
+        margin-top: 10px;
+    }
+    .designer .section .content .section.link-layout li.activity .center-reports-block {
+        width: 100%;
+        margin-right: 0;
+        float: none;
+    }
+    .designer .section .content .section.link-layout li.activity .mod-indent-outer .col.align-self-center {
+        text-align: right;
+    }
+    .designer .section.list-layout .activity .actions {
+        top: 0;
+        right: 0;
+    }
+    /* .designer .section.mobile-one-column .content .section.card-layout li.activity,
+    .designer .section.mobile-one-column .content .section.circles-layout li.activity {
+        width: 100%;
+        margin-right: 0;
+    } */
+    /* .designer .section.mobile-two-column .content .section.card-layout li.activity, */
+    .designer .section.tablet-two-column .content .section.card-layout li.activity {
+        width: 49%;
+    }
+    /* .designer .section.mobile-two-column .content .section.circles-layout li.activity, */
+    .designer .section.tablet-two-column .content .section.circles-layout li.activity {
+        width: 49%;
     }
 }
 
+@media (min-width: 768px) {
+    .designer .section .content .section.link-layout li.activity .mod-content {
+        width: 50%;
+        display: inline-block;
+        margin-top: 10px;
+    }
+    .designer .section .content .section.link-layout li.activity.restricted .mod-content {
+        display: block;
+    }
+    .designer .section .content .section.link-layout li.activity.restricted .ismodcontent  + .availability-info + .mod-content {
+        display: inline-block;
+    }
+}
+
+/* @media (min-width: 576px) {
+    .designer .section .circle-layout .activity-block .card .card-body {
+        min-height: 390px;
+    }
+} */
+
 @media (max-width: 575px) {
-    .designer .section .content .section.link-layout li.activity .activityinstance {
-        width: auto;
+    .designer .section .content .section.card-layout li.activity {
+        width: 99%;
     }
-    .designer .section .content .section.link-layout li.activity .center-reports-block {
-        width: auto;
+    .designer .section .content .section.card-layout li.activity .activityinstance .activity-element {
+        width: 75%;
     }
-    .designer .section .content .section.link-layout li.activity .action-html-card {
-        float: right;
-    }
-    .designer .section .content .section.link-layout li.activity .activityinstance .aalink .instancename {
+    .editing .designer .section .content .section.link-layout li.activity .activityinstance .aalink .instancename {
         width: auto;
     }
     .designer .section .content .section.link-layout li.activity .activityinstance .aalink.quickeditlink {
         float: none;
+    }
+    .designer .section.img-text.link-layout .activity-block .availability-info {
+        float: right;
+    }
+    .designer .section .content .section.link-layout li.activity .activityinstance {
+        width: 90%;
+    }
+    /* .designer .section.img-text.link-layout .activity-block .availability-info {
+        width: 50%;
+    } 
+    .designer .section .content .section.link-layout li.activity .center-reports-block {
+        width: 50%;
+    }*/
+    .designer .section .content .section li.activity:hover .mod-visits-block {
+        margin-right: 0;
+        display: inline-block;
+    }
+    .designer .section .content .section li.activity:hover .mod-visits-block {
+        margin-right: 10px;
+    }
+    .designer .section .content .section.link-layout li.activity:hover .mod-visits-block {
+        margin-right: 10px;
+    }
+    .designer .section .content .section li.activity .activity-block.designer {
+        padding: 0;
+    }
+    .designer .section .content .section.list-layout li.activity .mod-indent-outer .col.align-self-center {
+        text-align: left;
+    }
+    .designer .section .content .section li.activity .mod-indent-outer .col.align-self-center {
+        text-align: center;
+    }
+    .designer .section .content .section.link-layout li.activity .mod-indent-outer .col.align-self-center {
+        text-align: right;
+    }
+    .designer .section.mobile-one-column .content .section.card-layout li.activity,
+    .designer .section.mobile-one-column .content .section.circles-layout li.activity {
+        width: 100%;
+        padding-right: 5px;
+        margin-right: 0;
+    }
+    .designer .section.mobile-two-column .content .section.img-text.card-layout .activity .activity-block .activityinstance {
+        margin-bottom: 20px;
+    }
+    .designer .section.mobile-two-column .content .section.card-layout li.activity .activityinstance .activity-element {
+        width: 90%;
+    }
+    .designer .section.mobile-two-column .content .section.card-layout li.activity,
+    .designer .section.mobile-two-column .content .section.circles-layout li.activity {
+        width: 49%;
     }
 }
 
@@ -850,4 +1437,114 @@ ul li {
 }
 .designer .section .content .section li.activity  .mod-content .fullcontent-summary.summary-hide {
     display: none;
+}
+
+/*Circle layout*/
+
+.designer .section .circle-layout {
+    width: 24.7%;
+    border: 0;
+    background: none;
+    padding: 0;
+    margin: 20px 0 0 0;
+    display: inline-block;
+    vertical-align: top;
+}
+.designer .section .circle-layout .activity-block .card {
+    min-height: 400px;
+    text-align: center;
+    border: 0;
+    background-color: transparent;
+    box-shadow: none;
+}
+.designer .section .circle-layout .activity-block .card.warning .img-block {
+    background-color: #ffe4cf;
+}
+.designer .section .circle-layout .activity-block .card.danger .img-block {
+    background-color: #ffe6e8;
+}
+.designer .section .circle-layout .activity-block .card .card-body {
+    padding: 10px;
+}
+.designer .section.img-text.circles-layout .activity-block .img-block {
+    width: 80px;
+    height: 80px;
+    line-height: 50px;
+    background-color: #eee;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    display: inline-block;
+    position: relative;
+    z-index: 0;
+}
+.designer .section.img-text .circle-layout .activity-block .activityinstance {
+    margin-bottom: 5px;
+    padding-right: 0;
+}
+.designer .section .content .section li.activity.circle-layout .activityinstance .activity-type {
+    margin-left: 0;
+    margin-bottom: 5px;
+}
+.designer .section .content .section li.activity.circle-layout .mod-content {
+    margin-left: 0;
+    margin-bottom: 10px;
+}
+.designer .section .content .section li.activity.circle-layout .completion-html-card {
+    margin-left: 0;
+}
+.designer .section .circle-layout .activity-block .img-block img.activityicon {
+    margin: 0 auto;
+}
+.designer .section .circle-layout .activity-block .aalink img.activityicon {
+    display: none;
+}
+ul.designer .circle-layout .card.card-list .card-body .mod-indent-outer .completion-info {
+    text-align: center;
+}
+.designer .section .content .section li.activity.circle-layout .mod-visits-block {
+    margin: 0;
+}
+.designer .section .content .section.card-layout li.activity.circle-layout .mod-visits-block p {
+    text-align: center;
+}
+.designer .section .content .section li.activity.circle-layout .activityinstance .aalink {
+    width: 100%;
+    padding: 0;
+}
+.designer .section .content .section li.activity.circle-layout .action-html-card {
+    float: none;
+    margin-top: 0;
+    margin-left: 0;
+}
+.designer .section.img-text.circles-layout .activity-block .availability-info {
+    position: absolute;
+    top: 0;
+    left: 20px;
+}
+.designer .section-design-whole .mod-content a,
+.designer .section-design-header .mod-content a {
+    color: var(--sectioncolor);
+}
+
+@media (min-width: 992px) and (max-width: 1366px) {
+    .designer .section .circle-layout {
+        width: 33%;
+    }
+}
+
+@media (min-width: 576px) and (max-width: 991px) {
+    .designer .section .circle-layout {
+        width: 49%;
+    }
+}
+
+@media (max-width: 575px) {
+    .designer .section .circle-layout {
+        width: 100%;
+    }
+    .designer .section .circle-layout .activity-block .card {
+        min-height: auto;
+    }
 }

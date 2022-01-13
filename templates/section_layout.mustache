@@ -25,19 +25,25 @@
     }
 }}
 
+{{#bgoverlay}}
+{{#sectiondesignwhole}}
+<div class="bg-overlay" style="{{bgoverlay}}">
+</div>
+{{/sectiondesignwhole}}
+{{/bgoverlay}}
 
-    <div class="left side">
-        {{{leftcontent}}}
-    </div>
+<div class="left side">
+    {{{leftcontent}}}
+</div>
 
-    <div class="right side">
-        {{{rightcontent}}}
-        <div class="icon-loader-block"></div>
-    </div>
+<div class="right side">
+    {{{rightcontent}}}
+    <div class="icon-loader-block"></div>
+</div>
 
-    <div class="content">
-        {{$content}}
+<div class="content {{sectioncontentlayout}}" style="{{#sectioncontentwidth}} {{sectioncontentwidth}} {{/sectioncontentwidth}}">
+    {{$content}}
 
-        {{/content}}
-    </div>
+    {{/content}}
+</div>
 

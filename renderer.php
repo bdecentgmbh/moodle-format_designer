@@ -138,28 +138,42 @@ class format_designer_renderer extends format_section_renderer_base {
                 ];
             }
 
-            $o = $this->render_from_template('format_designer/section_controls', [
-                'seciontypes' => [
-                    [
-                        'type' => 'default',
-                        'name' => get_string('link', 'format_designer'),
-                        'active' => empty($format->get_section_option($section->id, 'sectiontype'))
-                            || $format->get_section_option($section->id, 'sectiontype') == 'default',
-                        'url' => new moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $section->section)
-                    ],
-                    [
-                        'type' => 'list',
-                        'name' => get_string('list', 'format_designer'),
-                        'active' => $format->get_section_option($section->id, 'sectiontype') == 'list',
-                        'url' => new moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $section->section)
-                    ],
-                    [
-                        'type' => 'cards',
-                        'name' => get_string('cards', 'format_designer'),
-                        'active' => $format->get_section_option($section->id, 'sectiontype') == 'cards',
-                        'url' => new moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $section->section)
-                    ],
+            $sectiontypes = [
+                [
+                    'type' => 'default',
+                    'name' => get_string('link', 'format_designer'),
+                    'active' => empty($format->get_section_option($section->id, 'sectiontype'))
+                        || $format->get_section_option($section->id, 'sectiontype') == 'default',
+                    'url' => new moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $section->section)
                 ],
+                [
+                    'type' => 'list',
+                    'name' => get_string('list', 'format_designer'),
+                    'active' => $format->get_section_option($section->id, 'sectiontype') == 'list',
+                    'url' => new moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $section->section)
+                ],
+                [
+                    'type' => 'cards',
+                    'name' => get_string('cards', 'format_designer'),
+                    'active' => $format->get_section_option($section->id, 'sectiontype') == 'cards',
+                    'url' => new moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $section->section)
+                ],
+            ];
+
+            if (format_designer_has_pro()) {
+                $prosectiontypes = [
+                    [
+                        'type' => 'circles',
+                        'name' => get_string('circles', 'format_designer'),
+                        'active' => $format->get_section_option($section->id, 'sectiontype') == 'circles',
+                        'url' => new moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $section->section)
+                    ],
+                ];
+                $sectiontypes = array_merge($sectiontypes, $prosectiontypes);
+            }
+
+            $o = $this->render_from_template('format_designer/section_controls', [
+                'seciontypes' => $sectiontypes,
                 'sectionid' => $section->id,
                 'sectionnumber' => $section->section,
                 'courseid' => $course->id,
@@ -437,7 +451,6 @@ class format_designer_renderer extends format_section_renderer_base {
 
         $modinfo = get_fast_modinfo($course);
         $course = course_get_format($course)->get_course();
-
         $context = context_course::instance($course->id);
         // Title with completion help icon.
         $completioninfo = new completion_info($course);
@@ -467,7 +480,7 @@ class format_designer_renderer extends format_section_renderer_base {
 
             if (!$this->page->user_is_editing() && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
                 // Display section summary only.
-                echo $this->section_summary($thissection, $course, null);
+                echo $this->render_section($thissection, $course, false, true);
             } else {
                 echo $this->render_section($thissection, $course, false);
             }
@@ -517,7 +530,6 @@ class format_designer_renderer extends format_section_renderer_base {
             throw new moodle_exception('unknowncoursesection', 'error', course_get_url($course),
                 format_string($course->fullname));
         }
-
         // Copy activity clipboard..
         echo $this->start_section_list();
 
@@ -630,16 +642,16 @@ class format_designer_renderer extends format_section_renderer_base {
      * @param \section_info $section
      * @param stdClass $course
      * @param bool $onsectionpage
+     * @param bool $sectionheader
      * @param int $sectionreturn
      * @param bool $sectioncontent
      * @return void|string
      */
     public function render_section(section_info $section, stdClass $course, $onsectionpage,
-        $sectionreturn = 0, $sectioncontent = false) {
+        $sectionheader = false, $sectionreturn = 0, $sectioncontent = false) {
         global $DB, $USER, $CFG;
         /** @var format_designer $format */
         $format = course_get_format($course);
-
         $sectionstyle = '';
         if ($section->section != 0) {
             // Only in the non-general sections.
@@ -650,7 +662,6 @@ class format_designer_renderer extends format_section_renderer_base {
                 $sectionstyle = ' current';
             }
         }
-
         $leftcontent = $this->section_left_content($section, $course, $onsectionpage);
         $rightcontent = $this->section_right_content($section, $course, $onsectionpage);
         $sectionname = html_writer::tag('span', $this->section_title($section, $course));
@@ -676,6 +687,32 @@ class format_designer_renderer extends format_section_renderer_base {
         // END CM LIST.
         $cmcontrol = $this->courserenderer->course_section_add_cm_control($course, 0, 0);
 
+        // Calculate to the section progress.
+        $cmcompleted = 0;
+        $totalmods = 0;
+        $issectioncompletion = 0;
+        if (!empty($modinfo->sections[$section->section]) && $section->uservisible) {
+            foreach ($modinfo->sections[$section->section] as $modnumber) {
+                $mod = $modinfo->cms[$modnumber];
+                if (!empty($mod)) {
+                    $cmcompletion = new cm_completion($mod);
+                    if ($mod->uservisible && $cmcompletion->get_completion_mode() != COMPLETION_TRACKING_NONE) {
+                        $totalmods++;
+                        $cmcompletionstate = $cmcompletion->get_completion_state();
+                        if ($cmcompletionstate == COMPLETION_COMPLETE || $cmcompletionstate == COMPLETION_COMPLETE_PASS ) {
+                            $cmcompleted++;
+                        }
+                    }
+                }
+            }
+        }
+        if ($totalmods) {
+            $sectionprogress = $cmcompleted / $totalmods * 100;
+            $issectioncompletion = 1;
+        } else {
+            $sectionprogress = 0;
+        }
+        $sectionprogresscomp = ($sectionprogress == 100) ? true : false;
         $sectionsummary = '';
         if ($section->uservisible || $section->visible) {
             // Show summary if section is available or has availability restriction information.
@@ -683,6 +720,78 @@ class format_designer_renderer extends format_section_renderer_base {
             // "Hidden sections are shown in collapsed form".
             $sectionsummary = $this->format_summary_text($section);
         }
+        $sectionbackgroundstyle = '';
+        $sectioncontainerwidth = '';
+        $sectioncontentwidth = '';
+        $sectiondesigntextcolor = '';
+        $sectiondesignheader = false;
+        $sectiondesignwhole = false;
+        $sectioncontainerlayout = '';
+        $sectioncontentlayout = '';
+        $bgoverlay = false;
+        if (format_designer_has_pro()) {
+
+            $sectionstyle .= local_designer_layout_columnclasses($section);
+            // Get section designer background image.
+            $sectiondesignerbackimageurl = get_section_designer_background_image($section, $course->id);
+            if ($section->sectionbackgroundtype == 'header') {
+                $sectiondesignheader = true;
+                $sectionstyle .= ' section-design-header ';
+            } else if ($section->sectionbackgroundtype == 'whole') {
+                $sectiondesignwhole = true;
+                $sectionstyle .= ' section-design-whole ';
+            }
+
+
+            // Section designer background styles.
+            $backgradient = (isset($section->sectiondesignerbackgradient) && ($section->sectiondesignerbackgradient))
+                            ? str_replace(';', '', $section->sectiondesignerbackgradient) : null;
+
+            // Background color.
+            if ($section->sectiondesignerbackgroundcolor) {
+                $overlaycolor = "background-color: $section->sectiondesignerbackgroundcolor" . ";";
+                $sectionbackgroundstyle .= $overlaycolor;
+            }
+            if ($sectiondesignerbackimageurl) {
+                if ($backgradient) {
+                    $sectionbackgroundstyle .= sprintf('background-image: url(%s);', $sectiondesignerbackimageurl);
+                    $overlaycolor = sprintf('background: %s;', $backgradient );
+                } else {
+                    $sectionbackgroundstyle .= "background-image: url('" . $sectiondesignerbackimageurl . "');";
+                }
+                $bgoverlay = (isset($overlaycolor)) ? $overlaycolor : false;
+                $sectionstyle .= (isset($overlaycolor)) ? ' bg-color-overlay' : '';
+            } else if ($section->sectiondesignerbackgradient) {
+                $gradient = $section->sectiondesignerbackgradient;
+                $sectionbackgroundstyle .= sprintf('background: %s;', $gradient);
+            }
+
+            if ($section->sectiondesignertextcolor) {
+                $sectiondesigntextcolor = "color: $section->sectiondesignertextcolor" . ";--sectioncolor:  $section->sectiondesignertextcolor;";
+            }
+
+            // Section container & content layout.
+            $containerlayout = $section->layoutcontainer;
+            if ($containerlayout == 'full') {
+                $sectioncontainerlayout = 'container-full';
+            } else if ($containerlayout == 'boxed') {
+                $sectioncontainerlayout = 'container-boxed';
+                $sectioncontainerboxwidth = ($section->layoutcontainerwidth) ? $section->layoutcontainerwidth : '1200';
+                $sectioncontainerwidth .= 'max-width:'. $sectioncontainerboxwidth. "px;";
+            } else {
+                $sectioncontainerlayout = "container";
+            }
+
+            $contentlayout = $section->layoutcontent;
+            if ($contentlayout == 'boxed') {
+                $sectioncontentlayout = 'content-boxed';
+                $sectioncontentboxwidth = ($section->layoutcontentwidth) ? $section->layoutcontentwidth : '1200';
+                $sectioncontentwidth .= 'max-width: '. $sectioncontentboxwidth . "px;";
+            } else {
+                $sectioncontentlayout = 'content-normal';
+            }
+        }
+
         $sectionlayoutclass = 'link-layout';
         $sectiontype = $format->get_section_option($section->id, 'sectiontype') ?: 'default';
         if ($sectiontype == 'list') {
@@ -691,47 +800,21 @@ class format_designer_renderer extends format_section_renderer_base {
             $sectionlayoutclass = 'card-layout';
         }
         $templatename = 'format_designer/section_layout_' . $sectiontype;
-
+        $prolayouts = get_pro_layouts();
+        if (in_array($sectiontype, $prolayouts)) {
+            if (format_designer_has_pro()) {
+                $templatename = 'layouts_' . $sectiontype . '/section_layout_' . $sectiontype;
+            }
+        }
+        // Initailze section header titles.
         try {
             $this->get_mustache()->loadTemplate($templatename);
         } catch (Exception $exception) {
             debugging('Missing section mustache template: ' . $templatename);
             $templatename = 'format_designer/section_layout_default';
         }
-        if ($sectioncontent) {
-            $contenttemplatename = 'format_designer/section_content_' . $sectiontype;
-            return $this->render_from_template($contenttemplatename, [
-                'section' => $section,
-                'sectiontype' => $sectiontype,
-                'sectionlayoutclass' => $sectionlayoutclass,
-                'sectionstyle' => $sectionstyle,
-                'sectionreturn' => $sectionreturn,
-                'leftcontent' => $leftcontent,
-                'rightcontent' => $rightcontent,
-                'sectionname' => $sectionname,
-                'sectionavailability' => $sectionavailability,
-                'sectionrestrict' => $sectionrestrict,
-                'sectionsummary' => $sectionsummary,
-                'cmlist' => $cmlist,
-                'courseid' => $course->id,
-                'cmcontrol' => $cmcontrol
-            ]);
-        }
 
-        $sectionclass = 'section-type-'.$sectiontype.' '.$sectionstyle;
-        $sectionclass .= ($sectionrestrict) ? 'restricted' : '';
-        $sectionhead = html_writer::start_tag('li', [
-            'id' => 'section-'.$section->section,
-            'class' => 'section main clearfix'.$sectionclass,
-            'role' => 'region',
-            'aria-labelledby' => "sectionid-{$section->id}-title",
-            'data-sectionid' => $section->section,
-            'data-sectionreturnid' => $sectionreturn,
-            'data-id' => $section->id
-        ]);
-
-        echo $sectionhead;
-        echo $this->render_from_template($templatename, [
+        $templatecontext = [
             'section' => $section,
             'sectiontype' => $sectiontype,
             'sectionlayoutclass' => $sectionlayoutclass,
@@ -745,8 +828,43 @@ class format_designer_renderer extends format_section_renderer_base {
             'sectionsummary' => $sectionsummary,
             'cmlist' => $cmlist,
             'courseid' => $course->id,
-            'cmcontrol' => $cmcontrol
+            'cmcontrol' => $cmcontrol,
+            'sectionprogress' => isset($sectionprogress) ? round($sectionprogress) : '',
+            'sectionprogresscomp' => isset($sectionprogresscomp) ? round($sectionprogresscomp) : '',
+            'sectioncategorisetitle' => isset($section->categorisetitle) ? $section->categorisetitle : '',
+            'sectionbackgroundstyle' => $sectionbackgroundstyle,
+            'sectioncontainerwidth' => $sectioncontainerwidth,
+            'sectioncontentwidth' => $sectioncontentwidth,
+            'sectiondesignwhole' => $sectiondesignwhole,
+            'sectiondesignheader' => $sectiondesignheader,
+            'sectiondesigntextcolor' => $sectiondesigntextcolor,
+            'sectioncontainerlayout' => $sectioncontainerlayout,
+            'sectioncontentlayout' => $sectioncontentlayout,
+            'sectionheader' => $sectionheader,
+            'bgoverlay' => $bgoverlay,
+            'issectioncompletion' => $issectioncompletion
+        ];
+        if ($sectioncontent) {
+            $contenttemplatename = 'format_designer/section_content_' . $sectiontype;
+            return $this->render_from_template($contenttemplatename, $templatecontext);
+        }
+        $sectionclass = 'section-type-'.$sectiontype.' '.$sectionstyle.' '.$sectioncontainerlayout;
+        $sectionclass .= ($sectionrestrict) ? 'restricted' : '';
+        $style = ($sectiondesignwhole) ? $sectionbackgroundstyle : '';
+        $style .= ($sectioncontainerwidth) ? ' '.$sectioncontainerwidth : '';
+        $sectionhead = html_writer::start_tag('li', [
+            'id' => 'section-'.$section->section,
+            'class' => 'section main clearfix'.$sectionclass,
+            'role' => 'region',
+            'aria-labelledby' => "sectionid-{$section->id}-title",
+            'data-sectionid' => $section->section,
+            'data-sectionreturnid' => $sectionreturn,
+            'data-id' => $section->id,
+            'style' => $style
         ]);
+
+        echo $sectionhead;
+        echo $this->render_from_template($templatename, $templatecontext);
         echo html_writer::end_tag('li');
     }
 
@@ -760,7 +878,7 @@ class format_designer_renderer extends format_section_renderer_base {
      * @return void|string
      */
     public function render_course_module($mod, $sectionreturn, $displayoptions = []) {
-        global $DB, $USER;
+        global $DB, $USER, $CFG;
         if (!$mod->is_visible_on_course_page()) {
             return [];
         }
@@ -836,24 +954,31 @@ class format_designer_renderer extends format_section_renderer_base {
 
         $modvisits = $DB->count_records('logstore_standard_log', array('contextinstanceid' => $mod->id,
             'userid' => $USER->id, 'action' => 'viewed', 'target' => 'course_module'));
-        $modvisits = !empty($modvisits) ? get_string('modvisit', 'format_designer', $modvisits) : false;
+        $modvisits = !empty($modvisits) ? get_string('modvisit', 'format_designer', $modvisits) :
+            get_string('notvisit', 'format_designer');
         $calltoactionhtml = $this->render(new call_to_action($mod));
         $availabilityrestrict = '';
+        $modrestricted = false;
         if ($mod->availableinfo) {
             $availabilityhtml = $availability;
             $restricthtml = html_writer::start_tag('div', array('class' => 'restrict-block'));
             $restricthtml .= html_writer::start_tag('div', array('class' => 'info-content-block'));
-            $restricthtml .= $availabilityhtml;
             $restricthtml .= html_writer::start_tag('div', array('class' => 'call-action-block'));
             $restricthtml .= $calltoactionhtml;
             $restricthtml .= html_writer::end_tag('div');
+            $restricthtml .= $availabilityhtml;
             $restricthtml .= html_writer::end_tag('div');
             $restricthtml .= html_writer::end_tag('div');
             $calltoactionhtml = $restricthtml;
             $availabilityrestrict = $availability;
             $availability = '';
+            $modrestricted = true;
         }
 
+        $activitylink = html_writer::empty_tag('img', array('src' => $mod->get_icon_url(),
+                'class' => 'iconlarge activityicon', 'alt' => '', 'role' => 'presentation', 'aria-hidden' => 'true'));
+        $modiconurl = html_writer::link($url, $activitylink, array('class' => 'mod-icon-url'));
+        $cmname = $this->get_cmname($mod, $displayoptions);
         $cmlist = [
             'id' => 'module-' . $mod->id,
             'cm' => $mod,
@@ -862,7 +987,7 @@ class format_designer_renderer extends format_section_renderer_base {
             'indentclasses' => $indentclasses,
             'colorclass' => $cmcompletion->get_color_class(),
             'movehtml' => $movehtml,
-            'cmname' => $this->courserenderer->course_section_cm_name($mod, $displayoptions),
+            'cmname' => $cmname,
             'cmcompletion' => $cmcompletion,
             'cmcompletionhtml' => $cmcompletionhtml,
             'calltoactionhtml' => $calltoactionhtml,
@@ -873,9 +998,145 @@ class format_designer_renderer extends format_section_renderer_base {
             'availability' => $availability,
             'isrestricted' => !empty($mod->availableinfo),
             'modcontent' => isset($modcontent) ? $modcontent : '',
+            'modcontentclass' => !empty($modcontent) ? 'ismodcontent' : '',
             'modvisits' => $modvisits,
-            'availabilityrestrict' => $availabilityrestrict
+            'availabilityrestrict' => $availabilityrestrict,
+            'modiconurl' => $modiconurl,
+            'modrestricted' => $modrestricted,
         ];
+
+        if (format_designer_has_pro()) {
+            require_once($CFG->dirroot. "/local/designer/lib.php");
+            $promodcontent = [];
+            $modulebackdesign = $DB->get_record('local_designer_fields', array('cmid' => $mod->id));
+            if ($modulebackdesign) {
+                $modulebackimageurl = get_module_designer_background_image($mod, $modulebackdesign->backimage);
+                /* if ($modulebackdesign->backcolor) {
+                    $modulebackgroundstyle = "background-color: $modulebackdesign->backcolor" . ";";
+                } */ 
+                $backgradient = (isset($modulebackdesign->backgradient) && ($modulebackdesign->backgradient))
+                            ? str_replace(';', '', $modulebackdesign->backgradient) : null;
+
+                if ($modulebackimageurl) {
+                    $modulebackgroundstyle = "background-image: url('" . $modulebackimageurl . "');";
+                    if ($backgradient) {
+                        $promodcontent['modbackoverlaycolor'] = sprintf('background: %s;', $backgradient );
+                        $cmlist['modclasses'] .= ' bg-color-overlay ';
+                    }
+                } else if ($modulebackdesign->backgradient) {
+                    $modulebackgroundstyle = sprintf('background: %s;', $backgradient );
+                } else {
+                    $modulebackgroundstyle = '';
+                }
+
+                $promodcontent['modulebackgroundstyle'] = $modulebackgroundstyle;
+                $moduletextcolor = '';
+                // Text Color.
+                if ($modulebackdesign->textcolor) {
+                    $moduletextcolor = "color: $modulebackdesign->textcolor" . ";";
+                }
+                $promodcontent['moduletextcolor'] = $moduletextcolor;
+                $cmlist = array_merge($cmlist, $promodcontent);
+            }
+        }
         return $cmlist;
+    }
+    /**
+     * Get course modulename.
+     * @param object $mod
+     * @param array $displayoptions
+     * @return string module name.
+     */
+    public function get_cmname($mod, $displayoptions = []) {
+        global $DB;
+        if ($mod->url) {
+            list($linkclasses, $textclasses) = $this->course_section_cm_classes($mod);
+            $groupinglabel = $mod->get_grouping_label($textclasses);
+            $temp1 = new \core_course\output\course_module_name($mod, $this->page->user_is_editing(), $displayoptions);
+            $modulenametemplate = $temp1->export_for_template($this->output);
+            $output = '';
+            $style = '';
+            if (format_designer_has_pro()) {
+                $modulebackdesign = $DB->get_record('local_designer_fields', array('cmid' => $mod->id));
+                if ($modulebackdesign) {
+                    if ($modulebackdesign->textcolor) {
+                        $style = "color: $modulebackdesign->textcolor" . ";";
+                    }
+                }
+            }
+            $onclick = htmlspecialchars_decode($mod->onclick, ENT_QUOTES);
+            $url = $mod->url;
+            $instancename = $mod->get_formatted_name();
+            $activitylink = html_writer::tag('span', $instancename, array('class' => 'instancename', 'style' => $style));
+            if ($mod->uservisible) {
+                $output .= html_writer::link($url, $activitylink, array('class' => 'aalink' . $linkclasses, 'onclick' => $onclick));
+            } else {
+                // We may be displaying this just in order to show information
+                // about visibility, without the actual link ($mod->is_visible_on_course_page()).
+                $output .= html_writer::tag('div', $activitylink, array('class' => $textclasses));
+            }
+            $modulenametemplate['displayvalue'] = $output;
+            $cmname = $this->output->render_from_template('core/inplace_editable', $modulenametemplate) . $groupinglabel;
+            return $cmname;
+        }
+        return '';
+    }
+
+    /**
+     * Returns the CSS classes for the activity name/content
+     *
+     * For items which are hidden, unavailable or stealth but should be displayed
+     * to current user ($mod->is_visible_on_course_page()), we show those as dimmed.
+     * Students will also see as dimmed activities names that are not yet available
+     * but should still be displayed (without link) with availability info.
+     *
+     * @param cm_info $mod
+     * @return array array of two elements ($linkclasses, $textclasses)
+     */
+    public function course_section_cm_classes(cm_info $mod) {
+        $linkclasses = '';
+        $textclasses = '';
+        if ($mod->uservisible) {
+            $conditionalhidden = $this->is_cm_conditionally_hidden($mod);
+            $accessiblebutdim = (!$mod->visible || $conditionalhidden) &&
+                has_capability('moodle/course:viewhiddenactivities', $mod->context);
+            if ($accessiblebutdim) {
+                $linkclasses .= ' dimmed';
+                $textclasses .= ' dimmed_text';
+                if ($conditionalhidden) {
+                    $linkclasses .= ' conditionalhidden';
+                    $textclasses .= ' conditionalhidden';
+                }
+            }
+            if ($mod->is_stealth()) {
+                // Stealth activity is the one that is not visible on course page.
+                // It still may be displayed to the users who can manage it.
+                $linkclasses .= ' stealth';
+                $textclasses .= ' stealth';
+            }
+        } else {
+            $linkclasses .= ' dimmed';
+            $textclasses .= ' dimmed dimmed_text';
+        }
+        return array($linkclasses, $textclasses);
+    }
+
+    /**
+     * Checks if course module has any conditions that may make it unavailable for
+     * all or some of the students
+     *
+     * This function is internal and is only used to create CSS classes for the module name/text
+     *
+     * @param cm_info $mod
+     * @return bool
+     */
+    public function is_cm_conditionally_hidden(cm_info $mod) {
+        global $CFG;
+        $conditionalhidden = false;
+        if (!empty($CFG->enableavailability)) {
+            $info = new \core_availability\info_module($mod);
+            $conditionalhidden = !$info->is_available_for_all();
+        }
+        return $conditionalhidden;
     }
 }
