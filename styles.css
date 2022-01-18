@@ -26,9 +26,6 @@ ul.designer .card.card-list .card-body .mod-indent-outer .completion-info {
     margin-bottom: 5px;
     display: inline-block;
 }
-ul.designer .card.card-list .card-body .mod-indent-outer .completion-info .completed-button form {
-
-}
 ul.designer .card-layout .card.card-list .card-body .mod-indent-outer .completion-info {
     text-align: left;
 }
@@ -188,8 +185,8 @@ ul.designer .circles-layout .card.card-list.secondary {
     top: 5px;
     right: 5px;
 }
-.designer .bg-success {
-    background-color: #28a744 !important;
+.designer .progress-bg-success {
+    background-color: #28a744;
 }
 .designer .badge-success {
     background-color: #28a744;

@@ -314,9 +314,7 @@ class cm_completion implements renderable, templatable {
         if ($this->is_restricted()) {
             $buttonclass .= ' disabled';
         }
-        /* $output .= html_writer::start_tag('form', array('method' => 'post',
-            'action' => new moodle_url('/course/togglecompletion.php'),
-            'class' => 'togglecompletion'. $extraclass)); */
+
         $output = html_writer::start_tag('div');
         $output .= html_writer::empty_tag('input', array(
             'type' => 'hidden', 'name' => 'id', 'value' => $this->cm->id));
@@ -326,11 +324,7 @@ class cm_completion implements renderable, templatable {
             'type' => 'hidden', 'name' => 'modulename', 'value' => $this->get_cm_formatted_name()));
         $output .= html_writer::empty_tag('input', array(
             'type' => 'hidden', 'name' => 'completionstate', 'value' => $newstate));
-        // $output .= html_writer::tag('button',
-        //     $OUTPUT->pix_icon('i/completion-' . $completionicon, $imgalt),
-        //     array('class' => $buttonclass, 'aria-live' => 'assertive'));
         $output .= html_writer::end_tag('div');
-        // $output .= html_writer::end_tag('form');
 
         $manualcompletiondata = [
             'url' => new moodle_url('/course/togglecompletion.php'),

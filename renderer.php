@@ -535,7 +535,7 @@ class format_designer_renderer extends format_section_renderer_base {
 
         $thissection = $modinfo->get_section_info(0);
         if ($thissection->summary or !empty($modinfo->sections[0]) or $this->page->user_is_editing()) {
-            // $this->render_section($thissection, $course, true);
+            $this->render_section($thissection, $course, true);
         }
         if ($this->page->user_is_editing() and has_capability('moodle/course:update', $context)) {
             echo $this->end_section_list();
