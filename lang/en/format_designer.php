@@ -150,3 +150,12 @@ $string['mobilecolumn'] = 'Layout columns - Mobile';
 $string['backgroundgradient_help'] = "Generate a gradient: <a href=' https://cssgradient.io/'>https://cssgradient.io/</a>. Paste the background property (linear-gradient).";
 $string['markasdone'] = "Mark as done";
 $string['done'] = "Done";
+$string['gotosection'] = 'Go to section';
+
+$string['completion_manual:markdone'] = 'Mark as done';
+$string['completion_manual:markdone:duetoday'] = 'Mark as done today';
+$string['completion_manual:markdone:overdue'] = 'Mark as done overdue';
+$string['completion_manual:markdone:completeby'] = 'Mark as done by';
+$string['completion_manual:done'] = 'Done on';
+$string['completion_manual:aria:done'] = '{$a} is marked as done. Press to undo.';
+$string['completion_manual:aria:markdone'] = 'Mark {$a} as done';

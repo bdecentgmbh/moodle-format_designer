@@ -588,7 +588,8 @@ class format_designer extends format_base {
                 $cm = $modinfo->get_cm($cmid);
                 $moduledata = $courserenderer->render_course_module($cm, $sr, []);
                 $liclass = $sectiontype;
-                $liclass .= ' '.$sectiontype.'-layout';
+                $sectionclass = ( ($sectiontype == 'circles') ? 'circle' : $sectiontype);
+                $liclass .= ' '.$sectionclass.'-layout';
                 $liclass .= ' '.$moduledata['modclasses'];
                 $liclass .= (isset($moduledata['isrestricted']) && $moduledata['isrestricted']) ? ' restricted' : '';
                 $html = html_writer::start_tag('li', ['class' => $liclass, 'id' => $moduledata['id']]);

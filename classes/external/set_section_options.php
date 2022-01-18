@@ -161,7 +161,14 @@ trait set_section_options {
                 $templatename = 'layouts_' . $sectiontype . '/cm/module_layout_' . $sectiontype;
             }
         }
-        return $OUTPUT->render_from_template($templatename, $cmlistdata);
+        $liclass = $sectiontype;
+        $liclass .= ' '.$sectiontype.'-layout';
+        $liclass .= ' '.$cmlistdata['modclasses'];
+        $liclass .= (isset($cmlistdata['isrestricted']) && $cmlistdata['isrestricted']) ? ' restricted' : '';
+        $html = \html_writer::start_tag('li', ['class' => $liclass, 'id' => $cmlistdata['id']]);
+        $html .= $OUTPUT->render_from_template($templatename, $cmlistdata);
+        $html .= \html_writer::end_tag('li');
+        return $html;
     }
 
     /**
