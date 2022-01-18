@@ -21,7 +21,7 @@
  * @copyright  2015 Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace format_designer\test;
+namespace format_designer\tests;
 
 defined('MOODLE_INTERNAL') || die();
 

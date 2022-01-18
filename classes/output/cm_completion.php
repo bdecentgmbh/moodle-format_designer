@@ -412,7 +412,8 @@ class cm_completion implements renderable, templatable {
 
         $withavailability = false;
         $course = $this->cm->get_course();
-        if ($this->get_completion_mode() != COMPLETION_TRACKING_NONE && $this->get_completion_mode() != COMPLETION_TRACKING_AUTOMATIC) {
+        if ($this->get_completion_mode() != COMPLETION_TRACKING_NONE
+            && $this->get_completion_mode() != COMPLETION_TRACKING_AUTOMATIC) {
             $withavailability = !empty($CFG->enableavailability) && info::completion_value_used($course, $this->cm->id);
         }
 
