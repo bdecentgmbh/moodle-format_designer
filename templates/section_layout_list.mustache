@@ -26,53 +26,6 @@
 }}
 {{<format_designer/section_layout}}
     {{$content}}
-        <div class="section-header-content"
-        style="{{#sectiondesignheader}} {{sectionbackgroundstyle}} {{/sectiondesignheader}}"
-                >
-
-            {{#bgoverlay}}
-            {{^sectiondesignwhole}}
-            <div class="bg-overlay" style="{{bgoverlay}}">
-            </div>
-            {{/sectiondesignwhole}}
-            {{/bgoverlay}}
-            
-            {{^section.hidesectiontitle}}
-            {{#sectionname}}
-                <h3 id="sectionid-{{section.id}}-title" class="sectionname">
-                    {{{sectionname}}}
-                </h3>
-            {{/sectionname}}
-            {{/section.hidesectiontitle}}
-            {{#section.categorisetitle}}
-                <div class="categorise-section-block">
-                    <span class="badge" style="color:{{section.categorisetextcolor}}; background-color:{{section.categorisebackcolor}};">{{section.categorisetitle}}</span>
-                </div>
-            {{/section.categorisetitle}}
-            {{#issectioncompletion}}
-            <div class="section-progress-info">
-                {{^sectionprogresscomp}}
-                <div class="section-progress-bar">
-                    <div class="progress">
-                        <div class="progress-bar bg-success" role="progressbar" style= "width: {{sectionprogress}}%" aria-valuenow="{{sectionprogress}}" aria-valuemin="0" aria-valuemax="100">
-                            <span class="percentage">{{sectionprogress}}%</span>
-                        </div>
-                    </div>
-                </div>
-                {{/sectionprogresscomp}}
-                {{#sectionprogresscomp}}
-                    <div class="section-progress-completeted">
-                        <span class="badge badge-completion badge-success"><span><i class="fa fa-check"></i> {{#str}}sectioncompleted, format_designer{{/str}}</span></span>
-                    </div>
-                {{/sectionprogresscomp}}
-            </div>
-            {{/issectioncompletion}}
-            {{> format_designer/section_availability}}
-
-            <div class="summary" style="{{#sectiondesigntextcolor}} {{sectiondesigntextcolor}} {{/sectiondesigntextcolor}}">
-                {{{sectionsummary}}}
-            </div>
-        </div>
         {{^sectionheader}}
             {{> format_designer/section_content_list}}
             {{{cmcontrol}}}

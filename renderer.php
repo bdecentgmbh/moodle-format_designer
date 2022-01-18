@@ -535,12 +535,11 @@ class format_designer_renderer extends format_section_renderer_base {
 
         $thissection = $modinfo->get_section_info(0);
         if ($thissection->summary or !empty($modinfo->sections[0]) or $this->page->user_is_editing()) {
-            $this->render_section($thissection, $course, false);
+            // $this->render_section($thissection, $course, true);
         }
         if ($this->page->user_is_editing() and has_capability('moodle/course:update', $context)) {
             echo $this->end_section_list();
             echo $this->change_number_sections($course, 0);
-
         } else {
             echo $this->end_section_list();
         }
@@ -567,7 +566,7 @@ class format_designer_renderer extends format_section_renderer_base {
 
         // Now the list of sections..
         echo $this->start_section_list();
-        echo $this->render_section($thissection, $course, false);
+        echo $this->render_section($thissection, $course, true);
         echo $this->end_section_list();
 
         // Display section bottom navigation.
@@ -650,6 +649,8 @@ class format_designer_renderer extends format_section_renderer_base {
     public function render_section(section_info $section, stdClass $course, $onsectionpage,
         $sectionheader = false, $sectionreturn = 0, $sectioncontent = false) {
         global $DB, $USER, $CFG;
+
+        $sectionurl = new \moodle_url('/course/view.php', ['id' => $course->id, 'section' => $section->section]);
         /** @var format_designer $format */
         $format = course_get_format($course);
         $sectionstyle = '';
@@ -686,6 +687,9 @@ class format_designer_renderer extends format_section_renderer_base {
         $cmlist = array_values($cmlist);
         // END CM LIST.
         $cmcontrol = $this->courserenderer->course_section_add_cm_control($course, 0, 0);
+        if ($course->coursedisplay == 1 && !$onsectionpage) {
+            $gotosection = true;
+        }
 
         // Calculate to the section progress.
         $cmcompleted = 0;
@@ -841,7 +845,10 @@ class format_designer_renderer extends format_section_renderer_base {
             'sectioncontentlayout' => $sectioncontentlayout,
             'sectionheader' => $sectionheader,
             'bgoverlay' => $bgoverlay,
-            'issectioncompletion' => $issectioncompletion
+            'issectioncompletion' => $issectioncompletion,
+            'gotosection' => (isset($gotosection) ? $gotosection : false),
+            'sectionurl' => $sectionurl,
+
         ];
         if ($sectioncontent) {
             $contenttemplatename = 'format_designer/section_content_' . $sectiontype;
@@ -976,7 +983,14 @@ class format_designer_renderer extends format_section_renderer_base {
 
         $activitylink = html_writer::empty_tag('img', array('src' => $mod->get_icon_url(),
                 'class' => 'iconlarge activityicon', 'alt' => '', 'role' => 'presentation', 'aria-hidden' => 'true'));
-        $modiconurl = html_writer::link($url, $activitylink, array('class' => 'mod-icon-url'));
+        if ($mod->uservisible) {
+            $modiconurl = html_writer::link($url, $activitylink, array('class' => 'mod-icon-url'));
+        } else {
+            $modiconurl = html_writer::start_div('mod-icon-url');
+            $modiconurl .= $activitylink;
+            $modiconurl .= html_writer::end_div();
+        }
+
         $cmname = $this->get_cmname($mod, $displayoptions);
         $cmlist = [
             'id' => 'module-' . $mod->id,
@@ -998,7 +1012,7 @@ class format_designer_renderer extends format_section_renderer_base {
             'isrestricted' => !empty($mod->availableinfo),
             'modcontent' => isset($modcontent) ? $modcontent : '',
             'modcontentclass' => !empty($modcontent) ? 'ismodcontent' : '',
-            'modvisits' => $modvisits,
+            'modvisits' => ($mod->url) ? $modvisits : false,
             'availabilityrestrict' => $availabilityrestrict,
             'modiconurl' => $modiconurl,
             'modrestricted' => $modrestricted,
