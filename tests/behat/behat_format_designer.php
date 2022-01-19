@@ -185,7 +185,7 @@ class behat_format_designer extends behat_base {
             }
 
             $langstringkey = $completionstatus === 'Done' ? 'done' : 'markdone';
-            $conditionslistlabel = get_string('completion_manual:aria:' . $langstringkey, 'core_course', $activityname);
+            $conditionslistlabel = get_string('completion_manual:aria:' . $langstringkey, 'format_designer', $activityname);
             $selector = "button[aria-label='$conditionslistlabel']";
 
             $this->execute("behat_general::assert_element_contains_text", [$completionstatus, $selector, "css_element"]);
