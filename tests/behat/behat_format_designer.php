@@ -170,17 +170,9 @@ class behat_format_designer extends behat_base {
      */
     public function i_toggle_assignment_manual_completion_designer($activityname, $activityidendifier) {
         global $CFG;
-        if (round($CFG->version) > 2020111000) {
-            // Moodle-3.11 and above.
-            $this->i_click_on_activity($activityidendifier);
-            $this->execute("behat_completion::toggle_the_manual_completion_state", [$activityname]);
-            $this->execute("behat_completion::manual_completion_button_displayed_as", [$activityname, "Done"]);
-        } else {
-            // Moodle-3.11 below.
-            $element = "Not completed: $activityname. Select to mark as complete.";
-            $this->execute("behat_general::i_click_on", [$element, "icon"]);
-            $this->execute("behat_completion::activity_marked_as_complete", [$activityname, "assign", "manual"]);
-        }
+        $this->i_click_on_activity($activityidendifier);
+        $this->execute("behat_completion::toggle_the_manual_completion_state", [$activityname]);
+        $this->execute("behat_completion::manual_completion_button_displayed_as", [$activityname, "Done"]);
     }
 
     /**
