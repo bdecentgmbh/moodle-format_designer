@@ -170,9 +170,26 @@ class behat_format_designer extends behat_base {
      */
     public function i_toggle_assignment_manual_completion_designer($activityname, $activityidendifier) {
         global $CFG;
-        $this->i_click_on_activity($activityidendifier);
-        $this->execute("behat_completion::toggle_the_manual_completion_state", [$activityname]);
-        $this->execute("behat_completion::manual_completion_button_displayed_as", [$activityname, "Done"]);
+        if (round($CFG->version) > 2020111000) {
+            // Moodle-3.11 and above.
+            $this->i_click_on_activity($activityidendifier);
+            $this->execute("behat_completion::toggle_the_manual_completion_state", [$activityname]);
+            $this->execute("behat_completion::manual_completion_button_displayed_as", [$activityname, "Done"]);
+        } else {
+            // Moodle-3.11 below.
+            $selector = "button[data-action=toggle-manual-completion][data-activityname='{$activityname}']";
+            $this->execute("behat_general::i_click_on", [$selector, "css_element"]);
+            $completionstatus = 'Done';
+            if (!in_array($completionstatus, ['Mark as done', 'Done'])) {
+                throw new coding_exception('Invalid completion status. It must be "Mark as done" or "Done".');
+            }
+
+            $langstringkey = $completionstatus === 'Done' ? 'done' : 'markdone';
+            $conditionslistlabel = get_string('completion_manual:aria:' . $langstringkey, 'format_designer', $activityname);
+            $selector = "button[aria-label='$conditionslistlabel']";
+
+            $this->execute("behat_general::assert_element_contains_text", [$completionstatus, $selector, "css_element"]);
+        }
     }
 
     /**
