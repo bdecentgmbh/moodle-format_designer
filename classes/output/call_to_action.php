@@ -90,6 +90,7 @@ class call_to_action extends cm_completion {
             'colorclass' => $this->get_color_class(),
             'modurl' => $this->get_cm_url(),
             'actiontextcolor' => $actiontextcolor,
+            'isrestricted' => $this->is_restricted()
         ];
     }
 }
