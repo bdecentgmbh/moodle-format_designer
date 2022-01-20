@@ -54,6 +54,7 @@ class format_designer_renderer extends format_section_renderer_base {
     /**
      * Generate the starting container html for a list of sections.
      *
+     * @param bool $sectioncollapse
      * @return string HTML to output.
      */
     protected function start_section_list($sectioncollapse=false) {

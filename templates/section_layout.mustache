@@ -47,6 +47,7 @@
     data-target="#section-content-{{section.section}}"
     aria-expanded="false"
     aria-controls="section-head-{{section.section}}"
+    role="button"
     style="{{#sectiondesignheader}} {{sectionbackgroundstyle}} {{/sectiondesignheader}}">
 
         {{#bgoverlay}}
@@ -104,7 +105,7 @@
     {{#sectionaccordion}}
     data-parent="#section-course-accordion"
     {{/sectionaccordion}}
-
+    role="content"
     style="{{#sectioncontentwidth}} {{sectioncontentwidth}} {{/sectioncontentwidth}}">
     {{$content}}
 
