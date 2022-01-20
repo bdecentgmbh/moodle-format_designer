@@ -25,6 +25,7 @@ ul.designer .card.card-list .card-body .mod-indent-outer .completion-info {
     text-align: center;
     margin-bottom: 5px;
     display: inline-block;
+    vertical-align: middle;
 }
 ul.designer .card-layout .card.card-list .card-body .mod-indent-outer .completion-info {
     text-align: left;
@@ -108,6 +109,12 @@ ul.designer .card.card-list:hover .card-body .mod-indent-outer .mod-indent .row 
     margin-top: 0;
     margin-bottom: 10px;
     margin-right: 10px;
+}
+.course-content ul.designer li.section .summary .no-overflow {
+    width: 100%;
+}
+.course-content ul.designer li.section .availability-section-block + div {
+    clear: both;
 }
 .course-content ul.designer li.section .availability-section-block .section_availability .availabilityinfo {
     font-size: 12px;
@@ -334,7 +341,6 @@ body.editing ul.designer .section .circles-layout .activity .editing_move {
     position: absolute;
     top: 0;
     left: 0;
-    opacity: .5;
     z-index: -1;
 }
 .course-content ul.designer li.section.main.bg-color-overlay.section-design-whole .img-block .bg-overlay,
@@ -359,6 +365,18 @@ body.editing ul.designer .section .circles-layout .activity .editing_move {
     padding: 10px;
     background-size: cover;
     background-repeat: no-repeat;
+}
+.course-content #section-course-accordion.designer li.section .section-header-content h3 a:before {
+    content: '\f107';
+    font-family: 'FontAwesome';
+    font-size: 24px;
+    font-weight: bold;
+    margin-right: 10px;
+    display: inline-block;
+    vertical-align: top;
+}
+.course-content #section-course-accordion.designer li.section .section-header-content.collapsed h3 a:before {
+    content: '\f105';
 }
 .course-content ul.designer li.section .section-header-content a.goto-section:after {
     content: '\f101';
@@ -397,6 +415,14 @@ body.editing ul.designer .section .circles-layout .activity .editing_move {
     line-height: 1.5;
     padding: .375rem .75rem;
     /* display: none; */
+}
+.path-course-view ul.designer li.activity form.togglecompletion .btn.badge-success:hover {
+    color: #fff;
+}
+.path-course-view ul.designer li.activity form.togglecompletion .btn.badge-success:focus,
+.path-course-view ul.designer li.activity form.togglecompletion .btn.badge-success:active {
+    color: #fff;
+    outline: none;
 }
 .path-course-view ul.designer li.activity > span {
     display: inline-block;
@@ -646,7 +672,12 @@ ul li {
     text-align: left;
     padding-left: 0;
     margin: 0;
-    display: block;
+    display: flex;
+    flex-wrap: wrap;
+}
+.designer .section .content .section.card-layout li.activity .activity-block.designer {
+    height: 100%;
+    display: flex;
 }
 .designer .section .content .section.card-layout.circles-layout {
     text-align: center;
@@ -664,6 +695,7 @@ ul li {
     display: inline-block;
     vertical-align: top;
     position: relative;
+    flex: auto;
 }
 .designer .section .content.collapse .section.card-layout li.activity,
 .designer .section .content.collapsing .section.card-layout li.activity,
@@ -1009,6 +1041,14 @@ ul li {
 .designer .section.img-text.list-layout .activity .activityinstance .activity-element {
     width: 80%;
 }
+.designer .container-boxed .section.img-text.list-layout .activity .activityinstance .activity-element,
+.designer .section.img-text.list-layout.content-boxed .activity .activityinstance .activity-element {
+    width: auto;
+}
+.designer .container-boxed .section.img-text.list-layout .activity .activityinstance .availability-info,
+.designer .section.img-text.list-layout.content-boxed .activity .activityinstance .availability-info {
+    margin-left: 5px;
+}
 .editing .designer .section .content .section.card-layout li.activity .activityinstance .activity-element .cmname-block {
     display: block;
 }
@@ -1064,6 +1104,12 @@ ul li {
 }
 .designer .section.desktop-five-column .content .section.circles-layout li.activity {
     width: 19.5%;
+}
+.designer .section .content .section.card-layout li.activity .card.card-list .mod-indent-outer {
+    height: 100%;
+}
+.designer .section .content .section.card-layout li.activity .card-list {
+    width: 100%;
 }
 
 @media (min-width: 1500px) {

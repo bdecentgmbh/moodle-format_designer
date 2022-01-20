@@ -56,8 +56,12 @@ class format_designer_renderer extends format_section_renderer_base {
      *
      * @return string HTML to output.
      */
-    protected function start_section_list() {
-        return html_writer::start_tag('ul', ['class' => 'designer']);
+    protected function start_section_list($sectioncollapse=false) {
+        $attrs = ['class' => 'designer'];
+        if ($sectioncollapse) {
+            $attrs['id'] = 'section-course-accordion';
+        }
+        return html_writer::start_tag('ul', $attrs);
     }
 
     /**
@@ -461,7 +465,8 @@ class format_designer_renderer extends format_section_renderer_base {
         echo $this->course_activity_clipboard($course, 0);
 
         // Now the list of sections..
-        echo $this->start_section_list();
+        $sectioncollapse = isset($course->sectioncollapse) ? $course->sectioncollapse : false;
+        echo $this->start_section_list($sectioncollapse);
         $numsections = course_get_format($course)->get_last_section_number();
         foreach ($modinfo->get_section_info_all() as $section => $thissection) {
             if ($section > $numsections) {
@@ -531,7 +536,8 @@ class format_designer_renderer extends format_section_renderer_base {
                 format_string($course->fullname));
         }
         // Copy activity clipboard..
-        echo $this->start_section_list();
+        $sectioncollapse = isset($course->sectioncollapse) ? $course->sectioncollapse : false;
+        echo $this->start_section_list($sectioncollapse);
 
         $thissection = $modinfo->get_section_info(0);
         if ($thissection->summary or !empty($modinfo->sections[0]) or $this->page->user_is_editing()) {
@@ -565,7 +571,8 @@ class format_designer_renderer extends format_section_renderer_base {
         echo $sectiontitle;
 
         // Now the list of sections..
-        echo $this->start_section_list();
+        $sectioncollapse = isset($course->sectioncollapse) ? $course->sectioncollapse : false;
+        echo $this->start_section_list($sectioncollapse);
         echo $this->render_section($thissection, $course, true);
         echo $this->end_section_list();
 
@@ -817,6 +824,13 @@ class format_designer_renderer extends format_section_renderer_base {
             $templatename = 'format_designer/section_layout_default';
         }
 
+        if (isset($course->initialstate) && $course->initialstate == SECTION_COLLAPSE) {
+            $sectioncollapsestatus = '';
+        } else {
+            $sectioncollapsestatus = (isset($course->initialstate) && $course->initialstate == FIRST_EXPAND)
+                ? (($section->section == 0) ? 'show' : '') : 'show';
+        }
+
         $templatecontext = [
             'section' => $section,
             'sectiontype' => $sectiontype,
@@ -848,7 +862,9 @@ class format_designer_renderer extends format_section_renderer_base {
             'issectioncompletion' => $issectioncompletion,
             'gotosection' => (isset($gotosection) ? $gotosection : false),
             'sectionurl' => $sectionurl,
-
+            'sectioncollapse' => isset($course->sectioncollapse) ? $course->sectioncollapse : false,
+            'sectionshow' => $sectioncollapsestatus,
+            'sectionaccordion' => isset($course->accordion) ? $course->accordion : false
         ];
         if ($sectioncontent) {
             $contenttemplatename = 'format_designer/section_content_' . $sectiontype;

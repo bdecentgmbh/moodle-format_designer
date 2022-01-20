@@ -41,7 +41,12 @@
     <div class="icon-loader-block"></div>
 </div>
 
-<div class="section-header-content"
+<div class="section-header-content {{#sectioncollapse}}{{^sectionshow}}collapsed{{/sectionshow}}{{/sectioncollapse}}"
+    id="section-head-{{section.section}}"
+    {{#sectioncollapse}} data-toggle="collapse" {{/sectioncollapse}}
+    data-target="#section-content-{{section.section}}"
+    aria-expanded="false"
+    aria-controls="section-head-{{section.section}}"
     style="{{#sectiondesignheader}} {{sectionbackgroundstyle}} {{/sectiondesignheader}}">
 
         {{#bgoverlay}}
@@ -91,7 +96,16 @@
         {{/gotosection}}
 </div>
 
-<div class="content {{sectioncontentlayout}}" style="{{#sectioncontentwidth}} {{sectioncontentwidth}} {{/sectioncontentwidth}}">
+<div class="content {{sectioncontentlayout}}
+    {{#sectioncollapse}}collapse{{/sectioncollapse}}
+    {{#sectionshow}}show{{/sectionshow}}"
+    id="section-content-{{section.section}}"
+    aria-labelledby="section-head-{{section.section}}"
+    {{#sectionaccordion}}
+    data-parent="#section-course-accordion"
+    {{/sectionaccordion}}
+
+    style="{{#sectioncontentwidth}} {{sectioncontentwidth}} {{/sectioncontentwidth}}">
     {{$content}}
 
     {{/content}}
