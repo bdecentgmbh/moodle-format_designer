@@ -23,9 +23,23 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot. '/course/format/lib.php');
 
 use core\output\inplace_editable;
+
+/**
+ * Collapsible format settings: Expand all the sections in intial state.
+ */
+define('SECTION_EXPAND', 1);
+/**
+ * Collapsible format settings: Collapse all the sections in intial state.
+ */
+define('SECTION_COLLAPSE', 2);
+/**
+ * Collapsible format settings: Expand the first the section only in intial state.
+ */
+define('FIRST_EXPAND', 3);
 
 /**
  * Main class for the Designer course format.
@@ -237,6 +251,18 @@ class format_designer extends format_base {
                     'default' => $courseconfig->coursedisplay,
                     'type' => PARAM_INT,
                 ],
+                'sectioncollapse' => [
+                    'default' => isset($courseconfig->sectioncollapse) ? $courseconfig->sectioncollapse : 0,
+                    'type' => PARAM_INT
+                ],
+                'accordion' => [
+                    'default' => isset($courseconfig->accordion) ? $courseconfig->accordion : 0,
+                    'type' => PARAM_INT
+                ],
+                'initialstate' => [
+                    'default' => isset($courseconfig->initialstate) ? $courseconfig->initialstate : 3,
+                    'type' => PARAM_INT,
+                ],
             ];
         }
         if ($foreditform && !isset($courseformatoptions['coursedisplay']['label'])) {
@@ -265,6 +291,43 @@ class format_designer extends format_base {
                     'help' => 'coursedisplay',
                     'help_component' => 'moodle',
                 ],
+
+                'sectioncollapse' => [
+                    'label' => new lang_string('collapsiblesections', 'format_designer'),
+                    'element_type' => 'select',
+                    'element_attributes' => [
+                        array(
+                            0 => new lang_string('disable'),
+                            1 => new lang_string('enable')
+                        )
+                    ],
+                ],
+
+                'accordion' => [
+                    'label' => new lang_string('accordion', 'format_designer'),
+                    'element_type' => 'select',
+                    'element_attributes' => [
+                       array(
+                           0 => new lang_string('disable'),
+                           1 => new lang_string('enable')
+                        )
+                    ],
+                    'disabledif' => ['sectioncollapse', 'neq', 1]
+                ],
+
+                'initialstate' => [
+                    'label' => new lang_string('initialstate', 'format_designer'),
+                    'element_type' => 'select',
+                    'element_attributes' => [
+                        [
+                            SECTION_EXPAND => new lang_string('expand', 'format_designer'),
+                            SECTION_COLLAPSE => new lang_string('collapse', 'format_designer'),
+                            FIRST_EXPAND => new lang_string('firstexpand', 'format_designer')
+                        ],
+                    ],
+                    'disabledif' => ['sectioncollapse', 'neq', 1]
+                ],
+
             ];
             $courseformatoptions = array_merge_recursive($courseformatoptions, $courseformatoptionsedit);
         }

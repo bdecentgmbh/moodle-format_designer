@@ -366,6 +366,19 @@ body.editing ul.designer .section .circles-layout .activity .editing_move {
     background-size: cover;
     background-repeat: no-repeat;
 }
+.course-content #section-course-accordion.designer li.section .section-header-content:before {
+    content: '\f107';
+    font-family: 'FontAwesome';
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 32px;
+    margin-right: 10px;
+    display: inline-block;
+    vertical-align: top;
+}
+.course-content #section-course-accordion.designer li.section .section-header-content.collapsed:before {
+    content: '\f105';
+}
 .course-content ul.designer li.section .section-header-content a.goto-section:after {
     content: '\f101';
     font-family: 'FontAwesome';
@@ -661,6 +674,7 @@ ul li {
     padding-left: 0;
     margin: 0;
     display: flex;
+    flex-wrap: wrap;
 }
 .designer .section .content .section.card-layout li.activity .activity-block.designer {
     height: 100%;
@@ -1091,6 +1105,12 @@ ul li {
 }
 .designer .section.desktop-five-column .content .section.circles-layout li.activity {
     width: 19.5%;
+}
+.designer .section .content .section.card-layout li.activity .card.card-list .mod-indent-outer {
+    height: 100%;
+}
+.designer .section .content .section.card-layout li.activity .card-list {
+    width: 100%;
 }
 
 @media (min-width: 1500px) {
