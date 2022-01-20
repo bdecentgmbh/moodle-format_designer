@@ -28,10 +28,17 @@ require_once($CFG->dirroot. '/course/format/lib.php');
 
 use core\output\inplace_editable;
 
+/**
+ * Collapsible format settings: Expand all the sections in intial state.
+ */
 define('SECTION_EXPAND', 1);
-
+/**
+ * Collapsible format settings: Collapse all the sections in intial state.
+ */
 define('SECTION_COLLAPSE', 2);
-
+/**
+ * Collapsible format settings: Expand the first the section only in intial state.
+ */
 define('FIRST_EXPAND', 3);
 
 /**
