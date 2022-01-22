@@ -49,6 +49,7 @@ class format_designer_renderer extends format_section_renderer_base {
         // when editing mode is on we need to be sure that the link 'Turn editing mode on' is available for a user
         // who does not have any other managing capability.
         $page->set_other_editing_capability('moodle/course:setcurrentsection');
+        $this->page = $page;
     }
 
     /**
@@ -465,7 +466,7 @@ class format_designer_renderer extends format_section_renderer_base {
         // Copy activity clipboard..
         echo $this->course_activity_clipboard($course, 0);
 
-        // Now the list of sections..
+        // Now the list of sections.
         $sectioncollapse = isset($course->sectioncollapse) ? $course->sectioncollapse : false;
         echo $this->start_section_list($sectioncollapse);
         $numsections = course_get_format($course)->get_last_section_number();
@@ -695,7 +696,7 @@ class format_designer_renderer extends format_section_renderer_base {
         $cmlist = array_values($cmlist);
         // END CM LIST.
         $cmcontrol = $this->courserenderer->course_section_add_cm_control($course, 0, 0);
-        if ($course->coursedisplay == 1 && !$onsectionpage) {
+        if ($course->coursedisplay == 1 && !$onsectionpage && $section->section > 0) {
             $gotosection = true;
         }
 
@@ -865,7 +866,7 @@ class format_designer_renderer extends format_section_renderer_base {
             'sectionurl' => $sectionurl,
             'sectioncollapse' => isset($course->sectioncollapse) ? $course->sectioncollapse : false,
             'sectionshow' => $sectioncollapsestatus,
-            'sectionaccordion' => isset($course->accordion) ? $course->accordion : false
+            'sectionaccordion' => isset($course->accordion) && !$this->page->user_is_editing() ? $course->accordion : false
         ];
         if ($sectioncontent) {
             $contenttemplatename = 'format_designer/section_content_' . $sectiontype;

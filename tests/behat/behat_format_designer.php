@@ -103,7 +103,7 @@ class behat_format_designer extends behat_base {
     public function i_check_the_section_layout($sectionnumber, $layouttype) {
         $layoutclass = "$layouttype-layout";
         $xpath = "//li[@id='section-" . $sectionnumber . "']";
-        $xpath .= "/descendant::ul[contains(@id, 'designer-section-content') and contains(@class, '".$layoutclass."')]";
+        $xpath .= "/descendant::ul[contains(@class, 'designer-section-content') and contains(@class, '".$layoutclass."')]";
         $exception = new ExpectationException('Section "' . $sectionnumber . '" was not change the layout "'
         . $layouttype . '"', $this->getSession());
         $this->find('xpath', $xpath, $exception);
