@@ -62,19 +62,19 @@
      */
     DesignerSection.prototype.SectionController = ".designer #section-designer-action .dropdown-menu a";
 
-    DesignerSection.prototype.RestrictInfo = ".designer #designer-section-content .call-action-block";
+    DesignerSection.prototype.RestrictInfo = ".designer .designer-section-content .call-action-block";
 
-    DesignerSection.prototype.moduleBlock = ".designer #designer-section-content li.activity";
+    DesignerSection.prototype.moduleBlock = ".designer .designer-section-content li.activity";
 
     DesignerSection.prototype.loadingElement = ".icon-loader-block";
 
     DesignerSection.prototype.sectionRestricted = ".designer .availability-section-block .section-restricted-action";
 
-    DesignerSection.prototype.moduleDescription = ".designer #designer-section-content li .mod-description-action";
+    DesignerSection.prototype.moduleDescription = ".designer .designer-section-content li .mod-description-action";
 
-    DesignerSection.prototype.fullDescription = "#designer-section-content li .fullcontent-summary .mod-description-action";
+    DesignerSection.prototype.fullDescription = ".designer-section-content li .fullcontent-summary .mod-description-action";
 
-    DesignerSection.prototype.trimDescription = "#designer-section-content li .trim-summary .mod-description-action";
+    DesignerSection.prototype.trimDescription = ".designer-section-content li .trim-summary .mod-description-action";
 
     DesignerSection.prototype.addSectionSpinner = function(sectioninfo) {
         var sectionelement = $(sectioninfo).addClass('editinprogress');

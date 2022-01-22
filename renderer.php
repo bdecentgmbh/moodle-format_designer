@@ -58,6 +58,9 @@ class format_designer_renderer extends format_section_renderer_base {
      * @return string HTML to output.
      */
     protected function start_section_list($sectioncollapse=false) {
+        global $PAGE;
+        // print_object(array_keys((array) $PAGE));
+        // exit;
         $attrs = ['class' => 'designer'];
         if ($sectioncollapse) {
             $attrs['id'] = 'section-course-accordion';
@@ -465,7 +468,7 @@ class format_designer_renderer extends format_section_renderer_base {
         // Copy activity clipboard..
         echo $this->course_activity_clipboard($course, 0);
 
-        // Now the list of sections..
+        // Now the list of sections.
         $sectioncollapse = isset($course->sectioncollapse) ? $course->sectioncollapse : false;
         echo $this->start_section_list($sectioncollapse);
         $numsections = course_get_format($course)->get_last_section_number();
@@ -656,7 +659,7 @@ class format_designer_renderer extends format_section_renderer_base {
      */
     public function render_section(section_info $section, stdClass $course, $onsectionpage,
         $sectionheader = false, $sectionreturn = 0, $sectioncontent = false) {
-        global $DB, $USER, $CFG;
+        global $DB, $USER, $CFG, $PAGE;
 
         $sectionurl = new \moodle_url('/course/view.php', ['id' => $course->id, 'section' => $section->section]);
         /** @var format_designer $format */
@@ -695,7 +698,7 @@ class format_designer_renderer extends format_section_renderer_base {
         $cmlist = array_values($cmlist);
         // END CM LIST.
         $cmcontrol = $this->courserenderer->course_section_add_cm_control($course, 0, 0);
-        if ($course->coursedisplay == 1 && !$onsectionpage) {
+        if ($course->coursedisplay == 1 && !$onsectionpage && $section->section > 0) {
             $gotosection = true;
         }
 
@@ -865,7 +868,7 @@ class format_designer_renderer extends format_section_renderer_base {
             'sectionurl' => $sectionurl,
             'sectioncollapse' => isset($course->sectioncollapse) ? $course->sectioncollapse : false,
             'sectionshow' => $sectioncollapsestatus,
-            'sectionaccordion' => isset($course->accordion) ? $course->accordion : false
+            'sectionaccordion' => isset($course->accordion) && !$PAGE->user_is_editing() ? $course->accordion : false
         ];
         if ($sectioncontent) {
             $contenttemplatename = 'format_designer/section_content_' . $sectiontype;
