@@ -49,6 +49,7 @@ class format_designer_renderer extends format_section_renderer_base {
         // when editing mode is on we need to be sure that the link 'Turn editing mode on' is available for a user
         // who does not have any other managing capability.
         $page->set_other_editing_capability('moodle/course:setcurrentsection');
+        $this->page = $page;
     }
 
     /**
@@ -58,9 +59,6 @@ class format_designer_renderer extends format_section_renderer_base {
      * @return string HTML to output.
      */
     protected function start_section_list($sectioncollapse=false) {
-        global $PAGE;
-        // print_object(array_keys((array) $PAGE));
-        // exit;
         $attrs = ['class' => 'designer'];
         if ($sectioncollapse) {
             $attrs['id'] = 'section-course-accordion';
@@ -659,7 +657,7 @@ class format_designer_renderer extends format_section_renderer_base {
      */
     public function render_section(section_info $section, stdClass $course, $onsectionpage,
         $sectionheader = false, $sectionreturn = 0, $sectioncontent = false) {
-        global $DB, $USER, $CFG, $PAGE;
+        global $DB, $USER, $CFG;
 
         $sectionurl = new \moodle_url('/course/view.php', ['id' => $course->id, 'section' => $section->section]);
         /** @var format_designer $format */
@@ -868,7 +866,7 @@ class format_designer_renderer extends format_section_renderer_base {
             'sectionurl' => $sectionurl,
             'sectioncollapse' => isset($course->sectioncollapse) ? $course->sectioncollapse : false,
             'sectionshow' => $sectioncollapsestatus,
-            'sectionaccordion' => isset($course->accordion) && !$PAGE->user_is_editing() ? $course->accordion : false
+            'sectionaccordion' => isset($course->accordion) && !$this->page->user_is_editing() ? $course->accordion : false
         ];
         if ($sectioncontent) {
             $contenttemplatename = 'format_designer/section_content_' . $sectiontype;
