@@ -15,20 +15,18 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template format_designer/call_to_action
+    @template format_designer/section_availability
 
     Displays the course module card layout
 
     Example context (json):
     {
-        "reactionurl_dislike": "http://moodleurl/course/format/designer/classes/output/call_to_action.php"
+        "reactionurl_dislike": "http://moodleurl/course/format/designer/renderer.php"
     }
 }}
-{{#isrestricted}}
-<a href="javascript:void(0);"> <span class="font-weight-bold" style="{{#actiontextcolor}} {{actiontextcolor}} {{/actiontextcolor}}">{{{calltoactionlabel}}}</span></a>
-{{/isrestricted}}
-{{^isrestricted}}
-{{#modurl}}
-<a href="{{modurl}}"> <span class="font-weight-bold" style="{{#actiontextcolor}} {{actiontextcolor}} {{/actiontextcolor}}">{{{calltoactionlabel}}}</span></a>
-{{/modurl}}
-{{/isrestricted}}
+
+{{#sectionavailability}}
+<div class="availability-section-block">
+	{{{sectionavailability}}}
+</div>
+{{/sectionavailability}}
