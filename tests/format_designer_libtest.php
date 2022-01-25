@@ -34,7 +34,7 @@ require_once($CFG->dirroot . '/course/lib.php');
  * @copyright  2015 Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class format_designer_testcase extends advanced_testcase {
+class format_designer_libtest extends advanced_testcase {
 
     /**
      * Tests for format_designer::get_section_name method with default section names.
@@ -276,8 +276,9 @@ class format_designer_testcase extends advanced_testcase {
 
     public function test_format_designer_modcontent_trim_char() {
 
-        $str1 = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard
-        dummy text ever since the 1500s,when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
+        $str1 = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+        Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+        when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
         $resstr1 = format_designer_modcontent_trim_char($str1, 30);
         $this->assertEquals(23, str_word_count($resstr1));
 

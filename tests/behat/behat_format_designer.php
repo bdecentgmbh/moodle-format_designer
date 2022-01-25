@@ -145,12 +145,12 @@ class behat_format_designer extends behat_base {
      *
      * @Given /^I click on section header "(?P<section_number>\d+)"$/
      * @throws DriverException The step is not available when Javascript is disabled
-     * @param int $sectionnumber
+     * @param int $sectionnum
      */
-    public function i_click_on_section_header($sectionnumber) {
-        $xpath = "//li[@id='section-" . $sectionnumber . "']";
+    public function i_click_on_section_header($sectionnum) {
+        $xpath = "//li[@id='section-" . $sectionnum . "']";
         $xpath .= "/descendant::div[contains(@class, 'section-header-content')]";
-        $exception = new ExpectationException('Click for section"' . $sectionnumber . '" header was not found', $this->getSession());
+        $exception = new ExpectationException('Click for section"'. $sectionnum .'" header was not found', $this->getSession());
         $menu = $this->find('xpath', $xpath, $exception);
         $menu->click();
     }
@@ -176,7 +176,8 @@ class behat_format_designer extends behat_base {
      */
     public function i_check_section_collapsed($sectionnumber) {
         $xpath = "//li[@id='section-" . $sectionnumber . "']";
-        $xpath .= "/descendant::div[contains(@class, 'section-header-content') and contains(@class, 'collapse') and contains(@data-toggle, 'collapse')]";
+        $xpath .= "/descendant::div[contains(@class, 'section-header-content')
+            and contains(@class, 'collapse') and contains(@data-toggle, 'collapse')]";
         $exception = "";
         $this->find('xpath', $xpath, $exception);
     }
