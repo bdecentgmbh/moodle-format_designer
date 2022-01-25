@@ -141,6 +141,47 @@ class behat_format_designer extends behat_base {
     }
 
     /**
+     * Click the section header.
+     *
+     * @Given /^I click on section header "(?P<section_number>\d+)"$/
+     * @throws DriverException The step is not available when Javascript is disabled
+     * @param int $sectionnumber
+     */
+    public function i_click_on_section_header($sectionnumber) {
+        $xpath = "//li[@id='section-" . $sectionnumber . "']";
+        $xpath .= "/descendant::div[contains(@class, 'section-header-content')]";
+        $exception = new ExpectationException('Click for section"' . $sectionnumber . '" header was not found', $this->getSession());
+        $menu = $this->find('xpath', $xpath, $exception);
+        $menu->click();
+    }
+
+    /**
+     * Check the section is expanded.
+     * @Given /^I click on section expanded "(?P<section_number>\d+)"$/
+     * @throws DriverException The step is not available when Javascript is disabled
+     * @param int $sectionnumber
+     */
+    public function i_check_section_expanded($sectionnumber) {
+        $xpath = "//li[@id='section-" . $sectionnumber . "']";
+        $xpath .= "/descendant::div[contains(@class, 'section-header-content') and contains(@data-toggle, 'collapse')]";
+        $exception = "";
+        $this->find('xpath', $xpath, $exception);
+    }
+
+    /**
+     * Check the section is collapsed.
+     * @Given /^I click on section collapsed "(?P<section_number>\d+)"$/
+     * @throws DriverException The step is not available when Javascript is disabled
+     * @param int $sectionnumber
+     */
+    public function i_check_section_collapsed($sectionnumber) {
+        $xpath = "//li[@id='section-" . $sectionnumber . "']";
+        $xpath .= "/descendant::div[contains(@class, 'section-header-content') and contains(@class, 'collapse') and contains(@data-toggle, 'collapse')]";
+        $exception = "";
+        $this->find('xpath', $xpath, $exception);
+    }
+
+    /**
      * Check the activity completion info for designer format.
      *
      * @Given /^I should see designerinfo "(?P<acti_id>(?:[^"]|\\")*)" "(?P<com_info>(?:[^"]|\\")*)" "(?P<Dur_info>(?:[^"]|\\")*)"$/
