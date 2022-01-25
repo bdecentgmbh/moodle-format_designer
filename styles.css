@@ -108,6 +108,7 @@ ul.designer .card.card-list:hover .card-body .mod-indent-outer .mod-indent .row 
     vertical-align: top;
     margin-top: 0;
     margin-bottom: 10px;
+    margin-left: 5px;
     margin-right: 10px;
 }
 .course-content ul.designer li.section .summary .no-overflow {
@@ -745,6 +746,7 @@ ul li {
 .designer .section .content .section li.activity .activity-block.designer {
     display: block;
     padding: 0;
+    z-index: 0;
 }
 .designer .section .content .section li.activity .activity-block.designer .contentwithoutlink {
     padding: 0;

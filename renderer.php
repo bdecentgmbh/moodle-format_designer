@@ -747,12 +747,12 @@ class format_designer_renderer extends format_section_renderer_base {
             $sectionstyle .= local_designer_layout_columnclasses($section);
             // Get section designer background image.
             $sectiondesignerbackimageurl = get_section_designer_background_image($section, $course->id);
-            if ($section->sectionbackgroundtype == 'header') {
-                $sectiondesignheader = true;
-                $sectionstyle .= ' section-design-header ';
-            } else if ($section->sectionbackgroundtype == 'whole') {
+            if ($section->sectionbackgroundtype == 'whole') {
                 $sectiondesignwhole = true;
                 $sectionstyle .= ' section-design-whole ';
+            } else {
+                $sectiondesignheader = true;
+                $sectionstyle .= ' section-design-header ';
             }
             // Section designer background styles.
             $backgradient = (isset($section->sectiondesignerbackgradient) && ($section->sectiondesignerbackgradient))
