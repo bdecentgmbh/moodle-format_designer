@@ -274,6 +274,11 @@ class format_designer_libtest extends advanced_testcase {
         $this->assertNotEmpty($format->get_view_url(0, ['navigation' => 1]));
     }
 
+    /**
+     * Test the module content trim character.
+     *
+     * @return void
+     */
     public function test_format_designer_modcontent_trim_char() {
 
         $str1 = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.
@@ -287,6 +292,11 @@ class format_designer_libtest extends advanced_testcase {
         $this->assertEquals(str_word_count($str2), str_word_count($resstr2));
     }
 
+    /**
+     * Test desginer format date method.
+     *
+     * @return void
+     */
     public function test_format_designer_format_date() {
         $timestamp = 1642861536;
         $dateformat = format_designer_format_date($timestamp);
