@@ -166,7 +166,11 @@ class options {
         ];
     }
 
-
+    /**
+     * Get area files available for backup.
+     * @param $structure Type of format module or section
+     * @return null|array List of available fileareas
+     */
     public static function get_file_areas($structure='module') {
         if (format_designer_has_pro()) {
             return \local_designer\options::get_file_areas($structure);

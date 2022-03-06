@@ -18,7 +18,7 @@
  * designer course format related unit tests.
  *
  * @package    format_designer
- * @copyright  2015 Marina Glancy
+ * @copyright  2021 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/course/lib.php');
  * designer course format related unit tests.
  *
  * @package    format_designer
- * @copyright  2015 Marina Glancy
+ * @copyright  2021 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format_designer_optionstest extends advanced_testcase {

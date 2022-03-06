@@ -102,10 +102,10 @@
         var card = event.target.closest("[data-action=go-to-url]");
         let modurl = card.getAttribute('data-url');
         window.location.href = modurl;
-    }
-    
+    };
+
     DesignerSection.prototype.expandSection = () => {
-        // alert();
+        // Alert();
         var sectionID = window.location.hash;
         if (sectionID) {
             var id = sectionID.substring(1);
@@ -127,7 +127,7 @@
                 section.scrollIntoView();
             }
         }
-    }
+    };
 
     DesignerSection.prototype.removeSectionSpinner = function(sectioninfo, spinner, delay) {
         var element = $(sectioninfo);
@@ -293,7 +293,7 @@
             'cards': 'card-deck card-layout',
             'list': 'list-layout',
             'default': 'link-layout',
-            'circles' : 'circles-layout'
+            'circles': 'circles-layout'
         };
         var promises = Ajax.call([{
                 methodname: 'format_designer_set_section_options',
