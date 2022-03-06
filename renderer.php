@@ -56,10 +56,12 @@ class format_designer_renderer extends format_section_renderer_base {
      * Generate the starting container html for a list of sections.
      *
      * @param bool $sectioncollapse
+     * @param string $class Additional class for section ul
      * @return string HTML to output.
      */
-    protected function start_section_list($sectioncollapse=false) {
-        $attrs = ['class' => 'designer'];
+    protected function start_section_list($sectioncollapse=false, $class='') {
+        $attrs = ['class' => 'designer '.$class];
+
         if ($sectioncollapse) {
             $attrs['id'] = 'section-course-accordion';
         }
@@ -445,6 +447,116 @@ class format_designer_renderer extends format_section_renderer_base {
     }
 
     /**
+     * Render the completion info icon to modify the content.
+     *
+     * @param \completion_info $completioninfo Completion info of the current course.
+     * @return html $result Completion progress info icon.
+     */
+    public function completioninfo_icon(\completion_info $completioninfo) {
+        global $USER;
+        $result = '';
+        if ($completioninfo->is_enabled() && !$this->page->user_is_editing()
+            && $completioninfo->is_tracked_user($USER->id) && isloggedin() && !isguestuser()) {
+            $result .= html_writer::tag('div', get_string('yourprogress', 'completion') .
+                    $this->output->help_icon('completionicons', 'format_designer'), array(
+                        'id' => 'completionprogressid', 'class' => 'completionprogress'
+                    ));
+        }
+        return $result;
+    }
+
+    /**
+     * Get course time mananagment details user current course progress and due modules course.
+     *
+     * @param stdclass $course
+     * @return string
+     */
+    public function timemanagement_details(stdclass $course): string {
+        global $USER, $CFG, $DB;
+        require_once($CFG->dirroot.'/enrol/locallib.php');
+
+        $context = context_course::instance($course->id);
+        if (is_enrolled($context, $USER->id)) {
+            $enrolmanager = new course_enrolment_manager($this->page, $course);
+            $enrolments = $enrolmanager->get_user_enrolments($USER->id);
+            $enrolment = (!empty($enrolments)) ? current($enrolments) : [];
+            $enrolstartdate = ($enrolment->timestart) ?? '';
+            $enrolenddate = ($enrolment->timeend) ?? '';
+        } else {
+            $enrolstartdate = $course->startdate;
+            $enrolenddate = $course->enddate;
+        }
+        $data = [
+            'course' => $course,
+            'enrolmentstartdate' => ($course->enrolmentstartdate) ? $enrolstartdate : '',
+            'enrolmentenddate' => $course->enrolmentenddate ? $enrolenddate : '',
+        ];
+        $courseprogress = $this->activity_progress($course, $USER->id);
+        if ($courseprogress != null) {
+            $sql = "SELECT * FROM {course_completions}
+                WHERE course = :course AND userid = :userid AND timecompleted IS NOT NULL";
+            $completion = $DB->get_record_sql($sql, ['userid' => $USER->id, 'course' => $course->id]);
+            $data += [
+                'showcompletiondate' => ($course->coursecompletiondate) ?: '',
+                'completiondate' => (!empty($completion) ? $completion->timecompleted : ''),
+                'courseprogress' => ($course->activityprogress) ? $courseprogress : '',
+            ];
+        }
+
+        if (is_timemanagement_installed() && function_exists('ltool_timemanagement_cal_course_duedate')) {
+            $coursedatesinfo = $DB->get_record('ltool_timemanagement_course', array('course' => $course->id));
+            if ($course->courseduedate && $coursedatesinfo) {
+                $data['courseduedate'] = ltool_timemanagement_cal_course_duedate($coursedatesinfo, $enrolstartdate);
+                if (empty($data['courseduedate'])) {
+                    $expectedcompletion = $courseprogress['completiondate'] ?? '';
+                    if (!empty($expectedcompletion)) {
+                        $data['courseduedate'] = $expectedcompletion;
+                    }
+                }
+            }
+            $data['due'] = ltool_timemanagement_get_due_overdue_course($course->id, $USER->id);
+        }
+
+        $html = $this->output->render_from_template('format_designer/course_time_management', $data);
+        return $html;
+    }
+
+    /**
+     * Get current course module progress. count of completion enable modules and count of completed modules.
+     *
+     * @param stdclass $course
+     * @param int $userid
+     * @return array Modules progress
+     */
+    protected function activity_progress($course, $userid) {
+        $completion = new \completion_info($course);
+        // First, let's make sure completion is enabled.
+        if (!$completion->is_enabled() || !$completion->is_tracked_user($userid)) {
+            return null;
+        }
+        $result = [];
+        $completiondate = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_DATE);
+        if (!empty($completiondate)) {
+            $result['completiondate'] = current($completiondate)->timeend ?? '';
+        }
+        // Get the number of modules that support completion.
+        $modules = $completion->get_activities();
+        $count = count($modules);
+        if (!$count) {
+            return null;
+        }
+        // Get the number of modules that have been completed.
+        $completed = 0;
+        foreach ($modules as $module) {
+            $data = $completion->get_data($module, true, $userid);
+            $completed += $data->completionstate == COMPLETION_INCOMPLETE ? 0 : 1;
+        }
+        $percent = ($completed / $count) * 100;
+
+        return ['count' => $count, 'completed' => $completed, 'percent' => $percent] + $result;
+    }
+
+    /**
      * Output the html for a multiple section page
      *
      * @param stdClass $course The course entry from DB
@@ -458,17 +570,26 @@ class format_designer_renderer extends format_section_renderer_base {
         $modinfo = get_fast_modinfo($course);
         $course = course_get_format($course)->get_course();
         $context = context_course::instance($course->id);
+        // Display the time management plugin widget.
+        echo $this->timemanagement_details($course);
         // Title with completion help icon.
         $completioninfo = new completion_info($course);
-        echo $completioninfo->display_help_icon();
+        echo $this->completioninfo_icon($completioninfo);
         echo $this->output->heading($this->page_title(), 2, 'accesshide');
 
         // Copy activity clipboard..
         echo $this->course_activity_clipboard($course, 0);
 
         // Now the list of sections.
-        $sectioncollapse = isset($course->sectioncollapse) ? $course->sectioncollapse : false;
-        echo $this->start_section_list($sectioncollapse);
+        $sectioncollapse = isset($course->sectioncollapse) ?
+            (($course->coursedisplay && !$this->page->user_is_editing()) ? false : $course->sectioncollapse) : false;
+        $startclass = ($course->coursedisplay && !$this->page->user_is_editing()) ? 'row' : '';
+        // If kanban board enabled remove the row.
+        if ($course->coursetype) {
+            $sectioncollapse = false;
+            $startclass .= ' kanban-board ';
+        }
+        echo $this->start_section_list($sectioncollapse, $startclass);
         $numsections = course_get_format($course)->get_last_section_number();
         foreach ($modinfo->get_section_info_all() as $section => $thissection) {
             if ($section > $numsections) {
@@ -510,7 +631,6 @@ class format_designer_renderer extends format_section_renderer_base {
 
             echo $this->change_number_sections($course, 0);
         } else {
-
             echo $this->end_section_list();
         }
 
@@ -537,6 +657,8 @@ class format_designer_renderer extends format_section_renderer_base {
             throw new moodle_exception('unknowncoursesection', 'error', course_get_url($course),
                 format_string($course->fullname));
         }
+        // Display the time management plugin widget.
+        echo $this->timemanagement_details($course);
         // Copy activity clipboard..
         $sectioncollapse = isset($course->sectioncollapse) ? $course->sectioncollapse : false;
         echo $this->start_section_list($sectioncollapse);
@@ -645,6 +767,29 @@ class format_designer_renderer extends format_section_renderer_base {
     }
 
     /**
+     * Genreate the class for the sections to deifine the width of sections.
+     * It contains bootstrap grid classes, for desktop, laptop and mobile.
+     *
+     * @param stdclass $section Record object.
+     * @return string classes list.
+     */
+    protected function generate_section_widthclass($section) {
+        $tablet = $section->tabletwidth;
+        $mobile = $section->mobilewidth;
+        $desktop = $section->desktopwidth;
+
+        $widthclasses = [0 => 12, 1 => 6, 2 => 4, 3 => 3, 4 => 2 ];
+        $classes = [];
+        foreach (['desktop' => 'md', 'tablet' => 'sm', 'mobile' => ''] as $device => $size) {
+            $class = 'col-';
+            $class .= ($size) ? $size.'-' : '';
+            $class .= (isset($widthclasses[$$device])) ? $widthclasses[$$device] : 12;
+            $classes[] = $class;
+        }
+        return ' '.implode(' ', $classes);
+    }
+
+    /**
      * Render the section info.
      *
      * @param \section_info $section
@@ -657,7 +802,6 @@ class format_designer_renderer extends format_section_renderer_base {
      */
     public function render_section(section_info $section, stdClass $course, $onsectionpage,
         $sectionheader = false, $sectionreturn = 0, $sectioncontent = false) {
-        global $DB, $USER, $CFG;
 
         $sectionurl = new \moodle_url('/course/view.php', ['id' => $course->id, 'section' => $section->section]);
         /** @var format_designer $format */
@@ -682,13 +826,13 @@ class format_designer_renderer extends format_section_renderer_base {
         $cmlist = [];
         $modinfo = get_fast_modinfo($course);
         $displayoptions = [];
-        $completioninfo = new completion_info($course);
 
         // Get the list of modules visible to user.
+        $section->sectiontype = $format->get_section_option($section->id, 'sectiontype') ?: 'default';
         if (!empty($modinfo->sections[$section->section]) && $section->uservisible) {
             foreach ($modinfo->sections[$section->section] as $modnumber) {
                 $mod = $modinfo->cms[$modnumber];
-                $cminfo = $this->render_course_module($mod, $sectionreturn, $displayoptions);
+                $cminfo = $this->render_course_module($mod, $sectionreturn, $displayoptions, $section);
                 $cmlist[$modnumber] = $cminfo;
                 $cmlist[$modnumber]['modstatus'] = !empty($cminfo) ? true : false;
             }
@@ -701,31 +845,9 @@ class format_designer_renderer extends format_section_renderer_base {
         }
 
         // Calculate to the section progress.
-        $cmcompleted = 0;
-        $totalmods = 0;
-        $issectioncompletion = 0;
-        if (!empty($modinfo->sections[$section->section]) && $section->uservisible) {
-            foreach ($modinfo->sections[$section->section] as $modnumber) {
-                $mod = $modinfo->cms[$modnumber];
-                if (!empty($mod)) {
-                    $cmcompletion = new cm_completion($mod);
-                    if ($mod->uservisible && $cmcompletion->get_completion_mode() != COMPLETION_TRACKING_NONE) {
-                        $totalmods++;
-                        $cmcompletionstate = $cmcompletion->get_completion_state();
-                        if ($cmcompletionstate == COMPLETION_COMPLETE || $cmcompletionstate == COMPLETION_COMPLETE_PASS ) {
-                            $cmcompleted++;
-                        }
-                    }
-                }
-            }
-        }
-        if ($totalmods) {
-            $sectionprogress = $cmcompleted / $totalmods * 100;
-            $issectioncompletion = 1;
-        } else {
-            $sectionprogress = 0;
-        }
-        $sectionprogresscomp = ($sectionprogress == 100) ? true : false;
+        $sectiondata = \format_designer\options::is_section_completed($section, $course, $modinfo);
+        list($issectioncompletion, $sectionprogress, $sectionprogresscomp) = $sectiondata;
+
         $sectionsummary = '';
         if ($section->uservisible || $section->visible) {
             // Show summary if section is available or has availability restriction information.
@@ -742,67 +864,7 @@ class format_designer_renderer extends format_section_renderer_base {
         $sectioncontainerlayout = '';
         $sectioncontentlayout = '';
         $bgoverlay = false;
-        if (format_designer_has_pro()) {
-
-            $sectionstyle .= local_designer_layout_columnclasses($section);
-            // Get section designer background image.
-            $sectiondesignerbackimageurl = get_section_designer_background_image($section, $course->id);
-            if ($section->sectionbackgroundtype == 'whole') {
-                $sectiondesignwhole = true;
-                $sectionstyle .= ' section-design-whole ';
-            } else {
-                $sectiondesignheader = true;
-                $sectionstyle .= ' section-design-header ';
-            }
-            // Section designer background styles.
-            $backgradient = (isset($section->sectiondesignerbackgradient) && ($section->sectiondesignerbackgradient))
-                            ? str_replace(';', '', $section->sectiondesignerbackgradient) : null;
-
-            // Background color.
-            if ($section->sectiondesignerbackgroundcolor) {
-                $overlaycolor = "background-color: $section->sectiondesignerbackgroundcolor" . ";";
-                $sectionbackgroundstyle .= $overlaycolor;
-            }
-            if ($sectiondesignerbackimageurl) {
-                if ($backgradient) {
-                    $sectionbackgroundstyle .= sprintf('background-image: url(%s);', $sectiondesignerbackimageurl);
-                    $overlaycolor = sprintf('background: %s;', $backgradient );
-                } else {
-                    $sectionbackgroundstyle .= "background-image: url('" . $sectiondesignerbackimageurl . "');";
-                }
-                $bgoverlay = (isset($overlaycolor)) ? $overlaycolor : false;
-                $sectionstyle .= (isset($overlaycolor)) ? ' bg-color-overlay' : '';
-            } else if ($section->sectiondesignerbackgradient) {
-                $gradient = $section->sectiondesignerbackgradient;
-                $sectionbackgroundstyle .= sprintf('background: %s;', $gradient);
-            }
-
-            if ($section->sectiondesignertextcolor) {
-                $sectiondesigntextcolor = "color: $section->sectiondesignertextcolor"
-                    . ";--sectioncolor:  $section->sectiondesignertextcolor;";
-            }
-
-            // Section container & content layout.
-            $containerlayout = $section->layoutcontainer;
-            if ($containerlayout == 'full') {
-                $sectioncontainerlayout = 'container-full';
-            } else if ($containerlayout == 'boxed') {
-                $sectioncontainerlayout = 'container-boxed';
-                $sectioncontainerboxwidth = ($section->layoutcontainerwidth) ? $section->layoutcontainerwidth : '1200';
-                $sectioncontainerwidth .= 'max-width:'. $sectioncontainerboxwidth. "px;";
-            } else {
-                $sectioncontainerlayout = "container";
-            }
-
-            $contentlayout = $section->layoutcontent;
-            if ($contentlayout == 'boxed') {
-                $sectioncontentlayout = 'content-boxed';
-                $sectioncontentboxwidth = ($section->layoutcontentwidth) ? $section->layoutcontentwidth : '1200';
-                $sectioncontentwidth .= 'max-width: '. $sectioncontentboxwidth . "px;";
-            } else {
-                $sectioncontentlayout = 'content-normal';
-            }
-        }
+        $prodata = [];
 
         $sectionlayoutclass = 'link-layout';
         $sectiontype = $format->get_section_option($section->id, 'sectiontype') ?: 'default';
@@ -812,7 +874,7 @@ class format_designer_renderer extends format_section_renderer_base {
             $sectionlayoutclass = 'card-layout';
         }
         $templatename = 'format_designer/section_layout_' . $sectiontype;
-        $prolayouts = get_pro_layouts();
+        $prolayouts = format_designer_get_pro_layouts();
         if (in_array($sectiontype, $prolayouts)) {
             if (format_designer_has_pro()) {
                 $templatename = 'layouts_' . $sectiontype . '/section_layout_' . $sectiontype;
@@ -826,12 +888,22 @@ class format_designer_renderer extends format_section_renderer_base {
             $templatename = 'format_designer/section_layout_default';
         }
 
+        $sectioncollapsestatus = '';
         if (isset($course->initialstate) && $course->initialstate == SECTION_COLLAPSE) {
             $sectioncollapsestatus = '';
         } else {
             $sectioncollapsestatus = (isset($course->initialstate) && $course->initialstate == FIRST_EXPAND)
-                ? (($section->section == 0) ? 'show' : '') : 'show';
+            ? (($section->section == 0) ? 'show' : '') : 'show';
         }
+        // Disable the collapsible for kanban board.
+        if ($course->coursetype) {
+            $course->sectioncollapse = false;
+            $sectioncollapsestatus = '';
+        }
+
+        // Calculate section width for single section format.
+        $section->widthclass = ($course->coursedisplay && !$this->page->user_is_editing())
+            ? $this->generate_section_widthclass($section) : '';
 
         $templatecontext = [
             'section' => $section,
@@ -868,14 +940,19 @@ class format_designer_renderer extends format_section_renderer_base {
             'sectionshow' => $sectioncollapsestatus,
             'sectionaccordion' => isset($course->accordion) && !$this->page->user_is_editing() ? $course->accordion : false
         ];
+
+        if (format_designer_has_pro()) {
+            $prodata = \local_designer\options::render_section($section, $course, $modinfo, $templatecontext);
+        }
         if ($sectioncontent) {
             $contenttemplatename = 'format_designer/section_content_' . $sectiontype;
             return $this->render_from_template($contenttemplatename, $templatecontext);
         }
-        $sectionclass = 'section-type-'.$sectiontype.' '.$sectionstyle.' '.$sectioncontainerlayout;
+        $sectionclass = 'section-type-'.$sectiontype;
         $sectionclass .= ($sectionrestrict) ? 'restricted' : '';
-        $style = ($sectiondesignwhole) ? $sectionbackgroundstyle : '';
-        $style .= ($sectioncontainerwidth) ? ' '.$sectioncontainerwidth : '';
+        $sectionclass .= $section->widthclass;
+        $sectionclass .= ($templatecontext['sectionstyle']) ?? ' '.$templatecontext['sectionstyle'];
+        $style = isset($templatecontext['prosectionstyle']) ? ' '.$templatecontext['prosectionstyle'] : '';
         $sectionhead = html_writer::start_tag('li', [
             'id' => 'section-'.$section->section,
             'class' => 'section main clearfix'.$sectionclass,
@@ -892,16 +969,16 @@ class format_designer_renderer extends format_section_renderer_base {
         echo html_writer::end_tag('li');
     }
 
-
     /**
      * Render the mod info.
      *
      * @param object $mod
      * @param int $sectionreturn
      * @param array $displayoptions
+     * @param stdclass $section section record data.
      * @return void|string
      */
-    public function render_course_module($mod, $sectionreturn, $displayoptions = []) {
+    public function render_course_module($mod, $sectionreturn, $displayoptions = [], $section=null) {
         global $DB, $USER, $CFG;
         if (!$mod->is_visible_on_course_page()) {
             return [];
@@ -916,6 +993,7 @@ class format_designer_renderer extends format_section_renderer_base {
         }
 
         $movehtml = '';
+        $style = '';
         if ($this->page->user_is_editing()) {
             $movehtml = course_get_cm_move($mod, $sectionreturn);
         }
@@ -949,6 +1027,7 @@ class format_designer_renderer extends format_section_renderer_base {
         }
 
         $availability = $this->courserenderer->course_section_cm_availability($mod, $displayoptions);
+
         // If there is content AND a link, then display the content here.
         // (AFTER any icons). Otherwise it was displayed before.
         $cmtext = '';
@@ -1034,41 +1113,38 @@ class format_designer_renderer extends format_section_renderer_base {
             'availabilityrestrict' => $availabilityrestrict,
             'modiconurl' => $modiconurl,
             'modrestricted' => $modrestricted,
+            'elementstate' => $this->get_activity_elementclasses($mod),
         ];
 
         if (format_designer_has_pro()) {
             require_once($CFG->dirroot. "/local/designer/lib.php");
-            $promodcontent = [];
-            $modulebackdesign = $DB->get_record('local_designer_fields', array('cmid' => $mod->id));
-            if ($modulebackdesign) {
-                $modulebackimageurl = get_module_designer_background_image($mod, $modulebackdesign->backimage);
-                $backgradient = (isset($modulebackdesign->backgradient) && ($modulebackdesign->backgradient))
-                            ? str_replace(';', '', $modulebackdesign->backgradient) : null;
-
-                if ($modulebackimageurl) {
-                    $modulebackgroundstyle = "background-image: url('" . $modulebackimageurl . "');";
-                    if ($backgradient) {
-                        $promodcontent['modbackoverlaycolor'] = sprintf('background: %s;', $backgradient );
-                        $cmlist['modclasses'] .= ' bg-color-overlay ';
-                    }
-                } else if ($modulebackdesign->backgradient) {
-                    $modulebackgroundstyle = sprintf('background: %s;', $backgradient );
-                } else {
-                    $modulebackgroundstyle = '';
-                }
-
-                $promodcontent['modulebackgroundstyle'] = $modulebackgroundstyle;
-                $moduletextcolor = '';
-                // Text Color.
-                if ($modulebackdesign->textcolor) {
-                    $moduletextcolor = "color: $modulebackdesign->textcolor" . ";";
-                }
-                $promodcontent['moduletextcolor'] = $moduletextcolor;
-                $cmlist = array_merge($cmlist, $promodcontent);
-            }
+            $prodata = \local_designer\options::render_course_module($mod, $cmlist, $section);
+            $cmlist = array_merge($cmlist, $prodata);
         }
         return $cmlist;
     }
+
+    /**
+     * Generate the classes for the activity elements visibility classes.
+     * It used to show or hide, or show, hide during the activity hover.
+     * @param \modinfo $mod
+     * @return void
+     */
+    public function get_activity_elementclasses($mod) {
+
+        $option  = \format_designer\options::get_option($mod->id, 'activityelements');
+        if (!empty($option)) {
+            $element = json_decode($option, true);
+            $classes = [0 => 'content-hide', 1 => 'content-show', 2 => 'content-show-hover', 3 => 'content-hide-hover'];
+
+            $elementclasses = array_map(function($v) use ($classes) {
+                return (isset($classes[$v])) ? $classes[$v] : $v;
+            }, $element);
+            return $elementclasses;
+        }
+        return [];
+    }
+
     /**
      * Get course modulename.
      * @param object $mod
@@ -1076,7 +1152,7 @@ class format_designer_renderer extends format_section_renderer_base {
      * @return string module name.
      */
     public function get_cmname($mod, $displayoptions = []) {
-        global $DB;
+
         if ($mod->url) {
             list($linkclasses, $textclasses) = $this->course_section_cm_classes($mod);
             $groupinglabel = $mod->get_grouping_label($textclasses);
@@ -1085,11 +1161,9 @@ class format_designer_renderer extends format_section_renderer_base {
             $output = '';
             $style = '';
             if (format_designer_has_pro()) {
-                $modulebackdesign = $DB->get_record('local_designer_fields', array('cmid' => $mod->id));
-                if ($modulebackdesign) {
-                    if ($modulebackdesign->textcolor) {
-                        $style = "color: $modulebackdesign->textcolor" . ";";
-                    }
+                $textcolor = \format_designer\options::get_option($mod->id, 'textcolor');
+                if ($textcolor) {
+                    $style = "color: $textcolor" . ";";
                 }
             }
             $onclick = htmlspecialchars_decode($mod->onclick, ENT_QUOTES);

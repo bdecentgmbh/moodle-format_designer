@@ -26,14 +26,18 @@
         "id": 3,
         "module": "assign",
         "extraclasses": ""
+        "prostyle": "min-height: 200px"
 
     }
 }}
 
-<div class="activity-block designer">
+<div class="activity-block designer" style="{{#prostyle}} {{{prostyle}}} {{/prostyle}}">
     {{{movehtml}}}
     <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{cm.url}}">
-        <div class="card-body" style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
+        <div class="card-body">
+            <div class="activity-background-style" style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
+            </div>
+
             {{#modbackoverlaycolor}}
             <div class="bg-overlay" style="{{modbackoverlaycolor}}"></div>
             {{/modbackoverlaycolor}}
@@ -43,22 +47,24 @@
                 <div>
                     <div class="activityinstance">
                         {{#modiconurl}}
-                            <div class="img-block">
-                                {{{modiconurl}}}
+                            <div class="img-element {{elementstate.icon}}">
+                                <div class="img-block">
+                                    {{{modiconurl}}}
+                                </div>
                             </div>
                         {{/modiconurl}}
                         <div class="activity-element {{modcontentclass}}">
-                            <div class="activity-type">
-                                <p class="text-capitalize" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">{{modtype}}</p>
+                            <div class="activity-type {{elementstate.modname}}">
+                                <p class="text-capitalize " style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">{{modtype}}</p>
                             </div>
-                            <div class="cmname-block">
+                            <div class="cmname-block {{elementstate.title}}">
                                 {{#cmname}}
                                     {{{cmname}}}
                                 {{/cmname}}
                             </div>
                         </div>
                         {{#modrestricted}}
-                        <div class="availability-info">
+                        <div class="availability-info {{elementstate.calltoaction}}">
                             {{{calltoactionhtml}}}
                         </div>
                         {{/modrestricted}}
@@ -67,24 +73,24 @@
                     {{{beforecontent}}}
 
                     {{#modcontent}}
-                        <div class="mod-content" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">
+                        <div class="mod-content {{elementstate.description}}" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">
                             {{{modcontent}}}
                         </div>
                     {{/modcontent}}
 
                     {{#cmcompletionhtml}}
-                        <div class="completion-html-card">
+                        <div class="completion-html-card {{elementstate.completionbadge}}">
                             {{{cmcompletionhtml}}}
                         </div>
                     {{/cmcompletionhtml}}
 
                     {{#modvisits}}
-                    <div class="mod-visits-block">
+                    <div class="mod-visits-block  {{elementstate.visits}}">
                         <p style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">{{modvisits}}</p>
                     </div>
                     {{/modvisits}}
                     {{^modrestricted}}
-                    <div class="action-html-card">
+                    <div class="action-html-card {{elementstate.calltoaction}}">
                         {{{calltoactionhtml}}}
                     </div>
                     {{/modrestricted}}

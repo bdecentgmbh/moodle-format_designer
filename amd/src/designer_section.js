@@ -55,11 +55,16 @@
         $('body').delegate(self.trimDescription, "click", self.trimmodcontentHandler.bind(this));
         $('body').on('click keypress', SELECTOR.ACTIVITYLI + ' ' +
         SELECTOR.ACTIVITYACTION + '[data-action]', this.editModuleRenderer.bind(this));
+        $('body').delegate(self.goToURL, "click", self.redirectToModule.bind(this));
+
+        this.expandSection();
     };
 
     /**
      * Selector section controller.
      */
+    DesignerSection.prototype.goToURL = '.designer [data-action="go-to-url"]';
+
     DesignerSection.prototype.SectionController = ".designer #section-designer-action .dropdown-menu a";
 
     DesignerSection.prototype.RestrictInfo = ".designer .designer-section-content .call-action-block";
@@ -86,6 +91,43 @@
         }
         return null;
     };
+
+    DesignerSection.prototype.redirectToModule = (event) => {
+        let nodeName = event.target.nodeName;
+        let preventionNodes = ['a', 'button', 'form'];
+        let iscircle = event.target.closest('li.activity').classList.contains('circle-layout');
+        if ((nodeName in preventionNodes) || document.body.classList.contains('editing') || iscircle) {
+            return null;
+        }
+        var card = event.target.closest("[data-action=go-to-url]");
+        let modurl = card.getAttribute('data-url');
+        window.location.href = modurl;
+    }
+    
+    DesignerSection.prototype.expandSection = () => {
+        // alert();
+        var sectionID = window.location.hash;
+        if (sectionID) {
+            var id = sectionID.substring(1);
+            var section = document.getElementById(id);
+            if (section) {
+                var title = section.querySelector('.section-header-content');
+                if (title) {
+                    title.classList.remove('collapsed');
+                    title.setAttribute('aria-expanded', true);
+                }
+                var content = section.querySelector('.content');
+                if (content) {
+                    content.classList.add('show');
+                }
+                if (document.getElementById('section-course-accordion') !== null) {
+                    document.getElementById('section-head-0').classList.add('collapsed');
+                    document.getElementById('section-content-0').classList.remove('show');
+                }
+                section.scrollIntoView();
+            }
+        }
+    }
 
     DesignerSection.prototype.removeSectionSpinner = function(sectioninfo, spinner, delay) {
         var element = $(sectioninfo);

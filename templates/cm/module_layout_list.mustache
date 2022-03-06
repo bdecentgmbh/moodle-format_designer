@@ -30,10 +30,12 @@
     }
 }}
 
-<div class="activity-block designer">
+<div class="activity-block designer" style="{{#prostyle}} {{{prostyle}}} {{/prostyle}}">
     {{{movehtml}}}
     <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{cm.url}}" >
-        <div class="card-body" style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
+        <div class="card-body">
+            <div class="activity-background-style" style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
+            </div>
             {{#modbackoverlaycolor}}
             <div class="bg-overlay" style="{{modbackoverlaycolor}}"></div>
             {{/modbackoverlaycolor}}
@@ -43,21 +45,25 @@
                         <div class="col-12 col-md-7">
                             <div class="activityinstance {{modcontentclass}}">
                                 {{#modiconurl}}
-                                    <div class="img-block">
-                                        {{{modiconurl}}}
+                                    <div class="img-element {{elementstate.icon}}">
+                                        <div class="img-block">
+                                            {{{modiconurl}}}
+                                        </div>
                                     </div>
                                 {{/modiconurl}}
                                 <div class="activity-element">
-                                    <div class="activity-type">
+                                    <div class="activity-type {{elementstate.modname}}">
                                         <p class="text-capitalize" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">{{modtype}}</p>
                                     </div>
-                                    {{#cmname}}
-                                        {{{cmname}}}
-                                    {{/cmname}}
+                                    <div class="cmname-block {{elementstate.title}}">
+                                        {{#cmname}}
+                                            {{{cmname}}}
+                                        {{/cmname}}
+                                    </div>
                                 </div>
 
                                 {{#modrestricted}}
-                                <div class="availability-info">
+                                <div class="availability-info {{elementstate.calltoaction}}">
                                     {{{calltoactionhtml}}}
                                 </div>
                                 {{/modrestricted}}
@@ -65,7 +71,7 @@
                             </div>
                             {{{beforecontent}}}
                             {{#modcontent}}
-                            <div class="mod-content" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">
+                            <div class="mod-content {{elementstate.description}}" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">
                                 {{{modcontent}}}
                             </div>
                             {{/modcontent}}
@@ -74,11 +80,15 @@
                             <div class="row h-100 pull-right">
                                 <div class="col align-self-center">
                                     {{#modvisits}}
-                                    <div class="mod-visits-block">
+                                    <div class="mod-visits-block {{elementstate.visits}}">
                                         <p style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">{{modvisits}}</p>
                                     </div>
                                     {{/modvisits}}
-                                    {{{cmcompletionhtml}}}
+                                    {{#cmcompletionhtml}}
+                                        <div class="completion-html-card {{elementstate.completionbadge}}">
+                                            {{{cmcompletionhtml}}}
+                                        </div>
+                                    {{/cmcompletionhtml}}
                                 </div>
                             </div>
                         </div>
@@ -86,7 +96,9 @@
                             {{^modrestricted}}
                             <div class="row h-100 pull-right">
                                 <div class="col align-self-center">
-                                    {{{calltoactionhtml}}}
+                                    <div class="action-html-card {{elementstate.calltoaction}}">
+                                        {{{calltoactionhtml}}}
+                                    </div>
                                 </div>
                             </div>
                             {{/modrestricted}}
