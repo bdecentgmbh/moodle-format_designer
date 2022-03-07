@@ -21,6 +21,10 @@
  * @copyright  2021 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace format_designer;
+
+use context_course;
+use \format_designer\options;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -34,7 +38,7 @@ require_once($CFG->dirroot . '/course/lib.php');
  * @copyright  2021 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class format_designer_options_testcase extends advanced_testcase {
+class options_test extends \advanced_testcase {
 
     /**
      * Setup testing cases.
@@ -44,7 +48,7 @@ class format_designer_options_testcase extends advanced_testcase {
     public function setUp(): void {
         global $CFG;
 
-        $this->resetAfterTest(false);
+        $this->resetAfterTest(true);
         // Remove the output display of cron task.
         $this->course = $this->getDataGenerator()->create_course(['format' => 'designer', 'enablecompletion' => 1]);
         $this->coursecontext = context_course::instance($this->course->id);
@@ -62,12 +66,12 @@ class format_designer_options_testcase extends advanced_testcase {
             'name' => 'Test page', 'content' => 'Test the module element avilabilities are available',
             'designer_activityelements' => $elements
         ]);
-        $option = format_designer\options::get_option($module->cmid, 'activityelements');
-        $isjson = format_designer\options::is_json($option);
+        $option = \format_designer\options::get_option($module->cmid, 'activityelements');
+        $isjson = \format_designer\options::is_json($option);
         $this->assertTrue($isjson);
 
         $string = 'Notjson';
-        $isjson = format_designer\options::is_json($string);
+        $isjson = \format_designer\options::is_json($string);
         $this->assertNotTrue($isjson);
     }
 
@@ -88,7 +92,7 @@ class format_designer_options_testcase extends advanced_testcase {
         $field = $DB->get_field('format_designer_options', 'value', ['name' => 'activityelements', 'cmid' => $module->cmid]);
         $this->assertEquals($elements, json_decode($field, true));
 
-        $option = format_designer\options::get_option($module->cmid, 'activityelements');
+        $option = \format_designer\options::get_option($module->cmid, 'activityelements');
         $this->assertEquals($elements, json_decode($option, true));
 
         $classes = $PAGE->get_renderer('format_designer')->get_activity_elementclasses((object)['id' => $module->cmid]);
@@ -120,10 +124,10 @@ class format_designer_options_testcase extends advanced_testcase {
         $iscompleted = \format_designer\options::is_mod_completed($cm);
         $this->assertFalse($iscompleted);
 
-        $c = new completion_info($this->course);
+        $c = new \completion_info($this->course);
 
         // 1) Test with new data.
-        $data = new stdClass();
+        $data = new \stdClass();
         $data->id = 0;
         $data->userid = $user1->id;
         $data->coursemoduleid = $cm->id;
@@ -163,10 +167,10 @@ class format_designer_options_testcase extends advanced_testcase {
         $iscompleted = \format_designer\options::is_section_completed($section, $this->course, $modinfo, true);
         $this->assertFalse($iscompleted);
 
-        $c = new completion_info($this->course);
+        $c = new \completion_info($this->course);
         $cm = $modinfo->get_cm($module->cmid);
         // 1) Test with new data.
-        $data = new stdClass();
+        $data = new \stdClass();
         $data->id = 0;
         $data->userid = $user1->id;
         $data->coursemoduleid = $cm->id;
@@ -179,10 +183,10 @@ class format_designer_options_testcase extends advanced_testcase {
         $iscompleted = \format_designer\options::is_section_completed($section, $this->course, $modinfo, true);
         $this->assertNotTrue($iscompleted);
 
-        $c = new completion_info($this->course);
+        $c = new \completion_info($this->course);
         $cm = $modinfo->get_cm($module2->cmid);
         // 1) Test with new data.
-        $data = new stdClass();
+        $data = new \stdClass();
         $data->id = 0;
         $data->userid = $user1->id;
         $data->coursemoduleid = $cm->id;
@@ -196,17 +200,4 @@ class format_designer_options_testcase extends advanced_testcase {
         $this->assertTrue($iscompleted);
     }
 
-    /**
-     * Test case for the activity minimum height settings.
-     */
-    public function test_minheightelements() {
-        global $DB;
-        $module = $this->getDataGenerator()->create_module('page', ['course' => $this->course, 'section' => 1,
-            'name' => 'Test page',
-            'content' => 'Test the module element avilabilities are available',
-            'designer_minheight' => '200px'
-        ]);
-        $field = $DB->get_field('format_designer_options', 'value', ['name' => 'minheight', 'cmid' => $module->cmid]);
-        $this->assertEquals('200px', $field);
-    }
 }
