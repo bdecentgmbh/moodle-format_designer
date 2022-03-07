@@ -34,7 +34,7 @@ require_once($CFG->dirroot . '/course/lib.php');
  * @copyright  2021 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class format_designer_optionstest extends advanced_testcase {
+class format_designer_options_testcase extends advanced_testcase {
 
     /**
      * Setup testing cases.
