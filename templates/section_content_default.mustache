@@ -25,7 +25,8 @@
     }
 }}
 <ul class="section img-text link-layout {{sectioncontentlayout}} designer-section-content" data-sectionlayout="{{sectionlayoutclass}}"
-    style="{{#sectioncontentwidth}} {{sectioncontentwidth}} {{/sectioncontentwidth}}">
+    style="{{#sectioncontentwidth}} {{sectioncontentwidth}} {{/sectioncontentwidth}}
+    {{#prosectionstyle}} {{{prosectionstyle}}} {{/prosectionstyle}}">
     {{#cmlist}}
         {{#modstatus}}
         <li id="{{id}}" class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}}">

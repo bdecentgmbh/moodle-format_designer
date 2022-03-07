@@ -20,17 +20,22 @@
     Displays the course module card layout
 
     Example context (json):
-    {
-        "reactionurl_dislike": "http://moodleurl/course/format/designer/renderer.php"
+    {        
+        "sectiondesigntextcolor": "color: #fff",
+        "sectionheaderstyle": "min-height:100px;"
     }
 }}
 
-{{#bgoverlay}}
+<div class="section-content-wrapper">
 {{#sectiondesignwhole}}
-<div class="bg-overlay" style="{{bgoverlay}}">
-</div>
+    <div class="section-background-style section-design-whole" style="{{#sectionbackgroundstyle}} {{sectionbackgroundstyle}} {{/sectionbackgroundstyle}}">
+    </div>
+
+    {{#bgoverlay}}
+    <div class="bg-overlay" style="{{bgoverlay}}">
+    </div>
+    {{/bgoverlay}}
 {{/sectiondesignwhole}}
-{{/bgoverlay}}
 
 <div class="left side">
     {{{leftcontent}}}
@@ -48,14 +53,23 @@
     aria-expanded="false"
     aria-controls="section-head-{{section.section}}"
     role="contentinfo"
-    style="{{#sectiondesignheader}} {{sectionbackgroundstyle}} {{/sectiondesignheader}}">
+    style="{{sectionheaderstyle}}"
+    >
+
+    {{#sectiondesignheader}} 
+        <div class="section-background-style sectiondesign-header" style="{{sectionbackgroundstyle}}"></div>
+    {{/sectiondesignheader}}
+        {{#sectioncollapse}}
+        <span class="section-collapse-icon" style="{{{sectiondesigntextcolor}}}"></span>
+        {{/sectioncollapse}}
 
         {{#bgoverlay}}
         {{^sectiondesignwhole}}
-        <div class="bg-overlay" style="{{bgoverlay}}">
-        </div>
+            <div class="bg-overlay" style="{{bgoverlay}}">
+            </div>
         {{/sectiondesignwhole}}
         {{/bgoverlay}}
+
         {{^section.hidesectiontitle}}
         {{#sectionname}}
             <h3 id="sectionid-{{section.id}}-title" class="sectionname">
@@ -111,4 +125,4 @@
 
     {{/content}}
 </div>
-
+</div>

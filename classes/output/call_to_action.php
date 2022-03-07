@@ -80,7 +80,7 @@ class call_to_action extends cm_completion {
         $cmid = $this->get_cm()->id;
         $actiontextcolor = '';
         if (format_designer_has_pro()) {
-            $moduledesign = $DB->get_record('local_designer_fields', array('cmid' => $cmid));
+            $moduledesign = \format_designer\options::get_options($cmid);
             if ($moduledesign) {
                 $actiontextcolor = !empty($moduledesign->textcolor) ? "color: ". $moduledesign->textcolor . ";" : '';
             }

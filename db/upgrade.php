@@ -31,6 +31,7 @@
 function xmldb_format_designer_upgrade($oldversion) {
     global $CFG, $DB;
 
+    $dbman = $DB->get_manager();
     // Automatically generated Moodle v3.5.0 release upgrade line.
     // Put any upgrade step following this.
 
@@ -48,6 +49,31 @@ function xmldb_format_designer_upgrade($oldversion) {
 
     // Automatically generated Moodle v3.10.0 release upgrade line.
     // Put any upgrade step following this.
+
+    if ($oldversion < 2022020301) {
+
+        $table = new xmldb_table('format_designer_options');
+
+        // Adding fields to table designer options.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('cmid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('value', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        // Conditionally launch create table for designer activity customfields.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+            if (format_designer_has_pro()) {
+                designer_update_prodata();
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2022020301, 'format', 'designer');
+    }
 
     return true;
 }
