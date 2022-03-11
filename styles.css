@@ -247,6 +247,7 @@
 .format-designer ul.designer li.activity .activity-block .card .show-on-hover .col a,
 .format-designer ul.designer li.activity .activity-block .card:hover .show-on-hover .col a {
     font-size: 12px;
+    line-height: 24px;
     color: #000;
     text-decoration: none;
     box-shadow: none;
@@ -491,7 +492,7 @@ span.section-collapse-icon:before {
 }
 
 
-@media (min-width: 1200px) {
+@media (max-width: 1399px) {
     .format-designer .course-content ul.designer li.section.main.container {
         max-width: 1240px;
     }
@@ -704,6 +705,36 @@ ul li {
 .format-designer .designer .section.img-text .activity:hover .activityinstance .img-element.content-hide-hover .img-block {
     visibility: hidden;
 }
+.format-designer .designer .section.img-text.circles-layout .activity .activityinstance .img-element.content-hide .img-block,
+.format-designer .designer .section.img-text.circles-layout .activity .activityinstance .img-element.content-show-hover .img-block,
+.format-designer .designer .section.img-text.circles-layout .activity:hover .activityinstance .img-element.content-hide-hover .img-block {
+    background: none;
+}
+.format-designer .designer .section.img-text.circles-layout .activity:hover .activityinstance .img-element.content-show-hover .img-block,
+.format-designer .designer .section.img-text.circles-layout .activity .activityinstance .img-element.content-hide-hover .img-block {
+    background: #eee;
+}
+.format-designer .designer .section.img-text.circles-layout .activity .activityinstance .img-element.content-show .img-block,
+.format-designer .designer .section.img-text.circles-layout .activity .activityinstance .img-element.content-hide .img-block,
+.format-designer .designer .section.img-text.circles-layout .activity .activityinstance .img-element.content-show-hover .img-block,
+.format-designer .designer .section.img-text.circles-layout .activity .activityinstance .img-element.content-hide-hover .img-block {
+    visibility: visible;
+}
+.format-designer .designer .section.img-text.circles-layout .activity .activityinstance .img-element.content-show .img-block .mod-icon-url {
+    visibility: visible;
+}
+.format-designer .designer .section.img-text.circles-layout .activity .activityinstance .img-element.content-hide .img-block .mod-icon-url {
+    visibility: hidden;
+}
+.format-designer .designer .section.img-text.circles-layout .activity .activityinstance .img-element.content-show-hover .img-block .mod-icon-url {
+    visibility: hidden;
+}
+.format-designer .designer .section.img-text.circles-layout .activity:hover .activityinstance .img-element.content-show-hover .img-block .mod-icon-url {
+    visibility: visible;
+}
+.format-designer .designer .section.img-text.circles-layout .activity:hover .activityinstance .img-element.content-hide-hover .img-block .mod-icon-url {
+    visibility: hidden;
+}
 .format-designer .designer .section.img-text.link-layout .activity .activityinstance .img-block {
     display: inline-block;
     background: none;
@@ -747,10 +778,12 @@ ul li {
 .format-designer .designer .section.img-text.list-layout .activity .availabilityinfo {
     opacity: .5;
 }
-.format-designer .designer .section.list-layout .activity .actions,
-.format-designer .designer .section.card-layout .activity .actions {
+.format-designer .designer .section.list-layout .activity .actions {
     top: 15px;
     right: 40px;
+}
+.format-designer .designer .section.card-layout .activity .actions {
+    right: 10px;
 }
 .format-designer .designer .section.list-layout .activity .aalink img.activityicon,
 .format-designer .designer .section.card-layout .activity .aalink img.activityicon {
@@ -1372,6 +1405,12 @@ ul li {
 body.format-designer.editing .designer .section .content .section.card-layout li.activity .card-list {
     cursor: default;
 }
+body.format-designer.editing .designer .section .content .section.card-layout li.activity .card-list .card-body {
+    padding-top: 40px;
+}
+.format-designer .designer .section .content .section.card-layout li.activity.label .activity-block.designer .contentwithoutlink {
+    width: 100%;
+}
 
 @media (min-width: 1500px) {
     .format-designer .designer .section.container-full .content.show .section.circles-layout li.activity {
@@ -1784,10 +1823,14 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     top: 0;
     left: 20px;
 }
-.format-designer .designer .section-design-whole .mod-content a,
-.format-designer .designer .section-design-header .mod-content a {
+.format-designer .designer .section-design-whole .mod-content .trim-summary a,
+.format-designer .designer .section-design-header .mod-content .trim-summary a {
     color: var(--sectioncolor);
-    cursor: grab;
+    cursor: zoom-in;
+}
+.format-designer .designer .section-design-whole .mod-content .fullcontent-summary a,
+.format-designer .designer .section-design-header .mod-content .fullcontent-summary a {
+    cursor: zoom-out;
 }
 
 @media (min-width: 992px) and (max-width: 1366px) {
@@ -1816,6 +1859,9 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 .format-designer .course-info-block {
     padding: 15px;
     clear: both;
+}
+.format-designer.path-course-view .completionprogress {
+    margin-bottom: 15px;
 }
 .format-designer .course-info-block > div {
     width: 23%;
@@ -1907,8 +1953,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 
 .format-designer .course-content ul.designer.kanban-board {
     padding: 0 15px;
-    overflow: auto;
-    display: flex;
 }
 .format-designer .course-content ul.designer.kanban-board li.section.main {
     min-width: 800px;
@@ -1920,6 +1964,27 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     border-radius: 10px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, .3);
     align-self: flex-start;
+    flex: none;
+}
+.format-designer .course-content ul.designer.kanban-board li.section.main#section-0 {
+    max-width: none;
+    margin-bottom: 0;
+    background: none;
+    box-shadow: none;
+}
+.format-designer .course-content ul.designer.kanban-board .kanban-board-activities {
+    overflow: auto;
+    display: flex;
+}
+.format-designer .course-content ul.designer.kanban-board li.section.main .section-background-style,
+.format-designer .course-content ul.designer.kanban-board li.section.main .bg-overlay {
+    border-radius: 10px;
+}
+.format-designer .course-content ul.designer.kanban-board li.section .section-progress-info {
+    margin-top: 10px;
+}
+.format-designer .course-content ul.designer.kanban-board li.section .section-progress-info .progress {
+    background: var(--white);
 }
 .format-designer .course-content ul.designer.kanban-board li.section .content .section-modchooser {
     text-align: left;

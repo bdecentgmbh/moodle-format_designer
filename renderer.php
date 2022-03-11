@@ -37,6 +37,13 @@ require_once($CFG->dirroot.'/course/format/renderer.php');
 class format_designer_renderer extends format_section_renderer_base {
 
     /**
+     * Course modinfo instance.
+     *
+     * @var course_modinfo
+     */
+    public $modinfo;
+
+    /**
      * Constructor method, calls the parent constructor.
      *
      * @param moodle_page $page
@@ -502,17 +509,11 @@ class format_designer_renderer extends format_section_renderer_base {
                 'courseprogress' => ($course->activityprogress) ? $courseprogress : '',
             ];
         }
-
-        if (is_timemanagement_installed() && function_exists('ltool_timemanagement_cal_course_duedate')) {
+        // Find the course due date. only if the timemanagement installed.
+        if (format_designer_timemanagement_installed() && function_exists('ltool_timemanagement_cal_course_duedate')) {
             $coursedatesinfo = $DB->get_record('ltool_timemanagement_course', array('course' => $course->id));
             if ($course->courseduedate && $coursedatesinfo) {
                 $data['courseduedate'] = ltool_timemanagement_cal_course_duedate($coursedatesinfo, $enrolstartdate);
-                if (empty($data['courseduedate'])) {
-                    $expectedcompletion = $courseprogress['completiondate'] ?? '';
-                    if (!empty($expectedcompletion)) {
-                        $data['courseduedate'] = $expectedcompletion;
-                    }
-                }
             }
             $data['due'] = ltool_timemanagement_get_due_overdue_course($course->id, $USER->id);
         }
@@ -531,25 +532,28 @@ class format_designer_renderer extends format_section_renderer_base {
     protected function activity_progress($course, $userid) {
         $completion = new \completion_info($course);
         // First, let's make sure completion is enabled.
-        if (!$completion->is_enabled() || !$completion->is_tracked_user($userid)) {
+        if (!$completion->is_enabled()) {
             return null;
         }
         $result = [];
-        $completiondate = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_DATE);
-        if (!empty($completiondate)) {
-            $result['completiondate'] = current($completiondate)->timeend ?? '';
-        }
+
         // Get the number of modules that support completion.
         $modules = $completion->get_activities();
-        $count = count($modules);
+        $completionactivities = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY);
+
+        $count = count($completionactivities);
         if (!$count) {
             return null;
         }
         // Get the number of modules that have been completed.
         $completed = 0;
-        foreach ($modules as $module) {
-            $data = $completion->get_data($module, true, $userid);
-            $completed += $data->completionstate == COMPLETION_INCOMPLETE ? 0 : 1;
+        foreach ($completionactivities as $activity) {
+            $cmid = $activity->moduleinstance;
+
+            if (isset($modules[$cmid])) {
+                $data = $completion->get_data($modules[$cmid], true, $userid);
+                $completed += $data->completionstate == COMPLETION_INCOMPLETE ? 0 : 1;
+            }
         }
         $percent = ($completed / $count) * 100;
 
@@ -568,6 +572,7 @@ class format_designer_renderer extends format_section_renderer_base {
     public function print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused) {
 
         $modinfo = get_fast_modinfo($course);
+        $this->modinfo = $modinfo;
         $course = course_get_format($course)->get_course();
         $context = context_course::instance($course->id);
         // Display the time management plugin widget.
@@ -592,6 +597,7 @@ class format_designer_renderer extends format_section_renderer_base {
         echo $this->start_section_list($sectioncollapse, $startclass);
         $numsections = course_get_format($course)->get_last_section_number();
         foreach ($modinfo->get_section_info_all() as $section => $thissection) {
+
             if ($section > $numsections) {
                 // Activities inside this section are 'orphaned', this section will be printed as 'stealth' below.
                 continue;
@@ -612,7 +618,14 @@ class format_designer_renderer extends format_section_renderer_base {
             } else {
                 echo $this->render_section($thissection, $course, false);
             }
-
+            if ($course->coursetype && $section == 0) {
+                echo html_writer::start_div('kanban-board-activities');
+                $kanbanactivities = true;
+            }
+        }
+        // Close the kanban board items.
+        if (isset($kanbanactivities)) {
+            echo html_writer::end_div();
         }
         if ($this->page->user_is_editing() and has_capability('moodle/course:update', $context)) {
 
@@ -633,7 +646,7 @@ class format_designer_renderer extends format_section_renderer_base {
         } else {
             echo $this->end_section_list();
         }
-
+        format_designer_editsetting_style($this->page);
     }
 
     /**
@@ -647,7 +660,9 @@ class format_designer_renderer extends format_section_renderer_base {
      * @param int $displaysection The section number in the course which is being displayed
      */
     public function print_single_section_page($course, $sections, $mods, $modnames, $modnamesused, $displaysection) {
+
         $modinfo = get_fast_modinfo($course);
+        $this->modinfo = $modinfo;
         $course = course_get_format($course)->get_course();
         $context = context_course::instance($course->id);
         // Can we view the section in question?
@@ -712,6 +727,8 @@ class format_designer_renderer extends format_section_renderer_base {
 
         // Close single-section div.
         echo html_writer::end_tag('div');
+
+        format_designer_editsetting_style($this->page);
     }
 
     /**
@@ -902,7 +919,7 @@ class format_designer_renderer extends format_section_renderer_base {
         }
 
         // Calculate section width for single section format.
-        $section->widthclass = ($course->coursedisplay && !$this->page->user_is_editing())
+        $section->widthclass = ($course->coursedisplay && !$this->page->user_is_editing() && !$onsectionpage)
             ? $this->generate_section_widthclass($section) : '';
 
         $templatecontext = [
