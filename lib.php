@@ -375,7 +375,7 @@ class format_designer extends format_base {
                     ],
                     'help' => 'enrolmentstartdate',
                     'help_component' => 'format_designer',
-                    
+
                 ],
                 'enrolmentenddate' => [
                     'label' => new lang_string('enrolmentenddate', 'format_designer'),
@@ -388,7 +388,7 @@ class format_designer extends format_base {
                     ],
                     'help' => 'enrolmentenddate',
                     'help_component' => 'format_designer',
-                    
+
                 ],
                 'coursecompletiondate' => [
                     'label' => new lang_string('coursecompletiondate', 'format_designer'),
@@ -402,7 +402,7 @@ class format_designer extends format_base {
                     'help' => 'coursecompletiondate',
                     'help_component' => 'format_designer',
                     'disabledif' => ['enablecompletion', 'neq', 1],
-                    
+
                 ],
 
                 'activityprogress' => [
@@ -417,7 +417,7 @@ class format_designer extends format_base {
                     'help' => 'activityprogress',
                     'help_component' => 'format_designer',
                     'disabledif' => ['enablecompletion', 'neq', 1],
-                    
+
                 ],
                 'coursetype' => [
                     'label' => new lang_string('coursetype', 'format_designer'),
