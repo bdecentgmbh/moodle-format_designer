@@ -92,11 +92,14 @@
         return null;
     };
 
-    DesignerSection.prototype.redirectToModule = (event) => {
+    DesignerSection.prototype.redirectToModule = function(event) {
         let nodeName = event.target.nodeName;
         let preventionNodes = ['a', 'button', 'form'];
         let iscircle = event.target.closest('li.activity').classList.contains('circle-layout');
-        if ((nodeName in preventionNodes) || document.body.classList.contains('editing') || iscircle) {
+        let isDescription = event.target.classList.contains('mod-description-action');
+        let isPadlock = event.target.classList.contains('fa-lock');
+        if ((nodeName in preventionNodes)
+            || document.body.classList.contains('editing') || iscircle || isDescription || isPadlock) {
             return null;
         }
         var card = event.target.closest("[data-action=go-to-url]");

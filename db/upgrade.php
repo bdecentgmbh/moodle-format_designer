@@ -68,7 +68,7 @@ function xmldb_format_designer_upgrade($oldversion) {
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
             if (format_designer_has_pro()) {
-                designer_update_prodata();
+                local_designer_update_prodata();
             }
         }
 

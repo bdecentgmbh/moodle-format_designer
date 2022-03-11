@@ -216,11 +216,14 @@ class cm_completion implements renderable, templatable {
     }
 
     /**
-     * Get when cm must be completed by.
+     * Get when cm must be completed by. Check is timemanagement tool contains any duedates for this module.
      *
      * @return int
      */
     final public function get_completion_expected(): int {
+        if ($duedate = \format_designer\options::timetool_duedate($this->cm)) {
+            return $duedate;
+        }
         return $this->cm->completionexpected;
     }
 

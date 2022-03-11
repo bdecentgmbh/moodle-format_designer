@@ -264,16 +264,15 @@ class format_designer extends format_base {
                     'type' => PARAM_INT,
                 ],
                 'enrolmentstartdate' => [
-                    'default' => 1,
+                    'default' => 0,
                     'type' => PARAM_INT
                 ],
-
                 'enrolmentenddate' => [
-                    'default' => 1,
+                    'default' => 0,
                     'type' => PARAM_INT
                 ],
                 'coursecompletiondate' => [
-                    'default' => 1,
+                    'default' => 0,
                     'type' => PARAM_INT
                 ],
                 'coursecompletiondateinfo' => [
@@ -282,16 +281,16 @@ class format_designer extends format_base {
                     'label' => new lang_string('coursecompletiondate', 'format_designer'),
                 ],
                 'courseduedate' => [
-                    'default' => $courseconfig->courseduedate ?? 0,
+                    'default' => 0,
                     'type' => PARAM_INT
                 ],
                 'courseduedateinfo' => [
                     'default' => get_string('timemanagementmissing', 'format_designer'),
-                    'type' => PARAM_TEXT,
+                    'type' => PARAM_RAW_TRIMMED,
                     'label' => new lang_string('courseduedate', 'format_designer'),
                 ],
                 'activityprogress' => [
-                    'default' => $courseconfig->activityprogress ?? 0,
+                    'default' => 0,
                     'type' => PARAM_INT
                 ],
                 'coursetype' => [
@@ -336,6 +335,8 @@ class format_designer extends format_base {
                             1 => new lang_string('enable')
                         )
                     ],
+                    'disabledif' => ['coursetype', 'neq', 0],
+                    'default' => '0'
                 ],
 
                 'accordion' => [
@@ -374,6 +375,7 @@ class format_designer extends format_base {
                     ],
                     'help' => 'enrolmentstartdate',
                     'help_component' => 'format_designer',
+
                 ],
                 'enrolmentenddate' => [
                     'label' => new lang_string('enrolmentenddate', 'format_designer'),
@@ -384,8 +386,9 @@ class format_designer extends format_base {
                             0 => new lang_string('hide'),
                         ],
                     ],
-                    'help' => 'enrolmentstartdate',
+                    'help' => 'enrolmentenddate',
                     'help_component' => 'format_designer',
+
                 ],
                 'coursecompletiondate' => [
                     'label' => new lang_string('coursecompletiondate', 'format_designer'),
@@ -398,7 +401,8 @@ class format_designer extends format_base {
                     ],
                     'help' => 'coursecompletiondate',
                     'help_component' => 'format_designer',
-                    'disabledif' => ['enablecompletion', 'neq', 1]
+                    'disabledif' => ['enablecompletion', 'neq', 1],
+
                 ],
 
                 'activityprogress' => [
@@ -412,7 +416,8 @@ class format_designer extends format_base {
                     ],
                     'help' => 'activityprogress',
                     'help_component' => 'format_designer',
-                    'disabledif' => ['enablecompletion', 'neq', 1]
+                    'disabledif' => ['enablecompletion', 'neq', 1],
+
                 ],
                 'coursetype' => [
                     'label' => new lang_string('coursetype', 'format_designer'),
@@ -423,12 +428,12 @@ class format_designer extends format_base {
                             1 => new lang_string('kanbanboard', 'format_designer'),
                         ],
                     ],
-                    'help' => 'activityprogress',
+                    'help' => 'coursetype',
                     'help_component' => 'format_designer',
                 ]
             ];
 
-            if (is_timemanagement_installed()) {
+            if (format_designer_timemanagement_installed()) {
                 $courseformatoptionsedit['courseduedate'] = [
                     'label' => new lang_string('courseduedate', 'format_designer'),
                     'element_type' => 'select',
@@ -440,6 +445,7 @@ class format_designer extends format_base {
                     ],
                     'help' => 'courseduedate',
                     'help_component' => 'format_designer',
+                    'default' => 0
                 ];
                 $courseformatoptionsedit['courseduedateinfo'] = [
                     'element_type' => 'hidden',
@@ -572,7 +578,7 @@ class format_designer extends format_base {
      * @return array
      */
     public function section_format_options($foreditform = false) {
-        global $CFG, $COURSE;
+        global $CFG;
         $sectionoptions = array(
             'sectiontype' => array(
                 'type' => PARAM_ALPHA,
@@ -588,6 +594,13 @@ class format_designer extends format_base {
             3 => '25%',
             4 => '20%'
         ];
+        $sectionoptions['sectionlayoutheader'] = array(
+            'type' => PARAM_TEXT,
+            'element_type' => 'header',
+            'default' => get_string('sectionlayouts', 'format_designer'),
+            'label' => '',
+        );
+
         foreach (['desktop' => 5, 'tablet' => 3, 'mobile' => 2] as $name => $size) {
             $name = $name.'width';
             $availablewidth = array_slice($width, 0, $size);
@@ -599,14 +612,14 @@ class format_designer extends format_base {
                 'element_attributes' => [
                    $availablewidth
                 ],
-                'help' => 'activityprogress',
+                'help' => $name,
                 'help_component' => 'format_designer',
             ];
         }
         // Include pro feature options for section.
         if (format_designer_has_pro()) {
             require_once($CFG->dirroot."/local/designer/lib.php");
-            $prosectionoptions = get_pro_section_options();
+            $prosectionoptions = local_designer_get_pro_section_options();
             $sectionoptions = array_merge($sectionoptions, $prosectionoptions);
         }
         return $sectionoptions;
@@ -623,8 +636,10 @@ class format_designer extends format_base {
      */
     public function update_section_format_options($data) {
         global $COURSE;
-        $data = (array)$data;
-
+        $data = (array) $data;
+        if (empty($data['sectionlayoutheader'])) {
+            $data['sectionlayoutheader'] = get_string('sectionlayouts', 'format_designer');
+        }
         if (format_designer_has_pro()) {
             local_designer\options::update_section_format_options($data);
         }
@@ -1065,7 +1080,7 @@ function format_designer_pluginfile($course, $cm, $context, $filearea, $args, $f
  * @param admin_settingspage $settings Admin format settings.
  * @return void
  */
-function designer_include_prosettings($settings) {
+function format_designer_include_prosettings($settings) {
     global $CFG, $DB;
     if (format_designer_has_pro() && file_exists($CFG->dirroot.'/local/designer_pro/setting.php')) {
         require_once($CFG->dirroot.'/local/designer_pro/setting.php');
@@ -1150,12 +1165,35 @@ function format_designer_coursemodule_edit_post_actions($data, $course) {
  *
  * @return bool result of the time management plugin availability.
  */
-function is_timemanagement_installed() {
-    global $DB;
+function format_designer_timemanagement_installed() {
+    global $DB, $CFG;
     $tools = \core_plugin_manager::instance()->get_subplugins_of_plugin('local_learningtools');
     if (in_array('ltool_timemanagement', array_keys($tools))) {
         $status = $DB->get_field('local_learningtools_products', 'status', ['shortname' => 'timemanagement']);
+        if ($status) {
+            require_once($CFG->dirroot.'/local/learningtools/ltool/timemanagement/lib.php');
+        }
         return ($status) ? true : false;
     }
     return false;
+}
+
+
+/**
+ * Fix the edit settings dropdown menu. due to the Moodle CI, can't able to add it to the styles.css
+ *
+ * @param moodle_page $page
+ * @return void
+ */
+function format_designer_editsetting_style($page) {
+    if ($page->user_is_editing()) {
+        // Fixed the overlapping issue by make this css rule as important. Moodle CI doesn't allow important.
+        $style = '.format-designer .course-content ul.designer li.section .right .dropdown .dropdown-menu {';
+        $style .= 'top: -40px !important;left: auto !important;right: 40px !important;transform: none !important;';
+        $style .= '}';
+        $style .= '.format-designer .designer .section .activity .actions .menubar .dropdown .dropdown-menu {';
+        $style .= 'top: -40px !important;left: auto !important;right: 40px !important;transform: none !important;';
+        $style .= '}';
+        echo html_writer::tag('style', $style, []);
+    }
 }

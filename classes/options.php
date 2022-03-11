@@ -177,4 +177,19 @@ class options {
         }
     }
 
+    /**
+     * Get timemanagement tools due date for the module.
+     *
+     * @param cm_info $cm
+     * @return int|bool Mod due date if available otherwiser returns false.
+     */
+    public static function timetool_duedate($cm) {
+        global $USER;
+        if (format_designer_timemanagement_installed() && function_exists('ltool_timemanagement_get_mod_user_info')) {
+            $data = ltool_timemanagement_get_mod_user_info($cm, $USER->id);
+            return $data['duedate'] ?? false;
+        }
+        return false;
+    }
+
 }

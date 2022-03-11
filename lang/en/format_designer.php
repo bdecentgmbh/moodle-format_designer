@@ -189,15 +189,16 @@ $string['backgroundsize_help'] = 'Background image will displayed in the size';
 $string['backgroundrepeat_help'] = 'Background image will displayed repeated if not fit with section block';
 
 $string['enrolmentstartdate'] = 'Enrolment start date';
-$string['enrolmentstartdate_help'] = 'Enrolment start date';
+$string['enrolmentstartdate_help'] = 'User current course enrolment start date will be displayed in top of the course.';
 $string['enrolmentenddate'] = 'Enrolment end date';
-$string['enrolmentenddate_help'] = 'Enrolment end date';
+$string['enrolmentenddate_help'] = 'User course enrolment end date will be displayed in top of the coures.';
 $string['coursecompletiondate'] = 'Course completion date';
-$string['coursecompletiondate_help'] = 'Course completion date';
+$string['coursecompletiondate_help'] = 'Student date of course completion displayed in time section.';
 $string['courseduedate'] = 'Course due date';
-$string['courseduedate_help'] = 'Course due date';
+$string['courseduedate_help'] = 'Course due date will shown in course timesection,
+it only works when Learning tools and time management tool will be installed and enabled';
 $string['activityprogress'] = 'Activity progress';
-$string['activityprogress_help'] = 'Activity progress';
+$string['activityprogress_help'] = 'Activities completion progress.';
 
 $string['activity:icon'] = 'Activity icon';
 $string['activity:visits'] = 'Activity visits';
@@ -209,9 +210,17 @@ $string['activity:completionbadge'] = 'Activity completion badge';
 $string['hideonhover'] = 'Hide on hover';
 $string['showonhover'] = 'Show on hover';
 $string['mobilewidth'] = 'Section width in phone size';
+$string['mobilewidth_help'] = 'Section will be displayed in the selected width in phone size,
+Only works for the one section per page.';
 $string['desktopwidth'] = 'Section width in desktop size';
+$string['desktopwidth_help'] = 'Section will be displayed in the selected width in desktop size,
+Only works for the one section per page.';
 $string['tabletwidth'] = 'Section width in tablet size';
+$string['tabletwidth_help'] = 'Section will be displayed in the selected width in tablet size,
+Only works for the one section per page.';
 $string['coursetype'] = 'Course type';
+$string['coursetype_help'] = 'Kanban board sets as course type, course sections will displayed horizontally.
+Collapsible sections are not working in kanban mode.';
 $string['kanbanboard'] = 'Kanban Board';
 $string['usecompletionbg'] = 'Use different background for completion';
 $string['activityelementsdisplay'] = '<h5 class="font-weight-normal font-italic pt-2 pb-2" > Activity Elements Visibility Styles </h5>';
@@ -223,7 +232,7 @@ $string['sectionbackgroundheader'] = '<h5 class="font-weight-normal font-italic 
 $string['masksize_help'] = 'Enter any of background size property to display the mask in that size.';
 $string['maskposition_help'] = 'Use any of background position property to display the mask in that position';
 $string['maskimage_help'] = 'Selected mask image will displayed in section block.';
-$string['timemanagementmissing'] = 'Learning tools pro required for this feature. Learn more.';
+$string['timemanagementmissing'] = 'Learning Tools Pro required for this feature. <a href="https://bdecent.de/product/learning-tools-pro/">Learn more</a>.';
 $string['completiontrackingmissing'] = 'Turn on completion tracking to display completion date.';
 $string['coursestartdate'] = 'Course start date';
 $string['courseduedate'] = 'Course due date';
