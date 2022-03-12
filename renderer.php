@@ -27,7 +27,7 @@ use format_designer\output\cm_completion;
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/course/format/renderer.php');
-
+require_once($CFG->dirroot.'/course/format/designer/lib.php');
 /**
  * Basic renderer for Designer format.
  *

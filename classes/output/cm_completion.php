@@ -249,7 +249,7 @@ class cm_completion implements renderable, templatable {
      * @return bool
      */
     final public function is_overdue(): bool {
-        return $this->get_completion_expected() > 0 && $this->get_completion_expected() + 86400 < time();
+        return $this->get_completion_expected() > 0 && $this->get_completion_expected() < time();
     }
 
     /**
@@ -267,8 +267,8 @@ class cm_completion implements renderable, templatable {
      * @return bool
      */
     final public function is_due_today(): bool {
-        return $this->get_completion_expected() > 0 && $this->get_completion_expected() > time() &&
-             $this->get_completion_expected() - time() < 86400;
+        return $this->get_completion_expected() > 0 &&
+            (date('y-m-d', $this->get_completion_expected()) == date('y-m-d'));
     }
 
     /**
