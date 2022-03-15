@@ -24,6 +24,8 @@
 
 namespace format_designer;
 
+require_once($CFG->dirroot.'/course/format/designer/lib.php');
+
 use format_designer\output\cm_completion;
 
 /**
