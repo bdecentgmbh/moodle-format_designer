@@ -56,7 +56,9 @@
         $('body').on('click keypress', SELECTOR.ACTIVITYLI + ' ' +
         SELECTOR.ACTIVITYACTION + '[data-action]', this.editModuleRenderer.bind(this));
         $('body').delegate(self.goToURL, "click", self.redirectToModule.bind(this));
-
+        window.onhashchange = function() {
+            self.expandSection();
+        };
         this.expandSection();
     };
 

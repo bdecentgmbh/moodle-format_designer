@@ -252,7 +252,7 @@ class format_designer extends format_base {
                     'type' => PARAM_INT,
                 ],
                 'sectioncollapse' => [
-                    'default' => isset($courseconfig->sectioncollapse) ? $courseconfig->sectioncollapse : 0,
+                    'default' => 0,
                     'type' => PARAM_INT
                 ],
                 'accordion' => [
@@ -336,7 +336,6 @@ class format_designer extends format_base {
                         )
                     ],
                     'disabledif' => ['coursetype', 'neq', 0],
-                    'default' => '0'
                 ],
 
                 'accordion' => [

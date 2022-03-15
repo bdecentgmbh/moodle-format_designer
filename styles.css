@@ -408,8 +408,13 @@ body.format-designer.editing ul.designer .section .circles-layout .activity .edi
     margin: 0 auto;
     clear: both;
 }
+.format-designer .course-content ul.designer li.section .left.side {
+    position: absolute;
+    top: 7px;
+    z-index: 1;
+}
 .format-designer .course-content ul.designer li.section .section-header-content {
-    padding: 10px;
+    padding: 10px 10px 10px 30px;
     background-size: cover;
     background-repeat: no-repeat;
     position: relative;
