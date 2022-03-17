@@ -515,11 +515,40 @@ class format_designer_renderer extends format_section_renderer_base {
             if ($course->courseduedate && $coursedatesinfo) {
                 $data['courseduedate'] = ltool_timemanagement_cal_course_duedate($coursedatesinfo, $enrolstartdate);
             }
-            $data['due'] = ltool_timemanagement_get_due_overdue_course($course->id, $USER->id);
         }
+
+        $data['due'] = $this->due_overdue_activities_count();
 
         $html = $this->output->render_from_template('format_designer/course_time_management', $data);
         return $html;
+    }
+
+    /**
+     * Get the count of due and overdue activities.
+     *
+     * @return array
+     */
+    public function due_overdue_activities_count(): array {
+        global $USER, $DB;
+        $duecount = $overduecount = 0;
+        $modinfo = $this->modinfo;
+        $completion = new \completion_info($this->modinfo->get_course());
+
+        foreach ($modinfo->sections as $modnumbers) {
+            foreach ($modnumbers as $modnumber) {
+                $mod = $modinfo->cms[$modnumber];
+                if (!empty($mod) && $DB->record_exists('course_modules', array('id' => $mod->id, 'deletioninprogress' => 0))
+                         && $mod->uservisible) {
+                    $data = $completion->get_data($mod, true, $USER->id);
+                    if ($data->completionstate != COMPLETION_COMPLETE) {
+                        $cmcompletion = new cm_completion($mod);
+                        $overduecount = ($cmcompletion->is_overdue()) ? $overduecount + 1 : $overduecount;
+                        $duecount = ($cmcompletion->is_due_today()) ? $duecount + 1 : $duecount;
+                    }
+                }
+            }
+        }
+        return ['dues' => $duecount, 'overdues' => $overduecount];
     }
 
     /**
