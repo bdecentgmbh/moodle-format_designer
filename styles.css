@@ -495,13 +495,16 @@ span.section-collapse-icon:before {
     padding: 0;
     overflow: visible;
 }
+.format-designer .course-content ul.designer li.section.main.container {
+    max-width: none;
+}
 
 
-@media (max-width: 1399px) {
+/* @media (max-width: 1399px) {
     .format-designer .course-content ul.designer li.section.main.container {
         max-width: 1240px;
     }
-}
+} */
 
 @media (min-width: 992px) {
     .format-designer ul.designer .list-layout .card.card-list .row .col-lg-2 .pull-right {
@@ -1291,9 +1294,6 @@ ul li {
     margin-top: 0;
     margin-left: 0;
 }
-.format-designer .designer .section .content .section.card-layout li.activity .action-html-card a {
-    cursor: grab;
-}
 .format-designer .designer .section .content .section.card-layout li.activity .restricted .action-html-card {
     opacity: 1;
 }
@@ -1896,6 +1896,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     display: block;
     border: 0;
     border-radius: 25px;
+    padding-right: 0;
     margin-bottom: 10px;
 }
 .format-designer .course-info-block > div.progress-block > .progress .progress-bar {
