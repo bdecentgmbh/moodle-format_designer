@@ -540,11 +540,10 @@ class format_designer_renderer extends format_section_renderer_base {
                 if (!empty($mod) && $DB->record_exists('course_modules', array('id' => $mod->id, 'deletioninprogress' => 0))
                          && $mod->uservisible) {
                     $data = $completion->get_data($mod, true, $USER->id);
-                    // print_object($data);
                     if ($data->completionstate != COMPLETION_COMPLETE) {
                         $cmcompletion = new cm_completion($mod);
-                        $overduecount = ($cmcompletion->is_overdue()) ? $overduecount+1 : $overduecount;
-                        $duecount = ($cmcompletion->is_due_today()) ? $duecount+1 : $duecount;
+                        $overduecount = ($cmcompletion->is_overdue()) ? $overduecount + 1 : $overduecount;
+                        $duecount = ($cmcompletion->is_due_today()) ? $duecount + 1 : $duecount;
                     }
                 }
             }
