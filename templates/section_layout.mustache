@@ -29,6 +29,9 @@
 <div class="section-content-wrapper">
 {{#sectiondesignwhole}}
     <div class="section-background-style section-design-whole" style="{{#sectionbackgroundstyle}} {{sectionbackgroundstyle}} {{/sectionbackgroundstyle}}">
+        {{#maskinner}}
+        <div class="mask-inner-section" style="{{{maskinner}}}"></div>
+        {{/maskinner}}
     </div>
 
     {{#bgoverlay}}
@@ -56,9 +59,13 @@
     style="{{sectionheaderstyle}}"
     >
 
-    {{#sectiondesignheader}} 
-        <div class="section-background-style sectiondesign-header" style="{{sectionbackgroundstyle}}"></div>
-    {{/sectiondesignheader}}
+        {{#sectiondesignheader}}
+            <div class="section-background-style sectiondesign-header" style="{{sectionbackgroundstyle}}">
+                {{#maskinner}}
+                <div class="mask-inner-section" style="{{{maskinner}}}"></div>
+                {{/maskinner}}
+            </div>
+        {{/sectiondesignheader}}
         {{#sectioncollapse}}
         <span class="section-collapse-icon" style="{{{sectiondesigntextcolor}}}"></span>
         {{/sectioncollapse}}
