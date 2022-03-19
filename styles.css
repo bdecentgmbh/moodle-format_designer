@@ -360,6 +360,14 @@ body.format-designer.editing ul.designer .section .circles-layout .activity .edi
     left: 0;
     z-index: -1;
 }
+.format-designer .course-content ul.designer li.section.main .section-background-style.section-design-whole .mask-inner-section,
+.format-designer .course-content ul.designer li.section .section-header-content .section-background-style.sectiondesign-header .mask-inner-section {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
 .format-designer .course-content ul.designer li.section.main.section-height {
     min-height: var(--section-height);
 }
