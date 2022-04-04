@@ -25,12 +25,15 @@
         "hasname": "true",
         "id": 3,
         "module": "assign",
-        "extraclasses": ""
+        "extraclasses": "",
+        "prostyle": "min-height:200px;"
 
     }
 }}
 {{! <div class="default-style" > }}
-    <div class="activity-block designer" style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
+    <div class="activity-block designer" style="{{#prostyle}} {{{prostyle}}} {{/prostyle}} ">
+        <div class="activity-background-style" style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
+        </div>
         {{#modbackoverlaycolor}}
         <div class="bg-overlay" style="{{modbackoverlaycolor}}"></div>
         {{/modbackoverlaycolor}}
@@ -40,18 +43,22 @@
             <div>
                 <div class="activityinstance {{modcontentclass}}">
                     {{#modiconurl}}
-                        <div class="img-block">
-                            {{{modiconurl}}}
+                        <div class="img-element {{elementstate.icon}}">
+                            <div class="img-block">
+                                {{{modiconurl}}}
+                            </div>
                         </div>
                     {{/modiconurl}}
-                    {{#cmname}}
-                        {{{cmname}}}
-                    {{/cmname}}
+                    <div class="cmname-block {{elementstate.title}}">
+                        {{#cmname}}
+                            {{{cmname}}}
+                        {{/cmname}}
+                    </div>
                     {{{afterlink}}}
                 </div>
 
                 {{#modrestricted}}
-                    <div class="availability-info">
+                    <div class="availability-info {{elementstate.calltoaction}}">
                         {{{calltoactionhtml}}}
                     </div>
                 {{/modrestricted}}
@@ -61,11 +68,15 @@
                     <div class="row h-100 pull-right">
                         <div class="col align-self-center">
                             {{#modvisits}}
-                            <div class="mod-visits-block text-muted">
+                            <div class="mod-visits-block {{elementstate.visits}} text-muted">
                                 <p class="text-capitalize" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">{{modvisits}}</p>
                             </div>
                             {{/modvisits}}
-                            {{{cmcompletionhtml}}}
+                            {{#cmcompletionhtml}}
+                                <div class="completion-html-card {{elementstate.completionbadge}}">
+                                    {{{cmcompletionhtml}}}
+                                </div>
+                            {{/cmcompletionhtml}}
                         </div>
                     </div>
                 </div>
@@ -77,7 +88,7 @@
                 {{/modcontent}}
 
                 {{^modrestricted}}
-                    <div class="action-html-card">
+                    <div class="action-html-card {{elementstate.calltoaction}}">
                         {{{calltoactionhtml}}}
                     </div>
                 {{/modrestricted}}

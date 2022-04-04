@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace format_designer;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -34,7 +36,7 @@ require_once($CFG->dirroot . '/course/lib.php');
  * @copyright  2015 Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class format_designer_testcase extends \advanced_testcase {
+class lib_test extends \advanced_testcase {
 
     /**
      * Tests for format_designer::get_section_name method with default section names.
@@ -272,5 +274,34 @@ class format_designer_testcase extends \advanced_testcase {
         $CFG->linkcoursesections = 1;
         $this->assertNotEmpty($format->get_view_url(1, ['navigation' => 1]));
         $this->assertNotEmpty($format->get_view_url(0, ['navigation' => 1]));
+    }
+
+    /**
+     * Test the module content trim character.
+     *
+     * @return void
+     */
+    public function test_format_designer_modcontent_trim_char() {
+
+        $str1 = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+        Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+        when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
+        $resstr1 = format_designer_modcontent_trim_char($str1, 30);
+        $this->assertEquals(23, str_word_count($resstr1));
+
+        $str2 = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.";
+        $resstr2 = format_designer_modcontent_trim_char($str2, 30);
+        $this->assertEquals(str_word_count($str2), str_word_count($resstr2));
+    }
+
+    /**
+     * Test desginer format date method.
+     *
+     * @return void
+     */
+    public function test_format_designer_format_date() {
+        $timestamp = 1642861536;
+        $dateformat = format_designer_format_date($timestamp);
+        $this->assertEquals("Jan 22", $dateformat);
     }
 }

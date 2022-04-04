@@ -18,15 +18,15 @@
  * Version details.
  *
  * @package   format_designer
- * @copyright 2021 bdecent gmbh <https://bdecent.de>
+ * @copyright 2022 bdecent gmbh <https://bdecent.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2022012200;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version   = 2022031900;        // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires  = 2020061500;        // Requires this Moodle version.
 $plugin->component = 'format_designer';  // Full name of the plugin (used for diagnostics).
-$plugin->release = 'Version 1.1';
+$plugin->release = 'Version 1.2';
 $plugin->supported = [39, 311];
 $plugin->maturity  = MATURITY_STABLE;

@@ -216,11 +216,14 @@ class cm_completion implements renderable, templatable {
     }
 
     /**
-     * Get when cm must be completed by.
+     * Get when cm must be completed by. Check is timemanagement tool contains any duedates for this module.
      *
      * @return int
      */
     final public function get_completion_expected(): int {
+        if ($duedate = \format_designer\options::timetool_duedate($this->cm)) {
+            return $duedate;
+        }
         return $this->cm->completionexpected;
     }
 
@@ -246,7 +249,7 @@ class cm_completion implements renderable, templatable {
      * @return bool
      */
     final public function is_overdue(): bool {
-        return $this->get_completion_expected() > 0 && $this->get_completion_expected() + 86400 < time();
+        return $this->get_completion_expected() > 0 && $this->get_completion_expected() < time();
     }
 
     /**
@@ -264,8 +267,8 @@ class cm_completion implements renderable, templatable {
      * @return bool
      */
     final public function is_due_today(): bool {
-        return $this->get_completion_expected() > 0 && $this->get_completion_expected() > time() &&
-             $this->get_completion_expected() - time() < 86400;
+        return $this->get_completion_expected() > 0 &&
+            (date('y-m-d', $this->get_completion_expected()) == date('y-m-d'));
     }
 
     /**
