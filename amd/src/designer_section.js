@@ -20,7 +20,7 @@
  * @copyright  2021 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- define(['jquery', 'core/fragment', 'core/templates', 'core/loadingicon', 'core/ajax'],
+ define(['jquery', 'core/fragment', 'core/templates', 'format_designer/loadingicon', 'core/ajax'],
  function($, Fragment, Templates, Loadingicon, Ajax) {
 
     var SELECTOR = {

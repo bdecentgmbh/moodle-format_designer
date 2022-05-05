@@ -293,8 +293,8 @@ class format_designer extends format_base {
                     'default' => 0,
                     'type' => PARAM_INT
                 ],
-                'coursetype' => [
-                   'default' => $courseconfig->coursetype ?? 0,
+                'designercoursetype' => [
+                   'default' => $courseconfig->designercoursetype ?? 0,
                    'type' => PARAM_INT
                 ]
             ];
@@ -335,7 +335,7 @@ class format_designer extends format_base {
                             1 => new lang_string('enable')
                         )
                     ],
-                    'disabledif' => ['coursetype', 'neq', 0],
+                    'disabledif' => ['designercoursetype', 'neq', 0],
                 ],
 
                 'accordion' => [
@@ -418,7 +418,7 @@ class format_designer extends format_base {
                     'disabledif' => ['enablecompletion', 'neq', 1],
 
                 ],
-                'coursetype' => [
+                'designercoursetype' => [
                     'label' => new lang_string('coursetype', 'format_designer'),
                     'element_type' => 'select',
                     'element_attributes' => [
@@ -501,7 +501,6 @@ class format_designer extends format_base {
     public function create_edit_form_elements(&$mform, $forsection = false) {
         global $COURSE, $PAGE;
         $elements = parent::create_edit_form_elements($mform, $forsection);
-
         if (!$forsection && (empty($COURSE->id) || $COURSE->id == SITEID)) {
             // Add "numsections" element to the create course form - it will force new course to be prepopulated
             // with empty sections.
@@ -625,6 +624,57 @@ class format_designer extends format_base {
     }
 
     /**
+     * Adds format options elements to the section edit form.
+     *
+     * @param MoodleQuickForm $mform
+     * @param stdClass $section
+     * @return array
+     */
+    public function create_section_edit_form_elements(\MoodleQuickForm &$mform, \stdClass $section): array {
+        $options = $this->section_format_options(true);
+        $elements = $this->add_options_to_form_elements($mform, $options);
+
+        return $elements;
+    }
+
+    /**
+     * Adds format options elements common to both course and section edit forms.
+     *
+     * @param MoodleQuickForm $mform
+     * @param array $options
+     * @return array
+     */
+    protected function add_options_to_form_elements(\MoodleQuickForm &$mform, array $options): array {
+        global $PAGE;
+        $elements = parent::add_options_to_form_elements($mform, $options);
+        foreach ($options as $optionname => $option) {
+            if (isset($option['disabledif'])) {
+                $disabledif = $option['disabledif'];
+                if (isset($disabledif[2])) {
+                    $mform->disabledif($optionname, $disabledif[0], $disabledif[1], $disabledif[2]);
+                }
+            }
+            if (isset($option['hideif'])) {
+                $hideif = $option['hideif'];
+                if (isset($disabledif[1])) {
+                    $mform->hideif($optionname, $hideif[0], $hideif[1]);
+                }
+            }
+        }
+        $PAGE->requires->js_init_code('
+            require(["core/config"], function(CFG) {
+                document.querySelectorAll("input[name$=\"width\"]").forEach((v) => {
+                    var px = document.createElement("label");
+                    px.classList.add("px-string");
+                    px.innerHTML = "Px";
+                    v.parentNode.append(px);
+                })
+            })
+        ');
+        return $elements;
+    }
+
+    /**
      * Updates format options for a section
      *
      * Section id is expected in $data->id (or $data['id'])
@@ -728,6 +778,8 @@ class format_designer extends format_base {
             $url = course_get_url($section->course, $section->section, array('navigation' => true));
             if ($url) {
                 $displayvalue = html_writer::link($url, $title, array('style' => $style));
+            } else {
+                $displayvalue = html_writer::span($title, '', array('style' => $style));
             }
             $itemtype = 'sectionname';
         } else {
@@ -821,10 +873,10 @@ class format_designer extends format_base {
         $modinfo = get_fast_modinfo($course);
         $coursesections = $modinfo->sections;
         $sectiontype = $this->get_section_option($section->id, 'sectiontype') ?: 'default';
-        $templatename = 'format_designer/cm/module_layout_' . $sectiontype;
+        $templatename = 'format_designer/module_layout_' . $sectiontype;
         if (in_array($sectiontype, $prolayouts)) {
             if (format_designer_has_pro()) {
-                $templatename = 'layouts_' . $sectiontype . '/cm/module_layout_' . $sectiontype;
+                $templatename = 'layouts_' . $sectiontype . '/module_layout_' . $sectiontype;
             }
         }
         if (array_key_exists($section->section, $coursesections)) {
@@ -1001,6 +1053,7 @@ function format_designer_has_pro() {
  * @return array list of available module pro layouts.
  */
 function format_designer_get_pro_layouts() {
+    $t = core_component::get_plugin_list('layouts');
     $layouts = array_keys(core_component::get_plugin_list('layouts'));
     return $layouts;
 }
@@ -1095,6 +1148,7 @@ function format_designer_include_prosettings($settings) {
  */
 function format_designer_coursemodule_standard_elements($formwrapper, $mform) {
     global $CFG, $DB;
+    // print_object($mform);
     $cm = $formwrapper->get_coursemodule();
     $course = $formwrapper->get_course();
     if ($course->format == 'designer') {
@@ -1112,7 +1166,6 @@ function format_designer_coursemodule_standard_elements($formwrapper, $mform) {
         ];
 
         $mform->addElement('header', 'moduledesign', get_string('activitydesign', 'format_designer'));
-        $mform->addElement('html', get_string('activityelementsdisplay', 'format_designer'));
         foreach ($elements as $element) {
             // Module background image repeat.
             $name = 'designer_activityelements['.$element.']';
@@ -1188,9 +1241,9 @@ function format_designer_editsetting_style($page) {
     if ($page->user_is_editing()) {
         // Fixed the overlapping issue by make this css rule as important. Moodle CI doesn't allow important.
         $style = '.format-designer .course-content ul.designer li.section .right .dropdown .dropdown-menu {';
-        $style .= 'top: -40px !important;left: auto !important;right: 40px !important;transform: none !important;';
+        $style .= 'top: auto !important;left: auto !important;right: 40px !important; bottom: 0;transform: none !important;';
         $style .= '}';
-        $style .= '.format-designer .designer .section .activity .actions .menubar .dropdown .dropdown-menu {';
+        $style .= '.format-designer .designer .section .activity .actions .menu {';
         $style .= 'top: -40px !important;left: auto !important;right: 40px !important;transform: none !important;';
         $style .= '}';
         echo html_writer::tag('style', $style, []);

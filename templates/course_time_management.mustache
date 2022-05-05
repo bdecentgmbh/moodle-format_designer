@@ -29,14 +29,14 @@
     {{#enrolmentstartdate}}
     <div class="course-start-date">
         <h6><i class="fa fa-calendar"></i> {{#str}} coursestartdate, format_designer {{/str}}</h6>
-        <h3>{{#userdate}} {{enrolmentstartdate}}, {{#str}} strftimedate {{/str}} {{/userdate}}</h3>
+        <h3>{{enrolmentstartdate}}</h3>
     </div>
     {{/enrolmentstartdate}}
 
     {{#courseduedate}}
     <div class="course-due-date">
         <h6><i class="fa fa-clock-o"></i> {{#str}} courseduedate, format_designer {{/str}}</h6>
-        <h3>{{#userdate}} {{courseduedate}}, {{#str}} strftimedate {{/str}} {{/userdate}}</h3>
+        <h3> {{courseduedate}} </h3>
     </div>
     {{/courseduedate}}
 
@@ -44,7 +44,7 @@
     <div class="course-completion-date">
         <h6><i class="fa fa-flag-checkered"></i> {{#str}} coursecompletiondate, format_designer {{/str}}</h6>
         {{#completiondate}}
-        <h3> {{#userdate}} {{completiondate}}, {{#str}} strftimedate {{/str}} {{/userdate}}</h3>
+        <h3> {{completiondate}} </h3>
         {{/completiondate}}
         {{^completiondate}}
         <h3> -/-</h3>
@@ -56,7 +56,7 @@
     <div class="course-expire-date">
         <h6><i class="fa fa-sign-out"></i> {{#str}} courseexpirationdate, format_designer {{/str}} </h6>
         {{#enrolmentenddate}}
-        <h3>{{#userdate}} {{enrolmentenddate}}, {{#str}} strftimedate {{/str}} {{/userdate}}</h3>
+        <h3> {{enrolmentenddate}} </h3>
         {{/enrolmentenddate}}
         {{^enrolmentenddate}}
         <h3>-/-</h3>
@@ -67,27 +67,23 @@
     {{#courseprogress}}
     <div class="progress-block">
         <div class="progress">
-            <div class="progress-bar" role="progressbar" style="width: {{courseprogress.percent}}%" 
+            <div class="progress-bar" role="progressbar" style="width: {{courseprogress.percent}}%"
                 aria-valuenow="{{courseprogress.percent}}" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
 
         <div class="activity-completed-block">
-            <p> {{#str}} activitiescompleted, format_designer, { "count": {{courseprogress.count}}, "completed": {{courseprogress.completed}} } {{/str}}
+            <p> {{modcmpinfo}}
             </p>
         </div>
         {{#due}}
             {{#due.dues}}
             <div class="activity-due-block">
-                <p>{{#str}} todaydue, format_designer, {
-                    "due": {{due.dues}}
-                } {{/str}}</p>
+                <p>{{due.dues}}</p>
             </div>
             {{/due.dues}}
             {{#due.overdues}}
             <div class="activity-overdue-block">
-                <p>{{#str}} overdues, format_designer, {
-                    "overdues": {{due.overdues}}
-                } {{/str}}</p>
+                <p>{{due.overdues}}</p>
             </div>
             {{/due.overdues}}
         {{/due}}

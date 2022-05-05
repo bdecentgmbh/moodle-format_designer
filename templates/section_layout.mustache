@@ -26,7 +26,6 @@
     }
 }}
 
-<div class="section-content-wrapper">
 {{#sectiondesignwhole}}
     <div class="section-background-style section-design-whole" style="{{#sectionbackgroundstyle}} {{sectionbackgroundstyle}} {{/sectionbackgroundstyle}}">
         {{#maskinner}}
@@ -52,6 +51,7 @@
 <div class="section-header-content {{#sectioncollapse}}{{^sectionshow}}collapsed{{/sectionshow}}{{/sectioncollapse}}"
     id="section-head-{{section.section}}"
     {{#sectioncollapse}} data-toggle="collapse" {{/sectioncollapse}}
+    {{#sectionaccordion}} data-parent="#section-course-accordion" {{/sectionaccordion}}
     data-target="#section-content-{{section.section}}"
     aria-expanded="false"
     aria-controls="section-head-{{section.section}}"
@@ -120,7 +120,7 @@
 
 <div class="content {{sectioncontentlayout}}
     {{#sectioncollapse}}collapse{{/sectioncollapse}}
-    {{#sectionshow}}show{{/sectionshow}}"
+    {{#sectionshow}}in{{/sectionshow}}"
     id="section-content-{{section.section}}"
     aria-labelledby="section-head-{{section.section}}"
     {{#sectionaccordion}}
@@ -132,4 +132,4 @@
 
     {{/content}}
 </div>
-</div>
+

@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template format_designer/cm/module_layout_cards
+    @template format_designer/module_layout_cards
 
     Displays the course module card list
 
@@ -44,6 +44,7 @@
                     <div class="row">
                         <div class="col-12 col-md-7">
                             <div class="activityinstance {{modcontentclass}}">
+                                <a></a> <!-- to fix Module Hide/show, coursebase JS uses the selector like .activitiyinstance > a -->
                                 {{#modiconurl}}
                                     <div class="img-element {{elementstate.icon}}">
                                         <div class="img-block">

@@ -158,11 +158,11 @@ trait set_section_options {
         $section = (object) ['sectiontype' => $sectiontype];
         $cmlistdata = $renderer->render_course_module($cm, $sectionreturn, [], $section);
 
-        $templatename = 'format_designer/cm/module_layout_' . $sectiontype;
+        $templatename = 'format_designer/module_layout_' . $sectiontype;
         $prolayouts = format_designer_get_pro_layouts();
         if (in_array($sectiontype, $prolayouts)) {
             if (format_designer_has_pro()) {
-                $templatename = 'layouts_' . $sectiontype . '/cm/module_layout_' . $sectiontype;
+                $templatename = 'layouts_' . $sectiontype . '/module_layout_' . $sectiontype;
             }
         }
         $liclass = $sectiontype;

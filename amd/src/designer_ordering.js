@@ -1,4 +1,4 @@
-define(['jquery', 'core_course/actions', 'core/ajax'], function($, action, ajax) {
+define(['jquery', 'format_designer/actions', 'core/ajax'], function($, action, ajax) {
 
     var CSS = {
         EDITINPROGRESS: 'editinprogress',
@@ -13,7 +13,7 @@ define(['jquery', 'core_course/actions', 'core/ajax'], function($, action, ajax)
     /**
      * Implement the init.
      */
-    function init() {
+    function initialize() {
 
         // Register a function to be executed after D&D of an activity.
         Y.use('moodle-course-coursebase', function() {
@@ -130,6 +130,8 @@ define(['jquery', 'core_course/actions', 'core/ajax'], function($, action, ajax)
     }
 
     return {
-        init: init
+        init: function() {
+            initialize();
+        }
     };
 });

@@ -76,6 +76,23 @@ class format_designer_renderer extends format_section_renderer_base {
     }
 
     /**
+     * Find the course has collapasable accordion.
+     *
+     * @param stdclass $course
+     * @return boolean
+     */
+    protected function is_courseaccordion($course) {
+        // Now the list of sections.
+        $sectioncollapse = isset($course->sectioncollapse) ?
+            (($course->coursedisplay && !$this->page->user_is_editing()) ? false : $course->sectioncollapse) : false;
+        // If kanban board enabled remove the row.
+        if ($course->designercoursetype) {
+            $sectioncollapse = false;
+        }
+        return $sectioncollapse;
+    }
+
+    /**
      * Generate the closing container html for a list of sections.
      *
      * @return string HTML to output.
@@ -481,7 +498,6 @@ class format_designer_renderer extends format_section_renderer_base {
     public function timemanagement_details(stdclass $course): string {
         global $USER, $CFG, $DB;
         require_once($CFG->dirroot.'/enrol/locallib.php');
-
         $context = context_course::instance($course->id);
         if (is_enrolled($context, $USER->id)) {
             $enrolmanager = new course_enrolment_manager($this->page, $course);
@@ -493,10 +509,11 @@ class format_designer_renderer extends format_section_renderer_base {
             $enrolstartdate = $course->startdate;
             $enrolenddate = $course->enddate;
         }
+        $strftimedate = get_string('strftimedate');
         $data = [
             'course' => $course,
-            'enrolmentstartdate' => ($course->enrolmentstartdate) ? $enrolstartdate : '',
-            'enrolmentenddate' => $course->enrolmentenddate ? $enrolenddate : '',
+            'enrolmentstartdate' => ($course->enrolmentstartdate && $enrolstartdate) ? userdate($enrolstartdate, $strftimedate, '', false) : '',
+            'enrolmentenddate' => ($course->enrolmentenddate && $enrolenddate) ? userdate($enrolenddate, $strftimedate, '', false) : '',
         ];
         $courseprogress = $this->activity_progress($course, $USER->id);
         if ($courseprogress != null) {
@@ -505,7 +522,7 @@ class format_designer_renderer extends format_section_renderer_base {
             $completion = $DB->get_record_sql($sql, ['userid' => $USER->id, 'course' => $course->id]);
             $data += [
                 'showcompletiondate' => ($course->coursecompletiondate) ?: '',
-                'completiondate' => (!empty($completion) ? $completion->timecompleted : ''),
+                'completiondate' => (!empty($completion) ? userdate($completion->timecompleted, $strftimedate, '', false) : ''),
                 'courseprogress' => ($course->activityprogress) ? $courseprogress : '',
             ];
         }
@@ -513,12 +530,16 @@ class format_designer_renderer extends format_section_renderer_base {
         if (format_designer_timemanagement_installed() && function_exists('ltool_timemanagement_cal_course_duedate')) {
             $coursedatesinfo = $DB->get_record('ltool_timemanagement_course', array('course' => $course->id));
             if ($course->courseduedate && $coursedatesinfo) {
-                $data['courseduedate'] = ltool_timemanagement_cal_course_duedate($coursedatesinfo, $enrolstartdate);
+                $courseduedate = ltool_timemanagement_cal_course_duedate($coursedatesinfo, $enrolstartdate);
+                $data['courseduedate'] = userdate($courseduedate, $strftimedate, '', false);
             }
         }
 
         $data['due'] = $this->due_overdue_activities_count();
-
+        if (isset($courseprogress['count']) &&  isset($courseprogress['completed'])) {
+            $data['modcmpinfo'] = get_string("activitiescompleted", "format_designer",
+                 ['count' => $courseprogress['count'], 'completed' => $courseprogress['completed']]);
+        }
         $html = $this->output->render_from_template('format_designer/course_time_management', $data);
         return $html;
     }
@@ -548,7 +569,10 @@ class format_designer_renderer extends format_section_renderer_base {
                 }
             }
         }
-        return ['dues' => $duecount, 'overdues' => $overduecount];
+        return [
+            'dues' => get_string('todaydue', 'format_designer', ["due" => $duecount]),
+            'overdues' => get_string('overdues', 'format_designer', ["overdues" => $overduecount])
+        ];
     }
 
     /**
@@ -619,9 +643,12 @@ class format_designer_renderer extends format_section_renderer_base {
             (($course->coursedisplay && !$this->page->user_is_editing()) ? false : $course->sectioncollapse) : false;
         $startclass = ($course->coursedisplay && !$this->page->user_is_editing()) ? 'row' : '';
         // If kanban board enabled remove the row.
-        if ($course->coursetype) {
+        if ($course->designercoursetype) {
             $sectioncollapse = false;
             $startclass .= ' kanban-board ';
+        }
+        if (!$this->page->user_is_editing() && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
+                echo html_writer::start_tag('div', array('class' => 'single-section-list'));
         }
         echo $this->start_section_list($sectioncollapse, $startclass);
         $numsections = course_get_format($course)->get_last_section_number();
@@ -643,11 +670,13 @@ class format_designer_renderer extends format_section_renderer_base {
 
             if (!$this->page->user_is_editing() && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
                 // Display section summary only.
+               
                 echo $this->render_section($thissection, $course, false, true);
+                
             } else {
                 echo $this->render_section($thissection, $course, false);
             }
-            if ($course->coursetype && $section == 0) {
+            if ($course->designercoursetype && $section == 0) {
                 echo html_writer::start_div('kanban-board-activities');
                 $kanbanactivities = true;
             }
@@ -674,6 +703,9 @@ class format_designer_renderer extends format_section_renderer_base {
             echo $this->change_number_sections($course, 0);
         } else {
             echo $this->end_section_list();
+        }
+        if (!$this->page->user_is_editing() && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
+                echo html_writer::end_tag('div');
         }
         format_designer_editsetting_style($this->page);
     }
@@ -703,6 +735,7 @@ class format_designer_renderer extends format_section_renderer_base {
         }
         // Display the time management plugin widget.
         echo $this->timemanagement_details($course);
+        //echo html_writer::start_tag('div', array('class' => 'single-section-page'));
         // Copy activity clipboard..
         $sectioncollapse = isset($course->sectioncollapse) ? $course->sectioncollapse : false;
         echo $this->start_section_list($sectioncollapse);
@@ -779,11 +812,11 @@ class format_designer_renderer extends format_section_renderer_base {
         $o = '';
         if (!$section->visible) {
             if ($canviewhidden) {
-                $o .= $this->courserenderer->availability_info(get_string('hiddenfromstudents'), 'ishidden');
+                $o .= $this->availability_info(get_string('hiddenfromstudents'), 'ishidden');
             } else {
                 // We are here because of the setting "Hidden sections are shown in collapsed form".
                 // Student can not see the section contents but can see its name.
-                $o .= $this->courserenderer->availability_info(get_string('notavailable'), 'ishidden');
+                $o .= $this->availability_info(get_string('notavailable'), 'ishidden');
             }
         } else if (!$section->uservisible || $canviewhidden && !empty($CFG->enableavailability)) {
             if (!$section->uservisible && $section->availableinfo) {
@@ -791,7 +824,7 @@ class format_designer_renderer extends format_section_renderer_base {
                 // so there is definitely something to print.
                 $formattedinfo = \core_availability\info::format_info(
                         $section->availableinfo, $section->course);
-                $o .= $this->courserenderer->availability_info($formattedinfo, 'isrestricted');
+                $o .= $this->availability_info($formattedinfo, 'isrestricted');
                 $o .= html_writer::start_tag('div', array('class' => 'section-restricted-action'));
                 $o .= html_writer::tag('i', '', array('class' => 'fa fa-lock'));
                 $o .= html_writer::end_tag('div');
@@ -802,7 +835,7 @@ class format_designer_renderer extends format_section_renderer_base {
                 if ($fullinfo) {
                     $formattedinfo = \core_availability\info::format_info(
                             $fullinfo, $section->course);
-                    $o .= $this->courserenderer->availability_info($formattedinfo, 'isrestricted isfullinfo');
+                    $o .= $this->availability_info($formattedinfo, 'isrestricted isfullinfo');
                     $o .= html_writer::start_tag('div', array('class' => 'section-restricted-action'));
                     $o .= html_writer::tag('i', '', array('class' => 'fa fa-lock'));
                     $o .= html_writer::end_tag('div');
@@ -826,7 +859,7 @@ class format_designer_renderer extends format_section_renderer_base {
 
         $widthclasses = [0 => 12, 1 => 6, 2 => 4, 3 => 3, 4 => 2 ];
         $classes = [];
-        foreach (['desktop' => 'md', 'tablet' => 'sm', 'mobile' => ''] as $device => $size) {
+        foreach (['desktop' => 'md', 'tablet' => 'sm', 'mobile' => 'xs'] as $device => $size) {
             $class = 'col-';
             $class .= ($size) ? $size.'-' : '';
             $class .= (isset($widthclasses[$$device])) ? $widthclasses[$$device] : 12;
@@ -848,7 +881,6 @@ class format_designer_renderer extends format_section_renderer_base {
      */
     public function render_section(section_info $section, stdClass $course, $onsectionpage,
         $sectionheader = false, $sectionreturn = 0, $sectioncontent = false) {
-
         $sectionurl = new \moodle_url('/course/view.php', ['id' => $course->id, 'section' => $section->section]);
         /** @var format_designer $format */
         $format = course_get_format($course);
@@ -862,6 +894,10 @@ class format_designer_renderer extends format_section_renderer_base {
                 $sectionstyle = ' current';
             }
         }
+        
+        // Add accordion panel class to bootstrap 3 accordion if course has accordion method.
+        $sectionstyle .= $this->is_courseaccordion($this->modinfo->get_course()) ? ' panel' : '';
+
         $leftcontent = $this->section_left_content($section, $course, $onsectionpage);
         $rightcontent = $this->section_right_content($section, $course, $onsectionpage);
         $sectionname = html_writer::tag('span', $this->section_title($section, $course));
@@ -942,7 +978,7 @@ class format_designer_renderer extends format_section_renderer_base {
             ? (($section->section == 0) ? 'show' : '') : 'show';
         }
         // Disable the collapsible for kanban board.
-        if ($course->coursetype) {
+        if ($course->designercoursetype) {
             $course->sectioncollapse = false;
             $sectioncollapsestatus = '';
         }
@@ -1001,7 +1037,7 @@ class format_designer_renderer extends format_section_renderer_base {
         $style = isset($templatecontext['prosectionstyle']) ? ' '.$templatecontext['prosectionstyle'] : '';
         $sectionhead = html_writer::start_tag('li', [
             'id' => 'section-'.$section->section,
-            'class' => 'section main clearfix'.$sectionclass,
+            'class' => 'section main clearfix '.$sectionclass,
             'role' => 'region',
             'aria-labelledby' => "sectionid-{$section->id}-title",
             'data-sectionid' => $section->section,
@@ -1009,10 +1045,38 @@ class format_designer_renderer extends format_section_renderer_base {
             'data-id' => $section->id,
             'style' => $style
         ]);
-
-        echo $sectionhead;
+		echo $sectionhead;
         echo $this->render_from_template($templatename, $templatecontext);
         echo html_writer::end_tag('li');
+    }
+
+    /**
+     * Displays availability info for a course section or course module
+     *
+     * @param string $text
+     * @param string $additionalclasses
+     * @return string
+     */
+    public function availability_info($text, $additionalclasses = '') {
+
+        $data = ['text' => $text, 'classes' => $additionalclasses];
+        $additionalclasses = array_filter(explode(' ', $additionalclasses));
+
+        if (in_array('ishidden', $additionalclasses)) {
+            $data['ishidden'] = 1;
+
+        } else if (in_array('isstealth', $additionalclasses)) {
+            $data['isstealth'] = 1;
+
+        } else if (in_array('isrestricted', $additionalclasses)) {
+            $data['isrestricted'] = 1;
+
+            if (in_array('isfullinfo', $additionalclasses)) {
+                $data['isfullinfo'] = 1;
+            }
+        }
+
+        return $this->render_from_template('format_designer/availability_info', $data);
     }
 
     /**
@@ -1025,8 +1089,13 @@ class format_designer_renderer extends format_section_renderer_base {
      * @return void|string
      */
     public function render_course_module($mod, $sectionreturn, $displayoptions = [], $section=null) {
-        global $DB, $USER, $CFG;
-        if (!$mod->is_visible_on_course_page()) {
+        global $DB, $USER, $CFG, $OUTPUT;
+
+        if ($this->modinfo == null) {
+            $this->modinfo = get_fast_modinfo($mod->course);
+        }
+
+        if (!$mod->uservisible && empty($mod->availableinfo)) {
             return [];
         }
 
@@ -1079,26 +1148,7 @@ class format_designer_renderer extends format_section_renderer_base {
         $cmtext = '';
         if (!empty($url)) {
             $cmtext = $this->courserenderer->course_section_cm_text($mod, $displayoptions);
-            $cmtextcontent = format_string($cmtext);
-            $modcontent = '';
-            if (!empty($cmtextcontent)) {
-                if (str_word_count($cmtextcontent) >= 23) {
-                    $modcontenthtml = '';
-                    $modcontenthtml .= html_writer::start_tag('div', array('class' => 'trim-summary'));
-                    $modcontenthtml .= format_designer_modcontent_trim_char($cmtextcontent, 24);
-                    $modcontenthtml .= \html_writer::link('javascript:void(0)', get_string('more'),
-                    array('class' => 'mod-description-action'));
-                    $modcontenthtml .= html_writer::end_tag('div');
-                    $modcontenthtml .= html_writer::start_tag('div', array('class' => 'fullcontent-summary summary-hide'));
-                    $modcontenthtml .= $cmtextcontent;
-                    $modcontenthtml .= " " .\html_writer::link('javascript:void(0)', get_string('less', 'format_designer'),
-                    array('class' => 'mod-description-action'));
-                    $modcontenthtml .= html_writer::end_tag('div');
-                    $modcontent = $modcontenthtml;
-                } else {
-                    $modcontent = html_writer::tag('p', $cmtextcontent);
-                }
-            }
+            $modcontent = $this->course_section_cm_text($mod, $displayoptions);
         }
 
         $modvisits = $DB->count_records('logstore_standard_log', array('contextinstanceid' => $mod->id,
@@ -1124,8 +1174,7 @@ class format_designer_renderer extends format_section_renderer_base {
             $modrestricted = true;
         }
 
-        $activitylink = html_writer::empty_tag('img', array('src' => $mod->get_icon_url(),
-                'class' => 'iconlarge activityicon', 'alt' => '', 'role' => 'presentation', 'aria-hidden' => 'true'));
+        $activitylink = $mod->render_icon($OUTPUT, 'activityicon');
         if ($mod->uservisible) {
             $modiconurl = html_writer::link($url, $activitylink, array('class' => 'mod-icon-url'));
         } else {
@@ -1133,6 +1182,7 @@ class format_designer_renderer extends format_section_renderer_base {
             $modiconurl .= $activitylink;
             $modiconurl .= html_writer::end_div();
         }
+
 
         $cmname = $this->get_cmname($mod, $displayoptions);
         $cmlist = [
@@ -1168,6 +1218,86 @@ class format_designer_renderer extends format_section_renderer_base {
             $cmlist = array_merge($cmlist, $prodata);
         }
         return $cmlist;
+    }
+
+    /**
+     * Renders html to display the module content on the course page (i.e. text of the labels)
+     *
+     * @param cm_info $mod
+     * @param array $displayoptions
+     * @return string
+     */
+    public function course_section_cm_text(cm_info $mod, $displayoptions = array()) {
+        global $CFG;
+
+        $output = '';
+        if (!$mod->uservisible && empty($mod->availableinfo)) {
+            // nothing to be displayed to the user
+            return $output;
+        }
+        $options = array('overflowdiv' => true);
+        if ($mod->modname === 'label' && get_config('label', 'allowxss')) {
+            $options['allowxss'] = true;
+        }
+        if (!empty($CFG->disableconsistentcleaning) && empty($options['allowxss'])) {
+            // This is the legacy behaviour. It was originally setting the noclean option.
+            // We use the allowxss option now, and only if the consistent cleaning is off.
+            $options['allowxss'] = true;
+        }
+
+        $cmtextcontent = $mod->get_formatted_content($options);
+        $cmtextcontent = format_string($cmtextcontent);
+        if (str_word_count($cmtextcontent) >= 23) {
+            $modcontenthtml = '';
+            $modcontenthtml .= html_writer::start_tag('div', array('class' => 'trim-summary'));
+            $modcontenthtml .= format_designer_modcontent_trim_char($cmtextcontent, 24);
+            $modcontenthtml .= \html_writer::link('javascript:void(0)', get_string('more'),
+            array('class' => 'mod-description-action'));
+            $modcontenthtml .= html_writer::end_tag('div');
+            $modcontenthtml .= html_writer::start_tag('div', array('class' => 'fullcontent-summary summary-hide'));
+            $modcontenthtml .= $cmtextcontent;
+            $modcontenthtml .= " " .\html_writer::link('javascript:void(0)', get_string('less', 'format_designer'),
+            array('class' => 'mod-description-action'));
+            $modcontenthtml .= html_writer::end_tag('div');
+            $content = $modcontenthtml;
+        } else {
+            $content = html_writer::tag('p', $cmtextcontent);
+        }
+
+        $accesstext = '';
+        $textclasses = '';
+        if ($mod->uservisible) {
+            // It is visible to the user, but should it be dimmed?
+            // To decide this we check if one of the following is true:
+            //   - If it is hidden and the user holds the viewhiddenactivities capability.
+            //   - If the activity is not available for the user yet.
+            $notavailable = !$mod->available;
+            $accessiblebutdim = $notavailable || (!$mod->visible && has_capability('moodle/course:viewhiddenactivities', $mod->context));
+            if ($accessiblebutdim) {
+                $textclasses .= ' dimmed_text';
+                if ($notavailable) {
+                    $textclasses .= ' conditionalhidden';
+                }
+                // Show accessibility note only if user can access the module himself.
+                $accesstext = get_accesshide(get_string('hiddenfromstudents').':'. $mod->modfullname);
+            }
+        } else {
+            $textclasses .= ' dimmed_text';
+        }
+        if ($mod->url) {
+            if ($content) {
+                // If specified, display extra content after link.
+                $output = html_writer::tag('div', $content, array('class' =>
+                        trim('contentafterlink ' . $textclasses)));
+            }
+        } else {
+            $groupinglabel = $mod->get_grouping_label($textclasses);
+
+            // No link, so display only content.
+            $output = html_writer::tag('div', $accesstext . $content . $groupinglabel,
+                    array('class' => 'contentwithoutlink ' . $textclasses));
+        }
+        return $output;
     }
 
     /**
@@ -1256,7 +1386,7 @@ class format_designer_renderer extends format_section_renderer_base {
                     $textclasses .= ' conditionalhidden';
                 }
             }
-            if ($mod->is_stealth()) {
+            if ($this->is_stealth($mod)) {
                 // Stealth activity is the one that is not visible on course page.
                 // It still may be displayed to the users who can manage it.
                 $linkclasses .= ' stealth';
@@ -1267,6 +1397,22 @@ class format_designer_renderer extends format_section_renderer_base {
             $textclasses .= ' dimmed dimmed_text';
         }
         return array($linkclasses, $textclasses);
+    }
+
+    /**
+     * Whether this module is available but hidden from course page
+     *
+     * "Stealth" modules are the ones that are not shown on course page but available by following url.
+     * They are normally also displayed in grade reports and other reports.
+     * Module will be stealth either if visibleoncoursepage=0 or it is a visible module inside the hidden
+     * section.
+     *
+     * @return bool
+     */
+    public function is_stealth($mod) {
+        $sectioninfo = $this->modinfo->get_section_info($mod->sectionnum);
+        return !$mod->visibleoncoursepage ||
+            ($mod->visible && ($section = $sectioninfo) && !$section->visible);
     }
 
     /**
@@ -1286,5 +1432,15 @@ class format_designer_renderer extends format_section_renderer_base {
             $conditionalhidden = !$info->is_available_for_all();
         }
         return $conditionalhidden;
+    }
+
+    public function render_call_to_action($page) {
+        $data = $page->export_for_template($this);
+        return parent::render_from_template('format_designer/call_to_action', $data);
+    }
+
+    public function render_cm_completion($page) {
+        $data = $page->export_for_template($this);
+        return parent::render_from_template('format_designer/cm_completion', $data);
     }
 }

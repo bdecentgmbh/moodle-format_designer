@@ -236,6 +236,9 @@ class cm_completion implements renderable, templatable {
      * @throws \dml_exception
      */
     final public function get_override_user(): ?stdClass {
+        if (!isset($this->get_completion_data()->overrideby)) {
+            return null;
+        }
         if ($user = \core_user::get_user($this->get_completion_data()->overrideby, '*', IGNORE_MISSING)) {
             $user->fullname = fullname($user);
             return $user;
@@ -282,10 +285,10 @@ class cm_completion implements renderable, templatable {
         global $OUTPUT, $CFG;
 
         if ($this->get_completion_state() == COMPLETION_INCOMPLETE) {
-            $completionicon = 'manual-n' . ($this->get_completion_data()->overrideby ? '-override' : '');
+            $completionicon = 'manual-n';
         } else if ($this->get_completion_state() == COMPLETION_COMPLETE ||
             $this->get_completion_state() == COMPLETION_COMPLETE_PASS) {
-            $completionicon = 'manual-y' . ($this->get_completion_data()->overrideby ? '-override' : '');
+            $completionicon = 'manual-y';
         }
         if ($this->is_overridden()) {
             $args = new stdClass();
@@ -423,6 +426,8 @@ class cm_completion implements renderable, templatable {
         $data = [
             'cmid' => $this->cm->id,
             'activityname' => $this->cm->name,
+            'strmarkdone'=> get_string('completion_manual:aria:markdone', 'format_designer', $this->cm->name),
+            'strcompletion_manualdone' => get_string('completion_manual:aria:done', 'format_designer', $this->cm->name),
             'withavailability' => $withavailability,
             'istrackeduser' => $this->is_tracked_user(),
             'isediting' => $this->is_editing(),
