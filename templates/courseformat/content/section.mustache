@@ -15,109 +15,50 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template format_designer/courseformat/content/section
+    @template core_courseformat/local/content/section
 
     Displays a course section.
+
+    Note: This template is a wrapper around the section/content template to allow course formats and theme designers to
+    modify parts of the wrapper without having to copy/paste the entire template.
 
     Example context (json):
     {
         "num": 3,
         "id": 35,
-        "controlmenu": "[tools menu]",
-        "header": {
-            "name": "Section title",
-            "url": "#",
-            "ishidden": true
-        },
-        "cmlist": {
-            "cms": [
-                {
-                    "cmitem": {
-                        "cmformat": {
-                            "cmname": "<a class=\"aalink\" href=\"#\"><span class=\"instancename\">Forum example</span></a>",
-                            "hasname": "true"
-                        },
-                        "id": 3,
-                        "module": "forum",
-                        "extraclasses": "newmessages"
-                    }
-                },
-                {
-                    "cmitem": {
-                        "cmformat": {
-                            "cmname": "<a class=\"aalink\" href=\"#\"><span class=\"instancename\">Assign example</span></a>",
-                            "hasname": "true"
-                        },
-                        "id": 4,
-                        "module": "assign",
-                        "extraclasses": ""
-                    }
-                }
-            ],
-            "hascms": true
-        },
         "ishidden": false,
         "iscurrent": true,
         "currentlink": "<span class=\"accesshide\">This topic</span>",
-        "availability": {
-            "info": "<span class=\"badge badge-info\">Hidden from students</span>",
-            "hasavailability": true
-        },
-        "summary": {
-            "summarytext": "Summary text!"
-        },
-        "controlmenu": {
-            "menu": "<a href=\"#\" class=\"d-inline-block dropdown-toggle icon-no-margin\">Edit<b class=\"caret\"></b></a>",
-            "hasmenu": true
-        },
         "cmcontrols": "[Add an activity or resource]",
         "iscoursedisplaymultipage": true,
         "sectionreturnid": 0,
-        "contentexpanded": true,
+        "contentcollapsed": false,
         "insertafter": true,
         "numsections": 42,
-        "sitehome": false
+        "sitehome": false,
+        "highlightedlabel" : "Highlighted",
+        "title": "Course section ",
+        "startid": "course-collapse-section"
     }
 }}
 {{<format_designer/courseformat/content}}
     {{$content}}
-        <li id="section-{{num}}"
-            class="section main {{#restrictsection}} restricted {{/restrictsection}} {{#onlysummary}} section-summary {{/onlysummary}} clearfix
-                    {{#ishidden}} hidden {{/ishidden}} {{#iscurrent}} current {{/iscurrent}}
-                    {{#isstealth}} orphaned {{/isstealth}}"
-            data-sectionid="{{num}}"
-            data-sectionreturnid="{{sectionreturnid}}"
-            data-for="section"
-            data-id="{{id}}"
-            data-number="{{num}}"
-        >
-            {{#singleheader}} {{> format_designer/courseformat/content/section/header }} {{/singleheader}}
-            <div class="left side">{{#iscurrent}} {{{currentlink}}} {{/iscurrent}}</div>
-            <div class="right side">
-            {{#controlmenu}}
-                    {{> format_designer/courseformat/content/section/controlmenu }}
-            {{/controlmenu}}
-            <div class="icon-loader-block"></div>
-            </div>
-            {{#header}} {{> format_designer/courseformat/content/section/header }} {{/header}}
-            <div id="coursecontentcollapse{{num}}"
-                class="content {{^iscoursedisplaymultipage}}
-                    {{^sitehome}}course-content-item-content collapse {{#contentexpanded}}show{{/contentexpanded}}{{/sitehome}}
-                {{/iscoursedisplaymultipage}}">
-                <div class="summary">
-                {{#summary}}
-                    {{> core_courseformat/local/content/section/summary }}
-                {{/summary}}
-                </div>
-                {{#cmsummary}} {{> core_courseformat/local/content/section/cmsummary }} {{/cmsummary}}
-                {{#cmlist}} {{> format_designer/courseformat/content/section/cmlist }} {{/cmlist}}
-                {{{cmcontrols}}}
-                {{#insertafter}}
-                    {{#numsections}}
-                        {{> core_courseformat/local/content/addsection}}
-                    {{/numsections}}
-                {{/insertafter}}
-            </div>
-        </li>
+    <li id="section-{{num}}"
+        class="section course-section main {{#onlysummary}} section-summary {{/onlysummary}} clearfix
+                {{#ishidden}} hidden {{/ishidden}} {{#iscurrent}} current {{/iscurrent}}
+                {{#isstealth}} orphaned {{/isstealth}} {{sectionclass}}"
+        data-sectionid="{{num}}"
+        data-sectionreturnid="{{sectionreturnid}}"
+        data-for="section"
+        data-id="{{id}}"
+        data-number="{{num}}"
+        style="{{{style}}}"
+    >
+
+        {{$ format_designer/section_layout }}
+            {{> format_designer/section_layout }}
+        {{/ format_designer/section_layout }}
+
+    </li>
     {{/content}}
 {{/format_designer/courseformat/content}}

@@ -1,0 +1,181 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template format_designer/section_layout
+
+    Displays the course module card layout
+
+    Example context (json):
+    {
+        "sectiondesigntextcolor": "color: #fff",
+        "sectionheaderstyle": "min-height:100px;"
+    }
+}}
+
+<div class="section-content-wrapper">
+{{#sectiondesignwhole}}
+    <div class="section-background-style section-design-whole" style="{{#sectionbackgroundstyle}} {{sectionbackgroundstyle}} {{/sectionbackgroundstyle}}">
+        {{#maskinner}}
+        <div class="mask-inner-section" style="{{{maskinner}}}"></div>
+        {{/maskinner}}
+    </div>
+
+    {{#bgoverlay}}
+    <div class="bg-overlay" style="{{bgoverlay}}">
+    </div>
+    {{/bgoverlay}}
+{{/sectiondesignwhole}}
+
+<div class="right side">
+    {{#controlmenu}}
+        {{$ format_designer/courseformat/content/section/controlmenu }}
+            {{> format_designer/courseformat/content/section/controlmenu }}
+        {{/ format_designer/courseformat/content/section/controlmenu }}
+    {{/controlmenu}}
+    <div class="icon-loader-block"></div>
+</div>
+
+<div class="course-section-header section-header-content {{#sectioncollapse}}{{^sectionshow}}collapsed{{/sectionshow}}{{/sectioncollapse}}"
+    id="section-head-{{section.section}}"
+    {{#sectioncollapse}} data-toggle="collapse" {{/sectioncollapse}}
+    data-target="#section-content-{{section.section}}"
+    aria-expanded="false"
+    aria-controls="section-head-{{section.section}}"
+    role="contentinfo"
+    style="{{sectionheaderstyle}}"
+    data-for="section_title"
+    data-id="{{id}}"
+    data-number="{{num}}"
+    >
+
+        {{#sectiondesignheader}}
+            <div class="section-background-style sectiondesign-header" style="{{sectionbackgroundstyle}}">
+                {{#maskinner}}
+                <div class="mask-inner-section" style="{{{maskinner}}}"></div>
+                {{/maskinner}}
+            </div>
+        {{/sectiondesignheader}}
+        {{#sectioncollapse}}
+        <span class="section-collapse-icon" style="{{{sectiondesigntextcolor}}}"></span>
+        {{/sectioncollapse}}
+
+        {{#bgoverlay}}
+        {{^sectiondesignwhole}}
+            <div class="bg-overlay" style="{{bgoverlay}}">
+            </div>
+        {{/sectiondesignwhole}}
+        {{/bgoverlay}}
+
+        {{! Section name header }}
+        {{^section.hidesectiontitle}}
+            {{#singleheader}}
+            {{$ format_designer/courseformat/content/section/header }}
+                {{> format_designer/courseformat/content/section/header }}
+            {{/ format_designer/courseformat/content/section/header }}
+            {{/singleheader}}
+            {{#header}}
+            {{$ format_designer/courseformat/content/section/header }}
+                {{> format_designer/courseformat/content/section/header }}
+            {{/ format_designer/courseformat/content/section/header }}
+            {{/header}}
+        {{/section.hidesectiontitle}}
+        {{! End of section name }}
+
+        {{! Section badges }}
+        <div data-region="sectionbadges" class="sectionbadges align-items-center">
+            {{$ core_courseformat/local/content/section/badges }}
+                {{> core_courseformat/local/content/section/badges }}
+            {{/ core_courseformat/local/content/section/badges }}
+        </div>
+        {{#section.categorisetitle}}
+            <div class="categorise-section-block">
+                <span class="badge" style="color:{{section.categorisetextcolor}}; background-color:{{section.categorisebackcolor}};">{{section.categorisetitle}}</span>
+            </div>
+        {{/section.categorisetitle}}
+        {{! End of section badges }}
+
+        {{#issectioncompletion}}
+        <div class="section-progress-info">
+            {{^sectionprogresscomp}}
+            <div class="section-progress-bar">
+                <div class="progress">
+                    <div class="progress-bar progress-bg-success" role="progressbar" style= "width: {{sectionprogress}}%" aria-valuenow="{{sectionprogress}}" aria-valuemin="0" aria-valuemax="100">
+                        <span class="percentage">{{sectionprogress}}%</span>
+                    </div>
+                </div>
+            </div>
+            {{/sectionprogresscomp}}
+            {{#sectionprogresscomp}}
+                <div class="section-progress-completeted">
+                    <span class="badge badge-completion badge-success"><span><i class="fa fa-check"></i> {{#str}}sectioncompleted, format_designer{{/str}}</span></span>
+                </div>
+            {{/sectionprogresscomp}}
+        </div>
+        {{/issectioncompletion}}
+
+        {{#availability}}
+        <div class="availability-section-block">
+            {{$ format_designer/courseformat/content/section/availability }}
+                {{> format_designer/courseformat/content/section/availability }}
+            {{/ format_designer/courseformat/content/section/availability }}
+        </div>
+        {{/availability}}
+
+        <div class="summary" style="{{#sectiondesigntextcolor}} {{sectiondesigntextcolor}} {{/sectiondesigntextcolor}}">
+        {{#summary}}
+            {{$ core_courseformat/local/content/section/summary }}
+                {{> core_courseformat/local/content/section/summary }}
+            {{/ core_courseformat/local/content/section/summary }}
+        {{/summary}}
+        </div>
+        {{#gotosection}}
+        <a href="{{{sectionurl}}}" class="goto-section btn btn-primary">{{#str}}gotosection, format_designer{{/str}}</a>
+        {{/gotosection}}
+</div>
+
+<div class="content {{sectioncontentlayout}}
+    {{#sectioncollapse}}collapse{{/sectioncollapse}}
+    {{#sectionshow}}show{{/sectionshow}}
+    {{^iscoursedisplaymultipage}}
+        {{^sitehome}}course-content-item-content {{/sitehome}}
+    {{/iscoursedisplaymultipage}}"
+    id="section-content-{{section.section}}"
+    aria-labelledby="section-head-{{section.section}}"
+    {{#sectionaccordion}}
+    data-parent="#section-course-accordion"
+    {{/sectionaccordion}}
+    role="contentinfo"
+    style="{{#sectioncontentwidth}} {{sectioncontentwidth}} {{/sectioncontentwidth}}">
+
+    {{^sectionheader}}
+        {{#cmlist}}
+        {{$ format_designer/courseformat/content/section/cmlist }}
+            {{> format_designer/courseformat/content/section/cmlist }}
+        {{/ format_designer/courseformat/content/section/cmlist }}
+        {{/cmlist}}
+
+        {{{cmcontrols}}}
+        {{#insertafter}}
+        {{#numsections}}
+            {{$ core_courseformat/local/content/addsection}}
+                {{> core_courseformat/local/content/addsection}}
+            {{/ core_courseformat/local/content/addsection}}
+        {{/numsections}}
+        {{/insertafter}}
+    {{/sectionheader}}
+</div>
+</div>

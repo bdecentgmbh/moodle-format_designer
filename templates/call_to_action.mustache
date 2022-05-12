@@ -21,10 +21,15 @@
 
     Example context (json):
     {
-        "reactionurl_dislike" : "http://moodleurl/course/format/designer/classes/output/call_to_action.php"
-
+        "modurl": "http://moodleurl/course/format/designer/classes/output/call_to_action.php",
+        "isrestricted": "false"
     }
 }}
-<a href="{{modurl}}">
-    <span class="text-uppercase font-weight-bold text-{{colorclass}}">{{{calltoactionlabel}}}</span>
-</a>
+{{#isrestricted}}
+<a href="javascript:void(0);"> <span class="font-weight-bold" style="{{#actiontextcolor}} {{actiontextcolor}} {{/actiontextcolor}}">{{{calltoactionlabel}}}</span></a>
+{{/isrestricted}}
+{{^isrestricted}}
+{{#modurl}}
+<a href="{{modurl}}"> <span class="font-weight-bold" style="{{#actiontextcolor}} {{actiontextcolor}} {{/actiontextcolor}}">{{{calltoactionlabel}}}</span></a>
+{{/modurl}}
+{{/isrestricted}}

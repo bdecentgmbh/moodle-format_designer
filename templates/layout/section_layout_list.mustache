@@ -15,36 +15,37 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template format_designer/layout/section_layout_list
+    @template format_designer/section_layout_list
 
-    Displays the course module list layout
+    Displays the course module card layout
 
     Example context (json):
     {
-        "reactionurl_dislike" : "http://moodleurl/course/format/designer/classes/output/courseformat/content/secton/cmlist.php"
-
+        "reactionurl_dislike": "http://moodleurl/course/format/designer/renderer.php"
     }
 }}
 {{#showmovehere}}
 <p>{{movingstr}} (<a href="{{{cancelcopyurl}}}">{{#str}} cancel {{/str}}</a>)</p>
 {{/showmovehere}}
+<ul class="section m-0 p-0 img-text list-layout {{#hascms}} d-block {{/hascms}} {{sectioncontentlayout}} designer-section-content" data-sectionlayout="{{sectionlayoutclass}}"
+    style="{{#sectioncontentwidth}} {{sectioncontentwidth}} {{/sectioncontentwidth}}" data-for="cmlist">
 
-
-<ul id="designer-section-content" class="section img-text {{sectionlayoutclass}} {{#hascms}} d-block {{/hascms}}"
-data-for="cmlist" data-sectionlayout="{{sectionlayoutclass}}">
-{{#hascms}}
-    {{#showmovehere}}
-    <li class="movehere">
-        <a href="{{{moveurl}}}" title="{{strmovefull}}" class="movehere"></a>
-    </li>
-    {{/showmovehere}}
     {{#cms}}
-        {{> format_designer/layout/cm/module_layout_list}}
+        {{#showmovehere}}
+        <li class="movehere">
+            <a href="{{{moveurl}}}" title="{{strmovefull}}" class="movehere"></a>
+        </li>
+        {{/showmovehere}}
+        {{#.}}
+        {{#cmitem}}
+            {{> format_designer/cm/module_layout_list}}
+        {{/cmitem}}
+        {{/.}}
     {{/cms}}
-{{/hascms}}
-{{#showmovehere}}
-    <li class="movehere">
-        <a href="{{{movetosectionurl}}}" title="{{strmovefull}}" class="movehere"></a>
-    </li>
-{{/showmovehere}}
+
+    {{#showmovehere}}
+        <li class="movehere">
+            <a href="{{{movetosectionurl}}}" title="{{strmovefull}}" class="movehere"></a>
+        </li>
+    {{/showmovehere}}
 </ul>

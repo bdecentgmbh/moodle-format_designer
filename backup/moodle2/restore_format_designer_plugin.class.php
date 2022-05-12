@@ -22,16 +22,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Specialised restore for Designer course format.
- *
- * Processes 'numsections' from the old backup files and hides sections that used to be "orphaned".
- *
- * @package   format_designer
- * @copyright 2021 bdecent gmbh <https://bdecent.de>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_format_designer_plugin extends restore_format_plugin {
 
@@ -74,11 +66,50 @@ class restore_format_designer_plugin extends restore_format_plugin {
     }
 
     /**
+     * Module stucture path.
+     */
+    public function define_module_plugin_structure() {
+        $paths[] = new restore_path_element('format_designer_options', '/module/format_designer_options');
+        return $paths;
+    }
+
+    /**
+     * Section structure path.
+     */
+    public function define_section_plugin_structure() {
+        $paths[] = new restore_path_element('dummy_section', $this->get_pathfor('/dummysection'));
+        return $paths;
+    }
+
+    /**
+     * Format designer options process.
+     * @param array $data
+     */
+    public function process_format_designer_options($data) {
+        global $DB, $CFG;
+
+        $data = (object) $data;
+        $data->courseid = $this->get_mappingid('course', $data->courseid);
+        $data->cmid = $this->get_mappingid('course_module', $data->cmid);
+
+        $DB->insert_record('format_designer_options', $data);
+    }
+
+    /**
      * Dummy process method.
      *
      * @return void
      */
     public function process_dummy_course() {
+
+    }
+
+    /**
+     * Dummy process method.
+     *
+     * @return void
+     */
+    public function process_dummy_section() {
 
     }
 
@@ -119,5 +150,27 @@ class restore_format_designer_plugin extends restore_format_plugin {
                 }
             }
         }
+    }
+
+    /**
+     * Update the files of editors after restore execution.
+     *
+     * @return void
+     */
+    protected function after_restore_module() {
+
+        $files = \format_designer\options::get_file_areas();
+        foreach ($files as $filearea => $component) {
+            $this->add_related_files($component, $filearea, null);
+        }
+    }
+
+    /**
+     * After section restore add the section related files.
+     */
+    protected function after_restore_section() {
+
+        $this->add_related_files('format_designer', 'sectiondesignbackground', null);
+        $this->add_related_files('format_designer', 'sectiondesigncompletionbackground', null);
     }
 }

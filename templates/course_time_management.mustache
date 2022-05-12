@@ -1,0 +1,96 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template format_designer/cm_completion
+
+    Displays the course module card layout
+
+    Example context (json):
+    {
+        "enrolmentstartdate": "1640983783",
+        "userdate": "true"
+    }
+}}
+<div class="course-info-block">
+    {{#enrolmentstartdate}}
+    <div class="course-start-date">
+        <h6><i class="fa fa-calendar"></i> {{#str}} coursestartdate, format_designer {{/str}}</h6>
+        <h3>{{#userdate}} {{enrolmentstartdate}}, {{#str}} strftimedate {{/str}} {{/userdate}}</h3>
+    </div>
+    {{/enrolmentstartdate}}
+
+    {{#courseduedate}}
+    <div class="course-due-date">
+        <h6><i class="fa fa-clock-o"></i> {{#str}} courseduedate, format_designer {{/str}}</h6>
+        <h3>{{#userdate}} {{courseduedate}}, {{#str}} strftimedate {{/str}} {{/userdate}}</h3>
+    </div>
+    {{/courseduedate}}
+
+    {{#showcompletiondate}}
+    <div class="course-completion-date">
+        <h6><i class="fa fa-flag-checkered"></i> {{#str}} coursecompletiondate, format_designer {{/str}}</h6>
+        {{#completiondate}}
+        <h3> {{#userdate}} {{completiondate}}, {{#str}} strftimedate {{/str}} {{/userdate}}</h3>
+        {{/completiondate}}
+        {{^completiondate}}
+        <h3> -/-</h3>
+        {{/completiondate}}
+    </div>
+    {{/showcompletiondate}}
+
+    {{#course.enrolmentenddate}}
+    <div class="course-expire-date">
+        <h6><i class="fa fa-sign-out"></i> {{#str}} courseexpirationdate, format_designer {{/str}} </h6>
+        {{#enrolmentenddate}}
+        <h3>{{#userdate}} {{enrolmentenddate}}, {{#str}} strftimedate {{/str}} {{/userdate}}</h3>
+        {{/enrolmentenddate}}
+        {{^enrolmentenddate}}
+        <h3>-/-</h3>
+        {{/enrolmentenddate}}
+    </div>
+    {{/course.enrolmentenddate}}
+
+    {{#courseprogress}}
+    <div class="progress-block">
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: {{courseprogress.percent}}%" 
+                aria-valuenow="{{courseprogress.percent}}" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+
+        <div class="activity-completed-block">
+            <p> {{#str}} activitiescompleted, format_designer, { "count": {{courseprogress.count}}, "completed": {{courseprogress.completed}} } {{/str}}
+            </p>
+        </div>
+        {{#due}}
+            {{#due.dues}}
+            <div class="activity-due-block">
+                <p>{{#str}} todaydue, format_designer, {
+                    "due": {{due.dues}}
+                } {{/str}}</p>
+            </div>
+            {{/due.dues}}
+            {{#due.overdues}}
+            <div class="activity-overdue-block">
+                <p>{{#str}} overdues, format_designer, {
+                    "overdues": {{due.overdues}}
+                } {{/str}}</p>
+            </div>
+            {{/due.overdues}}
+        {{/due}}
+    </div>
+    {{/courseprogress}}
+</div>

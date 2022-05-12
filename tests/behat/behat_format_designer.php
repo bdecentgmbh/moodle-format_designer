@@ -19,7 +19,7 @@
  *
  * @package    format_designer
  * @category   test
- * @copyright  2021 bdecent gmbh <https://bdecent.de>
+ * @copyright  2020 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -84,7 +84,7 @@ class behat_format_designer extends behat_base {
 
         // If it is already opened we do nothing.
         $xpath = "//li[@id='section-" . $sectionnumber . "']";
-        $xpath .= "/descendant::div[contains(@id,'section-designer-action')]/descendant::
+        $xpath .= "/descendant::div[contains(@id, 'section-designer-action')]/descendant::
         button[contains(@data-toggle, 'dropdown')]";
         $exception = new ExpectationException('Section "' . $sectionnumber . '" was not found', $this->getSession());
         $menu = $this->find('xpath', $xpath, $exception);
@@ -103,7 +103,7 @@ class behat_format_designer extends behat_base {
     public function i_check_the_section_layout($sectionnumber, $layouttype) {
         $layoutclass = "$layouttype-layout";
         $xpath = "//li[@id='section-" . $sectionnumber . "']";
-        $xpath .= "/descendant::ul[contains(@id, 'designer-section-content') and contains(@class, '".$layoutclass."')]";
+        $xpath .= "/descendant::ul[contains(@class, 'designer-section-content') and contains(@class, '".$layoutclass."')]";
         $exception = new ExpectationException('Section "' . $sectionnumber . '" was not change the layout "'
         . $layouttype . '"', $this->getSession());
         $this->find('xpath', $xpath, $exception);
@@ -141,6 +141,48 @@ class behat_format_designer extends behat_base {
     }
 
     /**
+     * Click the section header.
+     *
+     * @Given /^I click on section header "(?P<section_number>\d+)"$/
+     * @throws DriverException The step is not available when Javascript is disabled
+     * @param int $sectionnum
+     */
+    public function i_click_on_section_header($sectionnum) {
+        $xpath = "//li[@id='section-" . $sectionnum . "']";
+        $xpath .= "/descendant::div[contains(@class, 'section-header-content')]";
+        $exception = new ExpectationException('Click for section"'. $sectionnum .'" header was not found', $this->getSession());
+        $menu = $this->find('xpath', $xpath, $exception);
+        $menu->click();
+    }
+
+    /**
+     * Check the section is expanded.
+     * @Given /^I click on section expanded "(?P<section_number>\d+)"$/
+     * @throws DriverException The step is not available when Javascript is disabled
+     * @param int $sectionnumber
+     */
+    public function i_check_section_expanded($sectionnumber) {
+        $xpath = "//li[@id='section-" . $sectionnumber . "']";
+        $xpath .= "/descendant::div[contains(@class, 'section-header-content') and contains(@data-toggle, 'collapse')]";
+        $exception = "";
+        $this->find('xpath', $xpath, $exception);
+    }
+
+    /**
+     * Check the section is collapsed.
+     * @Given /^I click on section collapsed "(?P<section_number>\d+)"$/
+     * @throws DriverException The step is not available when Javascript is disabled
+     * @param int $sectionnumber
+     */
+    public function i_check_section_collapsed($sectionnumber) {
+        $xpath = "//li[@id='section-" . $sectionnumber . "']";
+        $xpath .= "/descendant::div[contains(@class, 'section-header-content')
+            and contains(@class, 'collapse') and contains(@data-toggle, 'collapse')]";
+        $exception = "";
+        $this->find('xpath', $xpath, $exception);
+    }
+
+    /**
      * Check the activity completion info for designer format.
      *
      * @Given /^I should see designerinfo "(?P<acti_id>(?:[^"]|\\")*)" "(?P<com_info>(?:[^"]|\\")*)" "(?P<Dur_info>(?:[^"]|\\")*)"$/
@@ -153,10 +195,27 @@ class behat_format_designer extends behat_base {
         $xpath = $this->get_activity_idendifier_slug($activityidendifier);
         $durationinfo = behat_context_helper::escape($duration);
         $completioninfo .= str_replace("'", "", $durationinfo);
-        $xpath .= "/descendant::div[contains(@class, 'completion-info')]/descendant::span[contains(., '".$completioninfo."')]";
-        $exception = new ExpectationException('Completion info for "' . $activityidendifier .
-            '" was not found', $this->getSession());
+        $xpath .= "/descendant::div[contains(@class, 'completion-info')]/descendant::
+        span[contains(., '".$completioninfo."')]";
+        $exception = new ExpectationException('Completion info for "' . $activityidendifier . '" was not found',
+            $this->getSession());
         $this->find('xpath', $xpath, $exception);
+    }
+
+    /**
+     * Manual completion for designer format.
+     *
+     * @Given /^I toggle assignment manual completion designer "(?P<acti_id>(?:[^"]|\\")*)" "(?P<acti_type>(?:[^"]|\\")*)"$/
+     * @throws DriverException The step is not available when Javascript is disabled
+     * @param string $activityname
+     * @param string $activityidendifier
+     */
+    public function i_toggle_assignment_manual_completion_designer($activityname, $activityidendifier) {
+        global $CFG;
+            // Moodle-3.11 and above.
+        $this->i_click_on_activity($activityidendifier);
+        $this->execute("behat_completion::toggle_the_manual_completion_state", [$activityname]);
+        $this->execute("behat_completion::manual_completion_button_displayed_as", [$activityname, "Done"]);
     }
 
     /**
@@ -172,8 +231,8 @@ class behat_format_designer extends behat_base {
         }
         $moduleid = "module-" . $cm->id;
         $xpath = "//li[@id='".$moduleid."']";
-        $exception = new ExpectationException('Activity idendifier "' . $activityidendifier .
-            '" was not found', $this->getSession());
+        $exception = new ExpectationException('Activity idendifier "' . $activityidendifier . '" was not found',
+            $this->getSession());
         $this->find('xpath', $xpath, $exception);
         return $xpath;
     }

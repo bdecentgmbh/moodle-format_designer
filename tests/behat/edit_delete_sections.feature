@@ -75,3 +75,12 @@ Feature: Sections can be edited and deleted in designer format
     And I should not see "Test chat name"
     And I should see "Test choice name" in the "li#section-4" "css_element"
     And I should see "Designer section 4"
+
+  @javascript
+  Scenario: Adding sections in designer format
+    When I follow "Add designer sections"
+    And I should see "Designer section 6" in the "li#section-6" "css_element"
+    And "li#section-7" "css_element" should not exist
+    And I follow "Add designer sections"
+    And I should see "Designer section 7" in the "li#section-7" "css_element"
+    And "li#section-8" "css_element" should not exist

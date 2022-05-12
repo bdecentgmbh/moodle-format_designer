@@ -15,37 +15,39 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template format_designer/layout/section_layout_default
+    @template format_designer/section_content_default
 
-    Displays the course module default(link) layout
+    Displays the course module card layout
 
     Example context (json):
     {
-        "reactionurl_dislike" : "http://moodleurl/course/format/designer/classes/output/courseformat/content/secton/cmlist.php"
+        "reactionurl_dislike": "http://moodleurl/course/format/designer/renderer.php"
     }
 }}
 {{#showmovehere}}
 <p>{{movingstr}} (<a href="{{{cancelcopyurl}}}">{{#str}} cancel {{/str}}</a>)</p>
 {{/showmovehere}}
-
-<ul id="designer-section-content" class="section img-text {{sectionlayoutclass}} {{#hascms}} d-block {{/hascms}}"
-data-sectionlayout="{{sectionlayoutclass}}" data-for="cmlist">
-    {{#hascms}}
+<ul class="section img-text link-layout {{#hascms}} d-block {{/hascms}} {{sectioncontentlayout}} designer-section-content" data-sectionlayout="{{sectionlayoutclass}}"
+    style="{{#sectioncontentwidth}} {{sectioncontentwidth}} {{/sectioncontentwidth}}" data-for="cmlist">
+    {{#cms}}
         {{#showmovehere}}
         <li class="movehere">
             <a href="{{{moveurl}}}" title="{{strmovefull}}" class="movehere"></a>
         </li>
         {{/showmovehere}}
+        {{#.}}
+        {{#cmitem}}
+        
+            {{> format_designer/cm/module_layout_default}}
+        
+        {{/cmitem}}
+        {{/.}}
+    {{/cms}}
 
-        {{#cms}}
-            {{> format_designer/layout/cm/module_layout_default}}
-        {{/cms}}
-    {{/hascms}}
     {{#showmovehere}}
-        <li class="movehere">
-            <a href="{{{movetosectionurl}}}" title="{{strmovefull}}" class="movehere"></a>
-        </li>
+    <li class="movehere">
+        <a href="{{{movetosectionurl}}}" title="{{strmovefull}}" class="movehere"></a>
+    </li>
     {{/showmovehere}}
 </ul>
-
 

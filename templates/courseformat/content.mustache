@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template format_designer/courseformat/content
+    @template core_courseformat/local/content
 
     Displays the complete course format.
 
@@ -45,10 +45,69 @@
                     "summarytext": "Summary text!"
                 }
             },
-        "format": "designer",
+        "sections": [
+            {
+                "num": 1,
+                "id": 35,
+                "header": {
+                    "name": "Section title",
+                    "url": "#"
+                },
+                "cmlist": {
+                    "cms": [
+                        {
+                            "cmitem": {
+                                "cmformat": {
+                                    "cmname": "<a class=\"aalink\" href=\"#\"><span class=\"instancename\">Another forum</span></a>",
+                                    "hasname": "true"
+                                },
+                                "id": 3,
+                                "module": "forum",
+                                "extraclasses": "newmessages"
+                            }
+                        }
+                    ],
+                    "hascms": true
+                },
+                "iscurrent": true,
+                "summary": {
+                    "summarytext": "Summary text!"
+                }
+            },
+            {
+                "num": 4,
+                "id": 36,
+                "header": {
+                    "name": "Section 2 title",
+                    "url": "#"
+                },
+                "cmlist": {
+                    "cms": [
+                        {
+                            "cmitem": {
+                                "cmformat": {
+                                    "cmname": "<a class=\"aalink\" href=\"#\"><span class=\"instancename\">Forum example</span></a>",
+                                    "hasname": "true"
+                                },
+                                "id": 5,
+                                "module": "forum",
+                                "extraclasses": "newmessages"
+                            }
+                        }
+                    ],
+                    "hascms": true
+                },
+                "iscurrent": true,
+                "summary": {
+                    "summarytext": "Summary text!"
+                }
+            }
+        ],
+        "format": "topics",
+        "startid": "course-collapse-section",
         "title": "Course title example",
-            "hasnavigation": true,
-            "sectionnavigation": {
+        "hasnavigation": true,
+        "sectionnavigation": {
             "hasprevious": true,
             "previousurl": "#",
             "larrow": "&#x25C4;",
@@ -69,6 +128,7 @@
             "nextname": "Section 5",
             "selector": "<select><option>Section 4</option></select>"
         },
+        "sectionreturn": 1,
         "singlesection": {
             "num": 1,
             "id": 35,
@@ -100,39 +160,53 @@
     }
 }}
 <div id="{{uniqid}}-course-format">
-    {{#title}}
-        <h2 class="accesshide">{{{title}}}</h2>
-    {{/title}}
+    {{{timemanagement}}}
+    <h2 class="accesshide">{{{title}}}</h2>
     {{{completionhelp}}}
-    <ul class="{{format}}" data-for="course_sectionlist">
+
+    <ul class="{{format}} {{startclass}}" data-for="course_sectionlist" id="{{startid}}">
         {{#initialsection}}
-            {{$content}}
-
-            {{/content}}
+            {{$content}}  {{/content}}
         {{/initialsection}}
-        {{#sections}}
-            {{$content}}
+        {{#kanbanmode}}
+        <div class="kanban-board-activities">
+        {{/kanbanmode}}
 
-            {{/content}}
+        {{#sections}}
+            {{$content}} {{/content}}
         {{/sections}}
+
+        {{#kanbanmode}}
+        </div>
+        {{/kanbanmode}}
     </ul>
     {{#hasnavigation}}
     <div class="single-section">
-        {{#sectionnavigation}} {{> core_courseformat/local/content/sectionnavigation }} {{/sectionnavigation}}
-        <ul class="{{format}}">
+        {{#sectionnavigation}}
+            {{$ core_courseformat/local/content/sectionnavigation }}
+                {{> core_courseformat/local/content/sectionnavigation }}
+            {{/ core_courseformat/local/content/sectionnavigation }}
+        {{/sectionnavigation}}
+        <ul class="{{format}} {{startclass}}">
         {{#singlesection}}
-            {{$content}}
-
-            {{/content}}
+            {{$content}}  {{/content}}
         {{/singlesection}}
         </ul>
-        {{#sectionselector}} {{> core_courseformat/local/content/sectionselector }} {{/sectionselector}}
+        {{#sectionselector}}
+            {{$ core_courseformat/local/content/sectionselector }}
+                {{> core_courseformat/local/content/sectionselector }}
+            {{/ core_courseformat/local/content/sectionselector }}
+        {{/sectionselector}}
     </div>
     {{/hasnavigation}}
-    {{#numsections}} {{> core_courseformat/local/content/addsection}} {{/numsections}}
+    {{#numsections}}
+        {{$ core_courseformat/local/content/addsection}}
+            {{> core_courseformat/local/content/addsection}}
+        {{/ core_courseformat/local/content/addsection}}
+    {{/numsections}}
 </div>
 {{#js}}
 require(['core_courseformat/local/content'], function(component) {
-    component.init('{{uniqid}}-course-format');
+    component.init('{{uniqid}}-course-format', {}, {{sectionreturn}});
 });
 {{/js}}

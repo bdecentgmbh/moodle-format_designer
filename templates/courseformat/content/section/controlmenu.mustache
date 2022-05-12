@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template format_designer/courseformat/content/section/controlmenu
+    @template core_courseformat/local/content/section/controlmenu
 
     Displays a section control menu (dropdown menu).
 
@@ -26,21 +26,19 @@
     }
 }}
 {{#hasmenu}}
-<div class="btn-group" role="group" aria-label="Basic example">
-    <div class="dropdown" id="section-designer-action">
-        <button class="btn btn-primary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {{#seciontypes}}
-                {{#active}}{{name}}{{/active}}
-            {{/seciontypes}}
-        </button>
-        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-            {{#seciontypes}}
-                <a class="dropdown-item{{#active}} active{{/active}}" href="javascript:void(0)" data-action="set-section-option" data-option="sectiontype" data-value="{{type}}">{{name}}</a>
-            {{/seciontypes}}
-        </div>
+<div class="dropdown designer-menu"  id="section-designer-action" data-sectionid="{{id}}">
+    <button class="btn btn-primary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {{#seciontypes}}
+            {{#active}}{{name}}{{/active}}
+        {{/seciontypes}}
+    </button>
+    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+        {{#seciontypes}}
+            <a class="dropdown-item{{#active}} active{{/active}}" href="javascript:void(0)" data-action="set-section-option" data-option="sectiontype" data-value="{{type}}">{{name}}</a>
+        {{/seciontypes}}
     </div>
-    <div class="section_action_menu" data-sectionid="{{id}}">
-        {{{menu}}}
-    </div>
+</div>
+<div class="section_action_menu ml-auto" data-sectionid="{{id}}">
+    {{{menu}}}
 </div>
 {{/hasmenu}}

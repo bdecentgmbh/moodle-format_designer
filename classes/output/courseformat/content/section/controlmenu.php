@@ -23,6 +23,7 @@
  */
 
 namespace format_designer\output\courseformat\content\section;
+
 use core_courseformat\output\local\content\section\controlmenu as controlmenu_base;
 use section_info;
 use core_courseformat\base as course_format;
@@ -116,6 +117,18 @@ class controlmenu extends controlmenu_base {
             ],
         ];
 
+        if (format_designer_has_pro()) {
+            $prosectiontypes = [
+                [
+                    'type' => 'circles',
+                    'name' => get_string('circles', 'format_designer'),
+                    'active' => $this->format->get_section_option($section->id, 'sectiontype') == 'circles',
+                    'url' => new moodle_url('/course/view.php', ['id' => $this->course->id], 'section-' . $section->section)
+                ],
+            ];
+            $sectiontypes = array_merge($sectiontypes, $prosectiontypes);
+        }
+
         $data = (object)[
             'menu' => $output->render($menu),
             'hasmenu' => true,
@@ -125,4 +138,5 @@ class controlmenu extends controlmenu_base {
 
         return $data;
     }
+
 }

@@ -18,9 +18,11 @@
  * designer course format related unit tests.
  *
  * @package    format_designer
- * @copyright  2021 bdecent gmbh <https://bdecent.de>
+ * @copyright  2015 Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace format_designer;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -31,14 +33,14 @@ require_once($CFG->dirroot . '/course/lib.php');
  * designer course format related unit tests.
  *
  * @package    format_designer
- * @copyright  2021 bdecent gmbh <https://bdecent.de>
+ * @copyright  2015 Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class format_designer_testcase extends advanced_testcase {
+class lib_test extends \advanced_testcase {
 
     /**
      * Tests for format_designer::get_section_name method with default section names.
-     *
+     * @covers ::get_section_name
      * @return void
      */
     public function test_get_section_name() {
@@ -64,7 +66,7 @@ class format_designer_testcase extends advanced_testcase {
 
     /**
      * Tests for format_designer::get_section_name method with modified section names.
-     *
+     * @covers ::get_section_name_customised
      * @return void
      */
     public function test_get_section_name_customised() {
@@ -98,7 +100,7 @@ class format_designer_testcase extends advanced_testcase {
 
     /**
      * Tests for format_designer::get_default_section_name.
-     *
+     * @covers ::get_default_section_name
      * @return void
      */
     public function test_get_default_section_name() {
@@ -129,7 +131,7 @@ class format_designer_testcase extends advanced_testcase {
 
     /**
      * Test web service updating section name.
-     *
+     * @covers \core_external::update_inplace_editable
      * @return void
      */
     public function test_update_inplace_editable() {
@@ -145,9 +147,9 @@ class format_designer_testcase extends advanced_testcase {
 
         // Call webservice without necessary permissions.
         try {
-            core_external::update_inplace_editable('format_designer', 'sectionname', $section->id, 'New section name');
+            \core_external::update_inplace_editable('format_designer', 'sectionname', $section->id, 'New section name');
             $this->fail('Exception expected');
-        } catch (moodle_exception $e) {
+        } catch (\moodle_exception $e) {
             $this->assertEquals('Course or activity not accessible. (Not enrolled)',
                     $e->getMessage());
         }
@@ -156,15 +158,15 @@ class format_designer_testcase extends advanced_testcase {
         $teacherrole = $DB->get_record('role', ['shortname' => 'editingteacher']);
         $this->getDataGenerator()->enrol_user($user->id, $course->id, $teacherrole->id);
 
-        $res = core_external::update_inplace_editable('format_designer', 'sectionname', $section->id, 'New section name');
-        $res = external_api::clean_returnvalue(core_external::update_inplace_editable_returns(), $res);
+        $res = \core_external::update_inplace_editable('format_designer', 'sectionname', $section->id, 'New section name');
+        $res = \external_api::clean_returnvalue(\core_external::update_inplace_editable_returns(), $res);
         $this->assertEquals('New section name', $res['value']);
         $this->assertEquals('New section name', $DB->get_field('course_sections', 'name', ['id' => $section->id]));
     }
 
     /**
      * Test callback updating section name.
-     *
+     * @covers ::inplace_editable
      * @return void
      */
     public function test_inplace_editable() {
@@ -191,14 +193,14 @@ class format_designer_testcase extends advanced_testcase {
         try {
             component_callback('format_weeks', 'inplace_editable', ['sectionname', $section->id, 'New name']);
             $this->fail('Exception expected');
-        } catch (moodle_exception $e) {
+        } catch (\moodle_exception $e) {
             $this->assertEquals(1, preg_match('/^Can\'t find data record in database/', $e->getMessage()));
         }
     }
 
     /**
      * Test get_default_course_enddate.
-     *
+     * @covers ::get_default_course_enddate
      * @return void
      */
     public function test_default_course_enddate() {
@@ -218,14 +220,14 @@ class format_designer_testcase extends advanced_testcase {
             'course' => $course,
             'category' => $category,
             'editoroptions' => [
-                'context' => context_course::instance($course->id),
+                'context' => \context_course::instance($course->id),
                 'subdirs' => 0
             ],
-            'returnto' => new moodle_url('/'),
-            'returnurl' => new moodle_url('/'),
+            'returnto' => new \moodle_url('/'),
+            'returnurl' => new \moodle_url('/'),
         ];
 
-        $courseform = new testable_course_edit_form(null, $args);
+        $courseform = new \testable_course_edit_form(null, $args);
         $courseform->definition_after_data();
 
         $enddate = $params['startdate'] + get_config('moodlecourse', 'courseduration');
@@ -237,7 +239,7 @@ class format_designer_testcase extends advanced_testcase {
 
     /**
      * Test for get_view_url() to ensure that the url is only given for the correct cases.
-     *
+     * @covers ::get_view_url
      * @return void
      */
     public function test_get_view_url() {
@@ -272,5 +274,34 @@ class format_designer_testcase extends advanced_testcase {
         $CFG->linkcoursesections = 1;
         $this->assertNotEmpty($format->get_view_url(1, ['navigation' => 1]));
         $this->assertNotEmpty($format->get_view_url(0, ['navigation' => 1]));
+    }
+
+    /**
+     * Test the module content trim character.
+     * @covers ::format_designer_modcontent_trim_char
+     * @return void
+     */
+    public function test_format_designer_modcontent_trim_char() {
+
+        $str1 = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+        Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+        when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
+        $resstr1 = format_designer_modcontent_trim_char($str1, 30);
+        $this->assertEquals(23, str_word_count($resstr1));
+
+        $str2 = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.";
+        $resstr2 = format_designer_modcontent_trim_char($str2, 30);
+        $this->assertEquals(str_word_count($str2), str_word_count($resstr2));
+    }
+
+    /**
+     * Test desginer format date method.
+     * @covers ::format_designer_format_date
+     * @return void
+     */
+    public function test_format_designer_format_date() {
+        $timestamp = 1642861536;
+        $dateformat = format_designer_format_date($timestamp);
+        $this->assertEquals("Jan 22", $dateformat);
     }
 }

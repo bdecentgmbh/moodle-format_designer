@@ -21,6 +21,7 @@
  * @copyright 2021 bdecent gmbh <https://bdecent.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
@@ -29,6 +30,22 @@ $functions = [
         'classname'     => 'format_designer\external\external',
         'methodname'    => 'set_section_options',
         'description'   => 'Set section options.',
+        'type'          => 'write',
+        'ajax'          => true
+    ],
+    'format_designer_get_module' => [
+        'classpath'     => '',
+        'classname'     => 'format_designer\external\external',
+        'methodname'    => 'get_module',
+        'description'   => 'Get the module info.',
+        'type'          => 'write',
+        'ajax'          => true
+    ],
+    'format_designer_section_refresh' => [
+        'classpath'     => '',
+        'classname'     => 'format_designer\external\external',
+        'methodname'    => 'section_refresh',
+        'description'   => 'Refresh the section block',
         'type'          => 'write',
         'ajax'          => true
     ]

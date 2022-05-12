@@ -15,33 +15,37 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Privacy Subsystem implementation for Designer course format.
+ * Contains the default activity title.
  *
- * @package   format_designer
- * @copyright 2021 bdecent gmbh <https://bdecent.de>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * This class is usually rendered inside the cmname inplace editable.
+ *
+ * @package    format_designer
+ * @copyright  2021 bdecent gmbh <https://bdecent.de>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace format_designer\privacy;
+namespace format_designer\output\courseformat\content\cm;
 
-use core_privacy\local\metadata\null_provider;
+use stdClass;
 
 /**
- * Privacy Subsystem for Designer course format implementing null_provider.
+ * Base class to render a course module title inside a course format.
  *
  * @package   format_designer
  * @copyright 2021 bdecent gmbh <https://bdecent.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements null_provider {
+class title extends \core_courseformat\output\local\content\cm\title {
 
     /**
-     * Get the language string identifier with the component's language
-     * file to explain why this plugin stores no data.
+     * Export this data so it can be used as the context for a mustache template.
      *
-     * @return  string
+     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @return stdClass data context for a mustache template
      */
-    public static function get_reason(): string {
-        return 'privacy:metadata';
+    public function export_for_template(\renderer_base $output): stdClass {
+        $data = parent::export_for_template($output);
+        $data->mod = $this->mod;
+        return $data;
     }
 }

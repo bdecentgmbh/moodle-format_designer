@@ -31,7 +31,10 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use format_designer;
-
+use context_module;
+use coding_exception;
+use moodle_exception;
+use completion_info;
 require_once($CFG->libdir.'/externallib.php');
 require_once($CFG->dirroot.'/course/format/lib.php');
 
@@ -48,7 +51,7 @@ trait set_section_options {
     public static function set_section_options_parameters() {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
-            'sectionid' => new external_value(PARAM_INT, 'Section Id'),
+            'sectionid' => new external_value(PARAM_INT, 'Section ID'),
             'options' => new \external_multiple_structure(new external_single_structure([
                 'name' => new external_value(PARAM_TEXT, 'Option name to set on section'),
                 'value' => new external_value(PARAM_RAW, 'Value for option')
@@ -79,15 +82,164 @@ trait set_section_options {
         foreach ($params['options'] as $option) {
             $format->set_section_option($params['sectionid'], $option['name'], $option['value']);
         }
+
         return null;
     }
 
     /**
-     * Describes the parameters for move activities return
+     * Return structure for edit_section()
      *
-     * @return external_single_structure
+     * @since Moodle 3.3
+     * @return external_description
      */
     public static function set_section_options_returns() {
-        return new external_value(PARAM_RAW, 'Section html');
+        return new external_value(PARAM_RAW, 'Additional data for javascript (JSON-encoded string)');
     }
+
+    /**
+     * Parameters for function get_module()
+     *
+     * @since Moodle 3.3
+     * @return external_function_parameters
+     */
+    public static function get_module_parameters() {
+        return new external_function_parameters(
+            array(
+                'id' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
+                'sectionid' => new external_value(PARAM_INT, 'course module section id', VALUE_REQUIRED),
+                'sectionreturn' => new external_value(PARAM_INT, 'section to return to', VALUE_DEFAULT, null),
+            )
+        );
+    }
+
+    /**
+     * Returns html for displaying one activity module on course page
+     *
+     * @since Moodle 3.3
+     * @param int $id
+     * @param int $sectionid
+     * @param null|int $sectionreturn
+     * @return string
+     */
+    public static function get_module($id, $sectionid, $sectionreturn = null) {
+        global $PAGE, $OUTPUT;
+        // Validate and normalize parameters.
+        $params = self::validate_parameters(self::get_module_parameters(),
+            array('id' => $id, 'sectionid' => $sectionid, 'sectionreturn' => $sectionreturn));
+        $id = $params['id'];
+        $sectionreturn = $params['sectionreturn'];
+
+        // Set of permissions an editing user may have.
+        $contextarray = [
+            'moodle/course:update',
+            'moodle/course:manageactivities',
+            'moodle/course:activityvisibility',
+            'moodle/course:sectionvisibility',
+            'moodle/course:movesections',
+            'moodle/course:setcurrentsection',
+        ];
+        $PAGE->set_other_editing_capability($contextarray);
+
+        // Validate access to the course (note, this is html for the course view page, we don't validate access to the module).
+        list($course, $cm) = get_course_and_cm_from_cmid($id);
+        self::validate_context(context_course::instance($course->id));
+        $renderer = $PAGE->get_renderer('format_designer');
+
+        $format = course_get_format($course);
+        $sectiontype = $format->get_section_option($sectionid, 'sectiontype') ?: 'default';
+
+        $section = (object) ['sectiontype' => $sectiontype];
+        $cmlistdata = $renderer->render_course_module($cm, $sectionreturn, [], $section);
+
+        $templatename = 'format_designer/cm/module_layout_' . $sectiontype;
+        $prolayouts = format_designer_get_pro_layouts();
+        if (in_array($sectiontype, $prolayouts)) {
+            if (format_designer_has_pro()) {
+                $templatename = 'layouts_' . $sectiontype . '/cm/module_layout_' . $sectiontype;
+            }
+        }
+        $liclass = $sectiontype;
+        $liclass .= ' '.$sectiontype.'-layout';
+        $liclass .= ' '.$cmlistdata['modclasses'];
+        $liclass .= (isset($cmlistdata['isrestricted']) && $cmlistdata['isrestricted']) ? ' restricted' : '';
+        $html = \html_writer::start_tag('li', ['class' => $liclass, 'id' => $cmlistdata['id']]);
+        $html .= $OUTPUT->render_from_template($templatename, $cmlistdata);
+        $html .= \html_writer::end_tag('li');
+        return $html;
+    }
+
+    /**
+     * Return structure for get_module()
+     *
+     * @since Moodle 3.3
+     * @return external_description
+     */
+    public static function get_module_returns() {
+        return new external_value(PARAM_RAW, 'html to replace the current module with');
+    }
+
+    /**
+     * Parameters for function section_refresh()
+     *
+     * @since Moodle 3.3
+     * @return external_function_parameters
+     */
+    public static function section_refresh_parameters() {
+        return new external_function_parameters(
+            array(
+                'courseid' => new external_value(PARAM_INT, 'course id', VALUE_REQUIRED),
+                'sectionid' => new external_value(PARAM_INT, 'section id', VALUE_REQUIRED),
+                'sectionreturn' => new external_value(PARAM_INT, 'section to return to', VALUE_DEFAULT, null),
+            ));
+    }
+
+    /**
+     * Performs one of the refresh the sections and return new html for AJAX
+     *
+     * Returns html to replace the current module html with, for example:
+     * - empty string for "delete" action,
+     * - two modules html for "duplicate" action
+     * - updated module html for everything else
+     *
+     * Throws exception if operation is not permitted/possible
+     *
+     * @since Moodle 3.3
+     * @param int $courseid
+     * @param int $sectionid
+     * @param null|int $sectionreturn
+     * @return string
+     */
+    public static function section_refresh($courseid, $sectionid, $sectionreturn = null) {
+        global $PAGE, $DB, $OUTPUT;
+        $context = context_course::instance($courseid);
+        $PAGE->set_context($context);
+        // Validate and normalize parameters.
+        $params = self::validate_parameters(self::section_refresh_parameters(),
+            array('courseid' => $courseid, 'sectionid' => $sectionid, 'sectionreturn' => $sectionreturn));
+        $courseid = $params['courseid'];
+        $sectionid = $params['sectionid'];
+        $sectionreturn = $params['sectionreturn'];
+        $course = $DB->get_record('course', ['id' => $params['courseid']]);
+        $modinfo = get_fast_modinfo($course);
+        $sectioninfo = $DB->get_record('course_sections', ['id' => $params['sectionid']]);
+        $section = $modinfo->get_section_info($sectioninfo->section);
+        $rv = course_get_format($section->course)->section_action($section, 'setsectionoption', $sectionreturn);
+        if ($rv) {
+            return json_encode($rv);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Return structure for edit_module()
+     *
+     * @since Moodle 3.3
+     * @return external_description
+     */
+    public static function section_refresh_returns() {
+        return new external_value(PARAM_RAW, 'Additional data for javascript (JSON-encoded string)');
+    }
+
+
 }

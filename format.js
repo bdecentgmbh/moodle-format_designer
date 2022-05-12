@@ -1,4 +1,4 @@
-// Javascript functions for Designer course format.
+// Javascript functions for Topics course format.
 
 M.course = M.course || {};
 
@@ -8,7 +8,7 @@ M.course.format = M.course.format || {};
  * Get sections config for this format.
  *
  * The section structure is:
- * <ul class="designer">
+ * <ul class="topics">
  *  <li class="section">...</li>
  *  <li class="section">...</li>
  *   ...
@@ -19,7 +19,7 @@ M.course.format = M.course.format || {};
 M.course.format.get_config = function() {
     return {
         container_node: 'ul',
-        container_class: 'designer',
+        container_class: 'topics',
         section_node: 'li',
         section_class: 'section'
     };

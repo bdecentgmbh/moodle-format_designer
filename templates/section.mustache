@@ -15,9 +15,12 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template format_designer/section_info
+    @template format_designer/courseformat/content/section
 
     Displays a course section.
+
+    Note: This template is a wrapper around the section/content template to allow course formats and theme designers to
+    modify parts of the wrapper without having to copy/paste the entire template.
 
     Example context (json):
     {
@@ -26,6 +29,7 @@
         "controlmenu": "[tools menu]",
         "header": {
             "name": "Section title",
+            "title": "<a href=\"http://moodle/course/view.php?id=5#section-0\">Section title</a>",
             "url": "#",
             "ishidden": true
         },
@@ -39,6 +43,7 @@
                         },
                         "id": 3,
                         "module": "forum",
+                        "anchor": "activity-3",
                         "extraclasses": "newmessages"
                     }
                 },
@@ -49,6 +54,7 @@
                             "hasname": "true"
                         },
                         "id": 4,
+                        "anchor": "activity-4",
                         "module": "assign",
                         "extraclasses": ""
                     }
@@ -73,46 +79,17 @@
         "cmcontrols": "[Add an activity or resource]",
         "iscoursedisplaymultipage": true,
         "sectionreturnid": 0,
-        "isactive": true,
-        "sitehome": false
+        "contentcollapsed": false,
+        "insertafter": true,
+        "numsections": 42,
+        "sitehome": false,
+        "highlightedlabel" : "Highlighted"
     }
 }}
+{{{sectionhead}}}
 
-    <li id="section-{{num}}"
-    class="section main {{#restrictsection}} restricted {{/restrictsection}} {{#onlysummary}} section-summary {{/onlysummary}} clearfix
-            {{#ishidden}} hidden {{/ishidden}} {{#iscurrent}} current {{/iscurrent}}
-            {{#isstealth}} orphaned {{/isstealth}}"
-    data-sectionid="{{num}}"
-    data-sectionreturnid="{{sectionreturnid}}"
-    data-for="section"
-    data-id="{{id}}"
-    data-number="{{num}}"
-    >
-    {{#singleheader}} {{> format_designer/courseformat/content/section/header }} {{/singleheader}}
-    <div class="left side">{{#iscurrent}} {{{currentlink}}} {{/iscurrent}}</div>
-    <div class="right side">
-    {{#controlmenu}}
-            {{> format_designer/courseformat/content/section/controlmenu }}
-    {{/controlmenu}}
-    <div class="icon-loader-block"></div>
-    </div>
-    {{#header}} {{> format_designer/courseformat/content/section/header }} {{/header}}
-    <div id="coursecontentcollapse{{num}}"
-        class="content {{^iscoursedisplaymultipage}}
-            {{^sitehome}}course-content-item-content collapse {{#contentexpanded}}show{{/contentexpanded}}{{/sitehome}}
-        {{/iscoursedisplaymultipage}}">
-        <div class="summary">
-        {{#summary}}
-            {{> core_courseformat/local/content/section/summary }}
-        {{/summary}}
-        </div>
-        {{#cmsummary}} {{> core_courseformat/local/content/section/cmsummary }} {{/cmsummary}}
-        {{#cmlist}} {{> format_designer/courseformat/content/section/cmlist }} {{/cmlist}}
-        {{{cmcontrols}}}
-        {{#insertafter}}
-            {{#numsections}}
-                {{> core_courseformat/local/content/addsection}}
-            {{/numsections}}
-        {{/insertafter}}
-    </div>
-    </li>
+    {{$ format_designer/section_layout }}
+        {{> format_designer/section_layout }}
+    {{/ format_designer/section_layout }}
+
+{{{sectionend}}}
