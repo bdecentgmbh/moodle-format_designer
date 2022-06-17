@@ -31,7 +31,7 @@
     }
 }}
 
-<li class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}} card"
+<li class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}} card" style="{{{modstyle}}}"
     id="{{anchor}}"
     data-for="cmitem"
     data-id="{{cm.id}}">
@@ -41,7 +41,7 @@
         }}{{#modhiddenfromstudents}}hiddenactivity{{/modhiddenfromstudents}}{{!
         }}{{#modinline}}activityinline{{/modinline}}" data-activityname="{{activityname}}" style="{{#prostyle}} {{{prostyle}}} {{/prostyle}}">
 
-        <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{cm.url}}">
+        <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{cmurl}}">
             <div class="card-body">
                 <div class="activity-background-style" style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
                 </div>
@@ -122,5 +122,6 @@
             </div>
             {{/cmformat.controlmenu}}
         </div>
+        {{{videotimeprogress}}}
     </div>
 </li>

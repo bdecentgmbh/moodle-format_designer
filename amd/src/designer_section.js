@@ -43,10 +43,11 @@
      * @param {int} courseId
      * @param {int} contextId
      */
-    let DesignerSection = function(courseId, contextId) {
+    let DesignerSection = function(courseId, contextId, popupActivities) {
         var self = this;
         self.courseId = courseId;
         self.contextId = contextId;
+        self.popupActivities = popupActivities
 
         $('body').delegate(self.SectionController, 'click', self.sectionLayoutaction.bind(this));
         $("body").delegate(self.RestrictInfo, "click", self.moduleHandler.bind(this));
@@ -58,6 +59,19 @@
             self.expandSection();
         };
         this.expandSection();
+        
+        if ($('.course-type-flow').length > 0) {
+            $('.collapse').on('show.bs.collapse', function() {
+                $(this).parents('li.section').addClass('stack-header-collapsing');
+                var sectionid = $(this).parents('li.section').attr('id');
+                var section = document.getElementById(sectionid)
+                var distance = section.offsetTop - document.body.scrollTop;
+                setTimeout(() => window.scroll(0, distance), 50);
+            }).on('shown.bs.collapse', function() {
+                $(this).parents('li.section').removeClass('stack-header-collapsing');
+            });
+        }
+
     };
 
     /**
@@ -79,19 +93,28 @@
 
     DesignerSection.prototype.trimDescription = ".designer-section-content li .trim-summary .mod-description-action";
 
+    DesignerSection.prototype.modules = null;
+
     DesignerSection.prototype.redirectToModule = function(event) {
         let nodeName = event.target.nodeName;
         let preventionNodes = ['a', 'button', 'form'];
         let iscircle = event.target.closest('li.activity').classList.contains('circle-layout');
         let isDescription = event.target.classList.contains('mod-description-action');
         let isPadlock = event.target.classList.contains('fa-lock');
+        let ispopupModule = event.target.closest('li.activity').classList.contains('popmodule');
         if ((nodeName in preventionNodes)
-            || document.body.classList.contains('editing') || iscircle || isDescription || isPadlock) {
+            || document.body.classList.contains('editing') || iscircle || isDescription || isPadlock || ispopupModule) {
+            if (ispopupModule && !document.body.classList.contains('editing')) {
+                var li = event.target.closest('li.activity');
+                li.querySelector('a[href]').click();
+                // event.target.closest('a').click();
+            }
             return null;
         }
         var card = event.target.closest("[data-action=go-to-url]");
         let modurl = card.getAttribute('data-url');
         window.location.href = modurl;
+        return true;
     };
 
     DesignerSection.prototype.expandSection = () => {
@@ -198,8 +221,8 @@
     };
 
     return {
-        init: function(courseId, contextId) {
-            return new DesignerSection(courseId, contextId);
+        init: function(courseId, contextId, popupActivities) {
+            return new DesignerSection(courseId, contextId, popupActivities);
         }
     };
 });

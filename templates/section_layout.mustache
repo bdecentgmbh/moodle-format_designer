@@ -49,7 +49,7 @@
     <div class="icon-loader-block"></div>
 </div>
 
-<div class="course-section-header section-header-content {{#sectioncollapse}}{{^sectionshow}}collapsed{{/sectionshow}}{{/sectioncollapse}}"
+<div class="course-section-header section-header-content {{#sectioncollapse}}{{^sectionshow}}collapsed{{/sectionshow}}{{/sectioncollapse}} {{coursetype.classes}}"
     id="section-head-{{section.section}}"
     {{#sectioncollapse}} data-toggle="collapse" {{/sectioncollapse}}
     data-target="#section-content-{{section.section}}"
@@ -60,8 +60,9 @@
     data-for="section_title"
     data-id="{{id}}"
     data-number="{{num}}"
+    {{coursetype.attributes}}
     >
-
+    {{#flowcourse}} <div class="section-background-color" style="{{sectionbackcolor}}"></div> {{/flowcourse}}
         {{#sectiondesignheader}}
             <div class="section-background-style sectiondesign-header" style="{{sectionbackgroundstyle}}">
                 {{#maskinner}}
@@ -152,14 +153,15 @@
     {{#sectionshow}}show{{/sectionshow}}
     {{^iscoursedisplaymultipage}}
         {{^sitehome}}course-content-item-content {{/sitehome}}
-    {{/iscoursedisplaymultipage}}"
+    {{/iscoursedisplaymultipage}} {{coursetype.content.classes}}"
     id="section-content-{{section.section}}"
     aria-labelledby="section-head-{{section.section}}"
     {{#sectionaccordion}}
     data-parent="#section-course-accordion"
     {{/sectionaccordion}}
     role="contentinfo"
-    style="{{#sectioncontentwidth}} {{sectioncontentwidth}} {{/sectioncontentwidth}}">
+    style="{{#sectioncontentwidth}} {{sectioncontentwidth}} {{/sectioncontentwidth}}"
+    {{coursetype.content.attributes}}>
 
     {{^sectionheader}}
         {{#cmlist}}
@@ -179,3 +181,49 @@
     {{/sectionheader}}
 </div>
 </div>
+
+<style>
+
+
+    .flow-animation {
+        -webkit-animation-duration: 1s;
+        animation-duration: 1s;
+        -webkit-animation-duration: 1s;
+        animation-duration: 1s;
+        -webkit-animation-fill-mode: both;
+        animation-fill-mode: both;
+        -webkit-animation-name: fadeInLeft;
+        animation-name: fadeInLeft;
+    }
+
+    @-webkit-keyframes fadeInLeft {
+        from {
+            opacity: 0;
+            -webkit-transform: translate3d(-100%, 0, 0);
+            transform: translate3d(-100%, 0, 0);
+            transform-origin: center;
+        }
+
+        to {
+            opacity: 1;
+            -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+            transform-origin: center;
+        }
+    }
+    @keyframes fadeInLeft {
+        from {
+            opacity: 0;
+            -webkit-transform: translate3d(-100%, 0, 0);
+            transform: translate3d(-100%, 0, 0);
+            transform-origin: center;
+        }
+
+        to {
+            opacity: 1;
+            -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+</style>

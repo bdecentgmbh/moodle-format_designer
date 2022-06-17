@@ -58,6 +58,13 @@ class renderer extends \core_courseformat\output\section_renderer {
     public $modinfo;
 
     /**
+     * Flow delay for each module.
+     *
+     * @var float
+     */
+    public $flowdelay;
+
+    /**
      * Constructor method, calls the parent constructor.
      *
      * @param moodle_page $page
@@ -83,19 +90,17 @@ class renderer extends \core_courseformat\output\section_renderer {
         $data = $widget->export_for_template($this);
         $course = $data->course;
         $this->modinfo = course_get_format($course)->get_modinfo();
-        $sectioncollapse = isset($course->sectioncollapse) ?
-            (($course->coursedisplay && !$this->page->user_is_editing()) ? false : $course->sectioncollapse) : false;
-        $startclass = ($course->coursedisplay && !$this->page->user_is_editing()) ? 'row' : '';
+
+        list($startid, $startclass) = $this->course_type_class($course);
+        $startclass[] = ($course->coursedisplay && !$this->page->user_is_editing()) ? 'row' : '';
         // If kanban board enabled remove the row.
-        if ($course->coursetype) {
-            $sectioncollapse = false;
-            $startclass .= ' kanban-board ';
+        if ($course->coursetype == DESIGNER_TYPE_KANBAN) {
+            $startclass[] = 'kanban-board';
             $data->kanbanmode = true;
         }
-        $data->startclass = $startclass;
-        if ($sectioncollapse) {
-            $data->startid = 'section-course-accordion';
-        }
+        $data->startclass = implode(' ', $startclass);
+        $data->startid = $startid;
+
         $data->timemanagement = $this->timemanagement_details($course);
 
         return $this->render_from_template('format_designer/courseformat/content/section', $data);
@@ -496,9 +501,12 @@ class renderer extends \core_courseformat\output\section_renderer {
      * @return string classes list.
      */
     protected function generate_section_widthclass($section) {
-        $tablet = $section->tabletwidth;
-        $mobile = $section->mobilewidth;
-        $desktop = $section->desktopwidth;
+        if (!isset($section->tabletwidth)) {
+            return '';
+        }
+        $tablet = isset($section->tabletwidth) ? $section->tabletwidth : '';
+        $mobile = isset($section->mobilewidth) ? $section->mobilewidth : '';
+        $desktop = isset($section->desktopwidth) ? $section->desktopwidth : '';
 
         $widthclasses = [0 => 12, 1 => 6, 2 => 4, 3 => 3, 4 => 2 ];
         $classes = [];
@@ -525,6 +533,66 @@ class renderer extends \core_courseformat\output\section_renderer {
             $templatename = 'format_designer/section_layout_default';
         }
         return $templatename;
+    }
+
+    /**
+     * Course type classes.
+     *
+     * @param stdclass $course
+     * @return void
+     */
+    public function course_type_class($course) {
+        if (!isset($course->coursetype)) {
+            return '';
+        }
+        if ($course->coursetype == DESIGNER_TYPE_COLLAPSIBLE) {
+            $class = 'course-type-collapsible';
+        } else if ($course->coursetype == DESIGNER_TYPE_KANBAN) {
+            $class = 'course-type-kanbanboard kanban-board';
+        } else if ($course->coursetype == DESIGNER_TYPE_FLOW) {
+            $class = (!$this->page->user_is_editing()) ? 'course-type-flow' : '';
+        } else {
+            $class = "course-type-default";
+        }
+
+        $id = isset($course->accordion) && $course->accordion && !$this->page->user_is_editing() ? 'section-course-accordion' : '';
+
+        return [$id, [$class] ];
+    }
+
+    /**
+     * Section classes based on different courses.
+     *
+     * @param stdclass $course
+     * @param stdclass $section
+     * @param cminfo $modinfo
+     * @return array list of classes.
+     */
+    public function course_type_sectionclasses($course, $section, $modinfo) {
+        $attrs = $contentattrs = [];
+        $contentclass = $actvitiyclass = '';
+        $class = "";
+        if ($course->coursetype == DESIGNER_TYPE_COLLAPSIBLE) {
+            $attrs[] = 'data-toggle="collapse"';
+            $contentattrs[] = 'data-parent="#section-course-accordion"';
+            $class = "collapsible-section";
+        } else if ($course->coursetype == DESIGNER_TYPE_FLOW) {
+            $modnumber = isset($modinfo->sections[$section->section]) ? $modinfo->sections[$section->section] : 0;
+            $class = ($modnumber > 0 ) ? 'has-modules flow-stack' : 'flow-none';
+            $contentclass = 'flow-open';
+            if (count($modinfo->sections) <= 1 && $section->section == '0') {
+                $class .= ' flow-head-hide';
+            }
+        }
+        return [
+            'classes' => $class,
+            'content' => [
+                'classes' => $contentclass,
+            ],
+            'activity' => [
+                'classes' => $actvitiyclass
+            ]
+        ];
     }
 
     /**
@@ -591,6 +659,10 @@ class renderer extends \core_courseformat\output\section_renderer {
             $sectionlayoutclass = 'card-layout';
         }
 
+        if ($course->coursetype == DESIGNER_TYPE_FLOW) {
+            $sectionlayoutclass = 'card-layout';
+            $sectiontype = 'cards';
+        }
         $sectioncollapsestatus = '';
         if (isset($course->initialstate) && $course->initialstate == SECTION_COLLAPSE) {
             $sectioncollapsestatus = '';
@@ -599,9 +671,14 @@ class renderer extends \core_courseformat\output\section_renderer {
             ? (($section->section == 0) ? 'show' : '') : 'show';
         }
         // Disable the collapsible for kanban board.
-        if ($course->coursetype) {
-            $course->sectioncollapse = false;
-            $sectioncollapsestatus = '';
+        if ( !($course->coursedisplay == 1 && !$onsectionpage)
+            && ($course->coursetype == DESIGNER_TYPE_COLLAPSIBLE || $course->coursetype == DESIGNER_TYPE_FLOW) ) {
+            $sectioncollapse = true;
+        }
+
+        // IN flow if general section only available then the general heading hidden. So we need to disable the collapsible.
+        if ($course->coursetype == DESIGNER_TYPE_FLOW && count($modinfo->sections) <= 1) {
+            $sectioncollapsestatus = 'show';
         }
 
         // Calculate section width for single section format.
@@ -609,8 +686,13 @@ class renderer extends \core_courseformat\output\section_renderer {
             ? $this->generate_section_widthclass($section) : '';
 
         if ($course->coursedisplay && !$onsectionpage) {
-            $course->sectioncollapse = false;
+            $sectioncollapse = false;
         }
+
+        // Set list width for kanban board sections.
+        $sectionstylerules = ($course->coursetype == DESIGNER_TYPE_KANBAN)
+            ? (isset($course->listwidth) && $section->section != 0
+            ? sprintf('width: %s;', $course->listwidth) : '') : '';
 
         $templatecontext = [
             'section' => $section,
@@ -637,20 +719,26 @@ class renderer extends \core_courseformat\output\section_renderer {
             'issectioncompletion' => $issectioncompletion,
             'gotosection' => (isset($gotosection) ? $gotosection : false),
             'sectionurl' => $sectionurl,
-            'sectioncollapse' => isset($course->sectioncollapse) ? $course->sectioncollapse : false,
+            'sectioncollapse' => isset($sectioncollapse) ? $sectioncollapse : false,
             'sectionshow' => $sectioncollapsestatus,
             'sectionaccordion' => isset($course->accordion) && !$this->page->user_is_editing() ? $course->accordion : false,
+            'coursetype' => $this->course_type_sectionclasses($course, $section, $modinfo),
+            'stylerules' => $sectionstylerules,
+            'flowcourse' => isset($course->coursetype) && $course->coursetype == DESIGNER_TYPE_FLOW ? true : false,
+            'maskimage' => ($section->sectiondesignermaskimage) ? true : false,
         ];
 
         if (format_designer_has_pro()) {
-            $prodata = \local_designer\options::render_section($section, $course, $modinfo, $templatecontext);
+            $prodata = \local_designer\options::render_section(
+                $section, $course, $modinfo, $templatecontext
+            );
         }
 
         if ($sectioncontent) {
             $contenttemplatename = 'format_designer/section_content_' . $sectiontype;
             return $this->render_from_template($contenttemplatename, $templatecontext);
         }
-        $sectionclass = 'section-type-'.$sectiontype;
+        $sectionclass = ' section-type-'.$sectiontype;
         $sectionclass .= ($sectionrestrict) ? 'restricted' : '';
         $sectionclass .= $section->widthclass;
         $sectionclass .= ($templatecontext['sectionstyle']) ?? ' '.$templatecontext['sectionstyle'];
@@ -658,8 +746,11 @@ class renderer extends \core_courseformat\output\section_renderer {
         $sectionclass .= isset($templatecontext['ishidden']) && $templatecontext['ishidden'] ? ' hidden ' : '';
         $sectionclass .= isset($templatecontext['iscurrent']) && $templatecontext['iscurrent'] ? ' current ' : '';
         $sectionclass .= isset($templatecontext['isstealth']) && $templatecontext['isstealth'] ? ' orphaned ' : '';
-
-        $style = isset($templatecontext['prosectionstyle']) ? ' '.$templatecontext['prosectionstyle'] : '';
+        $modnumber = isset($modinfo->sections[$section->section]) ? $modinfo->sections[$section->section] : 0;
+        if ($templatecontext['flowcourse']) {
+            $sectionclass .= ($modnumber > 0 ) ? '' : ' section-flow-none';
+        }
+        $style = isset($templatecontext['stylerules']) ? ' '.$templatecontext['stylerules'] : '';
 
         $templatecontext['sectionhead'] = html_writer::start_tag('li', [
             'id' => 'section-'.$section->section,
@@ -700,6 +791,30 @@ class renderer extends \core_courseformat\output\section_renderer {
 
         $modclasses = 'activity ' . $mod->modname . ' modtype_' . $mod->modname . ' ' . $mod->extraclasses;
 
+        // Add course type flow animation class.
+        // TODO: check the animation settings.
+        $course = course_get_format($mod->get_course())->get_course();
+        if ($course->coursetype == DESIGNER_TYPE_FLOW && !$this->page->user_is_editing()) {
+            if ((isset($course->showanimation) && $course->showanimation)) {
+                $modclasses .= ' flow-animation ';
+                $modstyle = sprintf('animation-delay: %ss;', $this->flowdelay);
+                $duration = get_config('format_designer', 'flowanimationduration');
+                $modstyle .= sprintf('animation-duration: %ss;', ($duration) ? $duration : '1');
+                $this->flowdelay = $this->flowdelay + 0.5;
+            }
+        }
+
+        $ispopupactivities = isset($course->popupactivities) && $course->popupactivities;
+        if ($ispopupactivities) {
+            $class = '\\format_popups\\local\\mod_' . $mod->modname;
+            if (
+                class_exists($class) &&
+                has_capability('format/popups:view', \context_module::instance($mod->id))
+            ) {
+                $modclasses .= ' popmodule ';
+            }
+        }
+
         $cmcompletion = new cm_completion($mod);
         $cmcompletionhtml = '';
         if (empty($displayoptions['hidecompletion'])) {
@@ -712,8 +827,16 @@ class renderer extends \core_courseformat\output\section_renderer {
         // If there is content AND a link, then display the content here.
         // (AFTER any icons). Otherwise it was displayed before.
         $cmtext = '';
-        if (!empty($url)) {
+        if (format_designer_has_pro()) {
+            $useactivityimage = \format_designer\options::get_option($mod->id, 'useactivityimage');
+            $videotime = ($mod->modname == 'videotime' && $useactivityimage);
+        }
+        if (!empty($url) || (isset($videotime) && $videotime)) {
             $cmtext = $mod->get_formatted_content(['overflowdiv' => true, 'noclean' => true]);
+            if (isset($videotime) && $videotime) {
+                $videotime = $DB->get_record('videotime', ['id' => $mod->instance]);
+                $cmtext = $videotime->intro;
+            }
             $cmtextcontent = format_string($cmtext);
             $modcontent = '';
             if (!empty($cmtextcontent)) {
@@ -759,14 +882,12 @@ class renderer extends \core_courseformat\output\section_renderer {
             'modtype' => $mod->get_module_type_name(),
             'modclasses' => $modclasses,
             'colorclass' => $cmcompletion->get_color_class(),
-
+            'cmurl' => $this->get_cmurl($mod),
             'cmcompletion' => $cmcompletion,
             'cmcompletionhtml' => $cmcompletionhtml,
             'calltoactionhtml' => $calltoactionhtml,
             'afterlink' => $mod->afterlink,
-
             'cmtext' => $cmtext,
-
             'isrestricted' => !empty($mod->availableinfo),
             'modcontent' => isset($modcontent) ? $modcontent : '',
             'modcontentclass' => !empty($modcontent) ? 'ismodcontent' : '',
@@ -774,6 +895,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             'modiconurl' => $modiconurl,
             'modrestricted' => $modrestricted,
             'elementstate' => $this->get_activity_elementclasses($mod),
+            'modstyle' => isset($modstyle) ? $modstyle : '',
         ];
 
         if (format_designer_has_pro()) {
@@ -795,7 +917,10 @@ class renderer extends \core_courseformat\output\section_renderer {
         $option  = \format_designer\options::get_option($mod->id, 'activityelements');
         if (!empty($option)) {
             $element = json_decode($option, true);
-            $classes = [0 => 'content-hide', 1 => 'content-show', 2 => 'content-show-hover', 3 => 'content-hide-hover'];
+            $classes = [
+                0 => 'content-hide', 1 => 'content-show', 2 => 'content-show-hover',
+                3 => 'content-hide-hover', 4 => 'content-remove'
+            ];
 
             $elementclasses = array_map(function($v) use ($classes) {
                 return (isset($classes[$v])) ? $classes[$v] : $v;
@@ -805,6 +930,21 @@ class renderer extends \core_courseformat\output\section_renderer {
         return [];
     }
 
+    /**
+     * Get course module URL.
+     *
+     * @param cminfo $mod Course Module Info.
+     * @return string
+     */
+    public function get_cmurl($mod) {
+        $options = (format_designer_has_pro()) ? \local_designer\options::get_options($mod->id) : [];
+        if ($mod->url) {
+            return $mod->url;
+        } else if ($mod->modname == 'videotime' && $options && $options->useactivityimage) {
+            return new moodle_url('/mod/videotime/view.php', ['id' => $mod->id]);
+        }
+        return '';
+    }
 
     /**
      * Returns the CSS classes for the activity name/content
