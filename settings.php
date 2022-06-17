@@ -27,7 +27,12 @@ defined('MOODLE_INTERNAL') || die;
 require_once($CFG->dirroot.'/course/format/designer/lib.php');
 
 if ($ADMIN->fulltree) {
-    $settings->add(
+
+    $settings = new theme_boost_admin_settingspage_tabs('formatsettingdesigner', get_string('configtitle', 'format_designer'));
+
+    $page = new admin_settingpage('format_designer_general', get_string('general', 'format_designer'));
+
+    $page->add(
         new admin_setting_configselect('format_designer/dateformat',
         new lang_string('dateformat', 'format_designer'),
         new lang_string('dateformat_help', 'format_designer'),
@@ -49,8 +54,19 @@ if ($ADMIN->fulltree) {
         ]
     ));
 
+    $page->add(
+        new admin_setting_configtext('format_designer/flowanimationduration',
+        new lang_string('flowanimationduration', 'format_designer'),
+        new lang_string('flowanimationduration_help', 'format_designer'),
+        '0.5', PARAM_FLOAT
+        )
+    );
+
+    $settings->add($page);
+
     if (format_designer_has_pro()
          && file_exists($CFG->dirroot.'/local/designer/setting.php')) {
         require_once($CFG->dirroot.'/local/designer/setting.php');
     }
+
 }

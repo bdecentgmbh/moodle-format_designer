@@ -304,4 +304,35 @@ class lib_test extends \advanced_testcase {
         $dateformat = format_designer_format_date($timestamp);
         $this->assertEquals("Jan 22", $dateformat);
     }
+
+    /**
+     * Test the kanban board setup changes the section type.
+     *
+     * @return void
+     */
+    public function test_kanban_setup() {
+        global $DB;
+        $this->resetAfterTest();
+        $record = ['format' => 'designer', 'coursetype' => '0', 'numsections' => 3];
+        $course = $this->getDataGenerator()->create_course($record);
+
+        $format = course_get_format($course);
+        $modinfo = get_fast_modinfo($course);
+        // Get section names for course.
+        $coursesections = $DB->get_records('course_sections', ['course' => $course->id]);
+        foreach ($coursesections as $section) {
+            $format->set_section_option($section->id, 'sectiontype', 'list');
+        }
+
+        $data = ['id' => $course->id, 'coursetype' => DESIGNER_TYPE_KANBAN];
+        $format->update_course_format_options($data);
+
+        foreach ($coursesections as $section) {
+            if ($section->section == 0) {
+                continue;
+            }
+            $sectiontype = $format->get_section_option($section->id, 'sectiontype');
+            $this->assertEquals('cards', $sectiontype);
+        }
+    }
 }

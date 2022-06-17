@@ -15,18 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details.
+ * Define event observers.
  *
  * @package   format_designer
- * @copyright 2022 bdecent gmbh <https://bdecent.de>
+ * @copyright 2021 bdecent gmbh <https://bdecent.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/**
+ * Need to define list of events that plugin will go to observe.
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2022061600;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2020061500;        // Requires this Moodle version.
-$plugin->component = 'format_designer';  // Full name of the plugin (used for diagnostics).
-$plugin->release = 'Version 1.3';
-$plugin->supported = [39, 311];
-$plugin->maturity  = MATURITY_STABLE;
+$observers = [
+    array(
+        'eventname' => 'core\event\course_section_created',
+        'callback' => '\format_designer\events::course_section_created',
+    ),
+];

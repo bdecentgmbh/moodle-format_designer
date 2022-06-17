@@ -28,7 +28,7 @@
     style="{{#sectioncontentwidth}} {{sectioncontentwidth}} {{/sectioncontentwidth}}">
     {{#cmlist}}
         {{#modstatus}}
-        <li id="{{id}}" class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}} position-relative">
+        <li id="{{id}}" class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}} position-relative" style="{{{modstyle}}}">
             {{> format_designer/cm/module_layout_list}}
         </li>
         {{/modstatus}}
