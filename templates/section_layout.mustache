@@ -20,7 +20,7 @@
     Displays the course module card layout
 
     Example context (json):
-    {        
+    {
         "sectiondesigntextcolor": "color: #fff",
         "sectionheaderstyle": "min-height:100px;"
     }
@@ -48,7 +48,7 @@
     <div class="icon-loader-block"></div>
 </div>
 
-<div class="section-header-content {{#sectioncollapse}}{{^sectionshow}}collapsed{{/sectionshow}}{{/sectioncollapse}}"
+<div class="section-header-content {{#sectioncollapse}}{{^sectionshow}}collapsed{{/sectionshow}}{{/sectioncollapse}}  {{designercoursetype.classes}}"
     id="section-head-{{section.section}}"
     {{#sectioncollapse}} data-toggle="collapse" {{/sectioncollapse}}
     {{#sectionaccordion}} data-parent="#section-course-accordion" {{/sectionaccordion}}
@@ -57,8 +57,9 @@
     aria-controls="section-head-{{section.section}}"
     role="contentinfo"
     style="{{sectionheaderstyle}}"
+    {{designercoursetype.attributes}}
     >
-
+    {{#flowcourse}} <div class="section-background-color" style="{{sectionbackcolor}}"></div> {{/flowcourse}}
         {{#sectiondesignheader}}
             <div class="section-background-style sectiondesign-header" style="{{sectionbackgroundstyle}}">
                 {{#maskinner}}
@@ -120,16 +121,17 @@
 
 <div class="content {{sectioncontentlayout}}
     {{#sectioncollapse}}collapse{{/sectioncollapse}}
-    {{#sectionshow}}in{{/sectionshow}}"
+    {{#sectionshow}}in{{/sectionshow}}
+    {{designercoursetype.content.classes}}"
     id="section-content-{{section.section}}"
     aria-labelledby="section-head-{{section.section}}"
     {{#sectionaccordion}}
     data-parent="#section-course-accordion"
     {{/sectionaccordion}}
     role="contentinfo"
-    style="{{#sectioncontentwidth}} {{sectioncontentwidth}} {{/sectioncontentwidth}}">
+    style="{{#sectioncontentwidth}} {{sectioncontentwidth}} {{/sectioncontentwidth}}"
+    {{designercoursetype.content.attributes}}>
     {{$content}}
 
     {{/content}}
 </div>
-

@@ -41,6 +41,16 @@ define('SECTION_COLLAPSE', 2);
  */
 define('FIRST_EXPAND', 3);
 
+define('DESIGNER_ENABLE_POPUPACTIVITIES', 1);
+
+define('DESIGNER_DISABLE_POPUPACTIVITIES', 0);
+
+define('DESIGNER_TYPE_KANBAN', 1);
+
+define('DESIGNER_TYPE_COLLAPSIBLE', 2);
+
+define('DESIGNER_TYPE_FLOW', 3);
+
 /**
  * Main class for the Designer course format.
  *
@@ -240,28 +250,106 @@ class format_designer extends format_base {
      */
     public function course_format_options($foreditform = false) {
         static $courseformatoptions = false;
+        $courseformatoptions = self::course_format_options_list($foreditform);
+
+        if ($foreditform) {
+            $courseformatoptions['coursecompletiondate'] = [
+                'label' => new lang_string('coursecompletiondate', 'format_designer'),
+                'element_type' => $this->designer_completion_enabled() ? 'select' : 'hidden',
+                'element_attributes' => [
+                    [
+                        1 => new lang_string('show'),
+                        0 => new lang_string('hide'),
+                    ],
+                ],
+                'help' => 'coursecompletiondate',
+                'help_component' => 'format_designer',
+                'disabledif' => [['enablecompletion', 'neq', 1]],
+
+            ];
+
+            if ($this->designer_completion_enabled()) {
+                $courseformatoptionsedit['coursecompletiondateinfo'] = [
+                    'element_type' => 'hidden',
+                ];
+            } else {
+                $courseformatoptionsedit['coursecompletiondateinfo'] = [
+                    'element_type' => 'static',
+                ];
+            }
+
+            $courseformatoptions = array_merge_recursive($courseformatoptions, $courseformatoptionsedit);
+            // Set designer default options to course config.
+            $design = \format_designer\options::get_default_options();
+            foreach ($courseformatoptions as $name => $value) {
+                if (isset($design->$name)) {
+                    $courseformatoptions[$name]['default'] = $design->$name;
+                }
+                $adv = $name.'_adv';
+                if (isset($design->$adv) && $design->$adv) {
+                    $courseformatoptions[$name]['adv'] = true;
+                }
+            }
+        }
+
+        return $courseformatoptions;
+    }
+
+    /**
+     * Designer course format options list.
+     *
+     * @param bool $foreditform
+     * @return array List of format options.
+     */
+    public static function course_format_options_list($foreditform = false) {
+        static $courseformatoptions = false;
         if ($courseformatoptions === false) {
             $courseconfig = get_config('moodlecourse');
             $courseformatoptions = [
-                'hiddensections' => [
-                    'default' => $courseconfig->hiddensections,
-                    'type' => PARAM_INT,
+                'designercoursetype' => [
+                    'default' => 0,
+                    'type' => PARAM_INT
+                ],
+                'popupactivities' => [
+                    'default' => 0,
+                    'type' => PARAM_INT
+                ],
+                'popupactivitiesinfo' => [
+                    'default' => get_string('popupactivitiesnotinstalled', 'format_designer'),
+                    'type' => PARAM_RAW,
+                    'label' => get_string('popupactivities', 'format_designer'),
                 ],
                 'coursedisplay' => [
                     'default' => $courseconfig->coursedisplay,
                     'type' => PARAM_INT,
                 ],
-                'sectioncollapse' => [
-                    'default' => 0,
+                'hiddensections' => [
+                    'default' => $courseconfig->hiddensections,
+                    'type' => PARAM_INT,
+                ],
+                'showanimation' => [
+                    'default' => true,
                     'type' => PARAM_INT
                 ],
                 'accordion' => [
-                    'default' => isset($courseconfig->accordion) ? $courseconfig->accordion : 0,
+                    'default' => 0,
                     'type' => PARAM_INT
                 ],
                 'initialstate' => [
-                    'default' => isset($courseconfig->initialstate) ? $courseconfig->initialstate : 3,
+                    'default' => 3,
                     'type' => PARAM_INT,
+                ],
+                'listwidth' => [
+                    'default' => '400px',
+                    'type' => PARAM_ALPHANUMEXT,
+                ],
+                'courseheader' => [
+                    'default' => get_string('courseheader', 'format_designer'),
+                    'type' => PARAM_TEXT,
+                ],
+                'activityprogress' => [
+                    'default' => 0,
+                    'type' => PARAM_INT
                 ],
                 'enrolmentstartdate' => [
                     'default' => 0,
@@ -288,14 +376,6 @@ class format_designer extends format_base {
                     'default' => get_string('timemanagementmissing', 'format_designer'),
                     'type' => PARAM_RAW_TRIMMED,
                     'label' => new lang_string('courseduedate', 'format_designer'),
-                ],
-                'activityprogress' => [
-                    'default' => 0,
-                    'type' => PARAM_INT
-                ],
-                'designercoursetype' => [
-                   'default' => $courseconfig->designercoursetype ?? 0,
-                   'type' => PARAM_INT
                 ]
             ];
         }
@@ -324,18 +404,7 @@ class format_designer extends format_base {
                     ],
                     'help' => 'coursedisplay',
                     'help_component' => 'moodle',
-                ],
-
-                'sectioncollapse' => [
-                    'label' => new lang_string('collapsiblesections', 'format_designer'),
-                    'element_type' => 'select',
-                    'element_attributes' => [
-                        array(
-                            0 => new lang_string('disable'),
-                            1 => new lang_string('enable')
-                        )
-                    ],
-                    'disabledif' => ['designercoursetype', 'neq', 0],
+                    'disabledif' => [['designercoursetype', 'eq', DESIGNER_TYPE_KANBAN]],
                 ],
 
                 'accordion' => [
@@ -347,7 +416,10 @@ class format_designer extends format_base {
                            1 => new lang_string('enable')
                         )
                     ],
-                    'disabledif' => ['sectioncollapse', 'neq', 1]
+                    'disabledif' => [
+                        ['designercoursetype', 'eq', DESIGNER_TYPE_KANBAN],
+                        ['designercoursetype', 'eq', 0],
+                    ]
                 ],
 
                 'initialstate' => [
@@ -360,7 +432,10 @@ class format_designer extends format_base {
                             FIRST_EXPAND => new lang_string('firstexpand', 'format_designer')
                         ],
                     ],
-                    'disabledif' => ['sectioncollapse', 'neq', 1]
+                    'disabledif' => [
+                        ['designercoursetype', 'eq', DESIGNER_TYPE_KANBAN],
+                        ['designercoursetype', 'eq', 0],
+                    ]
                 ],
 
                 'enrolmentstartdate' => [
@@ -391,7 +466,7 @@ class format_designer extends format_base {
                 ],
                 'coursecompletiondate' => [
                     'label' => new lang_string('coursecompletiondate', 'format_designer'),
-                    'element_type' => $this->designer_completion_enabled() ? 'select' : 'hidden',
+                    'element_type' => 'select',
                     'element_attributes' => [
                         [
                             1 => new lang_string('show'),
@@ -400,7 +475,7 @@ class format_designer extends format_base {
                     ],
                     'help' => 'coursecompletiondate',
                     'help_component' => 'format_designer',
-                    'disabledif' => ['enablecompletion', 'neq', 1],
+                    'disabledif' => [['enablecompletion', 'neq', 1]],
 
                 ],
 
@@ -415,22 +490,75 @@ class format_designer extends format_base {
                     ],
                     'help' => 'activityprogress',
                     'help_component' => 'format_designer',
-                    'disabledif' => ['enablecompletion', 'neq', 1],
+                    'disabledif' => [['enablecompletion', 'neq', 1]],
 
                 ],
                 'designercoursetype' => [
-                    'label' => new lang_string('coursetype', 'format_designer'),
+                    'label' => new lang_string('designercoursetype', 'format_designer'),
                     'element_type' => 'select',
                     'element_attributes' => [
                         [
                             0 => new lang_string('normal'),
-                            1 => new lang_string('kanbanboard', 'format_designer'),
+                            DESIGNER_TYPE_KANBAN => new lang_string('kanbanboard', 'format_designer'),
+                            DESIGNER_TYPE_COLLAPSIBLE => new lang_string('collapsiblesections', 'format_designer'),
+                            DESIGNER_TYPE_FLOW => new lang_string('type_flow', 'format_designer')
                         ],
                     ],
-                    'help' => 'coursetype',
+                    'help' => 'designercoursetype',
                     'help_component' => 'format_designer',
+                ],
+
+                'showanimation' => [
+                    'label' => new lang_string('showanimation', 'format_designer'),
+                    'element_type' => 'select',
+                    'element_attributes' => [
+                        array(
+                            0 => new lang_string('disable'),
+                            1 => new lang_string('enable')
+                        )
+                    ],
+                    'help' => 'showanimation',
+                    'help_component' => 'format_designer',
+                    'disabledif' => [['designercoursetype', 'neq', DESIGNER_TYPE_FLOW]]
+                ],
+
+                'courseheader' => [
+                    'label' => new lang_string('courseheader', 'format_designer'),
+                    'element_type' => 'header',
+                ],
+
+                'listwidth' => [
+                    'label' => new lang_string('listwidth', 'format_designer'),
+                    'element_type' => 'text',
+                    'hideif' => ['designercoursetype', 'neq', DESIGNER_TYPE_KANBAN]
                 ]
             ];
+
+            if (format_designer_popup_installed()) {
+                $courseformatoptionsedit['popupactivities'] = [
+                    'label' => new lang_string('popupactivities', 'format_designer'),
+                    'element_type' => 'select',
+                    'element_attributes' => [
+                        [
+                            DESIGNER_DISABLE_POPUPACTIVITIES => new lang_string('disable'),
+                            DESIGNER_ENABLE_POPUPACTIVITIES => new lang_string('enable'),
+                        ],
+                    ],
+                    'help' => 'popupactivities',
+                    'help_component' => 'format_designer',
+                ];
+                $courseformatoptionsedit['popupactivitiesinfo'] = [
+                    'element_type' => 'hidden',
+                ];
+            } else {
+                $courseformatoptionsedit['popupactivitiesinfo'] = [
+                    'element_type' => 'static',
+                ];
+                $courseformatoptionsedit['popupactivities'] = [
+                    'element_type' => 'hidden',
+                    'label' => get_string('popupactivities', 'format_designer'),
+                ];
+            }
 
             if (format_designer_timemanagement_installed()) {
                 $courseformatoptionsedit['courseduedate'] = [
@@ -460,18 +588,8 @@ class format_designer extends format_base {
                     'help_component' => 'format_designer',
                 ];
             }
-
-            if ($this->designer_completion_enabled()) {
-                $courseformatoptionsedit['coursecompletiondateinfo'] = [
-                    'element_type' => 'hidden',
-                ];
-            } else {
-                $courseformatoptionsedit['coursecompletiondateinfo'] = [
-                    'element_type' => 'static',
-                ];
-            }
-
             $courseformatoptions = array_merge_recursive($courseformatoptions, $courseformatoptionsedit);
+
         }
         return $courseformatoptions;
     }
@@ -524,28 +642,46 @@ class format_designer extends format_base {
         foreach ($options as $optionname => $option) {
             if (isset($option['disabledif'])) {
                 $disabledif = $option['disabledif'];
-                if (isset($disabledif[2])) {
-                    $mform->disabledif($optionname, $disabledif[0], $disabledif[1], $disabledif[2]);
+                foreach ($disabledif as $disable) {
+                    if (isset($disable[2])) {
+                        $mform->disabledif($optionname, $disable[0], $disable[1], $disable[2]);
+                    }
                 }
             }
             if (isset($option['hideif'])) {
                 $hideif = $option['hideif'];
-                if (isset($disabledif[1])) {
-                    $mform->hideif($optionname, $hideif[0], $hideif[1]);
+                if (isset($hideif[1])) {
+                    $hide = (isset($hideif[2]))
+                        ? $mform->hideif($optionname, $hideif[0], $hideif[1], $hideif[2])
+                        : $mform->hideif($optionname, $hideif[0], $hideif[1]);
                 }
+            }
+
+            if (isset($option['adv'])) {
+                $mform->setAdvanced($optionname);
             }
         }
 
-        $PAGE->requires->js_init_code('
-            require(["core/config"], function(CFG) {
-                document.querySelectorAll("input[name$=\"width\"]").forEach((v) => {
-                    var px = document.createElement("label");
-                    px.classList.add("px-string");
-                    px.innerHTML = "Px";
-                    v.parentNode.append(px);
+        if ($forsection) {
+            $PAGE->requires->js_init_code('
+                require(["core/config"], function(CFG) {
+                    document.querySelectorAll("input[name$=\"width\"]").forEach((v) => {
+                        var px = document.createElement("label");
+                        px.classList.add("px-string");
+                        px.innerHTML = "Px";
+                        v.parentNode.append(px);
+                    })
+
+                    if (document.querySelectorAll("input[name=\"sectiontype\"]").length > 0) {
+                        var sectionType = document.querySelectorAll("input[name=\"sectiontype\"]")[0].value;
+                        if (sectionType !== "circles" && sectionType != "horizontal_circles"
+                            &&  document.querySelectorAll("select[name=\"circlesize\"]").length > 0) {
+                            document.querySelectorAll("select[name=\"circlesize\"]")[0].setAttribute("disabled", "disabled");
+                        }
+                    }
                 })
-            })
-        ');
+            ');
+        }
 
         return $elements;
     }
@@ -576,10 +712,21 @@ class format_designer extends format_base {
      * @return array
      */
     public function section_format_options($foreditform = false) {
-        global $CFG;
+        return self::section_format_options_list($foreditform);
+    }
+
+    /**
+     * Config list for sections. Used in global settings and section edit.
+     *
+     * @param bool $foreditform
+     * @return array List of section settings.
+     */
+    public static function section_format_options_list($foreditform) {
+        global $CFG, $PAGE;
+        $design = \format_designer\options::get_default_options();
         $sectionoptions = array(
             'sectiontype' => array(
-                'type' => PARAM_ALPHA,
+                'type' => PARAM_ALPHANUMEXT,
                 'label' => '',
                 'element_type' => 'hidden',
                 'default' => 'default',
@@ -599,25 +746,34 @@ class format_designer extends format_base {
             'label' => '',
         );
 
-        foreach (['desktop' => 5, 'tablet' => 3, 'mobile' => 2] as $name => $size) {
-            $name = $name.'width';
-            $availablewidth = array_slice($width, 0, $size);
-            $sectionoptions[$name] = [
-                'default' => 0,
-                'type' => PARAM_INT,
-                'label' => new lang_string($name, 'format_designer'),
-                'element_type' => 'select',
-                'element_attributes' => [
-                   $availablewidth
-                ],
-                'help' => $name,
-                'help_component' => 'format_designer',
-            ];
+        $course = course_get_format($PAGE->course)->get_course();
+        $settingspage = ($PAGE->course->id == SITEID);
+        if ($settingspage || (isset($course->designercoursetype) && $course->designercoursetype != DESIGNER_TYPE_FLOW)) {
+            foreach (['desktop' => 5, 'tablet' => 3, 'mobile' => 2] as $name => $size) {
+                $name = $name.'width';
+                $availablewidth = array_slice($width, 0, $size);
+                $sectionoptions[$name] = [
+                    'default' => isset($design->$name) && $foreditform ? $design->$name : 0,
+                    'type' => PARAM_INT,
+                    'label' => new lang_string($name, 'format_designer'),
+                    'element_type' => 'select',
+                    'element_attributes' => [
+                        $availablewidth
+                    ],
+                    'help' => $name,
+                    'help_component' => 'format_designer',
+                ];
+
+                $adv = $name.'_adv';
+                if (isset($design->$adv) && $design->$adv) {
+                    $sectionoptions[$name]['adv'] = true;
+                }
+            }
         }
         // Include pro feature options for section.
         if (format_designer_has_pro()) {
             require_once($CFG->dirroot."/local/designer/lib.php");
-            $prosectionoptions = local_designer_get_pro_section_options();
+            $prosectionoptions = local_designer_get_pro_section_options($foreditform);
             $sectionoptions = array_merge($sectionoptions, $prosectionoptions);
         }
         return $sectionoptions;
@@ -633,7 +789,6 @@ class format_designer extends format_base {
     public function create_section_edit_form_elements(\MoodleQuickForm &$mform, \stdClass $section): array {
         $options = $this->section_format_options(true);
         $elements = $this->add_options_to_form_elements($mform, $options);
-
         return $elements;
     }
 
@@ -660,6 +815,10 @@ class format_designer extends format_base {
                     $mform->hideif($optionname, $hideif[0], $hideif[1]);
                 }
             }
+
+            if (isset($option['adv'])) {
+                $mform->setAdvanced($optionname);
+            }
         }
         $PAGE->requires->js_init_code('
             require(["core/config"], function(CFG) {
@@ -670,6 +829,13 @@ class format_designer extends format_base {
                     v.parentNode.append(px);
                 })
             })
+            if (document.querySelectorAll("input[name=\"sectiontype\"]").length > 0) {
+                var sectionType = document.querySelectorAll("input[name=\"sectiontype\"]")[0].value;
+                if (sectionType !== "circles" && sectionType != "horizontal_circles"
+                    &&  document.querySelectorAll("select[name=\"circlesize\"]").length > 0) {
+                    document.querySelectorAll("select[name=\"circlesize\"]")[0].setAttribute("disabled", "disabled");
+                }
+            }
         ');
         return $elements;
     }
@@ -723,9 +889,53 @@ class format_designer extends format_base {
                 if ($key == 'coursecompletiondateinfo') {
                     $data[$key] = get_string('completiontrackingmissing', 'format_designer');
                 }
+                if ($key == 'popupactivities' && !format_designer_popup_installed()) {
+                    $data[$key] = false;
+                }
+            }
+            if (isset($data['designercoursetype'])) {
+                if (isset($oldcourse['designercoursetype'])) {
+                    if ($data['designercoursetype'] == DESIGNER_TYPE_KANBAN
+                        && $oldcourse['designercoursetype'] != DESIGNER_TYPE_KANBAN) {
+                        $this->setup_kanban_layouts($oldcourse);
+                    }
+                }
+                if ($data['designercoursetype'] == DESIGNER_TYPE_KANBAN) {
+                    $data['coursedisplay'] = 0;
+                }
+            }
+        } else {
+            if (isset($data['designercoursetype'])) {
+                if ($data['designercoursetype'] == DESIGNER_TYPE_KANBAN) {
+                    $this->setup_kanban_layouts($data);
+                    $data['coursedisplay'] = 0;
+                }
             }
         }
+        unset($data['courseheader']);
+        unset($data['popupactivitiesinfo']);
+
         return $this->update_format_options($data);
+    }
+
+    /**
+     * Update the kanban layouts default options when layout changed to kanban mode.
+     *
+     * @param array $course
+     * @return void
+     */
+    public function setup_kanban_layouts($course) {
+        global $DB;
+        $sections = $DB->get_records('course_sections', ['course' => $course['id']]);
+        foreach ($sections as $section) {
+            if ($section->section == 0) {
+                continue;
+            }
+            $this->set_section_option($section->id, 'sectiontype', 'cards');
+            $this->set_section_option($section->id, 'layoutmobilecolumn', '1');
+            $this->set_section_option($section->id, 'layouttabletcolumn', '1');
+            $this->set_section_option($section->id, 'layoutdesktopcolumn', '1');
+        }
     }
 
     /**
@@ -1134,8 +1344,9 @@ function format_designer_pluginfile($course, $cm, $context, $filearea, $args, $f
  */
 function format_designer_include_prosettings($settings) {
     global $CFG, $DB;
-    if (format_designer_has_pro() && file_exists($CFG->dirroot.'/local/designer_pro/setting.php')) {
-        require_once($CFG->dirroot.'/local/designer_pro/setting.php');
+    if (format_designer_has_pro()
+        && file_exists($CFG->dirroot.'/local/designer/setting.php')) {
+        require_once($CFG->dirroot.'/local/designer/setting.php');
     }
 }
 
@@ -1148,10 +1359,10 @@ function format_designer_include_prosettings($settings) {
  */
 function format_designer_coursemodule_standard_elements($formwrapper, $mform) {
     global $CFG, $DB;
-    // print_object($mform);
     $cm = $formwrapper->get_coursemodule();
     $course = $formwrapper->get_course();
     if ($course->format == 'designer') {
+        $design = $designadv = \format_designer\options::get_default_options();
         if (isset($cm->id) && $cm->id) {
             $design = \format_designer\options::get_options($cm->id);
         }
@@ -1162,7 +1373,8 @@ function format_designer_coursemodule_standard_elements($formwrapper, $mform) {
             1 => get_string('show'),
             0 => get_string('hide'),
             2 => get_string('showonhover', 'format_designer'),
-            3 => get_string('hideonhover', 'format_designer')
+            3 => get_string('hideonhover', 'format_designer'),
+            4 => get_string('remove'),
         ];
 
         $mform->addElement('header', 'moduledesign', get_string('activitydesign', 'format_designer'));
@@ -1174,6 +1386,10 @@ function format_designer_coursemodule_standard_elements($formwrapper, $mform) {
             $mform->setType($name, PARAM_INT);
             if (isset($design->activityelements[$element])) {
                 $mform->setDefault($name, $design->activityelements[$element]);
+            }
+            $adv = 'activityelements_'.$element.'_adv';
+            if (isset($designadv->$adv) && $designadv->$adv) {
+                $mform->setAdvanced($name);
             }
         }
 
@@ -1240,12 +1456,23 @@ function format_designer_timemanagement_installed() {
 function format_designer_editsetting_style($page) {
     if ($page->user_is_editing()) {
         // Fixed the overlapping issue by make this css rule as important. Moodle CI doesn't allow important.
-        $style = '.format-designer .course-content ul.designer li.section .right .dropdown .dropdown-menu {';
-        $style .= 'top: auto !important;left: auto !important;right: 40px !important; bottom: 0;transform: none !important;';
+        $style = '.format-designer .course-content ul.designer li.section .right .dropdown.designer-menu .dropdown-menu {';
+        $style .= 'top: auto !important;left: auto !important;right: 40px !important; bottom: -95px;transform: none !important;';
         $style .= '}';
         $style .= '.format-designer .designer .section .activity .actions .menu {';
         $style .= 'top: -40px !important;left: auto !important;right: 40px !important;transform: none !important;';
         $style .= '}';
         echo html_writer::tag('style', $style, []);
     }
+}
+
+/**
+ * Find the plugin format_popup installed.
+ *
+ * @return bool
+ */
+function format_designer_popup_installed() {
+    $pluginman = \core_plugin_manager::instance();
+    $plugininfo = $pluginman->get_plugin_info('format_popups');
+    return !empty($plugininfo) ? true : false;
 }

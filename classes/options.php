@@ -62,6 +62,25 @@ class options {
     }
 
     /**
+     * Get course options.
+     *
+     * @param string $name
+     * @param int $courseid
+     * @return string Value of course option.
+     */
+    public static function get_course_option($name, $courseid=null) {
+        global $DB;
+        $record = $DB->get_record('course_format_options', [
+            'name' => $name,
+            'courseid' => $courseid,
+            'format' => 'designer'
+        ]);
+        if (!empty($record)) {
+            return $record->value;
+        }
+        return null;
+    }
+    /**
      * Get designer additional fields values for the given module.
      *
      * @param int $cmid course module id.
@@ -194,6 +213,47 @@ class options {
             return $data['duedate'] ?? false;
         }
         return false;
+    }
+
+    /**
+     * Get default options.
+     *
+     * @param bool $issection
+     * @return void
+     */
+    public static function get_default_options($issection=false) {
+        global $DB, $PAGE;
+        static $design;
+        if ($design == null) {
+
+            $formatdesign = (array) get_config('format_designer');
+            $localdesign = (array) get_config('local_designer');
+            $design = (object) array_merge($formatdesign, $localdesign);
+
+            $design->bgimagestyle = [
+                'size' => isset($design->bgimagestyle_size) ? $design->bgimagestyle_size : '',
+                'size_adv' => isset($design->bgimagestyle_size_adv) ? $design->bgimagestyle_size_adv : '',
+                'position' => isset($design->bgimagestyle_position) ? $design->bgimagestyle_position : '',
+                'position_adv' => isset($design->bgimagestyle_position_adv) ? $design->bgimagestyle_position_adv : '',
+                'repeat' => isset($design->bgimagestyle_repeat) ? $design->bgimagestyle_repeat : '',
+                'repeat_adv' => isset($design->bgimagestyle_repeat_adv) ? $design->bgimagestyle_repeat_adv : ''
+            ];
+
+            $design->maskstyle = [
+                'size' => isset($design->maskstyle_size) ? $design->maskstyle_size : '',
+                'size_adv' => isset($design->maskstyle_size_adv) ? $design->maskstyle_size_adv : 0,
+                'position' => isset($design->maskstyle_position) ? $design->maskstyle_position : '',
+                'position_adv' => isset($design->maskstyle_position_adv) ? $design->maskstyle_position_adv : 0,
+                'image' => isset($design->maskstyle_image) ? $design->maskstyle_image : '',
+            ];
+
+            $elements = ['icon', 'visits', 'calltoaction', 'title', 'description', 'modname', 'completionbadge'];
+            foreach ($elements as $element) {
+                $design->activityelements[$element] = isset($design->{'activityelements_'.$element})
+                    ? $design->{'activityelements_'.$element} : '';
+            }
+        }
+        return $design;
     }
 
 }
