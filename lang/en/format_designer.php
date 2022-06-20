@@ -275,3 +275,6 @@ $string['showanimation'] = 'Flow animation';
 $string['showanimation_help'] = 'Enable to reveal the modules with animation effect.';
 $string['verticalcircles'] = 'Vertical circles';
 $string['horizontal_circles'] = 'Horizontal Circles';
+$string['modmaskimage'] = 'Activity mask image';
+$string['modmasksize'] = 'Activity mask size';
+$string['modmaskposition'] = 'Activity mask position';
