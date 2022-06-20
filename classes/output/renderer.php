@@ -725,7 +725,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             'coursetype' => $this->course_type_sectionclasses($course, $section, $modinfo),
             'stylerules' => $sectionstylerules,
             'flowcourse' => isset($course->coursetype) && $course->coursetype == DESIGNER_TYPE_FLOW ? true : false,
-            'maskimage' => ($section->sectiondesignermaskimage) ? true : false,
+            'maskimage' => (isset($section->sectiondesignermaskimage) && $section->sectiondesignermaskimage) ? true : false,
         ];
 
         if (format_designer_has_pro()) {

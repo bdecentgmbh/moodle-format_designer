@@ -83,16 +83,18 @@
 
         {{! Section name header }}
         {{^section.hidesectiontitle}}
-            {{#singleheader}}
-            {{$ format_designer/courseformat/content/section/header }}
-                {{> format_designer/courseformat/content/section/header }}
-            {{/ format_designer/courseformat/content/section/header }}
-            {{/singleheader}}
-            {{#header}}
-            {{$ format_designer/courseformat/content/section/header }}
-                {{> format_designer/courseformat/content/section/header }}
-            {{/ format_designer/courseformat/content/section/header }}
-            {{/header}}
+            <div class="section-head-text" style="{{#sectiondesigntextcolor}} {{sectiondesigntextcolor}} {{/sectiondesigntextcolor}}">
+                {{#singleheader}}
+                {{$ format_designer/courseformat/content/section/header }}
+                    {{> format_designer/courseformat/content/section/header }}
+                {{/ format_designer/courseformat/content/section/header }}
+                {{/singleheader}}
+                {{#header}}
+                {{$ format_designer/courseformat/content/section/header }}
+                    {{> format_designer/courseformat/content/section/header }}
+                {{/ format_designer/courseformat/content/section/header }}
+                {{/header}}
+            </div>
         {{/section.hidesectiontitle}}
         {{! End of section name }}
 
@@ -181,49 +183,3 @@
     {{/sectionheader}}
 </div>
 </div>
-
-<style>
-
-
-    .flow-animation {
-        -webkit-animation-duration: 1s;
-        animation-duration: 1s;
-        -webkit-animation-duration: 1s;
-        animation-duration: 1s;
-        -webkit-animation-fill-mode: both;
-        animation-fill-mode: both;
-        -webkit-animation-name: fadeInLeft;
-        animation-name: fadeInLeft;
-    }
-
-    @-webkit-keyframes fadeInLeft {
-        from {
-            opacity: 0;
-            -webkit-transform: translate3d(-100%, 0, 0);
-            transform: translate3d(-100%, 0, 0);
-            transform-origin: center;
-        }
-
-        to {
-            opacity: 1;
-            -webkit-transform: translate3d(0, 0, 0);
-            transform: translate3d(0, 0, 0);
-            transform-origin: center;
-        }
-    }
-    @keyframes fadeInLeft {
-        from {
-            opacity: 0;
-            -webkit-transform: translate3d(-100%, 0, 0);
-            transform: translate3d(-100%, 0, 0);
-            transform-origin: center;
-        }
-
-        to {
-            opacity: 1;
-            -webkit-transform: translate3d(0, 0, 0);
-            transform: translate3d(0, 0, 0);
-        }
-    }
-
-</style>

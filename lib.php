@@ -434,6 +434,10 @@ class format_designer extends \core_courseformat\base {
                     'default' => get_string('timemanagementmissing', 'format_designer'),
                     'type' => PARAM_RAW_TRIMMED,
                     'label' => new lang_string('courseduedate', 'format_designer'),
+                ],
+                'courseindex' => [
+                    'default' => 0,
+                    'type' => PARAM_INT
                 ]
             ];
         }
@@ -534,7 +538,6 @@ class format_designer extends \core_courseformat\base {
                     'help' => 'coursecompletiondate',
                     'help_component' => 'format_designer',
                     'disabledif' => [['enablecompletion', 'neq', 1]],
-
                 ],
 
                 'activityprogress' => [
@@ -549,7 +552,6 @@ class format_designer extends \core_courseformat\base {
                     'help' => 'activityprogress',
                     'help_component' => 'format_designer',
                     'disabledif' => [['enablecompletion', 'neq', 1]],
-
                 ],
                 'coursetype' => [
                     'label' => new lang_string('coursetype', 'format_designer'),
@@ -589,6 +591,19 @@ class format_designer extends \core_courseformat\base {
                     'label' => new lang_string('listwidth', 'format_designer'),
                     'element_type' => 'text',
                     'hideif' => ['coursetype', 'neq', DESIGNER_TYPE_KANBAN]
+                ],
+                'courseindex' => [
+                    'label' => new lang_string('courseindex', 'format_designer'),
+                    'element_type' => 'select',
+                    'element_attributes' => [
+                        [
+                            0 => new lang_string('show'),
+                            self::HIDE_ON_COURSEPAGE => new lang_string('hideoncourses', 'format_designer'),
+                            self::HIDE_EVERYWHERE => new lang_string('hideeverywhere', 'format_designer'),
+                        ],
+                    ],
+                    'help' => 'courseindex',
+                    'help_component' => 'format_designer',
                 ]
             ];
 
@@ -1317,6 +1332,7 @@ function format_designer_coursemodule_standard_elements($formwrapper, $mform) {
             $title = get_string('activity:'.$element, 'format_designer');
             $mform->addElement('select', $name, $title, $choice);
             $mform->setType($name, PARAM_INT);
+            $mform->setDefault($name, 1);
             if (isset($design->activityelements[$element])) {
                 $mform->setDefault($name, $design->activityelements[$element]);
             }
@@ -1420,7 +1436,7 @@ function format_designer_get_module_layoutclass($format, $section) {
             if ($sectiontype == 'circles') {
                 $sectionlayoutclass = ' circle-layout card ';
             } else if ($sectiontype == 'horizontal_circles') {
-                $sectionlayoutclass = ' circle-layout horizontal_circles card ';
+                $sectionlayoutclass = ' horizontal_circles-layout card ';
             }
         }
     }

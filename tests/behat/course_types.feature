@@ -25,7 +25,7 @@ Feature: Users can choose different course types.
 
   @javascript
   Scenario: Collapsible sections
-    Given I navigate to "Edit settings" in current page administration
+    Given I navigate to "Settings" in current page administration
     And I expand all fieldsets
     And I set the following fields to these values:
         | Course type | Collapsible sections |
@@ -36,7 +36,7 @@ Feature: Users can choose different course types.
 
   @javascript @kanban_board
   Scenario: Kanban board
-    Given I navigate to "Edit settings" in current page administration
+    Given I navigate to "Settings" in current page administration
     And I expand all fieldsets
     And I set the following fields to these values:
         | Course type | Kanban Board |
@@ -48,7 +48,7 @@ Feature: Users can choose different course types.
 
   @javascript
   Scenario: Flow
-    Given I navigate to "Edit settings" in current page administration
+    Given I navigate to "Settings" in current page administration
     And I expand all fieldsets
     And I set the following fields to these values:
         | Course type | Flow |
@@ -60,7 +60,7 @@ Feature: Users can choose different course types.
     And I click on "#section-head-1" "css_element"
     Then the "class" attribute of "#section-head-1" "css_element" should not contain "collapsed"
     And the "class" attribute of "#section-1 .activity" "css_element" should contain "flow-animation"
-    And I navigate to "Edit settings" in current page administration
+    And I navigate to "Settings" in current page administration
     And I set the following fields to these values:
         | Flow animation | Disable |
     And I press "Save and display"

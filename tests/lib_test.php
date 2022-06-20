@@ -307,7 +307,7 @@ class lib_test extends \advanced_testcase {
 
     /**
      * Test the kanban board setup changes the section type.
-     *
+     * @covers ::setup_kanban_board
      * @return void
      */
     public function test_kanban_setup() {

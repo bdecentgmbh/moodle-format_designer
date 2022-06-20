@@ -42,12 +42,13 @@
      * Control designer format action
      * @param {int} courseId
      * @param {int} contextId
+     * @param {array} popupActivities
      */
     let DesignerSection = function(courseId, contextId, popupActivities) {
         var self = this;
         self.courseId = courseId;
         self.contextId = contextId;
-        self.popupActivities = popupActivities
+        self.popupActivities = popupActivities;
 
         $('body').delegate(self.SectionController, 'click', self.sectionLayoutaction.bind(this));
         $("body").delegate(self.RestrictInfo, "click", self.moduleHandler.bind(this));
@@ -59,12 +60,12 @@
             self.expandSection();
         };
         this.expandSection();
-        
+
         if ($('.course-type-flow').length > 0) {
             $('.collapse').on('show.bs.collapse', function() {
                 $(this).parents('li.section').addClass('stack-header-collapsing');
                 var sectionid = $(this).parents('li.section').attr('id');
-                var section = document.getElementById(sectionid)
+                var section = document.getElementById(sectionid);
                 var distance = section.offsetTop - document.body.scrollTop;
                 setTimeout(() => window.scroll(0, distance), 50);
             }).on('shown.bs.collapse', function() {
