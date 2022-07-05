@@ -645,7 +645,6 @@ class format_designer extends \core_courseformat\base {
                     ],
                     'help' => 'courseduedate',
                     'help_component' => 'format_designer',
-                    'default' => 0
                 ];
                 $courseformatoptionsedit['courseduedateinfo'] = [
                     'element_type' => 'hidden',
