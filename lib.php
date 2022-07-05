@@ -572,7 +572,6 @@ class format_designer extends format_base {
                     ],
                     'help' => 'courseduedate',
                     'help_component' => 'format_designer',
-                    'default' => 0
                 ];
                 $courseformatoptionsedit['courseduedateinfo'] = [
                     'element_type' => 'hidden',
@@ -832,11 +831,13 @@ class format_designer extends format_base {
                     $data[$key] = false;
                 }
             }
-            if ($data['coursetype'] == DESIGNER_TYPE_KANBAN && $oldcourse['coursetype'] != DESIGNER_TYPE_KANBAN) {
-                $this->setup_kanban_layouts($oldcourse);
-            }
-            if ($data['coursetype'] == DESIGNER_TYPE_KANBAN) {
-                $data['coursedisplay'] = 0;
+            if (isset($data['coursetype'])) {
+                if ($data['coursetype'] == DESIGNER_TYPE_KANBAN && $oldcourse['coursetype'] != DESIGNER_TYPE_KANBAN) {
+                    $this->setup_kanban_layouts($oldcourse);
+                }
+                if ($data['coursetype'] == DESIGNER_TYPE_KANBAN) {
+                    $data['coursedisplay'] = 0;
+                }
             }
         } else {
             if (isset($data['coursetype'])) {
