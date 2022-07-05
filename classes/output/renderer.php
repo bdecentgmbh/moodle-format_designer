@@ -115,7 +115,6 @@ class renderer extends \core_courseformat\output\section_renderer {
     public function render_title($widget) {
         global $CFG;
         $data = $widget->export_for_template($this);
-
         $data->elementstate = $this->get_activity_elementclasses($data->mod);
         if (format_designer_has_pro()) {
             require_once($CFG->dirroot. "/local/designer/lib.php");
@@ -827,11 +826,12 @@ class renderer extends \core_courseformat\output\section_renderer {
         // If there is content AND a link, then display the content here.
         // (AFTER any icons). Otherwise it was displayed before.
         $cmtext = '';
+        $videotime = $mod->modname == 'videotime';
         if (format_designer_has_pro()) {
             $useactivityimage = \format_designer\options::get_option($mod->id, 'useactivityimage');
-            $videotime = ($mod->modname == 'videotime' && $useactivityimage);
+            $useactivityimagestatus = ($videotime && $useactivityimage);
         }
-        if (!empty($url) || (isset($videotime) && $videotime)) {
+        if (!empty($url) || (isset($useactivityimagestatus) && $useactivityimagestatus)) {
             $cmtext = $mod->get_formatted_content(['overflowdiv' => true, 'noclean' => true]);
             if (isset($videotime) && $videotime) {
                 $videotime = $DB->get_record('videotime', ['id' => $mod->instance]);
@@ -857,7 +857,12 @@ class renderer extends \core_courseformat\output\section_renderer {
                     $modcontent = html_writer::tag('p', $cmtextcontent);
                 }
             }
+        } else {
+            $modcontent = $mod->get_formatted_content(
+                ['overflowdiv' => true, 'noclean' => true]
+            );
         }
+        //exit;
 
         $modvisits = $DB->count_records('logstore_standard_log', array('contextinstanceid' => $mod->id,
             'userid' => $USER->id, 'action' => 'viewed', 'target' => 'course_module'));
@@ -897,7 +902,6 @@ class renderer extends \core_courseformat\output\section_renderer {
             'elementstate' => $this->get_activity_elementclasses($mod),
             'modstyle' => isset($modstyle) ? $modstyle : '',
         ];
-
         if (format_designer_has_pro()) {
             require_once($CFG->dirroot. "/local/designer/lib.php");
             $prodata = \local_designer\options::render_course_module($mod, $cmlist, $section);

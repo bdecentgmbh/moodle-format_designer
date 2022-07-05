@@ -2238,6 +2238,9 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     left: 15px;
     bottom: 15px;
 }
+.format-designer .designer .section.img-text .activity.videotime .activity-block .mod-content .panel .panel-body h4 {
+    display: none;
+}
 .format-designer .designer .section.img-text.card-layout .activity.videotime .activity-block .activityinstance {
     padding: 10px;
 }
@@ -2302,7 +2305,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 } */
 .format-designer ul.designer .card-layout .card.card-list .card-body .mod-indent-outer > div:last-child {
     height: 100%;
-    display: block;
+    /*display: block;*/
 }
 .format-designer ul.designer .card-layout .card.card-list .card-body .mod-indent-outer > div:last-child .contentwithoutlink {
     height: auto;

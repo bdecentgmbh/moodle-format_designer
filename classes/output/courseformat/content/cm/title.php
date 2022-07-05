@@ -49,7 +49,7 @@ class title extends \core_courseformat\output\local\content\cm\title {
         $format = $this->format;
         $mod = $this->mod;
         $displayoptions = $this->displayoptions;
-        if (!$mod->is_visible_on_course_page() || !$mod->url) {
+        if (!$mod->is_visible_on_course_page() || !$mod->url && !$mod->modname == 'videotime') {
             // Nothing to be displayed to the user.
             $data = new stdClass();
             $data->mod = $mod;
