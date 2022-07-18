@@ -401,6 +401,10 @@ class format_designer extends \core_courseformat\base {
                     'default' => '400px',
                     'type' => PARAM_ALPHANUMEXT,
                 ],
+                'courseindex' => [
+                    'default' => 0,
+                    'type' => PARAM_INT
+                ],
                 'courseheader' => [
                     'default' => get_string('courseheader', 'format_designer'),
                     'type' => PARAM_TEXT,
@@ -434,10 +438,6 @@ class format_designer extends \core_courseformat\base {
                     'default' => get_string('timemanagementmissing', 'format_designer'),
                     'type' => PARAM_RAW_TRIMMED,
                     'label' => new lang_string('courseduedate', 'format_designer'),
-                ],
-                'courseindex' => [
-                    'default' => 0,
-                    'type' => PARAM_INT
                 ]
             ];
         }
@@ -1405,10 +1405,10 @@ function format_designer_editsetting_style($page) {
     if ($page->user_is_editing()) {
         // Fixed the overlapping issue by make this css rule as important. Moodle CI doesn't allow important.
         $style = '.format-designer .course-content ul.designer li.section .right .dropdown .dropdown-menu {';
-        $style .= 'top: -40px !important;left: auto !important;right: 40px !important;transform: none !important;';
+        $style .= 'top: -50px !important;left: auto !important;right: 40px !important;transform: none !important;';
         $style .= '}';
         $style .= '.format-designer .designer .section .activity .actions .menubar .dropdown .dropdown-menu {';
-        $style .= 'top: -40px !important;left: auto !important;right: 40px !important;transform: none !important;';
+        $style .= 'top: -50px !important;left: auto !important;right: 40px !important;transform: none !important;';
         $style .= '}';
         echo html_writer::tag('style', $style, []);
     }
@@ -1429,13 +1429,19 @@ function format_designer_get_module_layoutclass($format, $section) {
     } else if ($sectiontype == 'cards') {
         $sectionlayoutclass = ' card ';
     }
+
+    if ($format->get_course()->coursetype == DESIGNER_TYPE_FLOW) {
+        $sectionlayoutclass = 'card';
+        $sectiontype = 'cards';
+    }
+
     $prolayouts = format_designer_get_pro_layouts();
     if (in_array($sectiontype, $prolayouts)) {
         if (format_designer_has_pro()) {
             if ($sectiontype == 'circles') {
                 $sectionlayoutclass = ' circle-layout card ';
             } else if ($sectiontype == 'horizontal_circles') {
-                $sectionlayoutclass = ' horizontal_circles-layout card ';
+                $sectionlayoutclass = ' horizontal_circles circle-layout card ';
             }
         }
     }

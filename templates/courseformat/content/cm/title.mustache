@@ -36,11 +36,13 @@
 {{#url}}
     <div class="activity-instance flex-column">
         <div class="activitytitle media {{textclasses}} modtype_{{modname}} position-relative align-self-start">
+            {{^useactivityimage}}
             <div class="img-element {{elementstate.icon}}">
                 <div class="img-block activityiconcontainer {{purpose}} courseicon align-self-start mr-3" >
                     <img src="{{{icon}}}" class="activityicon " alt="{{{modname}}} icon">
                 </div>
             </div>
+            {{/useactivityimage}}
             <div class="media-body align-self-center activity-element {{modcontentclass}}">
                 <div class="activity-type {{elementstate.modname}}">
                     <p class="text-uppercase small text-capitalize " style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">

@@ -74,3 +74,5 @@ if ($ispopupactivities && !$PAGE->user_is_editing()) {
         $context->id, $course->id, $displaysection
     ));
 }
+
+format_designer_editsetting_style($PAGE);

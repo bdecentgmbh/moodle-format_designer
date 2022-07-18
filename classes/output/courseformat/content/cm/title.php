@@ -45,7 +45,7 @@ class title extends \core_courseformat\output\local\content\cm\title {
      * @return stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output): stdClass {
-
+        global $DB;
         $format = $this->format;
         $mod = $this->mod;
         $displayoptions = $this->displayoptions;
@@ -70,6 +70,17 @@ class title extends \core_courseformat\output\local\content\cm\title {
             $displayoptions['textclasses'] = $cmoutput->get_text_classes();
         }
 
+        $useactivityimage = '';
+        if (format_designer_has_pro()) {
+            if ($mod->modname == 'videotime') {
+                if ($videorecord = $DB->get_record('videotime', array('id' => $mod->instance))) {
+                    if ($videorecord->label_mode == 2) {
+                        $useactivityimage = \format_designer\options::get_option($mod->id, 'useactivityimage');
+                    }
+                }
+            }
+        }
+
         $data = (object)[
             'url' => ($mod->modname == 'videotime') ? new moodle_url('/mod/videotime/view.php', ['id' => $mod->id]) : $mod->url,
             'instancename' => ($mod->modname == 'videotime') ? ucwords($mod->name) : $mod->get_formatted_name(),
@@ -80,6 +91,7 @@ class title extends \core_courseformat\output\local\content\cm\title {
             'linkclasses' => $displayoptions['linkclasses'],
             'textclasses' => $displayoptions['textclasses'],
             'purpose' => plugin_supports('mod', $mod->modname, FEATURE_MOD_PURPOSE, MOD_PURPOSE_OTHER),
+            'useactivityimage' => $useactivityimage,
         ];
 
         // File type after name, for alphabetic lists (screen reader).

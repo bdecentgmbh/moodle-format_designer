@@ -42,7 +42,7 @@
         }}{{#modinline}}activityinline{{/modinline}}" data-activityname="{{activityname}}" style="{{#prostyle}} {{{prostyle}}} {{/prostyle}}">
 
         <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{cmurl}}">
-            <div class="card-body">
+            <div class="card-body {{#enableactivityimage}}bg-overlay{{/enableactivityimage}}">
                 <div class="activity-background-style" style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
                 </div>
 
@@ -91,6 +91,10 @@
                             </div>
                         {{/modcontent}}
 
+                        {{#useactivityimage}}
+                            {{{modiconurl}}}
+                        {{/useactivityimage}}
+
                         {{#cmcompletionhtml}}
                             <div class="completion-html-card {{elementstate.completionbadge}}">
                                 {{{cmcompletionhtml}}}
@@ -109,6 +113,12 @@
                         </div>
                         {{/modrestricted}}
                         {{{aftercontent}}}
+
+                        {{#useactivityimage}}
+                            {{#duration_formatted}}
+                                <span class="badge badge-dark video-duration">{{duration_formatted}}</span>
+                            {{/duration_formatted}}
+                        {{/useactivityimage}}
                     </div>
                 </div>
             </div>
