@@ -34,7 +34,7 @@
 <div class="activity-block designer" style="{{#prostyle}} {{{prostyle}}} {{/prostyle}}">
     {{{movehtml}}}
     <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{cmurl}}">
-        <div class="card-body">
+        <div class="card-body {{#enableactivityimage}}bg-overlay{{/enableactivityimage}}">
             <div class="activity-background-style" style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
             </div>
 
@@ -46,13 +46,15 @@
                 <div class="{{indentclasses}}"></div>
                 <div>
                     <div class="activityinstance">
-                        {{#modiconurl}}
-                            <div class="img-element {{elementstate.icon}}">
-                                <div class="img-block">
-                                    {{{modiconurl}}}
+                        {{^useactivityimage}}
+                            {{#modiconurl}}
+                                <div class="img-element {{elementstate.icon}}">
+                                    <div class="img-block">
+                                        {{{modiconurl}}}
+                                    </div>
                                 </div>
-                            </div>
-                        {{/modiconurl}}
+                            {{/modiconurl}}
+                        {{/useactivityimage}}
                         <div class="activity-element {{modcontentclass}}">
                             <div class="activity-type {{elementstate.modname}}">
                                 <p class="text-capitalize " style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">{{modtype}}</p>
@@ -78,6 +80,16 @@
                         </div>
                     {{/modcontent}}
 
+                    {{#useactivityimage}}
+                        {{#modiconurl}}
+                            <div class="img-element {{elementstate.icon}}">
+                                <div class="img-block">
+                                    {{{modiconurl}}}
+                                </div>
+                            </div>
+                        {{/modiconurl}}
+                    {{/useactivityimage}}
+
                     {{#cmcompletionhtml}}
                         <div class="completion-html-card {{elementstate.completionbadge}}">
                             {{{cmcompletionhtml}}}
@@ -95,6 +107,12 @@
                     </div>
                     {{/modrestricted}}
                     {{{aftercontent}}}
+
+                    {{#useactivityimage}}
+                        {{#duration_formatted}}
+                            <span class="badge badge-dark video-duration">{{duration_formatted}}</span>
+                        {{/duration_formatted}}
+                    {{/useactivityimage}}
                 </div>
             </div>
         </div>
