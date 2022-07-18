@@ -50,10 +50,15 @@
                             </div>
                         </div>
                     {{/modiconurl}}
-                    <div class="cmname-block {{elementstate.title}}">
-                        {{#cmname}}
-                            {{{cmname}}}
-                        {{/cmname}}
+                    <div class="activity-element {{modcontentclass}}">
+                        <div class="activity-type {{elementstate.modname}}">
+                            <p class="text-capitalize" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">{{modtype}}</p>
+                        </div>
+                        <div class="cmname-block {{elementstate.title}}">
+                            {{#cmname}}
+                                {{{cmname}}}
+                            {{/cmname}}
+                        </div>
                     </div>
                     {{{afterlink}}}
                 </div>

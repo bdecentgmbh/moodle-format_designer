@@ -1283,6 +1283,35 @@ class format_designer_renderer extends format_section_renderer_base {
             $modiconurl .= $activitylink;
             $modiconurl .= html_writer::end_div();
         }
+        $useactivityimage = false;
+        $options = (format_designer_has_pro()) ? \local_designer\options::get_options($mod->id) : [];
+        if (isset($options->useactivityimage)) {
+             if ($mod->modname == 'videotime') {
+                if ($videorecord = $DB->get_record('videotime', array('id' => $mod->instance))) {
+                    if ($videorecord->label_mode == 2) {
+                        $useactivityimage = ($options->useactivityimage) ? $options->useactivityimage : false;
+                    }
+                }
+            }
+            $enableactivityimage = ($options->useactivityimage) ? $options->useactivityimage : false;
+        }
+        $videotimeduration = '';
+        $durationformatted = '';
+        if ($mod->modname == 'videotime') {
+            $videoinstance = $DB->get_record('videotime', array('id' => $mod->instance));
+            if ($videoinstance) {
+                if ($video = $DB->get_record('videotime_vimeo_video', ['link' => $videoinstance->vimeo_url])) {
+                    $videotimeduration = $video->duration;
+                }
+            }
+        }
+        if ($videotimeduration) {
+            if ($videotimeduration >= 3600) {
+                $durationformatted = gmdate('H:i:s', $videotimeduration);
+            } else {
+                $durationformatted = gmdate('i:s', $videotimeduration);
+            }
+        }
 
         $cmname = $this->get_cmname($mod, $displayoptions);
         $cmlist = [
@@ -1306,12 +1335,15 @@ class format_designer_renderer extends format_section_renderer_base {
             'isrestricted' => !empty($mod->availableinfo),
             'modcontent' => isset($modcontent) ? $modcontent : '',
             'modcontentclass' => !empty($modcontent) ? 'ismodcontent' : '',
-            'modvisits' => ($mod->url) ? $modvisits : false,
+            'modvisits' => ($this->get_cmurl($mod)) ? $modvisits : false,
             'availabilityrestrict' => $availabilityrestrict,
             'modiconurl' => $modiconurl,
             'modrestricted' => $modrestricted,
             'elementstate' => $this->get_activity_elementclasses($mod),
             'modstyle' => isset($modstyle) ? $modstyle : '',
+            'useactivityimage' => $useactivityimage,
+            'duration_formatted' => $durationformatted,
+            'enableactivityimage' => $enableactivityimage,
         ];
 
         if (format_designer_has_pro()) {
