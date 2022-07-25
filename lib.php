@@ -885,6 +885,7 @@ class format_designer extends \core_courseformat\base {
      */
     public function update_course_format_options($data, $oldcourse = null) {
         $data = (array)$data;
+
         if ($oldcourse !== null) {
             $oldcourse = (array)$oldcourse;
             $options = $this->course_format_options();
@@ -904,14 +905,17 @@ class format_designer extends \core_courseformat\base {
                     $data[$key] = false;
                 }
             }
-            if (isset($data['coursetype'])) {
-                if ($data['coursetype'] == DESIGNER_TYPE_KANBAN && $oldcourse['coursetype'] != DESIGNER_TYPE_KANBAN) {
+
+            if (isset($oldcourse['coursetype'])
+                && $oldcourse['coursetype'] != DESIGNER_TYPE_KANBAN
+                && isset($data['coursetype'])
+                && $data['coursetype'] == DESIGNER_TYPE_KANBAN) {
                     $this->setup_kanban_layouts($oldcourse);
-                }
-                if ($data['coursetype'] == DESIGNER_TYPE_KANBAN) {
-                    $data['coursedisplay'] = 0;
-                }
             }
+            if (isset($data['coursetype']) && $data['coursetype'] == DESIGNER_TYPE_KANBAN) {
+                $data['coursedisplay'] = 0;
+            }
+
         } else {
             if (isset($data['coursetype']) && $data['coursetype'] == DESIGNER_TYPE_KANBAN) {
                 $this->setup_kanban_layouts($data);

@@ -39,7 +39,7 @@
     <div class="activity-block activity-basis designer 
         activity-item {{#modstealth}}hiddenactivity{{/modstealth}}{{!
         }}{{#modhiddenfromstudents}}hiddenactivity{{/modhiddenfromstudents}}{{!
-        }}{{#modinline}}activityinline{{/modinline}}" data-activityname="{{activityname}}" style="{{#prostyle}} {{{prostyle}}} {{/prostyle}}">
+        }}{{#modinline}}activityinline{{/modinline}} {{#videotimeprogress}}progress-element{{/videotimeprogress}}" data-activityname="{{activityname}}" style="{{#prostyle}} {{{prostyle}}} {{/prostyle}}">
 
         <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{cmurl}}">
             <div class="card-body {{#enableactivityimage}}bg-overlay{{/enableactivityimage}}">
@@ -121,6 +121,8 @@
                         {{/useactivityimage}}
                     </div>
                 </div>
+
+                {{{videotimeprogress}}}
             </div>
             {{#cmformat.controlmenu}}
             <div class="activity-actions align-self-start">
@@ -130,6 +132,5 @@
             </div>
             {{/cmformat.controlmenu}}
         </div>
-        {{{videotimeprogress}}}
     </div>
 </li>
