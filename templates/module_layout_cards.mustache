@@ -31,7 +31,7 @@
     }
 }}
 
-<div class="activity-block designer" style="{{#prostyle}} {{{prostyle}}} {{/prostyle}}">
+<div class="activity-block designer {{#videotimeprogress}}progress-element{{/videotimeprogress}}" style="{{#prostyle}} {{{prostyle}}} {{/prostyle}}">
     {{{movehtml}}}
     <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{cmurl}}">
         <div class="card-body {{#enableactivityimage}}bg-overlay{{/enableactivityimage}}">
@@ -115,6 +115,8 @@
                     {{/useactivityimage}}
                 </div>
             </div>
+
+            {{{videotimeprogress}}}
         </div>
         {{#modicons}}
             <div class="actions">
@@ -122,5 +124,4 @@
             </div>
         {{/modicons}}
     </div>
-    {{{videotimeprogress}}}
 </div>
