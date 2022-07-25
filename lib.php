@@ -1445,7 +1445,7 @@ function format_designer_get_module_layoutclass($format, $section) {
             if ($sectiontype == 'circles') {
                 $sectionlayoutclass = ' circle-layout card ';
             } else if ($sectiontype == 'horizontal_circles') {
-                $sectionlayoutclass = ' horizontal_circles circle-layout card ';
+                $sectionlayoutclass = ' horizontal_circles-layout card ';
             }
         }
     }
