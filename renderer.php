@@ -1254,7 +1254,8 @@ class format_designer_renderer extends format_section_renderer_base {
         $durationformatted = '';
         if ($mod->modname == 'videotime') {
             $videoinstance = $DB->get_record('videotime', array('id' => $mod->instance));
-            if ($videoinstance) {
+            $dbman = $DB->get_manager();
+            if ($videoinstance && $dbman->table_exists('videotime_vimeo_video')) {
                 if ($video = $DB->get_record('videotime_vimeo_video', ['link' => $videoinstance->vimeo_url])) {
                     $videotimeduration = $video->duration;
                 }

@@ -831,14 +831,17 @@ class format_designer extends format_base {
                     $data[$key] = false;
                 }
             }
-            if (isset($data['coursetype'])) {
-                if ($data['coursetype'] == DESIGNER_TYPE_KANBAN && $oldcourse['coursetype'] != DESIGNER_TYPE_KANBAN) {
+
+            if (isset($oldcourse['coursetype'])
+                && $oldcourse['coursetype'] != DESIGNER_TYPE_KANBAN
+                && isset($data['coursetype'])
+                && $data['coursetype'] == DESIGNER_TYPE_KANBAN) {
                     $this->setup_kanban_layouts($oldcourse);
-                }
-                if ($data['coursetype'] == DESIGNER_TYPE_KANBAN) {
-                    $data['coursedisplay'] = 0;
-                }
             }
+            if (isset($data['coursetype']) && $data['coursetype'] == DESIGNER_TYPE_KANBAN) {
+                $data['coursedisplay'] = 0;
+            }
+
         } else {
             if (isset($data['coursetype'])) {
                 if ($data['coursetype'] == DESIGNER_TYPE_KANBAN) {
