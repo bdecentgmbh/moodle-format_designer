@@ -715,11 +715,11 @@ class format_designer_renderer extends format_section_renderer_base {
         if (isset($kanbanactivities)) {
             echo html_writer::end_div();
         }
-        if ($this->page->user_is_editing() and has_capability('moodle/course:update', $context)) {
+        if ($this->page->user_is_editing() && has_capability('moodle/course:update', $context)) {
 
             // Print stealth sections if present.
             foreach ($modinfo->get_section_info_all() as $section => $thissection) {
-                if ($section <= $numsections or empty($modinfo->sections[$section])) {
+                if ($section <= $numsections || empty($modinfo->sections[$section])) {
                     // This is not stealth section or it is empty.
                     continue;
                 }
@@ -769,10 +769,10 @@ class format_designer_renderer extends format_section_renderer_base {
         echo $this->start_section_list($startid, $startclass);
 
         $thissection = $modinfo->get_section_info(0);
-        if ($thissection->summary or !empty($modinfo->sections[0]) or $this->page->user_is_editing()) {
+        if ($thissection->summary || !empty($modinfo->sections[0]) || $this->page->user_is_editing()) {
             $this->render_section($thissection, $course, true);
         }
-        if ($this->page->user_is_editing() and has_capability('moodle/course:update', $context)) {
+        if ($this->page->user_is_editing() && has_capability('moodle/course:update', $context)) {
             echo $this->change_number_sections($course, 0);
         }
 
