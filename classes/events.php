@@ -55,6 +55,8 @@ class events {
             $sectiondata[$name] = get_config('format_designer', $name);
         }
 
-        $format->update_section_format_options($sectiondata);
+        if (!defined('NO_OUTPUT_BUFFERING') || (defined('NO_OUTPUT_BUFFERING') && !NO_OUTPUT_BUFFERING)) {
+            $format->update_section_format_options($sectiondata);
+        }
     }
 }
