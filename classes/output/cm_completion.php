@@ -83,7 +83,7 @@ class cm_completion implements renderable, templatable {
      * @return cm_info
      */
     final protected function get_cm_url() {
-        return isset($this->cm->url) ? $this->cm->url : '#';
+        return isset($this->cm->url) ? $this->cm->url : '';
     }
 
     /**
@@ -216,11 +216,14 @@ class cm_completion implements renderable, templatable {
     }
 
     /**
-     * Get when cm must be completed by.
+     * Get when cm must be completed by. Check is timemanagement tool contains any duedates for this module.
      *
      * @return int
      */
     final public function get_completion_expected(): int {
+        if ($duedate = \format_designer\options::timetool_duedate($this->cm)) {
+            return $duedate;
+        }
         return $this->cm->completionexpected;
     }
 
@@ -246,7 +249,7 @@ class cm_completion implements renderable, templatable {
      * @return bool
      */
     final public function is_overdue(): bool {
-        return $this->get_completion_expected() > 0 && $this->get_completion_expected() + 86400 < time();
+        return $this->get_completion_expected() > 0 && $this->get_completion_expected() < time();
     }
 
     /**
@@ -264,8 +267,8 @@ class cm_completion implements renderable, templatable {
      * @return bool
      */
     final public function is_due_today(): bool {
-        return $this->get_completion_expected() > 0 && $this->get_completion_expected() > time() &&
-             $this->get_completion_expected() - time() < 86400;
+        return $this->get_completion_expected() > 0 &&
+            (date('y-m-d', $this->get_completion_expected()) == date('y-m-d'));
     }
 
     /**
@@ -275,7 +278,7 @@ class cm_completion implements renderable, templatable {
      * @throws \dml_exception
      * @throws coding_exception
      */
-    final public function get_completion_checkbox(): string {
+    final public function get_completion_checkbox(): array {
         global $OUTPUT, $CFG;
 
         if ($this->get_completion_state() == COMPLETION_INCOMPLETE) {
@@ -314,10 +317,8 @@ class cm_completion implements renderable, templatable {
         if ($this->is_restricted()) {
             $buttonclass .= ' disabled';
         }
-        $output .= html_writer::start_tag('form', array('method' => 'post',
-            'action' => new moodle_url('/course/togglecompletion.php'),
-            'class' => 'togglecompletion'. $extraclass));
-        $output .= html_writer::start_tag('div');
+
+        $output = html_writer::start_tag('div');
         $output .= html_writer::empty_tag('input', array(
             'type' => 'hidden', 'name' => 'id', 'value' => $this->cm->id));
         $output .= html_writer::empty_tag('input', array(
@@ -326,12 +327,16 @@ class cm_completion implements renderable, templatable {
             'type' => 'hidden', 'name' => 'modulename', 'value' => $this->get_cm_formatted_name()));
         $output .= html_writer::empty_tag('input', array(
             'type' => 'hidden', 'name' => 'completionstate', 'value' => $newstate));
-        $output .= html_writer::tag('button',
-            $OUTPUT->pix_icon('i/completion-' . $completionicon, $imgalt),
-            array('class' => $buttonclass, 'aria-live' => 'assertive'));
         $output .= html_writer::end_tag('div');
-        $output .= html_writer::end_tag('form');
-        return $output;
+
+        $manualcompletiondata = [
+            'url' => new moodle_url('/course/togglecompletion.php'),
+            'sesskey' => sesskey(),
+            'modulename' => $this->get_cm_formatted_name(),
+            'inputfield' => $output,
+            'buttonclass' => $buttonclass
+        ];
+        return $manualcompletiondata;
     }
 
     /**
@@ -406,7 +411,19 @@ class cm_completion implements renderable, templatable {
      * @return stdClass data context for a mustache template
      */
     public function export_for_template(renderer_base $output) {
+        global $CFG;
+
+        $withavailability = false;
+        $course = $this->cm->get_course();
+        if ($this->get_completion_mode() != COMPLETION_TRACKING_NONE
+            && $this->get_completion_mode() != COMPLETION_TRACKING_AUTOMATIC) {
+            $withavailability = !empty($CFG->enableavailability) && info::completion_value_used($course, $this->cm->id);
+        }
+
         $data = [
+            'cmid' => $this->cm->id,
+            'activityname' => $this->cm->name,
+            'withavailability' => $withavailability,
             'istrackeduser' => $this->is_tracked_user(),
             'isediting' => $this->is_editing(),
             'ispreview' => $this->is_editing() || !$this->is_tracked_user(),

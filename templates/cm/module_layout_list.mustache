@@ -29,63 +29,90 @@
 
     }
 }}
-<li id="{{id}}" class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}} position-relative">
-    <div class="activity-block designer">
-        {{{movehtml}}}
-        <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{cm.url}}" style="cursor: pointer">
-            <div class="card-body">
-                <div class="mod-indent-outer w-100">
-                    <div class="{{indentclasses}}"></div>
-                        <div class="row">
-                            <div class="col-12 col-lg-7">
-                                {{#cmname}}
-                                    <div class="activityinstance">
-                                        <div class="activity-type">
-                                            <p>{{modtype}}</p>
-                                        </div>
-                                        {{{cmname}}}
-                                        {{{afterlink}}}
-                                    </div>
-                                    {{{availability}}}
-                                {{/cmname}}
-                                {{{beforecontent}}}
-                                {{#modcontent}}
-                                <div class="mod-content">
-                                    {{{modcontent}}}
-                                </div>
-                                {{/modcontent}}
-                            </div>
 
-                            <div class="col-5 col-lg-3">
-                                <div class="row h-100 pull-right">
-                                    <div class="col align-self-center">
-                                        {{{cmcompletionhtml}}}
-                                        {{#modvisits}}
-                                        <div class="mod-visits-block">
-                                            <p>{{modvisits}}</p>
+<div class="activity-block designer" style="{{#prostyle}} {{{prostyle}}} {{/prostyle}}">
+    {{{movehtml}}}
+    <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{cmurl}}" >
+        <div class="card-body">
+            <div class="activity-background-style" style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
+            </div>
+            {{#modbackoverlaycolor}}
+            <div class="bg-overlay" style="{{modbackoverlaycolor}}"></div>
+            {{/modbackoverlaycolor}}
+            <div class="mod-indent-outer w-100">
+                <div class="{{indentclasses}}"></div>
+                    <div class="row">
+                        <div class="col-12 col-md-7">
+                            <div class="activityinstance {{modcontentclass}}">
+                                {{#modiconurl}}
+                                    <div class="img-element {{elementstate.icon}}">
+                                        <div class="img-block">
+                                            {{{modiconurl}}}
                                         </div>
-                                        {{/modvisits}}
+                                    </div>
+                                {{/modiconurl}}
+                                <div class="activity-element">
+                                    <div class="activity-type {{elementstate.modname}}">
+                                        <p class="text-capitalize" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">{{modtype}}</p>
+                                    </div>
+                                    <div class="cmname-block {{elementstate.title}}">
+                                        {{#cmname}}
+                                            {{{cmname}}}
+                                        {{/cmname}}
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="col-7 col-lg-2 show-on-hover">
-                                <div class="row h-100 pull-right">
-                                    <div class="col align-self-center">
+                                {{#modrestricted}}
+                                <div class="availability-info {{elementstate.calltoaction}}">
+                                    {{{calltoactionhtml}}}
+                                </div>
+                                {{/modrestricted}}
+                                {{{afterlink}}}
+                            </div>
+                            {{{beforecontent}}}
+                            {{#modcontent}}
+                            <div class="mod-content {{elementstate.description}}" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">
+                                {{{modcontent}}}
+                            </div>
+                            {{/modcontent}}
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="row h-100 pull-right">
+                                <div class="col align-self-center">
+                                    {{#modvisits}}
+                                    <div class="mod-visits-block {{elementstate.visits}}">
+                                        <p style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">{{modvisits}}</p>
+                                    </div>
+                                    {{/modvisits}}
+                                    {{#cmcompletionhtml}}
+                                        <div class="completion-html-card {{elementstate.completionbadge}}">
+                                            {{{cmcompletionhtml}}}
+                                        </div>
+                                    {{/cmcompletionhtml}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2 show-on-hover">
+                            {{^modrestricted}}
+                            <div class="row h-100 pull-right">
+                                <div class="col align-self-center">
+                                    <div class="action-html-card {{elementstate.calltoaction}}">
                                         {{{calltoactionhtml}}}
                                     </div>
                                 </div>
                             </div>
+                            {{/modrestricted}}
                         </div>
-                </div>
-            </div>
-            <div class="module-icons">
-                {{#modicons}}
-                    <div class="actions">
-                        {{{modicons}}}
                     </div>
-                {{/modicons}}
             </div>
         </div>
+        <div class="module-icons">
+            {{#modicons}}
+                <div class="actions">
+                    {{{modicons}}}
+                </div>
+            {{/modicons}}
+        </div>
     </div>
-</li>
+    {{{videotimeprogress}}}
+</div>

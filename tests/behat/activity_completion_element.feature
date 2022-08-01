@@ -86,5 +86,5 @@ Feature: Sections can be check activity completion element in designer format
     And I log in as "student1"
     And I am on "Course 1" course homepage
     Then I check the activity "assign3" to element "/descendant::div[contains(@class, 'danger')]"
-    Then I check the activity "assign3" to element "/descendant::div[contains(@class, 'completion-info')]/descendant::i[contains(@class, 'fa-exclamation-triangle')]"
+    Then I check the activity "assign3" to element "/descendant::div[contains(@class, 'completion-info')]/descendant::i[contains(@class, 'fa-exclamation-circle')]"
     And I should see designerinfo "assign3" "Overdue " "5 days ago"

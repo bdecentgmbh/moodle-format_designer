@@ -25,49 +25,87 @@
         "hasname": "true",
         "id": 3,
         "module": "assign",
-        "extraclasses": ""
+        "extraclasses": "",
+        "prostyle": "min-height:200px;"
 
     }
 }}
-<li id="{{id}}" class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}}">
-    <div class="activity-block designer">
+{{! <div class="default-style" > }}
+    <div class="activity-block designer" style="{{#prostyle}} {{{prostyle}}} {{/prostyle}} ">
+        <div class="activity-background-style" style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
+        </div>
+        {{#modbackoverlaycolor}}
+        <div class="bg-overlay" style="{{modbackoverlaycolor}}"></div>
+        {{/modbackoverlaycolor}}
         {{{movehtml}}}
         <div class="mod-indent-outer w-100">
             <div class="{{indentclasses}}"></div>
-                <div>
-                    {{#cmname}}
-                        <div class="activityinstance">
-                            {{{cmname}}}
-                            {{{afterlink}}}
-                        </div>
-                    {{/cmname}}
-                    {{{beforecontent}}}
-
-                    <div class="center-reports-block">
-                        <div class="row h-100 pull-right">
-                            <div class="col align-self-center">
-                                {{{cmcompletionhtml}}}
-                                {{#modvisits}}
-                                <div class="mod-visits-block text-muted">
-                                    <p>{{modvisits}}</p>
-                                </div>
-                                {{/modvisits}}
+            <div>
+                <div class="activityinstance {{modcontentclass}}">
+                    {{#modiconurl}}
+                        <div class="img-element {{elementstate.icon}}">
+                            <div class="img-block">
+                                {{{modiconurl}}}
                             </div>
                         </div>
+                    {{/modiconurl}}
+                    <div class="activity-element {{modcontentclass}}">
+                        <div class="activity-type {{elementstate.modname}}">
+                            <p class="text-capitalize" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">{{modtype}}</p>
+                        </div>
+                        <div class="cmname-block {{elementstate.title}}">
+                            {{#cmname}}
+                                {{{cmname}}}
+                            {{/cmname}}
+                        </div>
                     </div>
+                    {{{afterlink}}}
+                </div>
 
-                    <div class="action-html-card">
+                {{#modrestricted}}
+                    <div class="availability-info {{elementstate.calltoaction}}">
                         {{{calltoactionhtml}}}
                     </div>
+                {{/modrestricted}}
+                {{{beforecontent}}}
 
-                    {{#modicons}}
-                        <div class="actions">
-                            {{{modicons}}}
+                <div class="center-reports-block">
+                    <div class="row h-100 pull-right">
+                        <div class="col align-self-center">
+                            {{#modvisits}}
+                            <div class="mod-visits-block {{elementstate.visits}} text-muted">
+                                <p class="text-capitalize" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">{{modvisits}}</p>
+                            </div>
+                            {{/modvisits}}
+                            {{#cmcompletionhtml}}
+                                <div class="completion-html-card {{elementstate.completionbadge}}">
+                                    {{{cmcompletionhtml}}}
+                                </div>
+                            {{/cmcompletionhtml}}
                         </div>
-                    {{/modicons}}
-
-                    {{{aftercontent}}}
+                    </div>
                 </div>
+
+                {{#modcontent}}
+                    <div class="mod-content" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">
+                        {{{modcontent}}}
+                    </div>
+                {{/modcontent}}
+
+                {{^modrestricted}}
+                    <div class="action-html-card {{elementstate.calltoaction}}">
+                        {{{calltoactionhtml}}}
+                    </div>
+                {{/modrestricted}}
+
+                {{#modicons}}
+                    <div class="actions">
+                        {{{modicons}}}
+                    </div>
+                {{/modicons}}
+
+                {{{aftercontent}}}
+            </div>
         </div>
     </div>
-</li>
+{{! </div> }}

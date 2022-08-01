@@ -26,15 +26,9 @@
 }}
 {{<format_designer/section_layout}}
     {{$content}}
-        {{#sectionname}}
-            <h3 id="sectionid-{{section.id}}-title" class="sectionname">{{{sectionname}}}</h3>
-        {{/sectionname}}
-        {{> format_designer/section_availability}}
-
-        <div class="summary">
-            {{{sectionsummary}}}
-        </div>
-        {{> format_designer/section_content_list}}
-        {{{cmcontrol}}}
+        {{^sectionheader}}
+            {{> format_designer/section_content_list}}
+            {{{cmcontrol}}}
+        {{/sectionheader}}
     {{/content}}
 {{/format_designer/section_layout}}

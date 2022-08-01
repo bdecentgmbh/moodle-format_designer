@@ -24,10 +24,13 @@
         "reactionurl_dislike": "http://moodleurl/course/format/designer/renderer.php"
     }
 }}
-<ul class="section img-text link-layout" id="designer-section-content" data-sectionlayout="{{sectionlayoutclass}}">
+<ul class="section img-text link-layout {{sectioncontentlayout}} designer-section-content" data-sectionlayout="{{sectionlayoutclass}}"
+    style="{{#sectioncontentwidth}} {{sectioncontentwidth}} {{/sectioncontentwidth}}">
     {{#cmlist}}
         {{#modstatus}}
+        <li id="{{id}}" class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}}" style="{{{modstyle}}}">
             {{> format_designer/cm/module_layout_default}}
+        </li>
         {{/modstatus}}
     {{/cmlist}}
 </ul>

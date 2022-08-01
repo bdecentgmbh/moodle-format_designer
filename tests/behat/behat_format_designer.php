@@ -103,7 +103,7 @@ class behat_format_designer extends behat_base {
     public function i_check_the_section_layout($sectionnumber, $layouttype) {
         $layoutclass = "$layouttype-layout";
         $xpath = "//li[@id='section-" . $sectionnumber . "']";
-        $xpath .= "/descendant::ul[contains(@id, 'designer-section-content') and contains(@class, '".$layoutclass."')]";
+        $xpath .= "/descendant::ul[contains(@class, 'designer-section-content') and contains(@class, '".$layoutclass."')]";
         $exception = new ExpectationException('Section "' . $sectionnumber . '" was not change the layout "'
         . $layouttype . '"', $this->getSession());
         $this->find('xpath', $xpath, $exception);
@@ -138,6 +138,48 @@ class behat_format_designer extends behat_base {
         $exception = new ExpectationException('Click for "' . $activityidendifier . '" was not found', $this->getSession());
         $menu = $this->find('xpath', $xpath, $exception);
         $menu->click();
+    }
+
+    /**
+     * Click the section header.
+     *
+     * @Given /^I click on section header "(?P<section_number>\d+)"$/
+     * @throws DriverException The step is not available when Javascript is disabled
+     * @param int $sectionnum
+     */
+    public function i_click_on_section_header($sectionnum) {
+        $xpath = "//li[@id='section-" . $sectionnum . "']";
+        $xpath .= "/descendant::div[contains(@class, 'section-header-content')]";
+        $exception = new ExpectationException('Click for section"'. $sectionnum .'" header was not found', $this->getSession());
+        $menu = $this->find('xpath', $xpath, $exception);
+        $menu->click();
+    }
+
+    /**
+     * Check the section is expanded.
+     * @Given /^I click on section expanded "(?P<section_number>\d+)"$/
+     * @throws DriverException The step is not available when Javascript is disabled
+     * @param int $sectionnumber
+     */
+    public function i_check_section_expanded($sectionnumber) {
+        $xpath = "//li[@id='section-" . $sectionnumber . "']";
+        $xpath .= "/descendant::div[contains(@class, 'section-header-content') and contains(@data-toggle, 'collapse')]";
+        $exception = "";
+        $this->find('xpath', $xpath, $exception);
+    }
+
+    /**
+     * Check the section is collapsed.
+     * @Given /^I click on section collapsed "(?P<section_number>\d+)"$/
+     * @throws DriverException The step is not available when Javascript is disabled
+     * @param int $sectionnumber
+     */
+    public function i_check_section_collapsed($sectionnumber) {
+        $xpath = "//li[@id='section-" . $sectionnumber . "']";
+        $xpath .= "/descendant::div[contains(@class, 'section-header-content')
+            and contains(@class, 'collapse') and contains(@data-toggle, 'collapse')]";
+        $exception = "";
+        $this->find('xpath', $xpath, $exception);
     }
 
     /**
@@ -177,9 +219,18 @@ class behat_format_designer extends behat_base {
             $this->execute("behat_completion::manual_completion_button_displayed_as", [$activityname, "Done"]);
         } else {
             // Moodle-3.11 below.
-            $element = "Not completed: $activityname. Select to mark as complete.";
-            $this->execute("behat_general::i_click_on", [$element, "icon"]);
-            $this->execute("behat_completion::activity_marked_as_complete", [$activityname, "assign", "manual"]);
+            $selector = "button[data-action=toggle-manual-completion][data-activityname='{$activityname}']";
+            $this->execute("behat_general::i_click_on", [$selector, "css_element"]);
+            $completionstatus = 'Done';
+            if (!in_array($completionstatus, ['Mark as done', 'Done'])) {
+                throw new coding_exception('Invalid completion status. It must be "Mark as done" or "Done".');
+            }
+
+            $langstringkey = $completionstatus === 'Done' ? 'done' : 'markdone';
+            $conditionslistlabel = get_string('completion_manual:aria:' . $langstringkey, 'format_designer', $activityname);
+            $selector = "button[aria-label='$conditionslistlabel']";
+
+            $this->execute("behat_general::assert_element_contains_text", [$completionstatus, $selector, "css_element"]);
         }
     }
 

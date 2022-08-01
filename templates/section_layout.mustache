@@ -21,29 +21,158 @@
 
     Example context (json):
     {
-        "reactionurl_dislike": "http://moodleurl/course/format/designer/renderer.php"
+        "sectiondesigntextcolor": "color: #fff",
+        "sectionheaderstyle": "min-height:100px;"
     }
 }}
-<li id="section-{{section.section}}"
-    class="section section-type-{{sectiontype}} main clearfix {{sectionstyle}} {{#sectionrestrict}} restricted {{/sectionrestrict}}"
-    role="region"
-    aria-labelledby="sectionid-{{section.id}}-title"
-    data-sectionid="{{section.section}}"
-    data-id="{{section.id}}"
-    data-sectionreturnid="{{sectionreturn}}">
 
-    <div class="left side">
-        {{{leftcontent}}}
+<div class="section-content-wrapper">
+{{#sectiondesignwhole}}
+    <div class="section-background-style section-design-whole" style="{{#sectionbackgroundstyle}} {{sectionbackgroundstyle}} {{/sectionbackgroundstyle}}">
+        {{#maskinner}}
+        <div class="mask-inner-section" style="{{{maskinner}}}"></div>
+        {{/maskinner}}
     </div>
 
-    <div class="right side">
-        {{{rightcontent}}}
-        <div class="icon-loader-block"></div>
+    {{#bgoverlay}}
+    <div class="bg-overlay" style="{{bgoverlay}}">
     </div>
+    {{/bgoverlay}}
+{{/sectiondesignwhole}}
 
-    <div class="content">
-        {{$content}}
+<div class="left side">
+    {{{leftcontent}}}
+</div>
 
-        {{/content}}
-    </div>
-</li>
+<div class="right side">
+    {{{rightcontent}}}
+    <div class="icon-loader-block"></div>
+</div>
+
+
+<div class="section-header-content {{#sectioncollapse}}{{^sectionshow}}collapsed{{/sectionshow}}{{/sectioncollapse}} {{coursetype.classes}}"
+    id="section-head-{{section.section}}"
+    {{#sectioncollapse}} data-toggle="collapse" {{/sectioncollapse}}
+    data-target="#section-content-{{section.section}}"
+    aria-expanded="false"
+    aria-controls="section-head-{{section.section}}"
+    role="contentinfo"
+    style="{{sectionheaderstyle}}"
+    {{coursetype.attributes}}>
+    {{#flowcourse}} 
+        <div class="flow-stack-header"></div>
+        <div class="section-background-color"></div> 
+    {{/flowcourse}}
+        {{#sectiondesignheader}}
+            <div class="section-background-style sectiondesign-header" style="{{sectionbackgroundstyle}}">
+                {{#maskinner}}
+                <div class="mask-inner-section" style="{{{maskinner}}}"></div>
+                {{/maskinner}}
+            </div>
+        {{/sectiondesignheader}}
+        {{#sectioncollapse}}
+        <span class="section-collapse-icon" style="{{{sectiondesigntextcolor}}}"></span>
+        {{/sectioncollapse}}
+
+        {{#bgoverlay}}
+        {{^sectiondesignwhole}}
+            <div class="bg-overlay" style="{{bgoverlay}}">
+            </div>
+        {{/sectiondesignwhole}}
+        {{/bgoverlay}}
+
+        {{#flowcourse}}
+            {{#section.categorisetitle}}
+            <div class="categorise-section-block">
+                <span class="badge" style="color:{{section.categorisetextcolor}}; background-color:{{section.categorisebackcolor}};">{{section.categorisetitle}}</span>
+            </div>
+            {{/section.categorisetitle}}
+        {{/flowcourse}}
+
+        {{^section.hidesectiontitle}}
+        {{#sectionname}}
+            <h3 id="sectionid-{{section.id}}-title" class="sectionname">
+                {{{sectionname}}}
+            </h3>
+        {{/sectionname}}
+        {{/section.hidesectiontitle}}
+        
+        {{^flowcourse}}
+            {{#section.categorisetitle}}
+            <div class="categorise-section-block">
+                <span class="badge" style="color:{{section.categorisetextcolor}}; background-color:{{section.categorisebackcolor}};">{{section.categorisetitle}}</span>
+            </div>
+            {{/section.categorisetitle}}
+        {{/flowcourse}}
+
+        {{^flowcourse}}
+            {{#issectioncompletion}}
+            <div class="section-progress-info">
+                {{^sectionprogresscomp}}
+                <div class="section-progress-bar">
+                    <div class="progress">
+                        <div class="progress-bar progress-bg-success" role="progressbar" style= "width: {{sectionprogress}}%" aria-valuenow="{{sectionprogress}}" aria-valuemin="0" aria-valuemax="100">
+                            <span class="percentage">{{sectionprogress}}%</span>
+                        </div>
+                    </div>
+                </div>
+                {{/sectionprogresscomp}}
+                {{#sectionprogresscomp}}
+                    <div class="section-progress-completeted">
+                        <span class="badge badge-completion badge-success"><span><i class="fa fa-check"></i> {{#str}}sectioncompleted, format_designer{{/str}}</span></span>
+                    </div>
+                {{/sectionprogresscomp}}
+            </div>
+            {{/issectioncompletion}}
+        {{/flowcourse}}
+
+        {{> format_designer/section_availability}}
+
+        <div class="summary" style="{{#sectiondesigntextcolor}} {{sectiondesigntextcolor}} {{/sectiondesigntextcolor}}">
+            {{{sectionsummary}}}
+        </div>
+
+        {{#flowcourse}}
+            {{#issectioncompletion}}
+            <div class="section-progress-info">
+                {{^sectionprogresscomp}}
+                <div class="section-progress-bar">
+                    <div class="progress">
+                        <div class="progress-bar progress-bg-success" role="progressbar" style= "width: {{sectionprogress}}%" aria-valuenow="{{sectionprogress}}" aria-valuemin="0" aria-valuemax="100">
+                            <span class="percentage">{{sectionprogress}}%</span>
+                        </div>
+                    </div>
+                </div>
+                {{/sectionprogresscomp}}
+                {{#sectionprogresscomp}}
+                    <div class="section-progress-completeted">
+                        <span class="badge badge-completion badge-success"><span><i class="fa fa-check"></i> {{#str}}sectioncompleted, format_designer{{/str}}</span></span>
+                    </div>
+                {{/sectionprogresscomp}}
+            </div>
+            {{/issectioncompletion}}
+        {{/flowcourse}}
+
+        {{#gotosection}}
+        <a href="{{{sectionurl}}}" class="goto-section btn btn-primary">{{#str}}gotosection, format_designer{{/str}}</a>
+
+        {{/gotosection}}
+</div>
+
+
+
+<div class="content {{sectioncontentlayout}} {{#sectioncollapse}}collapse{{/sectioncollapse}} {{#sectionshow}}show{{/sectionshow}}
+    {{coursetype.content.classes}}"
+    id="section-content-{{section.section}}"
+    aria-labelledby="section-head-{{section.section}}"
+    {{#sectionaccordion}}
+    data-parent="#section-course-accordion"
+    {{/sectionaccordion}}
+    role="contentinfo"
+    style="{{#sectioncontentwidth}} {{sectioncontentwidth}} {{/sectioncontentwidth}}"
+    {{coursetype.content.attributes}}>
+    {{$content}}
+
+    {{/content}}
+</div>
+</div>

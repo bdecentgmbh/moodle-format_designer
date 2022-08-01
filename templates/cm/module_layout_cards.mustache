@@ -25,59 +25,103 @@
         "hasname": "true",
         "id": 3,
         "module": "assign",
-        "extraclasses": ""
+        "extraclasses": "",
+        "prostyle": "min-height: 200px;"
 
     }
 }}
-<li id="{{id}}" class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}} card">
-    <div class="activity-block designer">
-        {{{movehtml}}}
-        <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{cm.url}}" style="cursor: pointer">
-            <div class="card-body">
-                <div class="mod-indent-outer w-100">
-                    <div class="{{indentclasses}}"></div>
-                    <div>
-                        {{#cmname}}
-                            <div class="activityinstance">
-                                <div class="activity-type">
-                                    <p>{{modtype}}</p>
+
+<div class="activity-block designer {{#videotimeprogress}}progress-element{{/videotimeprogress}}" style="{{#prostyle}} {{{prostyle}}} {{/prostyle}}">
+    {{{movehtml}}}
+    <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{cmurl}}">
+        <div class="card-body {{#enableactivityimage}}bg-overlay{{/enableactivityimage}}">
+            <div class="activity-background-style" style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
+            </div>
+
+            {{#modbackoverlaycolor}}
+            <div class="bg-overlay" style="{{modbackoverlaycolor}}"></div>
+            {{/modbackoverlaycolor}}
+
+            <div class="mod-indent-outer w-100">
+                <div class="{{indentclasses}}"></div>
+                <div>
+                    <div class="activityinstance">
+                        {{^useactivityimage}}
+                            {{#modiconurl}}
+                                <div class="img-element {{elementstate.icon}}">
+                                    <div class="img-block">
+                                        {{{modiconurl}}}
+                                    </div>
                                 </div>
-                                {{{cmname}}}
-                                {{{afterlink}}}
+                            {{/modiconurl}}
+                        {{/useactivityimage}}
+                        <div class="activity-element {{modcontentclass}}">
+                            <div class="activity-type {{elementstate.modname}}">
+                                <p class="text-capitalize " style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">{{modtype}}</p>
                             </div>
-                        {{/cmname}}
-                        {{{beforecontent}}}
-
-                        {{#modcontent}}
-                            <div class="mod-content">
-                                {{{modcontent}}}
+                            <div class="cmname-block {{elementstate.title}}">
+                                {{#cmname}}
+                                    {{{cmname}}}
+                                {{/cmname}}
                             </div>
-                        {{/modcontent}}
-
-                        {{#cmcompletionhtml}}
-                            <div class="completion-html-card">
-                                {{{cmcompletionhtml}}}
-                            </div>
-                        {{/cmcompletionhtml}}
-
-                        {{#modvisits}}
-                        <div class="mod-visits-block">
-                            <p>{{modvisits}}</p>
                         </div>
-                        {{/modvisits}}
-
-                        <div class="action-html-card">
+                        {{#modrestricted}}
+                        <div class="availability-info {{elementstate.calltoaction}}">
                             {{{calltoactionhtml}}}
                         </div>
-                        {{{aftercontent}}}
+                        {{/modrestricted}}
+                        {{{afterlink}}}
                     </div>
+                    {{{beforecontent}}}
+
+                    {{#modcontent}}
+                        <div class="mod-content {{elementstate.description}}" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">
+                            {{{modcontent}}}
+                        </div>
+                    {{/modcontent}}
+
+                    {{#useactivityimage}}
+                        {{#modiconurl}}
+                            <div class="img-element {{elementstate.icon}}">
+                                <div class="img-block">
+                                    {{{modiconurl}}}
+                                </div>
+                            </div>
+                        {{/modiconurl}}
+                    {{/useactivityimage}}
+
+                    {{#cmcompletionhtml}}
+                        <div class="completion-html-card {{elementstate.completionbadge}}">
+                            {{{cmcompletionhtml}}}
+                        </div>
+                    {{/cmcompletionhtml}}
+
+                    {{#modvisits}}
+                    <div class="mod-visits-block  {{elementstate.visits}}">
+                        <p style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">{{modvisits}}</p>
+                    </div>
+                    {{/modvisits}}
+                    {{^modrestricted}}
+                    <div class="action-html-card {{elementstate.calltoaction}}">
+                        {{{calltoactionhtml}}}
+                    </div>
+                    {{/modrestricted}}
+                    {{{aftercontent}}}
+
+                    {{#useactivityimage}}
+                        {{#duration_formatted}}
+                            <span class="badge badge-dark video-duration">{{duration_formatted}}</span>
+                        {{/duration_formatted}}
+                    {{/useactivityimage}}
                 </div>
             </div>
-            {{#modicons}}
-                <div class="actions">
-                    {{{modicons}}}
-                </div>
-            {{/modicons}}
+
+            {{{videotimeprogress}}}
         </div>
+        {{#modicons}}
+            <div class="actions">
+                {{{modicons}}}
+            </div>
+        {{/modicons}}
     </div>
-</li>
+</div>

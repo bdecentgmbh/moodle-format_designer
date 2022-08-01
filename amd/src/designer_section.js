@@ -37,16 +37,17 @@
         }
     });
 
-
     /**
      * Control designer format action
      * @param {int} courseId
      * @param {int} contextId
+     * @param {bool} popupActivities
      */
-    let DesignerSection = function(courseId, contextId) {
+    let DesignerSection = function(courseId, contextId, popupActivities) {
         var self = this;
         self.courseId = courseId;
         self.contextId = contextId;
+        self.popupActivities = popupActivities;
 
         $('body').delegate(self.SectionController, 'click', self.sectionLayoutaction.bind(this));
         $("body").delegate(self.RestrictInfo, "click", self.moduleHandler.bind(this));
@@ -55,26 +56,46 @@
         $('body').delegate(self.trimDescription, "click", self.trimmodcontentHandler.bind(this));
         $('body').on('click keypress', SELECTOR.ACTIVITYLI + ' ' +
         SELECTOR.ACTIVITYACTION + '[data-action]', this.editModuleRenderer.bind(this));
+        $('body').delegate(self.goToURL, "click", self.redirectToModule.bind(this));
+        window.onhashchange = function() {
+            self.expandSection();
+        };
+        this.expandSection();
+        if ($('.course-type-flow').length > 0) {
+            $('.collapse').on('show.bs.collapse', function() {
+                $(this).parents('li.section').addClass('stack-header-collapsing');
+                var sectionid = $(this).parents('li.section').attr('id');
+                var section = document.getElementById(sectionid);
+                var distance = section.offsetTop - document.body.scrollTop;
+                setTimeout(() => window.scroll(0, distance), 50);
+            }).on('shown.bs.collapse', function() {
+                $(this).parents('li.section').removeClass('stack-header-collapsing');
+            });
+        }
     };
 
     /**
      * Selector section controller.
      */
+    DesignerSection.prototype.goToURL = '.designer [data-action="go-to-url"]';
+
     DesignerSection.prototype.SectionController = ".designer #section-designer-action .dropdown-menu a";
 
-    DesignerSection.prototype.RestrictInfo = ".designer #designer-section-content .call-action-block";
+    DesignerSection.prototype.RestrictInfo = ".designer .designer-section-content .call-action-block";
 
-    DesignerSection.prototype.moduleBlock = ".designer #designer-section-content li.activity";
+    DesignerSection.prototype.moduleBlock = ".designer .designer-section-content li.activity";
 
     DesignerSection.prototype.loadingElement = ".icon-loader-block";
 
     DesignerSection.prototype.sectionRestricted = ".designer .availability-section-block .section-restricted-action";
 
-    DesignerSection.prototype.moduleDescription = ".designer #designer-section-content li .mod-description-action";
+    DesignerSection.prototype.moduleDescription = ".designer .designer-section-content li .mod-description-action";
 
-    DesignerSection.prototype.fullDescription = "#designer-section-content li .fullcontent-summary .mod-description-action";
+    DesignerSection.prototype.fullDescription = ".designer-section-content li .fullcontent-summary .mod-description-action";
 
-    DesignerSection.prototype.trimDescription = "#designer-section-content li .trim-summary .mod-description-action";
+    DesignerSection.prototype.trimDescription = ".designer-section-content li .trim-summary .mod-description-action";
+
+    DesignerSection.prototype.modules = null;
 
     DesignerSection.prototype.addSectionSpinner = function(sectioninfo) {
         var sectionelement = $(sectioninfo).addClass('editinprogress');
@@ -85,6 +106,54 @@
             return spinner;
         }
         return null;
+    };
+
+
+    DesignerSection.prototype.redirectToModule = function(event) {
+        let nodeName = event.target.nodeName;
+        let preventionNodes = ['a', 'button', 'form'];
+        let iscircle = event.target.closest('li.activity').classList.contains('circle-layout');
+        let isDescription = event.target.classList.contains('mod-description-action');
+        let isPadlock = event.target.classList.contains('fa-lock');
+        let ispopupModule = event.target.closest('li.activity').classList.contains('popmodule');
+        if ((nodeName in preventionNodes)
+            || document.body.classList.contains('editing') || iscircle || isDescription || isPadlock || ispopupModule) {
+            if (ispopupModule && !document.body.classList.contains('editing')) {
+                var li = event.target.closest('li.activity');
+                li.querySelector('a[href]').click();
+                // Event.target.closest('a').click();
+            }
+            return null;
+        }
+        var card = event.target.closest("[data-action=go-to-url]");
+        let modurl = card.getAttribute('data-url');
+        window.location.href = modurl;
+        return true;
+    };
+
+    DesignerSection.prototype.expandSection = () => {
+        // Alert();
+        var sectionID = window.location.hash;
+        if (sectionID) {
+            var id = sectionID.substring(1);
+            var section = document.getElementById(id);
+            if (section) {
+                var title = section.querySelector('.section-header-content');
+                if (title) {
+                    title.classList.remove('collapsed');
+                    title.setAttribute('aria-expanded', true);
+                }
+                var content = section.querySelector('.content');
+                if (content) {
+                    content.classList.add('show');
+                }
+                if (document.getElementById('section-course-accordion') !== null) {
+                    document.getElementById('section-head-0').classList.add('collapsed');
+                    document.getElementById('section-content-0').classList.remove('show');
+                }
+                section.scrollIntoView();
+            }
+        }
     };
 
     DesignerSection.prototype.removeSectionSpinner = function(sectioninfo, spinner, delay) {
@@ -250,7 +319,10 @@
         var ULClasses = {
             'cards': 'card-deck card-layout',
             'list': 'list-layout',
-            'default': 'link-layout'
+            'default': 'link-layout',
+            'circles': 'circles-layout',
+            'horizontal_circles': 'circles-layout horizontal-circles-layout'
+
         };
         var promises = Ajax.call([{
                 methodname: 'format_designer_set_section_options',
@@ -272,6 +344,7 @@
                     $('#' + sectionId).find('ul.section').removeClass(ULClasses.cards);
                     $('#' + sectionId).find('ul.section').removeClass(ULClasses.list);
                     $('#' + sectionId).find('ul.section').removeClass(ULClasses.default);
+                    $('#' + sectionId).find('ul.section').removeClass(ULClasses.circles);
                     $('#' + sectionId).find('ul.section').addClass(ULClasses[layout]);
                 }
             });
@@ -310,8 +383,8 @@
     };
 
     return {
-        init: function(courseId, contextId) {
-            return new DesignerSection(courseId, contextId);
+        init: function(courseId, contextId, popupActivities) {
+            return new DesignerSection(courseId, contextId, popupActivities);
         }
     };
 });

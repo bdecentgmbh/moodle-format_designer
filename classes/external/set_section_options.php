@@ -151,11 +151,28 @@ trait set_section_options {
         list($course, $cm) = get_course_and_cm_from_cmid($id);
         self::validate_context(context_course::instance($course->id));
         $renderer = $PAGE->get_renderer('format_designer');
-        $cmlistdata = $renderer->render_course_module($cm, $sectionreturn);
+
         $format = course_get_format($course);
         $sectiontype = $format->get_section_option($sectionid, 'sectiontype') ?: 'default';
+
+        $section = (object) ['sectiontype' => $sectiontype];
+        $cmlistdata = $renderer->render_course_module($cm, $sectionreturn, [], $section);
+
         $templatename = 'format_designer/cm/module_layout_' . $sectiontype;
-        return $OUTPUT->render_from_template($templatename, $cmlistdata);
+        $prolayouts = format_designer_get_pro_layouts();
+        if (in_array($sectiontype, $prolayouts)) {
+            if (format_designer_has_pro()) {
+                $templatename = 'layouts_' . $sectiontype . '/cm/module_layout_' . $sectiontype;
+            }
+        }
+        $liclass = $sectiontype;
+        $liclass .= ' '.$sectiontype.'-layout';
+        $liclass .= ' '.$cmlistdata['modclasses'];
+        $liclass .= (isset($cmlistdata['isrestricted']) && $cmlistdata['isrestricted']) ? ' restricted' : '';
+        $html = \html_writer::start_tag('li', ['class' => $liclass, 'id' => $cmlistdata['id']]);
+        $html .= $OUTPUT->render_from_template($templatename, $cmlistdata);
+        $html .= \html_writer::end_tag('li');
+        return $html;
     }
 
     /**

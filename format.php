@@ -55,9 +55,19 @@ if (!empty($displaysection)) {
 } else {
     $renderer->print_multiple_section_page($course, null, null, null, null);
 }
+$ispopupactivities = isset($course->popupactivities) && $course->popupactivities;
+
 $PAGE->requires->js_call_amd('format_designer/designer_section', 'init',
-    array('courseid' => $course->id, 'contextid' => $context->id));
+    array('courseid' => $course->id, 'contextid' => $context->id, 'popupactivities' => $ispopupactivities));
+
 $PAGE->requires->js_call_amd('format_designer/designer_ordering', 'init');
 // Include course format js module.
 $PAGE->requires->js('/course/format/designer/format.js');
+
+if ($ispopupactivities && !$PAGE->user_is_editing()) {
+    // Include popups.
+    $PAGE->requires->js_call_amd('format_popups/popups', 'init', array(
+        $context->id, $course->id, $displaysection
+    ));
+}
 
