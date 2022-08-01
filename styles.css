@@ -1048,7 +1048,6 @@ ul li {
     display: inline-block;
 }
 .format-designer .designer .section .content .section.link-layout li.activity .activityinstance .cmname-block {
-    width: 70%;
     display: inline-flex;
     padding-left: 0;
 }
@@ -1202,7 +1201,6 @@ ul li {
     display: none;
 }
 .format-designer .designer .section .content .section li.activity .completion-html-card {
-    margin-bottom: 10px;
     display: inline-block;
     vertical-align: middle;
 }
