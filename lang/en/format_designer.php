@@ -218,8 +218,8 @@ Only works for the one section per page.';
 $string['tabletwidth'] = 'Section width in tablet size';
 $string['tabletwidth_help'] = 'Section will be displayed in the selected width in tablet size,
 Only works for the one section per page.';
-$string['coursetype'] = 'Course type';
-$string['coursetype_help'] = 'Kanban board sets as course type, course sections will displayed horizontally.
+$string['designercoursetype'] = 'Course type';
+$string['designercoursetype_help'] = 'Kanban board sets as course type, course sections will displayed horizontally.
 Collapsible sections are not working in kanban mode.';
 $string['kanbanboard'] = 'Kanban Board';
 $string['usecompletionbg'] = 'Use different background for completion';
@@ -245,3 +245,30 @@ $string['overdues'] = '{$a->overdues} overdues';
 $string['sectionmaskimage'] = 'Section mask image';
 $string['sectionmasksize'] = 'Section mask size';
 $string['sectionmaskposition'] = 'Section mask position';
+$string['popupactivities'] = 'Display activities in popups';
+$string['popupactivities_help'] = 'Display the resources in popup, if enabled some type of resources will display in the popup.';
+$string['displayprogress'] = 'Display Progress';
+$string['useactivityimage'] = 'Use activity image';
+$string['small'] = 'Small';
+$string['medium'] = 'Medium';
+$string['large'] = 'Large';
+$string['circlesize'] = 'Circle size';
+$string['type_flow'] = 'Flow';
+$string['configtitle'] = 'Designer default options';
+$string['generalsettings'] = 'General designer settings';
+
+$string['coursesettings'] = 'Course';
+$string['sectionsettings'] = 'Section';
+$string['activitysettings'] = 'Activity';
+$string['courseheader'] = 'Course header';
+$string['popupactivitiesnotinstalled'] = 'Popup format must be installed in order to display the activities in popup.';
+$string['listwidth'] = 'List width';
+
+$string['general'] = 'General';
+$string['flowanimationduration'] = 'Flow animation duration';
+$string['flowanimationduration_help'] = 'Change the animation duration for the flow animation';
+$string['showanimation'] = 'Flow animation';
+$string['showanimation_help'] = 'Enable to reveal the modules with animation effect.';
+$string['verticalcircles'] = 'Vertical circles';
+$string['horizontal_circles'] = 'Horizontal Circles';
+$string['coursetype'] = 'Course type';

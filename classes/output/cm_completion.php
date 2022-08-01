@@ -426,7 +426,7 @@ class cm_completion implements renderable, templatable {
         $data = [
             'cmid' => $this->cm->id,
             'activityname' => $this->cm->name,
-            'strmarkdone'=> get_string('completion_manual:aria:markdone', 'format_designer', $this->cm->name),
+            'strmarkdone' => get_string('completion_manual:aria:markdone', 'format_designer', $this->cm->name),
             'strcompletion_manualdone' => get_string('completion_manual:aria:done', 'format_designer', $this->cm->name),
             'withavailability' => $withavailability,
             'istrackeduser' => $this->is_tracked_user(),
