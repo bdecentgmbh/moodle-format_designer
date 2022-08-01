@@ -56,15 +56,6 @@ class section extends \core_courseformat\output\local\content\section {
             $data->collapsemenu = true;
         }
 
-        $data->contentcollapsed = false;
-        $preferences = $format->get_sections_preferences();
-        if (isset($preferences[$section->id])) {
-            $sectionpreferences = $preferences[$section->id];
-            if (!empty($sectionpreferences->contentcollapsed)) {
-                $data->contentcollapsed = true;
-            }
-        }
-
         if ($format->is_section_current($section)) {
             $data->iscurrent = true;
             $data->currentlink = get_accesshide(
@@ -76,7 +67,9 @@ class section extends \core_courseformat\output\local\content\section {
         if ($data->iscoursedisplaymultipage && !$format->get_section_number()) {
             $formatdata = (array) $renderer->render_section_data($this->section, $this->format->get_course(), false, true);
         } else {
-            $formatdata = (array) $renderer->render_section_data($this->section, $this->format->get_course(), false);
+            $formatdata = (array) $renderer->render_section_data(
+                $this->section, $this->format->get_course(), $format->get_section_number()
+            );
         }
         $data = (object) array_merge((array) $data, $formatdata);
 

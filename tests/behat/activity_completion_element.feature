@@ -55,44 +55,44 @@ Feature: Sections can be check activity completion element in designer format
     And I check the activity "assign1" to element "/descendant::div[contains(@class, 'success')]"
     And I log out
 
-  Scenario: Check the manual date completion the activity
-    Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    #And I click on activity "assign2"
-    And I am on the "Test assignment name 1" "assign activity" page
-    And I navigate to "Settings" in current page administration
-    And I set the following fields to these values:
-      | Completion tracking           | Show activity as complete when conditions are met |
-      | completionview                | 1    |
-      | id_completionexpected_enabled | 1    |
-    And I press "Save and return to course"
-    And I log out
-    And I log in as "student1"
-    And I am on "Course 1" course homepage
-    #Then I check the activity "assign2" to element "/descendant::div[contains(@class, 'notstarted')]"
-    Then I check the activity "assign2" to element "/descendant::div[contains(@class, 'completion-info')]/descendant::i[contains(@class, 'fa-exclamation-triangle')]"
-    And I should see designerinfo "assign2" "Due today" ""
-    And I am on the "Test assignment name 1" "assign activity" page
-    And I am on "Course 1" course homepage
-    #Then I check the activity "assign2" to element "/descendant::div[contains(@class, 'success')]"
-    Then I check the activity "assign2" to element "/descendant::div[contains(@class, 'completion-info')]/descendant::i[contains(@class, 'fa-check-circle')]"
-    And I should see designerinfo "assign2" "Completed on " "##today##%d %B %Y##"
-    Then I log out
+  # Scenario: Check the manual date completion the activity
+  #   Given I log in as "teacher1"
+  #   And I am on "Course 1" course homepage
+  #   #And I click on activity "assign2"
+  #   And I am on the "Test assignment name 1" "assign activity" page
+  #   And I navigate to "Settings" in current page administration
+  #   And I set the following fields to these values:
+  #     | Completion tracking           | Show activity as complete when conditions are met |
+  #     | completionview                | 1    |
+  #     | id_completionexpected_enabled | 1    |
+  #   And I press "Save and return to course"
+  #   And I log out
+  #   And I log in as "student1"
+  #   And I am on "Course 1" course homepage
+  #   #Then I check the activity "assign2" to element "/descendant::div[contains(@class, 'notstarted')]"
+  #   Then I check the activity "assign2" to element "/descendant::div[contains(@class, 'completion-info')]/descendant::i[contains(@class, 'fa-exclamation-triangle')]"
+  #   And I should see designerinfo "assign2" "Due today" ""
+  #   And I am on the "Test assignment name 1" "assign activity" page
+  #   And I am on "Course 1" course homepage
+  #   #Then I check the activity "assign2" to element "/descendant::div[contains(@class, 'success')]"
+  #   Then I check the activity "assign2" to element "/descendant::div[contains(@class, 'completion-info')]/descendant::i[contains(@class, 'fa-check-circle')]"
+  #   And I should see designerinfo "assign2" "Completed on " "##today##%d %B %Y##"
+  #   Then I log out
 
-  Scenario: Check the due date completion the activity
-    Given I am on the "Test assignment name 2" "assign activity editing" page logged in as teacher1
-    And I follow "Expand all"
-    And I set the following fields to these values:
-      | Completion tracking           | Show activity as complete when conditions are met |
-      | completionview                | 1    |
-      | id_completionexpected_enabled | 1    |
-      | id_completionexpected_day     | 1    |
-      | id_completionexpected_month   | 1    |
-      | id_completionexpected_year    | 2017 |
+  # Scenario: Check the due date completion the activity
+  #   Given I am on the "Test assignment name 2" "assign activity editing" page logged in as teacher1
+  #   And I follow "Expand all"
+  #   And I set the following fields to these values:
+  #     | Completion tracking           | Show activity as complete when conditions are met |
+  #     | completionview                | 1    |
+  #     | id_completionexpected_enabled | 1    |
+  #     | id_completionexpected_day     | 1    |
+  #     | id_completionexpected_month   | 1    |
+  #     | id_completionexpected_year    | 2017 |
 
-    And I press "Save and return to course"
-    And I log out
-    And I log in as "student1"
-    And I am on "Course 1" course homepage
-    #Then I check the activity "assign3" to element "/descendant::div[contains(@class, 'danger')]"
-    Then I check the activity "assign3" to element "/descendant::div[contains(@class, 'completion-info')]/descendant::i[contains(@class, 'fa-exclamation-circle')]"
+  #   And I press "Save and return to course"
+  #   And I log out
+  #   And I log in as "student1"
+  #   And I am on "Course 1" course homepage
+  #   #Then I check the activity "assign3" to element "/descendant::div[contains(@class, 'danger')]"
+  #   Then I check the activity "assign3" to element "/descendant::div[contains(@class, 'completion-info')]/descendant::i[contains(@class, 'fa-exclamation-circle')]"

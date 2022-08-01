@@ -31,7 +31,7 @@
     }
 }}
 
-<li class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}} card"
+<li class="{{modclasses}} {{#isrestricted}}restricted{{/isrestricted}} card" style="{{{modstyle}}}"
     id="{{anchor}}"
     data-for="cmitem"
     data-id="{{cm.id}}">
@@ -39,10 +39,10 @@
     <div class="activity-block activity-basis designer 
         activity-item {{#modstealth}}hiddenactivity{{/modstealth}}{{!
         }}{{#modhiddenfromstudents}}hiddenactivity{{/modhiddenfromstudents}}{{!
-        }}{{#modinline}}activityinline{{/modinline}}" data-activityname="{{activityname}}" style="{{#prostyle}} {{{prostyle}}} {{/prostyle}}">
+        }}{{#modinline}}activityinline{{/modinline}} {{#videotimeprogress}}progress-element{{/videotimeprogress}}" data-activityname="{{activityname}}" style="{{#prostyle}} {{{prostyle}}} {{/prostyle}}">
 
-        <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{cm.url}}">
-            <div class="card-body">
+        <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{cmurl}}">
+            <div class="card-body {{#enableactivityimage}}bg-overlay{{/enableactivityimage}}">
                 <div class="activity-background-style" style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
                 </div>
 
@@ -85,13 +85,15 @@
                             {{/afterlink}}
 
                         </div>
-                        {{{beforecontent}}}
-
                         {{#modcontent}}
                             <div class="mod-content {{elementstate.description}}" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">
                                 {{{modcontent}}}
                             </div>
                         {{/modcontent}}
+
+                        {{#useactivityimage}}
+                            {{{modiconurl}}}
+                        {{/useactivityimage}}
 
                         {{#cmcompletionhtml}}
                             <div class="completion-html-card {{elementstate.completionbadge}}">
@@ -104,15 +106,23 @@
                             <p style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">{{modvisits}}</p>
                         </div>
                         {{/modvisits}}
-                        
+
                         {{^modrestricted}}
                         <div class="action-html-card {{elementstate.calltoaction}}">
                             {{{calltoactionhtml}}}
                         </div>
                         {{/modrestricted}}
                         {{{aftercontent}}}
+
+                        {{#useactivityimage}}
+                            {{#duration_formatted}}
+                                <span class="badge badge-dark video-duration">{{duration_formatted}}</span>
+                            {{/duration_formatted}}
+                        {{/useactivityimage}}
                     </div>
                 </div>
+
+                {{{videotimeprogress}}}
             </div>
             {{#cmformat.controlmenu}}
             <div class="activity-actions align-self-start">

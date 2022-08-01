@@ -108,6 +108,11 @@ class cmlist extends \core_courseformat\output\local\content\section\cmlist {
         } else if ($sectiontype == 'cards') {
             $sectionlayoutclass = 'card-layout';
         }
+
+        if ($course->coursetype == DESIGNER_TYPE_FLOW) {
+            $sectionlayoutclass = 'card-layout';
+            $sectiontype = 'cards';
+        }
         $templatename = 'format_designer/layout/section_layout_' . $sectiontype;
         $prolayouts = format_designer_get_pro_layouts();
         if (in_array($sectiontype, $prolayouts)) {

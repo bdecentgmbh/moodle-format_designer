@@ -118,14 +118,7 @@ class controlmenu extends controlmenu_base {
         ];
 
         if (format_designer_has_pro()) {
-            $prosectiontypes = [
-                [
-                    'type' => 'circles',
-                    'name' => get_string('circles', 'format_designer'),
-                    'active' => $this->format->get_section_option($section->id, 'sectiontype') == 'circles',
-                    'url' => new moodle_url('/course/view.php', ['id' => $this->course->id], 'section-' . $section->section)
-                ],
-            ];
+            $prosectiontypes = \local_designer\info::get_layout_menu($this->format, $section, $this->course);
             $sectiontypes = array_merge($sectiontypes, $prosectiontypes);
         }
 
@@ -133,7 +126,8 @@ class controlmenu extends controlmenu_base {
             'menu' => $output->render($menu),
             'hasmenu' => true,
             'id' => $section->id,
-            'seciontypes' => $sectiontypes
+            'seciontypes' => $sectiontypes,
+            'hassectiontypes' => ($this->course->coursetype != DESIGNER_TYPE_FLOW),
         ];
 
         return $data;

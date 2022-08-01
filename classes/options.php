@@ -195,4 +195,47 @@ class options {
         }
         return false;
     }
+
+    /**
+     * Get default value for the course, section and module config.
+     *
+     * @param bool $issection
+     * @return void
+     */
+    public static function get_default_options($issection=false) {
+        global $DB, $PAGE;
+        static $design;
+        if ($design == null) {
+
+            $formatdesign = (array) get_config('format_designer');
+            $localdesign = (array) get_config('local_designer');
+            $design = (object) array_merge($formatdesign, $localdesign);
+
+            $design->bgimagestyle = [
+                'size' => isset($design->bgimagestyle_size) ? $design->bgimagestyle_size : '',
+                'size_adv' => isset($design->bgimagestyle_size_adv) ? $design->bgimagestyle_size_adv : '',
+                'position' => isset($design->bgimagestyle_position) ? $design->bgimagestyle_position : '',
+                'position_adv' => isset($design->bgimagestyle_position_adv) ? $design->bgimagestyle_position_adv : '',
+                'repeat' => isset($design->bgimagestyle_repeat) ? $design->bgimagestyle_repeat : '',
+                'repeat_adv' => isset($design->bgimagestyle_repeat_adv) ? $design->bgimagestyle_repeat_adv : ''
+            ];
+
+            $design->maskstyle = [
+                'size' => isset($design->maskstyle_size) ? $design->maskstyle_size : '',
+                'size_adv' => isset($design->maskstyle_size_adv) ? $design->maskstyle_size_adv : 0,
+                'position' => isset($design->maskstyle_position) ? $design->maskstyle_position : '',
+                'position_adv' => isset($design->maskstyle_position_adv) ? $design->maskstyle_position_adv : 0,
+                'image' => isset($design->maskstyle_image) ? $design->maskstyle_image : '',
+            ];
+
+            $elements = ['icon', 'visits', 'calltoaction', 'title', 'description', 'modname', 'completionbadge'];
+            foreach ($elements as $element) {
+                $design->activityelements[$element] = isset($design->{'activityelements_'.$element})
+                    ? $design->{'activityelements_'.$element} : '';
+            }
+
+            unset($design->sectiondesignerbackgroundimage);
+        }
+        return $design;
+    }
 }
