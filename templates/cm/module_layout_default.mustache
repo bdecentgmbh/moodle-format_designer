@@ -39,8 +39,8 @@
 {{#cmformat.moveicon}} {{{cmformat.moveicon}}} {{/cmformat.moveicon}}
 <div class="activity-block activity-basis designer activity-item {{#modstealth}}hiddenactivity{{/modstealth}}{{!
         }}{{#modhiddenfromstudents}}hiddenactivity{{/modhiddenfromstudents}}{{!
-        }}{{#modinline}}activityinline{{/modinline}}" 
-        data-activityname="{{activityname}}" 
+        }}{{#modinline}}activityinline{{/modinline}}"
+        data-activityname="{{cmformat.activityname}}"
         style="{{#prostyle}} {{{prostyle}}} {{/prostyle}} ">
     <div class="activity-background-style" style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
     </div>
@@ -53,9 +53,9 @@
         <div>
             <div class="activityinstance {{modcontentclass}}">
                 {{#cmformat.cmname}}
-                    {{$ core/inplace_editable }}
-                        {{> core/inplace_editable }}
-                    {{/ core/inplace_editable }}
+                    {{$ format_designer/courseformat/content/cm/cmname }}
+                        {{> format_designer/courseformat/content/cm/cmname }}
+                    {{/ format_designer/courseformat/content/cm/cmname }}
                 {{/cmformat.cmname}}
                 {{#afterlink}}
                     <div class="afterlink">

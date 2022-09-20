@@ -864,6 +864,11 @@ ul li {
     width: 95%;
     display: inline-block;
 }
+/*v-4.0+*/
+.format-designer .designer  .section.img-text.list-layout .activity .activityinstance .inplaceeditable {
+    display: flex;
+}
+/*End ofv-4.0+*/
 .format-designer .designer .section.img-text .activity .activityinstance .inplaceeditable.content-show {
     visibility: visible;
 }
@@ -915,6 +920,15 @@ ul li {
 .format-designer .designer .section.img-text.card-layout .activity .activityinstance .inplaceeditable {
     width: 90%;
 }
+
+/*v-4.0+*/
+.format-designer .designer .section.img-text.card-layout .activity .activityinstance .inplaceeditable {
+    display: block;
+}
+.format-designer .designer .section .content .section.card-layout li.activity .activityinstance .aalink {
+    width: 80%;
+}
+/*End of v-4.0*/
 .format-designer .designer .section.img-text.list-layout .activity .activityinstance {
     padding-right: 30px;
 }
@@ -1094,6 +1108,11 @@ ul li {
     vertical-align: middle;
     margin-bottom: 0;
 }
+/*V-4.0+*/
+.format-designer .designer .section .content .section.link-layout li.activity .activityinstance {
+    display: inline-block;
+}
+/*End of V-4.0+*/
 .format-designer .designer .section .content .section.link-layout li.activity.label .activityinstance {
     min-width: auto;
     width: auto;
@@ -1232,6 +1251,11 @@ ul li {
     text-indent: 0;
     display: inline-block;
 }
+/*v-4.0+*/
+.format-designer .designer .section .content .section li.activity.circle-layout .activityinstance .aalink {
+    display: block;
+}
+/*End of v-4.0+*/
 .format-designer .designer .section .content .section.list-layout li.activity .activityinstance .aalink {
     width: 100%;
     display: flex;
@@ -2417,6 +2441,11 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 .format-designer.editing .designer .section.img-text.horizontal-circles-layout li.horizontal_circles .activity-actions {
     right: 25px;
 }
+/*v-4.0+*/
+.format-designer.editing .designer .section.img-text.horizontal-circles-layout li.horizontal_circles .activity-actions {
+    right: 0;
+}
+/*v-4.0+*/
 .format-designer .designer .section.desktop-one-column .content .section.horizontal-circles-layout li.activity .card .card-body {
     min-height: auto;
     text-align: left;
