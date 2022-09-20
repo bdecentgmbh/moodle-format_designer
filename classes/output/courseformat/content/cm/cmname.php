@@ -38,7 +38,7 @@ use stdClass;
  */
 class cmname extends \core_courseformat\output\local\content\cm\cmname {
 
-      /**
+    /**
      * Export this data so it can be used as the context for a mustache template.
      *
      * @param \renderer_base $output typically, the renderer that's calling this function
@@ -106,7 +106,7 @@ class cmname extends \core_courseformat\output\local\content\cm\cmname {
         // Get on-click attribute value if specified and decode the onclick - it
         // has already been encoded for display (puke).
         $data->onclick = htmlspecialchars_decode($mod->onclick, ENT_QUOTES);
-        //$data->mod = $mod;
+
         return (array) $data;
     }
 }

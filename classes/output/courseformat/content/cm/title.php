@@ -38,7 +38,7 @@ use stdClass;
  */
 class title extends \core_courseformat\output\local\content\cm\title {
 
-  /**
+    /**
      * Return the title template data to be used inside the inplace editable.
      *
      */

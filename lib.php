@@ -607,7 +607,6 @@ class format_designer extends \core_courseformat\base {
                 ]
             ];
 
-
             if (format_designer_popup_installed()) {
                 $courseformatoptionsedit['popupactivities'] = [
                     'label' => new lang_string('popupactivities', 'format_designer'),
