@@ -365,6 +365,9 @@ body.format-designer.editing ul.designer .section .circles-layout .activity .edi
     position: relative;
     z-index: 0;
 }
+.format-designer .course-content ul.designer li.section.hidden {
+    opacity: .2;
+}
 .format-designer.editing .course-content ul.designer li.section.main {
     width: 100%;
     padding-left: 15px;
@@ -432,7 +435,7 @@ body.format-designer.editing ul.designer .section .circles-layout .activity .edi
     display: inline-block;
 }
 .format-designer .course-content ul.designer li.section .content {
-    padding: 0;
+    padding: 10px;
     margin: 0 auto;
     clear: both;
 }
