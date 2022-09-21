@@ -128,7 +128,6 @@ class cmlist extends \core_courseformat\output\local\content\section\cmlist {
             return $cmscontent;
         }
         $data->cmscontent = $cmscontent;
-
         return $data;
     }
 }

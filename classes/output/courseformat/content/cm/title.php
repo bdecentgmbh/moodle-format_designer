@@ -39,59 +39,23 @@ use stdClass;
 class title extends \core_courseformat\output\local\content\cm\title {
 
     /**
-     * Export this data so it can be used as the context for a mustache template.
+     * Return the title template data to be used inside the inplace editable.
      *
-     * @param \renderer_base $output typically, the renderer that's calling this function
-     * @return stdClass data context for a mustache template
      */
-    public function export_for_template(\renderer_base $output): stdClass {
-        global $DB;
-        $format = $this->format;
+    protected function get_title_displayvalue (): string {
+        global $PAGE, $CFG;
+
+        // Inplace editable uses core renderer by default. However, course elements require
+        // the format specific renderer.
+        $courseoutput = $this->format->get_renderer($PAGE);
+
         $mod = $this->mod;
-        $displayoptions = $this->displayoptions;
-        if (!$mod->is_visible_on_course_page() || !$mod->url && !$mod->modname == 'videotime') {
-            // Nothing to be displayed to the user.
-            $data = new stdClass();
-            $data->mod = $mod;
-            return $data;
-        }
-
-        // Usually classes are loaded in the main cm output. However when the user uses the inplace editor
-        // the cmname output does not calculate the css classes.
-        if (!isset($displayoptions['linkclasses']) || !isset($displayoptions['textclasses'])) {
-            $cmclass = $format->get_output_classname('content\\cm');
-            $cmoutput = new $cmclass(
-                $format,
-                $this->section,
-                $mod,
-                $displayoptions
-            );
-            $displayoptions['linkclasses'] = $cmoutput->get_link_classes();
-            $displayoptions['textclasses'] = $cmoutput->get_text_classes();
-        }
-
-        $useactivityimage = '';
-        if (format_designer_has_pro()) {
-            if ($mod->modname == 'videotime') {
-                if ($videorecord = $DB->get_record('videotime', array('id' => $mod->instance))) {
-                    if ($videorecord->label_mode == 2) {
-                        $useactivityimage = \format_designer\options::get_option($mod->id, 'useactivityimage');
-                    }
-                }
-            }
-        }
 
         $data = (object)[
             'url' => ($mod->modname == 'videotime') ? new moodle_url('/mod/videotime/view.php', ['id' => $mod->id]) : $mod->url,
             'instancename' => ($mod->modname == 'videotime') ? ucwords($mod->name) : $mod->get_formatted_name(),
             'uservisible' => $mod->uservisible,
-            'icon' => $mod->get_icon_url(),
-            'modname' => $mod->modname,
-            'pluginname' => get_string('pluginname', 'mod_' . $mod->modname),
-            'linkclasses' => $displayoptions['linkclasses'],
-            'textclasses' => $displayoptions['textclasses'],
-            'purpose' => plugin_supports('mod', $mod->modname, FEATURE_MOD_PURPOSE, MOD_PURPOSE_OTHER),
-            'useactivityimage' => $useactivityimage,
+            'linkclasses' => $this->displayoptions['linkclasses'],
         ];
 
         // File type after name, for alphabetic lists (screen reader).
@@ -105,8 +69,17 @@ class title extends \core_courseformat\output\local\content\cm\title {
         // Get on-click attribute value if specified and decode the onclick - it
         // has already been encoded for display (puke).
         $data->onclick = htmlspecialchars_decode($mod->onclick, ENT_QUOTES);
-        $data->mod = $mod;
-        return $data;
+        if (format_designer_has_pro()) {
+            require_once($CFG->dirroot. "/local/designer/lib.php");
+            if ($textcolor = \format_designer\options::get_option($mod->id, 'textcolor')) {
+                $data->moduletextcolor = "color: $textcolor" . ";";
+            }
+        }
+
+        return $courseoutput->render_from_template(
+            'format_designer/courseformat/content/cm/title',
+            $data
+        );
     }
 
 }

@@ -309,7 +309,6 @@ class format_designer extends \core_courseformat\base {
     public function course_format_options($foreditform = false) {
         static $courseformatoptions = false;
         $courseformatoptions = self::course_format_options_list($foreditform);
-
         if ($foreditform) {
             $courseformatoptions['coursecompletiondate'] = [
                 'label' => new lang_string('coursecompletiondate', 'format_designer'),
@@ -360,6 +359,7 @@ class format_designer extends \core_courseformat\base {
      * @return array List of format options.
      */
     public static function course_format_options_list($foreditform = false) {
+        global $CFG;
         static $courseformatoptions = false;
         if ($courseformatoptions === false) {
             $courseconfig = get_config('moodlecourse');
@@ -924,7 +924,6 @@ class format_designer extends \core_courseformat\base {
         }
         unset($data['courseheader']);
         unset($data['popupactivitiesinfo']);
-
         return $this->update_format_options($data);
     }
 
@@ -1363,7 +1362,9 @@ function format_designer_coursemodule_edit_post_actions($data, $course) {
     global $DB;
     $cmid = $data->coursemodule;
     if ($course->format == 'designer') {
-        $fields = ['designer_activityelements'];
+        $fields = [
+            'designer_activityelements',
+        ];
         foreach ($fields as $field) {
             if (!isset($data->$field)) {
                 continue;
@@ -1372,6 +1373,8 @@ function format_designer_coursemodule_edit_post_actions($data, $course) {
             if (isset($data->$field)) {
                 if (is_array($data->$field)) {
                     $value = json_encode($data->$field);
+                } else {
+                    $value = $data->{$field};
                 }
                 \format_designer\options::insert_option($cmid, $course->id, $name, $value);
             }
@@ -1463,3 +1466,4 @@ function format_designer_popup_installed() {
     $plugininfo = $pluginman->get_plugin_info('format_popups');
     return !empty($plugininfo) ? true : false;
 }
+
