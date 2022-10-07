@@ -302,6 +302,7 @@ class format_designer extends format_base {
      * @return array List of format options.
      */
     public static function course_format_options_list($foreditform = false) {
+        global $CFG;
         static $courseformatoptions = false;
         if ($courseformatoptions === false) {
             $courseconfig = get_config('moodlecourse');
@@ -378,6 +379,13 @@ class format_designer extends format_base {
                     'label' => new lang_string('courseduedate', 'format_designer'),
                 ]
             ];
+        }
+        if (format_designer_has_pro()) {
+            require_once($CFG->dirroot."/local/designer/lib.php");
+            if (function_exists('local_designer_course_format_options_list')) {
+                $courseformatoptions += local_designer_course_format_options_list();
+            }
+
         }
         if ($foreditform && !isset($courseformatoptions['coursedisplay']['label'])) {
             $courseformatoptionsedit = [
@@ -586,6 +594,13 @@ class format_designer extends format_base {
                     'help' => 'courseduedate',
                     'help_component' => 'format_designer',
                 ];
+            }
+            if (format_designer_has_pro()) {
+                require_once($CFG->dirroot."/local/designer/lib.php");
+                if (function_exists('local_designer_course_format_options_editlist')) {
+                    $courseformatoptionsedit += local_designer_course_format_options_editlist();
+                }
+
             }
             $courseformatoptions = array_merge_recursive($courseformatoptions, $courseformatoptionsedit);
 
@@ -852,6 +867,7 @@ class format_designer extends format_base {
         }
         unset($data['courseheader']);
         unset($data['popupactivitiesinfo']);
+        unset($data['courseprerequisites']);
 
         return $this->update_format_options($data);
     }

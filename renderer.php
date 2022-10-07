@@ -907,7 +907,7 @@ class format_designer_renderer extends format_section_renderer_base {
      */
     public function render_section(section_info $section, stdClass $course, $onsectionpage,
         $sectionheader = false, $sectionreturn = 0, $sectioncontent = false) {
-
+        global $CFG;
         $sectionurl = new \moodle_url('/course/view.php', ['id' => $course->id, 'section' => $section->section]);
         /** @var format_designer $format */
         $format = course_get_format($course);
@@ -1090,6 +1090,17 @@ class format_designer_renderer extends format_section_renderer_base {
             'data-id' => $section->id,
             'style' => $style
         ]);
+
+        if ($section->section == 0 && format_designer_has_pro()) {
+            require_once($CFG->dirroot. "/local/designer/lib.php");
+            if ($course->displaycourseprerequisites == DESIGNER_PREREQUISITES_ABOVECOURSE &&
+                function_exists('local_designer_import_prerequisites_courses')) {
+                if (local_designer_is_prerequisites_courses($course)) {
+                    $templatecontext += local_designer_import_prerequisites_courses($course);
+                    echo $this->render_from_template("local_designer/prerequisites", $templatecontext);
+                }
+            }
+        }
 
         echo $sectionhead;
         echo $this->render_from_template($templatename, $templatecontext);
