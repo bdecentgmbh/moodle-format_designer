@@ -606,7 +606,7 @@ class renderer extends \core_courseformat\output\section_renderer {
      */
     public function render_section_data(section_info $section, stdClass $course, $onsectionpage,
         $sectionheader = false, $sectionreturn = 0, $sectioncontent = false) {
-
+        global $CFG;
         $sectionurl = new \moodle_url('/course/view.php', ['id' => $course->id, 'section' => $section->section]);
         /** @var format_designer $format */
         $format = course_get_format($course);
@@ -686,12 +686,10 @@ class renderer extends \core_courseformat\output\section_renderer {
         if ($course->coursedisplay && !$onsectionpage) {
             $sectioncollapse = false;
         }
-
         // Set list width for kanban board sections.
         $sectionstylerules = ($course->coursetype == DESIGNER_TYPE_KANBAN)
             ? (isset($course->listwidth) && $section->section != 0
             ? sprintf('width: %s;', $course->listwidth) : '') : '';
-
         $templatecontext = [
             'section' => $section,
             'sectiontype' => $sectiontype,
@@ -708,6 +706,8 @@ class renderer extends \core_courseformat\output\section_renderer {
             'sectioncontainerwidth' => $sectioncontainerwidth,
             'sectioncontentwidth' => $sectioncontentwidth,
             'sectiondesignwhole' => $sectiondesignwhole,
+            'showprerequisites' => ($section->section == 0) ? true : false,
+            'prerequisitesnewtab' => isset($course->prerequisitesnewtab) ? $course->prerequisitesnewtab : false,
             'sectiondesignheader' => $sectiondesignheader,
             'sectiondesigntextcolor' => $sectiondesigntextcolor,
             'sectioncontainerlayout' => $sectioncontainerlayout,
@@ -725,7 +725,17 @@ class renderer extends \core_courseformat\output\section_renderer {
             'flowcourse' => isset($course->coursetype) && $course->coursetype == DESIGNER_TYPE_FLOW ? true : false,
             'maskimage' => (isset($section->sectiondesignermaskimage) && $section->sectiondesignermaskimage) ? true : false,
         ];
-
+        $zerotohero = get_config('format_designer', 'sectionzeroactivities');
+        if ($zerotohero == DESIGNER_HERO_ZERO_HIDE && $section->section == 0 && !$this->page->user_is_editing()) {
+            $templatecontext['hidesection'] = true;
+        }
+        if (format_designer_has_pro()) {
+            require_once($CFG->dirroot. "/local/designer/lib.php");
+            if ($course->displaycourseprerequisites == DESIGNER_PREREQUISITES_ABOVECOURSE
+                && function_exists('local_designer_import_prerequisites_courses')) {
+                $templatecontext += local_designer_import_prerequisites_courses($course);
+            }
+        }
         if (format_designer_has_pro()) {
             $prodata = \local_designer\options::render_section(
                 $section, $course, $modinfo, $templatecontext
