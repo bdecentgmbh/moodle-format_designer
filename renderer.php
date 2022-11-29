@@ -501,6 +501,10 @@ class format_designer_renderer extends format_section_renderer_base {
             'course' => $course,
             'enrolmentstartdate' => ($course->enrolmentstartdate) ? $enrolstartdate : '',
             'enrolmentenddate' => $course->enrolmentenddate ? $enrolenddate : '',
+            'coursestaffinfo' => format_designer_show_staffs_header($course),
+            'statuscoursestaffinfo' => !empty(format_designer_show_staffs_header($course)) ? true : false,
+            'slidearrow' => count(format_designer_show_staffs_header($course)) > 1 ? true : false,
+            'currentuser' => $USER->id,
         ];
         $courseprogress = $this->activity_progress($course, $USER->id);
         if ($courseprogress != null) {
