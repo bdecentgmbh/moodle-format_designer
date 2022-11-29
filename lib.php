@@ -371,6 +371,8 @@ class format_designer extends \core_courseformat\base {
     public static function course_format_options_list($foreditform = false) {
         global $CFG;
         static $courseformatoptions = false;
+        $teacher = get_archetype_roles('editingteacher');
+        $teacher = reset($teacher);
         if ($courseformatoptions === false) {
             $courseconfig = get_config('moodlecourse');
             $courseformatoptions = [
@@ -448,6 +450,10 @@ class format_designer extends \core_courseformat\base {
                     'default' => get_string('timemanagementmissing', 'format_designer'),
                     'type' => PARAM_RAW_TRIMMED,
                     'label' => new lang_string('courseduedate', 'format_designer'),
+                ],
+                'coursestaff' => [
+                    'default' => $teacher->id,
+                    'type' => PARAM_INT
                 ]
             ];
         }
@@ -676,7 +682,14 @@ class format_designer extends \core_courseformat\base {
                     'help_component' => 'format_designer',
                 ];
             }
-
+            $coursestaffroles = get_default_enrol_roles(context_system::instance());
+            $courseformatoptionsedit['coursestaff'] = [
+                'label' => new lang_string('displayheaderroleusers', 'format_designer'),
+                'element_type' => 'select',
+                'element_attributes' => [$coursestaffroles],
+                'help' => 'displayheaderroleusers',
+                'help_component' => 'format_designer',
+            ];
             if (format_designer_has_pro()) {
                 require_once($CFG->dirroot."/local/designer/lib.php");
                 if (function_exists('local_designer_course_format_options_editlist')) {
@@ -1687,4 +1700,33 @@ function format_designer_section_zero_tomake_hero($reports, $course) {
         }
     }
     return $reports;
+}
+
+
+function format_designer_show_staffs_header($course) {
+    global $PAGE;
+    $staffroleid = $course->coursestaff;
+    $enrolusers = enrol_get_course_users_roles($course->id);
+    $staffs = [];
+    $i = 1;
+    if (!empty($enrolusers)) {
+        foreach($enrolusers as $userid => $roles) {
+            if (isset($roles[$staffroleid])) {
+                $user = \core_user::get_user($userid);
+                $list = new stdClass();
+                $list->userid = $userid;
+                $list->email = $user->email;
+                $list->fullname = fullname($user);
+                $list->profileurl = new \moodle_url('/user/profile.php', ['id' => $userid]);
+                $list->contacturl = new \moodle_url('/message/index.php', ['id' => $userid]);
+                $userpicture = new \user_picture($user);
+                $userpicture->size = 1; // Size f1.
+                $list->profileimageurl = $userpicture->get_url($PAGE)->out(false);
+                $list->active = ($i == 1) ? true : false;
+                $staffs[] = $list;
+                $i++;
+            }
+        }
+    }
+    return $staffs;
 }

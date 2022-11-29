@@ -397,6 +397,10 @@ class renderer extends \core_courseformat\output\section_renderer {
             'course' => $course,
             'enrolmentstartdate' => ($course->enrolmentstartdate) ? $enrolstartdate : '',
             'enrolmentenddate' => $course->enrolmentenddate ? $enrolenddate : '',
+            'coursestaffinfo' => format_designer_show_staffs_header($course),
+            'statuscoursestaffinfo' => !empty(format_designer_show_staffs_header($course)) ? true : false,
+            'slidearrow' => count(format_designer_show_staffs_header($course)) > 1 ? true : false,
+            'currentuser' => $USER->id,
         ];
         $courseprogress = $this->activity_progress($course, $USER->id);
         $data['courseprogress'] = ($course->activityprogress) ? $courseprogress : '';
@@ -729,7 +733,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         if ($zerotohero == DESIGNER_HERO_ZERO_HIDE && $section->section == 0 && !$this->page->user_is_editing()) {
             $templatecontext['hidesection'] = true;
         }
-        if (format_designer_has_pro()) {
+        if (format_designer_has_pro() && $section->section == 0) {
             require_once($CFG->dirroot. "/local/designer/lib.php");
             if ($course->displaycourseprerequisites == DESIGNER_PREREQUISITES_ABOVECOURSE
                 && function_exists('local_designer_import_prerequisites_courses')) {
