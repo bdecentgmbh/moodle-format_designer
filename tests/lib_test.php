@@ -335,4 +335,22 @@ class lib_test extends \advanced_testcase {
             $this->assertEquals('cards', $sectiontype);
         }
     }
+
+    /**
+     * Test the Staffs for the course header.
+     * @covers ::format_designer_show_staffs_header
+     * @return void
+     */
+    public function test_format_designer_show_staffs_header() {
+        global $DB;
+        $this->resetAfterTest();
+        $user = $this->getDataGenerator()->create_user();
+        $teacherrole = $DB->get_record('role', ['shortname' => 'editingteacher']);
+        $record = ['format' => 'designer'];
+        $course = $this->getDataGenerator()->create_course($record);
+        $this->getDataGenerator()->enrol_user($user->id, $course->id, $teacherrole->id);
+        $result = format_designer_show_staffs_header($course);
+        $this->assertEquals(1, count($result));
+        $this->assertEquals($user->id, $result[0]->userid);
+    }
 }

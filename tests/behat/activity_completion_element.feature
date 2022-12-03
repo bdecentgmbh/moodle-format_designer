@@ -1,4 +1,4 @@
-@format @format_designer @javascript
+@format @format_designer @designer_activity_completion @javascript
 Feature: Sections can be check activity completion element in designer format
   In order to rearrange my course contents
   As a teacher
