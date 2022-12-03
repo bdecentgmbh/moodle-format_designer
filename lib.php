@@ -316,7 +316,8 @@ class format_designer extends \core_courseformat\base {
      * @param bool $foreditform
      * @return array of options
      */
-    public function course_format_options($foreditform = false) {
+    public function designer_course_format_options($foreditform = false) {
+        global $PAGE, $COURSE;
         static $courseformatoptions = false;
         $courseformatoptions = self::course_format_options_list($foreditform);
         if ($foreditform) {
@@ -358,8 +359,21 @@ class format_designer extends \core_courseformat\base {
                 }
             }
         }
-
         return $courseformatoptions;
+    }
+
+    /**
+     * Definitions of the additional options that this course format uses for course.
+     *
+     * Designer format uses the following options:
+     * - coursedisplay
+     * - hiddensections
+     *
+     * @param bool $foreditform
+     * @return array of options
+     */
+    public function course_format_options($foreditform = false) {
+        return $this->designer_course_format_options($foreditform);
     }
 
     /**
@@ -453,7 +467,7 @@ class format_designer extends \core_courseformat\base {
                 ],
                 'coursestaff' => [
                     'default' => $teacher->id,
-                    'type' => PARAM_INT
+                    'type' => PARAM_TEXT
                 ]
             ];
         }
@@ -685,8 +699,8 @@ class format_designer extends \core_courseformat\base {
             $coursestaffroles = get_default_enrol_roles(context_system::instance());
             $courseformatoptionsedit['coursestaff'] = [
                 'label' => new lang_string('displayheaderroleusers', 'format_designer'),
-                'element_type' => 'select',
-                'element_attributes' => [$coursestaffroles],
+                'element_type' => 'autocomplete',
+                'element_attributes' => [$coursestaffroles, ['multiple' => true]],
                 'help' => 'displayheaderroleusers',
                 'help_component' => 'format_designer',
             ];
@@ -728,7 +742,6 @@ class format_designer extends \core_courseformat\base {
     public function create_edit_form_elements(&$mform, $forsection = false) {
         global $COURSE, $PAGE;
         $elements = parent::create_edit_form_elements($mform, $forsection);
-
         if (!$forsection && (empty($COURSE->id) || $COURSE->id == SITEID)) {
             // Add "numsections" element to the create course form - it will force new course to be prepopulated
             // with empty sections.
@@ -747,8 +760,9 @@ class format_designer extends \core_courseformat\base {
         if ($forsection) {
             $options = $this->section_format_options(true);
         } else {
-            $options = $this->course_format_options(true);
+            $options = $this->designer_course_format_options(true);
         }
+        $design = \format_designer\options::get_default_options();
         foreach ($options as $optionname => $option) {
             if (isset($option['disabledif'])) {
                 $disabledif = $option['disabledif'];
@@ -768,6 +782,11 @@ class format_designer extends \core_courseformat\base {
             }
             if (isset($option['adv'])) {
                 $mform->setAdvanced($optionname);
+            }
+
+            if ($optionname == 'coursestaff' && isset($design->coursestaff)) {
+                $select = $mform->getElement($optionname);
+                $select->setSelected($design->{$optionname});
             }
         }
 
@@ -922,7 +941,6 @@ class format_designer extends \core_courseformat\base {
      */
     public function update_course_format_options($data, $oldcourse = null) {
         $data = (array)$data;
-
         if ($oldcourse !== null) {
             $oldcourse = (array)$oldcourse;
             $options = $this->course_format_options();
@@ -962,6 +980,9 @@ class format_designer extends \core_courseformat\base {
         unset($data['courseheader']);
         unset($data['popupactivitiesinfo']);
         unset($data['courseprerequisites']);
+        if (isset($data['coursestaff'])) {
+            $data['coursestaff'] = implode(",", $data['coursestaff']);
+        }
         return $this->update_format_options($data);
     }
 
@@ -1702,16 +1723,19 @@ function format_designer_section_zero_tomake_hero($reports, $course) {
     return $reports;
 }
 
-
+/**
+ * Get the course header staffs.
+ * @param object $course
+ * @return array data
+ */
 function format_designer_show_staffs_header($course) {
     global $PAGE;
-    $staffroleid = $course->coursestaff;
-    $enrolusers = enrol_get_course_users_roles($course->id);
     $staffs = [];
     $i = 1;
-    if (!empty($enrolusers)) {
-        foreach($enrolusers as $userid => $roles) {
-            if (isset($roles[$staffroleid])) {
+    if (isset($course->coursestaff)) {
+        $staffids = format_designer_get_staffs_users($course);
+        if (!empty($staffids)) {
+            foreach ($staffids as $userid) {
                 $user = \core_user::get_user($userid);
                 $list = new stdClass();
                 $list->userid = $userid;
@@ -1729,4 +1753,25 @@ function format_designer_show_staffs_header($course) {
         }
     }
     return $staffs;
+}
+
+/**
+ * Get course staff users.
+ * @param object $course
+ * @return array userids
+ */
+function format_designer_get_staffs_users($course) {
+    $staffids = [];
+    $staffroleids = explode(",", $course->coursestaff);
+    $enrolusers = enrol_get_course_users_roles($course->id);
+    if (!empty($enrolusers)) {
+        foreach ($enrolusers as $userid => $roles) {
+            foreach ($staffroleids as $staffid) {
+                if (isset($roles[$staffid])) {
+                    $staffids[] = $userid;
+                }
+            }
+        }
+    }
+    return array_unique($staffids);
 }

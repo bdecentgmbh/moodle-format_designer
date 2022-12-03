@@ -82,7 +82,6 @@
             element.addEventListener('click', function(e) {
                 e.preventDefault();
                 if (e.currentTarget.dataset.userid != undefined) {
-                    console.log(e.currentTarget.dataset.userid);
                     Contact.enhance(e.currentTarget);
                 }
             });
