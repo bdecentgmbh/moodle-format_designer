@@ -2165,7 +2165,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 
 /*Course Integrate time management*/
 .format-designer .course-info-block {
-    margin: 15px;
+    margin: 15px 0;
     clear: both;
 }
 .format-designer.path-course-view .completionprogress + h2.accesshide {
@@ -2176,18 +2176,17 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     margin-bottom: 15px;
 }
 .format-designer .course-info-block > div {
-    width: 20%;
+    width: 17%;
     display: inline-block;
     vertical-align: top;
-    margin-right: 25px;
+    margin-right: 15px;
     margin-bottom: 15px;
 }
-.format-designer .course-info-block > div:nth-child(4) {
-    /* width: 35%; */
+.format-designer .course-info-block .carousel {
     margin-right: 0;
+    float: right;
 }
 .format-designer .course-info-block .carousel .carousel-item .contact-element {
-    /* margin-bottom: 15px; */
     margin-right: 15px;
 }
 .format-designer .course-info-block .carousel .carousel-item .contact-element:last-child {
@@ -2200,11 +2199,14 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     text-align: center;
     border-radius: 50%;
     background: #333;
-    display: inline-block;
+    display: none;
     top: 45%;
 }
 .format-designer .course-info-block .carousel .carousel-control.carousel-control-prev {
     left: -30px;
+}
+.format-designer .course-info-block .carousel:hover .carousel-control {
+    display: block;
 }
 .format-designer .course-info-block .carousel .carousel-control span {
     display: none;
@@ -2230,8 +2232,11 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     border-radius: 50%;
 }
 .format-designer .course-info-block .carousel .contact-element .contact-block .content-block {
-    padding-left: 115px;
-    padding-left: 110px;
+    padding-left: 100px;
+}
+.format-designer .course-info-block .carousel .contact-element .contact-block .content-block .title-block h4 span + span {
+    font-size: 14px;
+    margin-top: 10px;
 }
 .format-designer .course-info-block .carousel .contact-element .contact-block .content-block .title-block > a {
     text-decoration: none;
@@ -2265,6 +2270,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     width: auto;
     display: block;
     margin-right: 30px;
+    clear: both;
 }
 .format-designer .course-info-block > div.progress-block > .progress {
     max-width: 50%;
@@ -2303,19 +2309,25 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 }
 
 @media (min-width: 1551px) {
-    .format-designer .course-info-block > div:nth-child(4) {
-        width: 32%;
+    .format-designer .course-info-block > div {
+        width: 19%;
+    }
+    .format-designer .course-info-block .carousel {
+        width: 38%;
     }
 }
 
 @media (min-width: 1200px) and (max-width: 1550px){
-    .format-designer .course-info-block > div:nth-child(4) {
-        width: 31%;
+    .format-designer .course-info-block > div {
+        width: 20%;
+    }
+    .format-designer .course-info-block .carousel {
+        width: 34%;
     }
 }
 
 /* @media (min-width: 1551px) {
-    .format-designer .course-info-block > div:nth-child(4) {
+    .format-designer .course-info-block .carousel {
         width: 34%;
     }
 } */
@@ -2324,14 +2336,14 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     .format-designer .course-info-block > div {
         width: 19%;
     }
-    .format-designer .course-info-block > div:nth-child(4) {
-        width: 30%;
+    .format-designer .course-info-block .carousel {
+        width: 35%;
     }
 }
 
 /* @media (max-width: 991px) {
 
-    .format-designer .course-info-block > div:nth-child(4) {
+    .format-designer .course-info-block .carousel {
 
         width: 45%;
 
@@ -2341,20 +2353,27 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 
 
 
-@media (max-width: 991px) {
+@media (min-width: 768px) and (max-width: 991px) {
     .format-designer .course-info-block > div {
         width: 45%;
     }
     .format-designer .course-info-block > div:nth-child(2n) {
+        width: 51%;
         margin-right: 0;
+    }
+    .format-designer .course-info-block .carousel {
+        float: none;
     }
 }
 
-@media (max-width: 575px) {
+@media (max-width: 767px) {
     .format-designer .course-info-block > div {
         width: 100%;
         margin-right: 0;
         margin-bottom: 30px;
+    }
+    .format-designer .course-info-block .carousel {
+        float: none;
     }
     .format-designer .course-info-block > div.progress-block > .progress {
         max-width: none;
