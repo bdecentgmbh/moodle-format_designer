@@ -1470,14 +1470,21 @@ function format_designer_popup_installed() {
  * @return array data
  */
 function format_designer_show_staffs_header($course) {
-    global $PAGE;
+    global $PAGE, $DB;
     $staffs = [];
     $i = 1;
+    $coursecontext = \context_course::instance($course->id);
     if (isset($course->coursestaff)) {
         $staffids = format_designer_get_staffs_users($course);
         if (!empty($staffids)) {
             foreach ($staffids as $userid) {
                 $user = \core_user::get_user($userid);
+                $roles = get_user_roles($coursecontext, $userid, false);
+                array_map(function($role) {
+                    $role->name = role_get_name($role);
+                    return $role;
+                }, $roles);
+                $roles = implode(", ", array_column($roles, 'name'));
                 $list = new stdClass();
                 $list->userid = $userid;
                 $list->email = $user->email;
@@ -1488,6 +1495,7 @@ function format_designer_show_staffs_header($course) {
                 $userpicture->size = 1; // Size f1.
                 $list->profileimageurl = $userpicture->get_url($PAGE)->out(false);
                 $list->active = ($i == 1) ? true : false;
+                $list->role = $roles;
                 $staffs[] = $list;
                 $i++;
             }
