@@ -129,11 +129,11 @@
             {{/slidearrow}}
         </div>
     {{/statuscoursestaffinfo}}
-
+    <div class="clearfix"></div>
     {{#courseprogress}}
     <div class="progress-block">
         <div class="progress">
-            <div class="progress-bar" role="progressbar" style="width: {{courseprogress.percent}}%"
+            <div class="progress-bar" role="progressbar" style="width: {{courseprogress.percent}}%" 
                 aria-valuenow="{{courseprogress.percent}}" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
 
@@ -159,5 +159,4 @@
         {{/due}}
     </div>
     {{/courseprogress}}
-    <div></div>
 </div>
