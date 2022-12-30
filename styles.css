@@ -4223,6 +4223,8 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 .format-designer.path-course-view .completionprogress {
 
     margin-bottom: 15px;
+    clear: both;
+    margin-top: 20px;
 
 }
 
