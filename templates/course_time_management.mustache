@@ -89,7 +89,7 @@
                                     </span>
                                     <span>{{role}}</span>
                                 </div>
-
+                                {{#ismessaging}}
                                 <div class="info-block">
                                     <div class="btn-group header-button-group">
                                         <a id="message-user-button" role="button" data-conversationid="0" data-userid="{{userid}}" class="btn"
@@ -100,17 +100,20 @@
                                             </span>
                                         </a>
                                         <span class="sr-only sr-only-focusable" data-region="jumpto" tabindex="-1"></span>
-                                        <a data-currentuserid="{{currentuser}}" data-userid="{{userid}}" data-is-contact="0" role="button" class="ajax-contact-button btn toggle-contact-button" href="#">
+                                        {{#showaddtocontacts}}
+                                        <a data-currentuserid="{{currentuser}}" data-userid="{{userid}}" data-is-contact="{{iscontact}}" role="button" class="ajax-contact-button btn toggle-contact-button" href="#">
                                             <span>
-                                                <i class="icon fa fa-address-card fa-fw iconsmall" title="{{#str}} addtocontacts, format_designer {{/str}}" aria-label="Add to contacts"></i>
-                                                <span class="header-button-title">{{#str}} addtocontacts, format_designer {{/str}}</span>
+                                                <i class="icon fa fa-address-card fa-fw iconsmall" title="{{contacttitle}}" aria-label="Add to contacts"></i>
+                                                <span class="header-button-title">{{contacttitle}}</span>
                                             </span>
                                             <span class="loading-icon icon-no-margin">
                                                 <i class="icon fa fa-circle-o-notch fa-spin fa-fw " title="Loading" aria-label="Loading"></i>
                                             </span>
                                         </a>
+                                        {{/showaddtocontacts}}
                                     </div>
                                 </div>
+                                {{/ismessaging}}
                             </div>
                         </div>
                     </div>

@@ -1561,8 +1561,11 @@ function format_designer_extend_navigation_course($navigation, $course, $context
     if ($course->format != 'designer') {
         return;
     }
-    $sql = "SELECT * FROM {format_designer_options} WHERE courseid = :courseid AND
-        (name='heroactivity' OR name='heroactivitypos') ORDER BY cmid DESC";
+    $sql = "SELECT fd.* FROM
+        {format_designer_options} fd
+        JOIN {course_modules} cm ON fd.cmid = cm.id
+        WHERE courseid = :courseid AND cm.deletioninprogress = 0 AND
+        (fd.name='heroactivity' OR fd.name='heroactivitypos') ORDER BY fd.cmid DESC";
     $records = $DB->get_records_sql($sql, ['courseid' => $course->id]);
     $neg = [];
     $pos = [];
@@ -1630,7 +1633,7 @@ function format_designer_extend_navigation_course($navigation, $course, $context
 
     $PAGE->requires->js_amd_inline("
         require(['jquery', 'core/moremenu'], function($, MenuMore) {
-            window.onload = (event) => {
+            $(document).ready(function() {
                 if ('$modulecontent') {
                     var moremenu = document.querySelector('.secondary-navigation ul.nav-tabs .dropdownmoremenu ul');
                     if (moremenu) {
@@ -1697,7 +1700,7 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                     }
                 }
                 MenuMore(secondarynav);
-            };
+            });
         });
     ");
 }
@@ -1729,7 +1732,7 @@ function format_designer_section_zero_tomake_hero($reports, $course) {
  * @return array data
  */
 function format_designer_show_staffs_header($course) {
-    global $PAGE, $DB;
+    global $PAGE, $DB, $USER;
     $staffs = [];
     $i = 1;
     $coursecontext = \context_course::instance($course->id);
@@ -1755,6 +1758,11 @@ function format_designer_show_staffs_header($course) {
                 $list->profileimageurl = $userpicture->get_url($PAGE)->out(false);
                 $list->active = ($i == 1) ? true : false;
                 $list->role = $roles;
+                $list->showaddtocontacts = ($USER->id != $user->id) ? true : false;
+                $iscontact = \core_message\api::is_contact($USER->id, $user->id);
+                $list->iscontact = $iscontact;
+                $list->contacttitle = $iscontact ? get_string('removefromyourcontacts', 'message') :
+                    get_string('addtoyourcontacts', 'message');
                 $staffs[] = $list;
                 $i++;
             }

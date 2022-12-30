@@ -401,6 +401,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             'statuscoursestaffinfo' => !empty(format_designer_show_staffs_header($course)) ? true : false,
             'slidearrow' => count(format_designer_show_staffs_header($course)) > 1 ? true : false,
             'currentuser' => $USER->id,
+            'ismessaging' => $CFG->messaging,
         ];
         $courseprogress = $this->activity_progress($course, $USER->id);
         $data['courseprogress'] = ($course->activityprogress) ? $courseprogress : '';
