@@ -26,8 +26,8 @@ Feature: Sections can be check activity completion element in designer format
     And I press "Save and display"
     And the following "activities" exist:
     | activity   | name                   | intro                         | course | idnumber    | section | completionexpected        |
-    | assign     | Test assignment name   | Test assignment description   | C1     | assign1     | 0       | ##last day of +5 days##   |
-    | assign     | Test assignment name 1 | Test assignment1 description  | C1     | assign2     | 0       | ##last day of +5 days##   |
+    | assign     | Test assignment name   | Test assignment description   | C1     | assign1     | 0       | 0                         |
+    | assign     | Test assignment name 1 | Test assignment1 description  | C1     | assign2     | 0       | 0                         |
     | assign     | Test assignment name 2 | Test assignment2 description  | C1     | assign3     | 0       | ##5 days ago##            |
     | choice     | Test choice name       | Test choice description       | C1     | choice1     | 0       | ##tomorrow##              |
     Then I log out
@@ -66,8 +66,8 @@ Feature: Sections can be check activity completion element in designer format
     And I log in as "student1"
     And I am on "Course 1" course homepage
     Then I check the activity "assign2" to element "/descendant::div[contains(@class, 'notstarted')]"
-    Then I check the activity "assign2" to element "/descendant::div[contains(@class, 'completion-info')]/descendant::i[contains(@class, 'fa-calendar')]"
-    And I should see designerinfo "assign2" "Complete by " "##last day of +5 days##%d %B %Y##"
+    #Then I check the activity "assign2" to element "/descendant::div[contains(@class, 'completion-info')]/descendant::i[contains(@class, 'fa-calendar')]"
+    #And I should see designerinfo "assign2" "Complete by " "##last day of +5 days##%d %B %Y##"
     And I click on activity "assign2"
     And I am on "Course 1" course homepage
     Then I check the activity "assign2" to element "/descendant::div[contains(@class, 'success')]"

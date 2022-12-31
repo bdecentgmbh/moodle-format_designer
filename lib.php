@@ -1478,7 +1478,12 @@ function format_designer_show_staffs_header($course) {
         $staffids = format_designer_get_staffs_users($course);
         if (!empty($staffids)) {
             foreach ($staffids as $userid) {
+                $customfield = [];
                 $user = \core_user::get_user($userid);
+                $extrafields = profile_get_user_fields_with_data($userid);
+                foreach ($extrafields as $formfield) {
+                    $customfield[]['value'] = $formfield->data;
+                }
                 $roles = get_user_roles($coursecontext, $userid, false);
                 array_map(function($role) {
                     $role->name = role_get_name($role);
@@ -1501,6 +1506,7 @@ function format_designer_show_staffs_header($course) {
                 $list->iscontact = $iscontact;
                 $list->contacttitle = $iscontact ? get_string('removefromyourcontacts', 'message') :
                     get_string('addtoyourcontacts', 'message');
+                $list->customfield = $customfield;
                 $staffs[] = $list;
                 $i++;
             }
