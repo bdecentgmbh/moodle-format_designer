@@ -1641,65 +1641,91 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                     }
                 }
                 var secondarynav = document.querySelector('.secondary-navigation ul.nav-tabs');
+				// Return false when the secondary nav is empty.
+                if (secondarynav == undefined) {
+                    return false;
+                }
                 var heroActivity = document.querySelectorAll('.secondary-navigation .designer-hero-activity');
                 var i = 0;
                 var baseTab = document.querySelectorAll('.secondary-navigation ul.nav-tabs li')[0];
-                var baseDataElement = baseTab.getAttribute('data-key');
+                if (baseTab) {
+                    var baseDataElement = baseTab.getAttribute('data-key');
+                }
+                var dropdownmenu = document.querySelectorAll('.secondary-navigation .dropdownmoremenu .nav-item');
+                var morebutton = document.querySelector('.secondary-navigation .nav li[data-region=morebutton]');
+                // Remove the dropdown menu and push to the all elements in the outer nav item.
+                if (heroActivity.length && dropdownmenu) {
+                    dropdownmenu.forEach((e) => {
+                        e.classList.remove('nav-link');
+                        e.children[0].classList.remove('dropdown-item');
+                        e.children[0].classList.add('nav-link');
+                        e.setAttribute('data-forceintomoremenu', 'false');
+                        secondarynav.insertBefore(e, morebutton);
+                    });
+                    $('.secondary-navigation .dropdownmoremenu .nav-item').remove();
+                }
+                // Check the hero activity or not to change the position.
                 if (heroActivity) {
                     heroActivity.forEach((e) => {
                         e.classList.remove('dropdown-item');
                         e.classList.add('nav-link');
+                        // Get the postion class.
                         var posClass = Array.from(e.classList).find(element => {
                             if (element.includes('position_')) {
                                 return true;
                             }
                         });
+                        // Convert the position.
                         var pos = posClass.substr(9, 3);
                         pos = Number(pos);
                         parent = e.parentNode;
                         parent.setAttribute('data-forceintomoremenu', 'false');
+                        // Check to position wheather add to basenode after or before.
                         if (pos < 0) {
                             pos = 0;
                         } else {
                             pos += i;
                         }
-                        secondarynav.insertBefore(parent, secondarynav.children[pos]);
+                        // Insert the heroactivity to current position.
+                        if (secondarynav.children[pos] !== undefined) {
+                            secondarynav.insertBefore(parent, secondarynav.children[pos]);
+                        } else {
+                            secondarynav.insertBefore(parent, morebutton);
+                        }
                         var nodes = Array.prototype.slice.call(secondarynav.children);
                         var baseSelector = '.secondary-navigation ul.nav-tabs li'+'[data-key='+baseDataElement+']';
                         var baseHandler = document.querySelector(baseSelector);
                         i = nodes.indexOf(baseHandler);
                     });
                 }
+                // Insert the prerequisite course link to secondary nav.
                 if ($designerpro) {
-                    var prerequisites = document.querySelectorAll('.prerequisites-course');
-                    var moremenu = document.querySelector('.secondary-navigation ul.nav-tabs .dropdownmoremenu a');
-                    if (moremenu) {
-                        moremenu.classList.remove('active');
+                    var prerequisites = document.querySelectorAll('.prerequisites-course')[0];
+                    var moremenulink = document.querySelector('.secondary-navigation ul.nav-tabs .dropdownmoremenu a');
+                    if (moremenulink) {
+                        moremenulink.classList.remove('active');
                     }
                     if (prerequisites) {
-                        prerequisites.forEach((e) => {
-                            e.classList.remove('dropdown-item');
-                            e.classList.add('nav-link');
-                            if ($prerequisitebnewtab) {
-                                e.setAttribute('target', '_blank');
-                            }
-                            parent = e.parentNode;
-                            parent.setAttribute('data-forceintomoremenu', 'false');
-                            secondarynav.insertBefore(parent, secondarynav.children[0]);
-                        });
+                        prerequisites.classList.remove('dropdown-item');
+                        prerequisites.classList.add('nav-link');
+                        if ($prerequisitebnewtab) {
+                            prerequisites.setAttribute('target', '_blank');
+                        }
+                        parent = prerequisites.parentNode;
+                        parent.setAttribute('data-forceintomoremenu', 'false');
+                        secondarynav.insertBefore(parent, secondarynav.children[0]);
                     }
-                    var backmaincourse = document.querySelectorAll('.backmain-course');
+                    var backmaincourse = document.querySelectorAll('.backmain-course')[0];
                     if (backmaincourse) {
-                        backmaincourse.forEach((e) => {
-                            e.classList.remove('dropdown-item');
-                            e.classList.add('nav-link');
-                            parent = e.parentNode;
-                            parent.setAttribute('data-forceintomoremenu', 'false');
-                            secondarynav.insertBefore(parent, secondarynav.children[0]);
-                        });
+                        backmaincourse.classList.remove('dropdown-item');
+                        backmaincourse.classList.add('nav-link');
+                        parent = backmaincourse.parentNode;
+                        parent.setAttribute('data-forceintomoremenu', 'false');
+                        secondarynav.insertBefore(parent, secondarynav.children[0]);
                     }
                 }
                 MenuMore(secondarynav);
+                return true;
             });
         });
     ");
