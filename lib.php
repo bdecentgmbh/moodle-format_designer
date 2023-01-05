@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot. '/course/format/lib.php');
+require_once($CFG->dirroot . '/user/profile/lib.php');
 
 use core\output\inplace_editable;
 
@@ -398,6 +399,15 @@ class format_designer extends format_base {
                     'type' => PARAM_TEXT
                 ]
             ];
+            $userprofilefields = profile_get_user_fields_with_data(0);
+            if (!empty($userprofilefields)) {
+                foreach ($userprofilefields as $field) {
+                    $courseformatoptions[$field->inputname] = [
+                        'default' => 0,
+                        'type' => PARAM_INT
+                    ];
+                }
+            }
         }
         if (format_designer_has_pro()) {
             require_once($CFG->dirroot."/local/designer/lib.php");
@@ -622,6 +632,17 @@ class format_designer extends format_base {
                 'help' => 'displayheaderroleusers',
                 'help_component' => 'format_designer',
             ];
+            $userprofilefields = profile_get_user_fields_with_data(0);
+            if (!empty($userprofilefields)) {
+                foreach ($userprofilefields as $field) {
+                    $courseformatoptionsedit[$field->inputname] = [
+                        'label' => $field->field->name,
+                        'element_type' => 'advcheckbox',
+                        'help' => 'profilefieditem',
+                        'help_component' => 'format_designer',
+                    ];
+                }
+            }
             if (format_designer_has_pro()) {
                 require_once($CFG->dirroot."/local/designer/lib.php");
                 if (function_exists('local_designer_course_format_options_editlist')) {
@@ -1482,7 +1503,9 @@ function format_designer_show_staffs_header($course) {
                 $user = \core_user::get_user($userid);
                 $extrafields = profile_get_user_fields_with_data($userid);
                 foreach ($extrafields as $formfield) {
-                    $customfield[]['value'] = $formfield->data;
+                    if ($course->{$formfield->inputname}) {
+                        $customfield[]['value'] = $formfield->data;
+                    }
                 }
                 $roles = get_user_roles($coursecontext, $userid, false);
                 array_map(function($role) {

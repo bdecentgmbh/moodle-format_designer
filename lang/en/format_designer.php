@@ -318,3 +318,5 @@ $string['nogroupsfound'] = "No groups found";
 $string['addnewgroup'] = "Add new group";
 $string['nocourses'] = "No courses";
 $string['move_item'] = 'Move this course';
+$string['profilefieditem'] = '';
+$string['profilefieditem_help'] = "Display the user profile field in the course staff block.";
