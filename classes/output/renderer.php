@@ -845,7 +845,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         if (format_designer_has_pro()) {
             if ($mod->modname == 'videotime') {
                 if ($videorecord = $DB->get_record('videotime', array('id' => $mod->instance))) {
-                    if ($videorecord->label_mode == 2) {
+                    if (isset($videorecord->label_mod) && $videorecord->label_mode == 2) {
                         $useactivityimage = \format_designer\options::get_option($mod->id, 'useactivityimage');
                     }
                 }

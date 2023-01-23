@@ -862,6 +862,22 @@ class format_designer extends \core_courseformat\base {
      * @return array
      */
     public function section_format_options($foreditform = false) {
+        global $PAGE, $COURSE;
+        $sectionid = optional_param('id', 0, PARAM_INT);
+        if ($sectionid && $PAGE->pagetype == 'course-editsection') {
+            $sectionbackdraftid = 0;
+            $sectioncompletionbackdraftid = 0;
+            $coursecontext = \context_course::instance($COURSE->id);
+            $format = course_get_format($COURSE);
+            file_prepare_draft_area($sectionbackdraftid, $coursecontext->id, 'format_designer',
+                    'sectiondesignbackground', $sectionid, array('accepted_types' => 'images',
+                    'maxfiles' => 1));
+            file_prepare_draft_area($sectioncompletionbackdraftid, $coursecontext->id, 'format_designer',
+            'sectiondesigncompletionbackground', $sectionid, array('accepted_types' => 'images',
+            'maxfiles' => 1));
+            $format->set_section_option($sectionid, 'sectiondesignerbackgroundimage', $sectionbackdraftid);
+            $format->set_section_option($sectionid, 'sectiondesignercompletionbg', $sectioncompletionbackdraftid);
+        }
         return self::section_format_options_list($foreditform);
     }
 
@@ -1310,17 +1326,15 @@ function format_designer_get_pro_layouts() {
 function format_designer_get_section_background_image($section, $course, $modinfo) {
     if (!empty($section->sectiondesignerbackgroundimage)) {
         $coursecontext = context_course::instance($course->id);
-        $itemid = $section->sectiondesignerbackgroundimage;
+        $itemid = $section->id;
         $filearea = 'sectiondesignbackground';
         if (\format_designer\options::is_section_completed($section, $course, $modinfo, true)
             && (isset($section->sectiondesignerusecompletionbg) && $section->sectiondesignerusecompletionbg)) {
             $filearea = 'sectiondesigncompletionbackground';
-            $itemid = $section->sectiondesignercompletionbg;
         }
         $files = get_file_storage()->get_area_files(
             $coursecontext->id, 'format_designer', $filearea,
             $itemid, 'itemid, filepath, filename', false);
-
         if (empty($files)) {
             return '';
         }
@@ -1379,7 +1393,6 @@ function format_designer_include_prosettings($settings) {
         require_once($CFG->dirroot.'/local/designer_pro/setting.php');
     }
 }
-
 
 /**
  * Inject the designer elements into all moodle module settings forms.
@@ -1760,14 +1773,20 @@ function format_designer_extend_navigation_course($navigation, $course, $context
  * @return array reports
  */
 function format_designer_section_zero_tomake_hero($reports, $course) {
-    global $PAGE;
+    global $PAGE, $DB;
     $zerotohero = get_config('format_designer', 'sectionzeroactivities');
     if ($zerotohero) {
         $modinfo = get_fast_modinfo($course);
         foreach ($modinfo->sections[0] as $modnumber) {
-            if (isset($reports[$modnumber])) {
-                $reports[$modnumber]['heroactivity'] = 1;
-                $reports[$modnumber]['heroactivitypos'] = 0;
+            if ($DB->record_exists('course_modules', array('deletioninprogress' => 0, 'id' => $modnumber))) {
+                if (isset($reports[$modnumber])) {
+                    $reports[$modnumber]['heroactivity'] = 1;
+                    $reports[$modnumber]['heroactivitypos'] = get_config('format_designer', 'heroactivitypos');
+                } else {
+                    $reports[$modnumber]['heroactivity'] = 1;
+                    $reports[$modnumber]['heroactivitypos'] = get_config('format_designer', 'heroactivitypos');;
+                    $reports[$modnumber]['cmid'] = $modnumber;
+                }
             }
         }
     }
