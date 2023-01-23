@@ -1258,7 +1258,7 @@ class format_designer_renderer extends format_section_renderer_base {
         if (isset($options->useactivityimage)) {
             if ($mod->modname == 'videotime') {
                 if ($videorecord = $DB->get_record('videotime', array('id' => $mod->instance))) {
-                    if ($videorecord->label_mode == 2) {
+                    if (isset($videorecord->label_mode) && $videorecord->label_mode == 2) {
                         $useactivityimage = ($options->useactivityimage) ? $options->useactivityimage : false;
                     }
                 }

@@ -780,6 +780,22 @@ class format_designer extends format_base {
      * @return array
      */
     public function section_format_options($foreditform = false) {
+        global $PAGE, $COURSE;
+        $sectionid = optional_param('id', 0, PARAM_INT);
+        if ($sectionid && $PAGE->pagetype == 'course-editsection') {
+            $sectionbackdraftid = 0;
+            $sectioncompletionbackdraftid = 0;
+            $coursecontext = \context_course::instance($COURSE->id);
+            $format = course_get_format($COURSE);
+            file_prepare_draft_area($sectionbackdraftid, $coursecontext->id, 'format_designer',
+                    'sectiondesignbackground', $sectionid, array('accepted_types' => 'images',
+                    'maxfiles' => 1));
+            file_prepare_draft_area($sectioncompletionbackdraftid, $coursecontext->id, 'format_designer',
+            'sectiondesigncompletionbackground', $sectionid, array('accepted_types' => 'images',
+            'maxfiles' => 1));
+            $format->set_section_option($sectionid, 'sectiondesignerbackgroundimage', $sectionbackdraftid);
+            $format->set_section_option($sectionid, 'sectiondesignercompletionbg', $sectioncompletionbackdraftid);
+        }
         return self::section_format_options_list($foreditform);
     }
 
@@ -1286,17 +1302,15 @@ function format_designer_get_pro_layouts() {
 function format_designer_get_section_background_image($section, $course, $modinfo) {
     if (!empty($section->sectiondesignerbackgroundimage)) {
         $coursecontext = context_course::instance($course->id);
-        $itemid = $section->sectiondesignerbackgroundimage;
+        $itemid = $section->id;
         $filearea = 'sectiondesignbackground';
         if (\format_designer\options::is_section_completed($section, $course, $modinfo, true)
             && (isset($section->sectiondesignerusecompletionbg) && $section->sectiondesignerusecompletionbg)) {
             $filearea = 'sectiondesigncompletionbackground';
-            $itemid = $section->sectiondesignercompletionbg;
         }
         $files = get_file_storage()->get_area_files(
             $coursecontext->id, 'format_designer', $filearea,
             $itemid, 'itemid, filepath, filename', false);
-
         if (empty($files)) {
             return '';
         }
