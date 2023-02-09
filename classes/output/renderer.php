@@ -403,7 +403,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             'currentuser' => $USER->id,
             'ismessaging' => $CFG->messaging,
         ];
-        $courseprogress = $this->activity_progress($course, $USER->id);
+        $courseprogress = self::criteria_progress($course, $USER->id);
         $data['courseprogress'] = ($course->activityprogress) ? $courseprogress : '';
 
         if ($courseprogress != null) {
@@ -464,7 +464,7 @@ class renderer extends \core_courseformat\output\section_renderer {
      * @param int $userid
      * @return array Modules progress
      */
-    protected function activity_progress($course, $userid) {
+    public static function criteria_progress($course, $userid) {
         $completion = new \completion_info($course);
         // First, let's make sure completion is enabled.
         if (!$completion->is_enabled()) {
@@ -475,19 +475,32 @@ class renderer extends \core_courseformat\output\section_renderer {
         // Get the number of modules that support completion.
         $modules = $completion->get_activities();
         $completionactivities = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY);
+        $complteioncourses = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_COURSE);
 
-        $count = count($completionactivities);
+        $count = count($completionactivities) + count($complteioncourses);
         if (!$count) {
             return null;
         }
+
         // Get the number of modules that have been completed.
         $completed = 0;
-        foreach ($completionactivities as $activity) {
-            $cmid = $activity->moduleinstance;
+        if ($completionactivities) {
+            foreach ($completionactivities as $activity) {
+                $cmid = $activity->moduleinstance;
 
-            if (isset($modules[$cmid])) {
-                $data = $completion->get_data($modules[$cmid], true, $userid);
-                $completed += $data->completionstate == COMPLETION_INCOMPLETE ? 0 : 1;
+                if (isset($modules[$cmid])) {
+                    $data = $completion->get_data($modules[$cmid], true, $userid);
+                    $completed += $data->completionstate == COMPLETION_INCOMPLETE ? 0 : 1;
+                }
+            }
+        }
+        if ($complteioncourses) {
+            foreach ($complteioncourses as $coursecriteria) {
+                $courseid = $coursecriteria->courseinstance;
+                $completion = new \completion_info(get_course($courseid));
+                if ($completion->is_course_complete($userid)) {
+                    $completed += 1;
+                }
             }
         }
         $percent = ($completed / $count) * 100;
@@ -730,7 +743,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             'flowcourse' => isset($course->coursetype) && $course->coursetype == DESIGNER_TYPE_FLOW ? true : false,
             'maskimage' => (isset($section->sectiondesignermaskimage) && $section->sectiondesignermaskimage) ? true : false,
         ];
-        $zerotohero = get_config('format_designer', 'sectionzeroactivities');
+        $zerotohero = $course->sectionzeroactivities;
         if ($zerotohero == DESIGNER_HERO_ZERO_HIDE && $section->section == 0 && !$this->page->user_is_editing()) {
             $templatecontext['hidesection'] = true;
         }
@@ -801,7 +814,6 @@ class renderer extends \core_courseformat\output\section_renderer {
         if (!$mod->is_visible_on_course_page()) {
             return [];
         }
-
         $modclasses = 'activity ' . $mod->modname . ' modtype_' . $mod->modname . ' ' . $mod->extraclasses;
 
         // Add course type flow animation class.
@@ -953,6 +965,25 @@ class renderer extends \core_courseformat\output\section_renderer {
             $cmlist = array_merge($cmlist, $prodata);
         }
         return $cmlist;
+    }
+
+    /**
+     * Get the course index drawer with placeholder.
+     *
+     * The default course index is loaded after the page is ready. Format plugins can override
+     * this method to provide an alternative course index.
+     *
+     * If the format is not compatible with the course index, this method will return an empty string.
+     *
+     * @param course_format $format the course format
+     * @return String the course index HTML.
+     */
+    public function course_index_drawer(course_format $format): ?String {
+        if ($format->uses_course_index()) {
+            include_course_editor($format);
+            return $this->render_from_template('format_designer/courseformat/courseindex/drawer', []);
+        }
+        return '';
     }
 
     /**

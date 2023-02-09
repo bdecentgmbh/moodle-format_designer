@@ -870,6 +870,11 @@ ul li {
     width: 95%;
     display: inline-block;
 }
+.format-designer .designer .section.img-text.circles-layout .activity .activityinstance .inplaceeditable {
+    display: flex;
+    flex-direction: column;
+}
+
 /*v-4.0+*/
 .format-designer .designer  .section.img-text.list-layout .activity .activityinstance .inplaceeditable {
     display: flex;
@@ -1267,7 +1272,7 @@ ul li {
     color: rgb(59, 59, 59);
     text-decoration: none;
     text-indent: 0;
-    display: inline-block;
+    display: inline-flex;
 }
 /*v-4.0+*/
 .format-designer .designer .section .content .section li.activity.circle-layout .activityinstance .aalink {
@@ -1787,6 +1792,8 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     .format-designer.editing .designer .section .content .section.list-layout li.activity .activityinstance .aalink.quickeditlink,
     .format-designer.editing .designer .section .content .section.card-layout li.activity .activityinstance .aalink.quickeditlink {
         width: auto;
+        position: absolute;
+        right: 0;
     }
     .format-designer .designer .section.desktop-three-column .content .section.card-layout li.activity {
         width: 32%;
@@ -2657,7 +2664,9 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 .format-designer.editing .designer .section.img-text.horizontal-circles-layout li.horizontal_circles
 .activityinstance .inplaceeditable .activity-instance {
     width: 100%;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 .format-designer.editing .designer .section.img-text.horizontal-circles-layout li.horizontal_circles .activity-actions {
     right: 25px;

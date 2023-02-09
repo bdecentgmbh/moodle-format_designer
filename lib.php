@@ -432,6 +432,10 @@ class format_designer extends \core_courseformat\base {
                     'default' => 0,
                     'type' => PARAM_INT
                 ],
+                'secondarymenutocourse' => [
+                    'default' => 0,
+                    'type' => PARAM_INT
+                ],
                 'courseheader' => [
                     'default' => get_string('courseheader', 'format_designer'),
                     'type' => PARAM_TEXT,
@@ -469,7 +473,7 @@ class format_designer extends \core_courseformat\base {
                 'coursestaff' => [
                     'default' => $teacher->id,
                     'type' => PARAM_TEXT
-                ]
+                ],
             ];
             $userprofilefields = profile_get_user_fields_with_data(0);
             if (!empty($userprofilefields)) {
@@ -480,6 +484,23 @@ class format_designer extends \core_courseformat\base {
                     ];
                 }
             }
+
+            $courseformatoptions['courseheroactivityheader'] = [
+                'default' => get_string('heroactivity', 'format_designer'),
+                'type' => PARAM_TEXT,
+            ];
+            $courseformatoptions['sectionzeroactivities'] = [
+                'default' => 0,
+                'type' => PARAM_INT,
+            ];
+            $courseformatoptions['heroactivity'] = [
+                'default' => 0,
+                'type' => PARAM_INT,
+            ];
+            $courseformatoptions['heroactivitypos'] = [
+                'default' => 0,
+                'type' => PARAM_INT,
+            ];
         }
         if (format_designer_has_pro()) {
             require_once($CFG->dirroot."/local/designer/lib.php");
@@ -651,6 +672,12 @@ class format_designer extends \core_courseformat\base {
                     ],
                     'help' => 'courseindex',
                     'help_component' => 'format_designer',
+                ],
+                'secondarymenutocourse' => [
+                    'label' => new lang_string('strsecondarymenutocourse', 'format_designer'),
+                    'element_type' => 'advcheckbox',
+                    'help' => 'strsecondarymenutocourse',
+                    'help_component' => 'format_designer',
                 ]
             ];
             if (format_designer_popup_installed()) {
@@ -726,6 +753,48 @@ class format_designer extends \core_courseformat\base {
                     ];
                 }
             }
+
+            $courseformatoptionsedit['courseheroactivityheader'] = [
+                'label' => new lang_string('heroactivity', 'format_designer'),
+                'element_type' => 'header',
+            ];
+
+            $courseformatoptionsedit['sectionzeroactivities'] = [
+                'label' => new lang_string('sectionzeroactivities', 'format_designer'),
+                'element_type' => 'select',
+                'element_attributes' => [
+                    [
+                        0 => new lang_string('disabled', 'format_designer'),
+                        1 => new lang_string('makeherohide', 'format_designer'),
+                        2 => new lang_string('makeherovisible', 'format_designer'),
+                    ],
+                ],
+                'help' => 'sectionzeroactivities',
+                'help_component' => 'format_designer',
+            ];
+
+            $courseformatoptionsedit['heroactivity'] = [
+                'label' => new lang_string('showastab', 'format_designer'),
+                'element_type' => 'select',
+                'element_attributes' => [
+                    [
+                        0 => new lang_string('disabled', 'format_designer'),
+                        1 => new lang_string('everywhere', 'format_designer'),
+                        2 => new lang_string('onlycoursepage', 'format_designer')
+                    ],
+                ],
+                'help' => 'sectionzeroactivities',
+                'help_component' => 'format_designer',
+            ];
+            $posrange = array_combine(range(-10, 10), range(-10, 10));
+            $courseformatoptionsedit['heroactivitypos'] = [
+                'label' => new lang_string('order'),
+                'element_type' => 'select',
+                'element_attributes' => [$posrange],
+                'help' => 'sectionzeroactivities',
+                'help_component' => 'format_designer',
+            ];
+
             if (format_designer_has_pro()) {
                 require_once($CFG->dirroot."/local/designer/lib.php");
                 if (function_exists('local_designer_course_format_options_editlist')) {
@@ -1220,6 +1289,25 @@ class format_designer extends \core_courseformat\base {
     }
 
     /**
+     * Get course module secondary navigation title.
+     * @param object $cm
+     * @return string title.
+     */
+    public function get_cm_secondary_title($cm) {
+        $secondarytitletype = \format_designer\options::get_option($cm->id, 'secondarytype');
+        $title = '';
+        if ($secondarytitletype == 'activitytitle') {
+            $title = $cm->name;
+        } else if ($secondarytitletype == 'activitytype') {
+            $title = get_string('modulename', $cm->modname);
+        } else {
+            // Custom title.
+            $title = \format_designer\options::get_option($cm->id, 'secondarycustomtitle');
+        }
+        return !empty($title) ? $title : $cm->name;
+    }
+
+    /**
      * Get all options for section.
      *
      * @param int $sectionid
@@ -1442,6 +1530,46 @@ function format_designer_coursemodule_standard_elements($formwrapper, $mform) {
         if (format_designer_has_pro()) {
             local_designer_coursemodule_standard_element($formwrapper, $mform);
         }
+
+        // Secondary menu.
+        $mform->addElement('html',  get_string('secondarymenu', 'format_designer'));
+        $types = [
+            'activitytitle' => get_string('stractivitytitle', 'format_designer'),
+            'activitytype' => get_string('stractivitytype', 'format_designer'),
+            'custom' => get_string('strcustom', 'format_designer'),
+        ];
+        $mform->addElement('select', 'designer_secondarytype', get_string('secondarymeu_title', 'format_designer'), $types);
+        $mform->setType('designer_secondarytype', PARAM_TEXT);
+        if (isset($design->secondarytype)) {
+            $mform->setDefault('designer_secondarytype', $design->secondarytype);
+        }
+
+        $mform->addElement('text', 'designer_secondarycustomtitle', get_string('strcustomtitle', 'format_designer'));
+        $mform->setType('designer_secondarycustomtitle', PARAM_TEXT);
+        if (isset($design->secondarycustomtitle)) {
+            $mform->setDefault('designer_secondarycustomtitle', $design->secondarycustomtitle);
+        }
+        $mform->hideIf('designer_secondarycustomtitle', 'designer_secondarytype', 'eq', 'activitytitle');
+        $mform->hideIf('designer_secondarycustomtitle', 'designer_secondarytype', 'eq', 'activitytype');
+
+        $mform->addElement('advcheckbox', 'designer_customtitleusecourseindex',
+            get_string('customnameincourseindex', 'format_designer'));
+        $mform->setType('designer_customtitleusecourseindex', PARAM_INT);
+        if (isset($design->customtitleusecourseindex)) {
+            $mform->setDefault('designer_customtitleusecourseindex', $design->customtitleusecourseindex);
+        }
+        $mform->hideIf('designer_customtitleusecourseindex', 'designer_secondarytype', 'eq', 'activitytitle');
+        $mform->hideIf('designer_customtitleusecourseindex', 'designer_secondarytype', 'eq', 'activitytype');
+
+        $mform->addElement('advcheckbox', 'designer_customtitleuseactivityitem',
+            get_string('customnameinactivityitem', 'format_designer'));
+        $mform->setType('designer_customtitleuseactivityitem', PARAM_INT);
+        if (isset($design->customtitleuseactivityitem)) {
+            $mform->setDefault('designer_customtitleuseactivityitem', $design->customtitleuseactivityitem);
+        }
+        $mform->hideIf('designer_customtitleuseactivityitem', 'designer_secondarytype', 'eq', 'activitytitle');
+        $mform->hideIf('designer_customtitleuseactivityitem', 'designer_secondarytype', 'eq', 'activitytype');
+
         // Show tab.
         $tabs = [
             0 => get_string('disabled', 'format_designer'),
@@ -1478,8 +1606,12 @@ function format_designer_coursemodule_edit_post_actions($data, $course) {
     if ($course->format == 'designer') {
         $fields = [
             'designer_activityelements',
+            'designer_secondarytype',
+            'designer_secondarycustomtitle',
+            'designer_customtitleusecourseindex',
+            'designer_customtitleuseactivityitem',
             'designer_heroactivity',
-            'designer_heroactivitypos'
+            'designer_heroactivitypos',
         ];
         foreach ($fields as $field) {
             if (!isset($data->$field)) {
@@ -1592,10 +1724,25 @@ function format_designer_popup_installed() {
  * @param stdClass $context The context of the course
  */
 function format_designer_extend_navigation_course($navigation, $course, $context) {
-    global $DB, $PAGE;
+    global $DB, $PAGE, $COURSE;
+
     if ($course->format != 'designer') {
         return;
     }
+
+    $format = course_get_format($COURSE);
+    $course = $format->get_course();
+
+    // Add the course menu opition for all course pages.
+    $secondarymenutocoursecontent = '';
+    if ($course->secondarymenutocourse) {
+        $secondarymenutocoursecontent .= html_writer::start_tag("li", array("data-key" => 'designercoursehome',
+        "class" => "nav-item", "role" => "none", "data-forceintomoremenu" => "true"));
+        $secondarymenutocoursecontent .= html_writer::link(new moodle_url('/course/view.php', ['id' => $course->id]),
+        get_string('course'), array('role' => 'menuitem', 'class' => 'designercoursehome', "tabindex" => "-1"));
+        $secondarymenutocoursecontent .= html_writer::end_tag("li");
+    }
+
     $sql = "SELECT fd.* FROM
         {format_designer_options} fd
         JOIN {course_modules} cm ON fd.cmid = cm.id
@@ -1629,27 +1776,35 @@ function format_designer_extend_navigation_course($navigation, $course, $context
             return $a['heroactivitypos'] - $b['heroactivitypos'];
         });
     }
+
     $content = '';
     $modulecontent = false;
+    $ishidecurrentcmid = false;
+    $heroactivityduplicate = get_config("format_designer", "avoidduplicate_heromodentry");
     if ($reports) {
         $reports = array_merge($neg, $pos);
+
         foreach ($reports as $report) {
             if ($report['heroactivity']) {
                 $cm = get_coursemodule_from_id('', $report['cmid']);
                 $modurl = new moodle_url("/mod/$cm->modname/view.php", array('id' => $cm->id));
                 $nodepos = $report['heroactivitypos'];
+                $cmtitle = $format->get_cm_secondary_title($cm);
                 if ($PAGE->context->contextlevel == CONTEXT_MODULE) {
                     if ($report['heroactivity'] == DESIGNER_HERO_ACTVITIY_EVERYWHERE) {
+                        if ($cm->id == $PAGE->cm->id && $heroactivityduplicate) {
+                            $ishidecurrentcmid = true;
+                        }
                         $content .= html_writer::start_tag("li", array("data-key" => $cm->id, "class" => "nav-item",
                             "role" => "none", "data-forceintomoremenu" => "true"));
                         $linkclass = "designer-hero-activity position_$nodepos dropdown-item";
-                        $content .= html_writer::link($modurl, $cm->name, array('role' => 'menuitem', 'class' => $linkclass,
-                            "tabindex" => "-1", "data-mod" => $cm->name));
+                        $content .= html_writer::link($modurl, $cmtitle, array('role' => 'menuitem', 'class' => $linkclass,
+                            "tabindex" => "-1", "data-mod" => $cm->name, "data-cm" => $cm->id));
                         $content .= html_writer::end_tag("li");
                         $modulecontent = true;
                     }
                 } else {
-                    $node = $navigation->create($cm->name, $modurl, navigation_node::TYPE_SETTING, $cm->name, $cm->id);
+                    $node = $navigation->create($cmtitle, $modurl, navigation_node::TYPE_SETTING, $cm->name, $cm->id);
                     $node->add_class('designer-hero-activity');
                     $node->add_class("position_$nodepos");
                     $navigation->add_node($node);
@@ -1666,13 +1821,22 @@ function format_designer_extend_navigation_course($navigation, $course, $context
         $designerpro = true;
     }
 
+    $currentmodclass = ($PAGE->context->contextlevel == CONTEXT_MODULE) ? "nav.moremenu li[data-key=\"{$PAGE->cm->id}\"]" : "";
+    $currentcmid = ($PAGE->context->contextlevel == CONTEXT_MODULE) ? $PAGE->cm->id : 0;
     $PAGE->requires->js_amd_inline("
         require(['jquery', 'core/moremenu'], function($, MenuMore) {
+            var moremenu = document.querySelector('.secondary-navigation ul.nav-tabs .dropdownmoremenu ul');
             $(document).ready(function() {
+
                 if ('$modulecontent') {
-                    var moremenu = document.querySelector('.secondary-navigation ul.nav-tabs .dropdownmoremenu ul');
                     if (moremenu) {
                         $(moremenu).append('$content');
+                    }
+                }
+                var coursehome = document.querySelectorAll('nav.moremenu li[data-key=coursehome]')[0];
+                if ('$secondarymenutocoursecontent' && !coursehome) {
+                    if (moremenu) {
+                        $(moremenu).append('$secondarymenutocoursecontent');
                     }
                 }
                 var secondarynav = document.querySelector('.secondary-navigation ul.nav-tabs');
@@ -1680,6 +1844,17 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                 if (secondarynav == undefined) {
                     return false;
                 }
+
+
+                function checkPosition(element, pos) {
+                    if ($(element.children).hasClass('designer-hero-activity')) {
+                        pos += 1;
+                        return checkPosition(secondarynav.children[pos], pos);
+                    } else {
+                        return pos;
+                    }
+                }
+
                 var heroActivity = document.querySelectorAll('.secondary-navigation .designer-hero-activity');
                 var i = 0;
                 var baseTab = document.querySelectorAll('.secondary-navigation ul.nav-tabs li')[0];
@@ -1688,6 +1863,7 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                 }
                 var dropdownmenu = document.querySelectorAll('.secondary-navigation .dropdownmoremenu .nav-item');
                 var morebutton = document.querySelector('.secondary-navigation .nav li[data-region=morebutton]');
+
                 // Remove the dropdown menu and push to the all elements in the outer nav item.
                 if (heroActivity.length && dropdownmenu) {
                     dropdownmenu.forEach((e) => {
@@ -1699,6 +1875,8 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                     });
                     $('.secondary-navigation .dropdownmoremenu .nav-item').remove();
                 }
+
+
                 // Check the hero activity or not to change the position.
                 if (heroActivity) {
                     heroActivity.forEach((e) => {
@@ -1721,6 +1899,7 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                         } else {
                             pos += i;
                         }
+                        pos = checkPosition(secondarynav.children[pos], pos);
                         // Insert the heroactivity to current position.
                         if (secondarynav.children[pos] !== undefined) {
                             secondarynav.insertBefore(parent, secondarynav.children[pos]);
@@ -1733,6 +1912,25 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                         i = nodes.indexOf(baseHandler);
                     });
                 }
+
+                // Remove the dupilcate entry.
+                var modulepage = document.querySelectorAll('nav.moremenu li[data-key=modulepage]')[0];
+                if ('$heroactivityduplicate' && modulepage) {
+                    let moduleurl = modulepage.children[0].getAttribute('href');
+                    let paramString = moduleurl.split('?')[1];
+                    let moduleurlparams = new URLSearchParams(paramString);
+                    let cmid = moduleurlparams.get('id');
+                    if (cmid == '$currentcmid' && '$ishidecurrentcmid') {
+                        console.log('inner');
+                        isActive = modulepage.children[0].classList.contains('active');
+                        modulepage.remove();
+                        var currentdesignermod = document.querySelectorAll('$currentmodclass')[0];
+                        if (currentdesignermod && isActive) {
+                            $(currentdesignermod).find('.nav-link').addClass('active');
+                        }
+                    }
+                }
+
                 // Insert the prerequisite course link to secondary nav.
                 if ($designerpro) {
                     var prerequisites = document.querySelectorAll('.prerequisites-course')[0];
@@ -1746,7 +1944,7 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                         if ($prerequisitebnewtab) {
                             prerequisites.setAttribute('target', '_blank');
                         }
-                        parent = prerequisites.parentNode;
+                        let parent = prerequisites.parentNode;
                         parent.setAttribute('data-forceintomoremenu', 'false');
                         secondarynav.insertBefore(parent, secondarynav.children[0]);
                     }
@@ -1754,11 +1952,21 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                     if (backmaincourse) {
                         backmaincourse.classList.remove('dropdown-item');
                         backmaincourse.classList.add('nav-link');
-                        parent = backmaincourse.parentNode;
+                        let parent = backmaincourse.parentNode;
                         parent.setAttribute('data-forceintomoremenu', 'false');
                         secondarynav.insertBefore(parent, secondarynav.children[0]);
                     }
                 }
+
+                var designercoursehome = document.querySelectorAll('.moremenu .designercoursehome')[0];
+                if (designercoursehome) {
+                        designercoursehome.classList.remove('dropdown-item');
+                        designercoursehome.classList.add('nav-link');
+                        let parent = designercoursehome.parentNode;
+                        parent.setAttribute('data-forceintomoremenu', 'false');
+                        secondarynav.insertBefore(parent, secondarynav.children[0]);
+                }
+
                 MenuMore(secondarynav);
                 return true;
             });
@@ -1774,17 +1982,19 @@ function format_designer_extend_navigation_course($navigation, $course, $context
  */
 function format_designer_section_zero_tomake_hero($reports, $course) {
     global $PAGE, $DB;
-    $zerotohero = get_config('format_designer', 'sectionzeroactivities');
-    if ($zerotohero) {
+    $course = course_get_format($course->id)->get_course();
+    if ($course->sectionzeroactivities) {
         $modinfo = get_fast_modinfo($course);
         foreach ($modinfo->sections[0] as $modnumber) {
             if ($DB->record_exists('course_modules', array('deletioninprogress' => 0, 'id' => $modnumber))) {
-                if (isset($reports[$modnumber])) {
-                    $reports[$modnumber]['heroactivity'] = 1;
-                    $reports[$modnumber]['heroactivitypos'] = get_config('format_designer', 'heroactivitypos');
-                } else {
-                    $reports[$modnumber]['heroactivity'] = 1;
-                    $reports[$modnumber]['heroactivitypos'] = get_config('format_designer', 'heroactivitypos');;
+                if (isset($reports[$modnumber]) && !$reports[$modnumber]['heroactivity']) {
+                    $reports[$modnumber]['heroactivity'] = ($course->heroactivity == DESIGNER_HERO_ACTVITIY_COURSEPAGE
+                        && isset($PAGE->cm->id)) ? 0 : ($course->heroactivity == true);
+                    $reports[$modnumber]['heroactivitypos'] = $course->heroactivitypos;
+                } else if (!isset($reports[$modnumber])) {
+                    $reports[$modnumber]['heroactivity'] = ($course->heroactivity == DESIGNER_HERO_ACTVITIY_COURSEPAGE
+                        && isset($PAGE->cm->id)) ? 0 : ($course->heroactivity == true);
+                    $reports[$modnumber]['heroactivitypos'] = $course->heroactivitypos;
                     $reports[$modnumber]['cmid'] = $modnumber;
                 }
             }

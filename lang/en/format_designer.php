@@ -197,8 +197,8 @@ $string['coursecompletiondate_help'] = 'Student date of course completion displa
 $string['courseduedate'] = 'Course due date';
 $string['courseduedate_help'] = 'Course due date will shown in course timesection,
 it only works when Learning tools and time management tool will be installed and enabled';
-$string['activityprogress'] = 'Activity progress';
-$string['activityprogress_help'] = 'Activities completion progress.';
+$string['activityprogress'] = 'Progress bar';
+$string['activityprogress_help'] = 'The progress bar displays how many activities and prerequisites the student has already completed visually. A tooltip is provided to list the activities and prerequisites that are still "to do" and those that are already "completed"';
 
 $string['activity:icon'] = 'Activity icon';
 $string['activity:visits'] = 'Activity visits';
@@ -238,7 +238,7 @@ $string['coursestartdate'] = 'Course start date';
 $string['courseduedate'] = 'Course due date';
 $string['coursecompletiondate'] = 'Course completion date';
 $string['courseexpirationdate'] = 'Course expiration date';
-$string['activitiescompleted'] = '{$a->completed} of {$a->count} activities completed';
+$string['criteriacompleted'] = '{$a->completed} of {$a->count} criteria completed';
 $string['todaydue'] = '{$a->due} due today';
 $string['overdues'] = '{$a->overdues} overdues';
 
@@ -338,3 +338,17 @@ $string['move_item'] = 'Move this course';
 $string['profilefieditem'] = '';
 $string['profilefieditem_help'] = "Display the user profile field in the course staff block.";
 $string['strcompleted'] = "Completed";
+
+$string['sectionzeroactivities_help'] = "";
+$string['heroactivitypos'] = "";
+$string['stravoidduplicateentry'] = "Avoid duplicate entry";
+$string['stractivitytype'] = 'Activity type';
+$string['stractivitytitle'] = "Activity title";
+$string['strcustom'] = "Custom";
+$string['secondarymeu_title'] = "Secondary menu title";
+$string['secondarymenu'] = '<h5 class="font-weight-normal font-italic pt-2 pb-2" > Secondary menu </h5>';
+$string['strcustomtitle'] = "Custom title";
+$string['customnameincourseindex'] = "Use custom name in course index";
+$string['customnameinactivityitem'] = "Use custom name on course/section pages";
+$string['strsecondarymenutocourse'] = "Add course to secondary menu item on all course pages";
+$string['strsecondarymenutocourse_help'] = "If checked, a link to the course is added on all pages in the course to the secondary navigation";
