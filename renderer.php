@@ -507,7 +507,7 @@ class format_designer_renderer extends format_section_renderer_base {
             'currentuser' => $USER->id,
             'ismessaging' => $CFG->messaging,
         ];
-        $courseprogress = $this->activity_progress($course, $USER->id);
+        $courseprogress = self::criteria_progress($course, $USER->id);
         if ($courseprogress != null) {
             $sql = "SELECT * FROM {course_completions}
                 WHERE course = :course AND userid = :userid AND timecompleted IS NOT NULL";
@@ -567,7 +567,7 @@ class format_designer_renderer extends format_section_renderer_base {
      * @param int $userid
      * @return array Modules progress
      */
-    protected function activity_progress($course, $userid) {
+    public static function criteria_progress($course, $userid) {
         $completion = new \completion_info($course);
         // First, let's make sure completion is enabled.
         if (!$completion->is_enabled()) {
@@ -578,19 +578,31 @@ class format_designer_renderer extends format_section_renderer_base {
         // Get the number of modules that support completion.
         $modules = $completion->get_activities();
         $completionactivities = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY);
-
-        $count = count($completionactivities);
+        $complteioncourses = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_COURSE);
+        $count = count($completionactivities) + count($complteioncourses);
         if (!$count) {
             return null;
         }
         // Get the number of modules that have been completed.
         $completed = 0;
-        foreach ($completionactivities as $activity) {
-            $cmid = $activity->moduleinstance;
+        if ($completionactivities) {
+            foreach ($completionactivities as $activity) {
+                $cmid = $activity->moduleinstance;
 
-            if (isset($modules[$cmid])) {
-                $data = $completion->get_data($modules[$cmid], true, $userid);
-                $completed += $data->completionstate == COMPLETION_INCOMPLETE ? 0 : 1;
+                if (isset($modules[$cmid])) {
+                    $data = $completion->get_data($modules[$cmid], true, $userid);
+                    $completed += $data->completionstate == COMPLETION_INCOMPLETE ? 0 : 1;
+                }
+            }
+        }
+
+        if ($complteioncourses) {
+            foreach ($complteioncourses as $coursecriteria) {
+                $courseid = $coursecriteria->courseinstance;
+                $completion = new \completion_info(get_course($courseid));
+                if ($completion->is_course_complete($userid)) {
+                    $completed += 1;
+                }
             }
         }
         $percent = ($completed / $count) * 100;

@@ -197,8 +197,8 @@ $string['coursecompletiondate_help'] = 'Student date of course completion displa
 $string['courseduedate'] = 'Course due date';
 $string['courseduedate_help'] = 'Course due date will shown in course timesection,
 it only works when Learning tools and time management tool will be installed and enabled';
-$string['activityprogress'] = 'Activity progress';
-$string['activityprogress_help'] = 'Activities completion progress.';
+$string['activityprogress'] = 'Progress bar';
+$string['activityprogress_help'] = 'The progress bar displays how many activities and prerequisites the student has already completed visually. A tooltip is provided to list the activities and prerequisites that are still "to do" and those that are already "completed"';
 
 $string['activity:icon'] = 'Activity icon';
 $string['activity:visits'] = 'Activity visits';
@@ -238,7 +238,7 @@ $string['coursestartdate'] = 'Course start date';
 $string['courseduedate'] = 'Course due date';
 $string['coursecompletiondate'] = 'Course completion date';
 $string['courseexpirationdate'] = 'Course expiration date';
-$string['activitiescompleted'] = '{$a->completed} of {$a->count} activities completed';
+$string['criteriacompleted'] = '{$a->completed} of {$a->count} criteria completed';
 $string['todaydue'] = '{$a->due} due today';
 $string['overdues'] = '{$a->overdues} overdues';
 
