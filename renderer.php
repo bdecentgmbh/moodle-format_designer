@@ -518,6 +518,7 @@ class format_designer_renderer extends format_section_renderer_base {
                 'courseprogress' => ($course->activityprogress) ? $courseprogress : '',
             ];
         }
+        $data['progresshelpicon'] = $this->output->help_icon('criteriaprogressinfo', 'format_designer');
         // Find the course due date. only if the timemanagement installed.
         if (format_designer_timemanagement_installed() && function_exists('ltool_timemanagement_cal_course_duedate')) {
             $coursedatesinfo = $DB->get_record('ltool_timemanagement_course', array('course' => $course->id));
@@ -574,15 +575,19 @@ class format_designer_renderer extends format_section_renderer_base {
             return null;
         }
         $result = [];
+        $completedcriteria = [];
+        $uncompletedcriteria = [];
 
         // Get the number of modules that support completion.
         $modules = $completion->get_activities();
         $completionactivities = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY);
         $complteioncourses = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_COURSE);
+
         $count = count($completionactivities) + count($complteioncourses);
         if (!$count) {
             return null;
         }
+
         // Get the number of modules that have been completed.
         $completed = 0;
         if ($completionactivities) {
@@ -591,7 +596,16 @@ class format_designer_renderer extends format_section_renderer_base {
 
                 if (isset($modules[$cmid])) {
                     $data = $completion->get_data($modules[$cmid], true, $userid);
-                    $completed += $data->completionstate == COMPLETION_INCOMPLETE ? 0 : 1;
+                    $completed += ($data->completionstate == COMPLETION_COMPLETE ||
+                        $data->completionstate == COMPLETION_COMPLETE_PASS) ? 1 : 0;
+                    $modtooltiplink = html_writer::link($modules[$cmid]->url,
+                        get_string('stractivity', 'format_designer') . " ". $modules[$cmid]->name);
+                    if ($data->completionstate == COMPLETION_COMPLETE ||
+                            $data->completionstate == COMPLETION_COMPLETE_PASS) {
+                        $completedcriteria[] = $modtooltiplink;
+                    } else {
+                        $uncompletedcriteria[] = $modtooltiplink;
+                    }
                 }
             }
         }
@@ -599,15 +613,53 @@ class format_designer_renderer extends format_section_renderer_base {
         if ($complteioncourses) {
             foreach ($complteioncourses as $coursecriteria) {
                 $courseid = $coursecriteria->courseinstance;
-                $completion = new \completion_info(get_course($courseid));
+                $course = get_course($courseid);
+                $completion = new \completion_info($course);
+                $coursetooltiplink = html_writer::link(new moodle_url('/course/view.php',
+                    ['id' => $course->id]), $course->fullname);
                 if ($completion->is_course_complete($userid)) {
                     $completed += 1;
+                    $completedcriteria[] = $coursetooltiplink;
+                } else {
+                    $uncompletedcriteria[] = $coursetooltiplink;
                 }
             }
         }
-        $percent = ($completed / $count) * 100;
 
-        return ['count' => $count, 'completed' => $completed, 'percent' => $percent] + $result;
+        $percent = ($completed / $count) * 100;
+        $completioncriteriahtml = '';
+        $uncompletioncriteriahtml = '';
+        if (!empty($completedcriteria)) {
+            $completioncriteriahtml = html_writer::start_div('completion-criteria-toolblock designer-criteria-tooltip');
+                $completioncriteriahtml .= html_writer::start_div('head-block');
+                    $completioncriteriahtml .= get_string('struppercompleted', 'format_designer');
+                $completioncriteriahtml .= html_writer::end_div();
+                $completioncriteriahtml .= html_writer::start_div('info-block');
+                $completioncriteriahtml .= implode("<br>", $completedcriteria);
+                $completioncriteriahtml .= html_writer::end_div();
+
+            $completioncriteriahtml .= html_writer::end_div();
+        }
+
+        if (!empty($uncompletedcriteria)) {
+            $uncompletioncriteriahtml = html_writer::start_div('uncompletion-criteria-toolblock designer-criteria-tooltip');
+            $uncompletioncriteriahtml .= html_writer::start_div('head-block');
+                $uncompletioncriteriahtml .= get_string('strtodo', 'format_designer');
+            $uncompletioncriteriahtml .= html_writer::end_div();
+            $uncompletioncriteriahtml .= html_writer::start_div('info-block');
+                $uncompletioncriteriahtml .= implode("<br>", $uncompletedcriteria);
+            $uncompletioncriteriahtml .= html_writer::end_div();
+            $uncompletioncriteriahtml .= html_writer::end_div();
+        }
+
+        return [
+            'count' => $count,
+            'completed' => $completed,
+            'percent' => $percent,
+            'remain' => 100 - $percent,
+            'completioncriteriahtml' => $completioncriteriahtml,
+            'uncompletioncriteriahtml' => $uncompletioncriteriahtml
+        ];
     }
 
     /**

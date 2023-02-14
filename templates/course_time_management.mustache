@@ -138,13 +138,22 @@
     <div class="clearfix"></div>
     {{#courseprogress}}
     <div class="progress-block">
+
         <div class="progress">
-            <div class="progress-bar" role="progressbar" style="width: {{courseprogress.percent}}%" 
-                aria-valuenow="{{courseprogress.percent}}" aria-valuemin="0" aria-valuemax="100"></div>
+            <div class="progress-bar success" role="progressbar" style="width: {{courseprogress.percent}}%" aria-valuenow="{{courseprogress.percent}}"
+                aria-valuemin="0" aria-valuemax="100" data-toggle="popover" data-content="{{courseprogress.completioncriteriahtml}}"
+                data-animation="true" data-placement="bottom" data-html="true">
+            </div>
+            <div class="progress-bar bg-remain-block" role="progressbar" style="width: {{courseprogress.remain}}%" aria-valuenow="{{courseprogress.remain}}"
+                aria-valuemin="0" aria-valuemax="100" data-toggle="popover" data-content="{{courseprogress.uncompletioncriteriahtml}}"
+                data-animation="true" data-placement="bottom" data-html="true">
+            </div>
         </div>
 
         <div class="activity-completed-block">
-            <p> {{#str}} criteriacompleted, format_designer, { "count": {{courseprogress.count}}, "completed": {{courseprogress.completed}} } {{/str}}
+            <p>
+                {{#str}} criteriacompleted, format_designer, { "count": {{courseprogress.count}}, "completed": {{courseprogress.completed}} } {{/str}}
+                {{{progresshelpicon}}}
             </p>
         </div>
         {{#due}}

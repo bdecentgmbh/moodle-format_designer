@@ -259,6 +259,7 @@ $string['generalsettings'] = 'General designer settings';
 
 $string['coursesettings'] = 'Course';
 $string['sectionsettings'] = 'Section';
+$string['stractivity'] = 'Activity';
 $string['activitysettings'] = 'Activity';
 $string['courseheader'] = 'Course header';
 $string['popupactivitiesnotinstalled'] = 'Popup format must be installed in order to display the activities in popup.';
@@ -321,3 +322,16 @@ $string['move_item'] = 'Move this course';
 $string['profilefieditem'] = '';
 $string['profilefieditem_help'] = "Display the user profile field in the course staff block.";
 $string['strcompleted'] = "Completed";
+$string['heroactivity_help'] = 'Designer gives teachers the option to make specific activities a "Hero activity". Hero activities are added to
+    the secondary navigation in order to make them easily accessible for students.';
+$string['sectionzeroactivities_help'] = "This setting determines wether activities in the general section should automatically become hero activities.
+    Designer can automatically hide the general section when editing is turned off. This is useful if you want students to access the activities in the general section only from the secondary navigation. This setting works as a default and can be overridden in the activity settings.";
+$string['showastab_help'] = "Use this setting to configure on which pages the menu items for the hero activities should be added to the secondary navigation menu. You can either have them displayed throughout the course or on the course main page.
+    This setting works as a default and can be overridden in the activity settings.";
+$string['heroactivitypos_help'] = "This setting gives you control over the order of the menu items in the secondary navigation menu. Menu items with negative values are added before the course menu item, menu items with positive values are added afterwards. Usually, it makes more sense to use positive numbers.
+    This setting works as a default and can be overridden in the activity settings.";
+$string['struppercompleted'] = "COMPLETED";
+$string['strtodo'] = "TODO";
+
+$string['criteriaprogressinfo_help'] = 'Tip: Click on the progress bar above to see which activities/prerequisites you have already completed and which are not completed yet.';
+$string['criteriaprogressinfo'] = 'Criteria progress bar info';
