@@ -405,7 +405,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         ];
         $courseprogress = self::criteria_progress($course, $USER->id);
         $data['courseprogress'] = ($course->activityprogress) ? $courseprogress : '';
-
+        $data['progresshelpicon'] = $this->output->help_icon('criteriaprogressinfo', 'format_designer');
         if ($courseprogress != null) {
             $sql = "SELECT * FROM {course_completions}
                 WHERE course = :course AND userid = :userid AND timecompleted IS NOT NULL";
@@ -471,6 +471,8 @@ class renderer extends \core_courseformat\output\section_renderer {
             return null;
         }
         $result = [];
+        $completedcriteria = [];
+        $uncompletedcriteria = [];
 
         // Get the number of modules that support completion.
         $modules = $completion->get_activities();
@@ -490,22 +492,70 @@ class renderer extends \core_courseformat\output\section_renderer {
 
                 if (isset($modules[$cmid])) {
                     $data = $completion->get_data($modules[$cmid], true, $userid);
-                    $completed += $data->completionstate == COMPLETION_INCOMPLETE ? 0 : 1;
+                    $completed += ($data->completionstate == COMPLETION_COMPLETE ||
+                        $data->completionstate == COMPLETION_COMPLETE_PASS) ? 1 : 0;
+                    $modtooltiplink = html_writer::link($modules[$cmid]->url,
+                        get_string('stractivity', 'format_designer') . " ". $modules[$cmid]->name);
+                    if ($data->completionstate == COMPLETION_COMPLETE ||
+                            $data->completionstate == COMPLETION_COMPLETE_PASS) {
+                        $completedcriteria[] = $modtooltiplink;
+                    } else {
+                        $uncompletedcriteria[] = $modtooltiplink;
+                    }
                 }
             }
         }
+
         if ($complteioncourses) {
             foreach ($complteioncourses as $coursecriteria) {
                 $courseid = $coursecriteria->courseinstance;
-                $completion = new \completion_info(get_course($courseid));
+                $course = get_course($courseid);
+                $completion = new \completion_info($course);
+                $coursetooltiplink = html_writer::link(new moodle_url('/course/view.php',
+                    ['id' => $course->id]), $course->fullname);
                 if ($completion->is_course_complete($userid)) {
                     $completed += 1;
+                    $completedcriteria[] = $coursetooltiplink;
+                } else {
+                    $uncompletedcriteria[] = $coursetooltiplink;
                 }
             }
         }
-        $percent = ($completed / $count) * 100;
 
-        return ['count' => $count, 'completed' => $completed, 'percent' => $percent] + $result;
+        $percent = ($completed / $count) * 100;
+        $completioncriteriahtml = '';
+        $uncompletioncriteriahtml = '';
+        if (!empty($completedcriteria)) {
+            $completioncriteriahtml = html_writer::start_div('completion-criteria-toolblock designer-criteria-tooltip');
+                $completioncriteriahtml .= html_writer::start_div('head-block');
+                    $completioncriteriahtml .= get_string('struppercompleted', 'format_designer');
+                $completioncriteriahtml .= html_writer::end_div();
+                $completioncriteriahtml .= html_writer::start_div('info-block');
+                $completioncriteriahtml .= implode("<br>", $completedcriteria);
+                $completioncriteriahtml .= html_writer::end_div();
+
+            $completioncriteriahtml .= html_writer::end_div();
+        }
+
+        if (!empty($uncompletedcriteria)) {
+            $uncompletioncriteriahtml = html_writer::start_div('uncompletion-criteria-toolblock designer-criteria-tooltip');
+            $uncompletioncriteriahtml .= html_writer::start_div('head-block');
+                $uncompletioncriteriahtml .= get_string('strtodo', 'format_designer');
+            $uncompletioncriteriahtml .= html_writer::end_div();
+            $uncompletioncriteriahtml .= html_writer::start_div('info-block');
+                $uncompletioncriteriahtml .= implode("<br>", $uncompletedcriteria);
+            $uncompletioncriteriahtml .= html_writer::end_div();
+            $uncompletioncriteriahtml .= html_writer::end_div();
+        }
+
+        return [
+            'count' => $count,
+            'completed' => $completed,
+            'percent' => $percent,
+            'remain' => 100 - $percent,
+            'completioncriteriahtml' => $completioncriteriahtml,
+            'uncompletioncriteriahtml' => $uncompletioncriteriahtml
+        ];
     }
 
 

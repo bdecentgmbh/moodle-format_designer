@@ -108,7 +108,7 @@ if ($ADMIN->fulltree) {
     $settings->add($setting);
     $settingspage->add($settings);
 
-    $activitypage = new admin_settingpage('format_designer_activity', get_string('activitysettings', 'format_designer'));
+    $activitypage = new admin_settingpage('format_designer_activity', get_string('stractivity', 'format_designer'));
 
     if (format_designer_has_pro()
          && file_exists($CFG->dirroot.'/local/designer/setting.php')) {

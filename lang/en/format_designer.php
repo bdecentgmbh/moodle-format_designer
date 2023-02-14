@@ -263,7 +263,7 @@ $string['generalsettings'] = 'General designer settings';
 
 $string['coursesettings'] = 'Course';
 $string['sectionsettings'] = 'Section';
-$string['activitysettings'] = 'Activity';
+$string['stractivity'] = 'Activity';
 $string['courseheader'] = 'Course header';
 $string['popupactivitiesnotinstalled'] = 'Popup format must be installed in order to display the activities in popup.';
 $string['listwidth'] = 'List width';
@@ -352,3 +352,16 @@ $string['customnameincourseindex'] = "Use custom name in course index";
 $string['customnameinactivityitem'] = "Use custom name on course/section pages";
 $string['strsecondarymenutocourse'] = "Add course to secondary menu item on all course pages";
 $string['strsecondarymenutocourse_help'] = "If checked, a link to the course is added on all pages in the course to the secondary navigation";
+$string['heroactivity_help'] = 'Designer gives teachers the option to make specific activities a "Hero activity". Hero activities are added to
+    the secondary navigation in order to make them easily accessible for students.';
+$string['sectionzeroactivities_help'] = "This setting determines wether activities in the general section should automatically become hero activities.
+    Designer can automatically hide the general section when editing is turned off. This is useful if you want students to access the activities in the general section only from the secondary navigation. This setting works as a default and can be overridden in the activity settings.";
+$string['showastab_help'] = "Use this setting to configure on which pages the menu items for the hero activities should be added to the secondary navigation menu. You can either have them displayed throughout the course or on the course main page.
+    This setting works as a default and can be overridden in the activity settings.";
+$string['heroactivitypos_help'] = "This setting gives you control over the order of the menu items in the secondary navigation menu. Menu items with negative values are added before the course menu item, menu items with positive values are added afterwards. Usually, it makes more sense to use positive numbers.
+    This setting works as a default and can be overridden in the activity settings.";
+$string['struppercompleted'] = "COMPLETED";
+$string['strtodo'] = "TODO";
+
+$string['criteriaprogressinfo_help'] = 'Tip: Click on the progress bar above to see which activities/prerequisites you have already completed and which are not completed yet.';
+$string['criteriaprogressinfo'] = 'Criteria progress bar info';

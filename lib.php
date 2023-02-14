@@ -757,6 +757,8 @@ class format_designer extends \core_courseformat\base {
             $courseformatoptionsedit['courseheroactivityheader'] = [
                 'label' => new lang_string('heroactivity', 'format_designer'),
                 'element_type' => 'header',
+                'help' => 'heroactivity',
+                'help_component' => 'format_designer',
             ];
 
             $courseformatoptionsedit['sectionzeroactivities'] = [
@@ -783,7 +785,7 @@ class format_designer extends \core_courseformat\base {
                         2 => new lang_string('onlycoursepage', 'format_designer')
                     ],
                 ],
-                'help' => 'sectionzeroactivities',
+                'help' => 'showastab',
                 'help_component' => 'format_designer',
             ];
             $posrange = array_combine(range(-10, 10), range(-10, 10));
@@ -791,7 +793,7 @@ class format_designer extends \core_courseformat\base {
                 'label' => new lang_string('order'),
                 'element_type' => 'select',
                 'element_attributes' => [$posrange],
-                'help' => 'sectionzeroactivities',
+                'help' => 'heroactivitypos',
                 'help_component' => 'format_designer',
             ];
 

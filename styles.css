@@ -2281,7 +2281,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 }
 .format-designer .course-info-block > div.progress-block > .progress {
     max-width: 50%;
-    display: block;
+    display: flex;
     border: 0;
     border-radius: 25px;
     padding-right: 0;
@@ -2290,6 +2290,9 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 .format-designer .course-info-block > div.progress-block > .progress .progress-bar {
     background: #28a745;
     height: 100%;
+}
+.format-designer .course-info-block > div.progress-block > .progress .progress-bar.bg-remain-block {
+    background: #e9ecef;
 }
 .format-designer .course-info-block > div.progress-block > div {
     display: inline-block;

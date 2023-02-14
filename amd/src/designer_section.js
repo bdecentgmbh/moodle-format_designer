@@ -87,6 +87,8 @@
             });
         });
 
+        $('.progress .progress-bar[data-toggle="popover"]').popover();
+
     };
 
     /**
