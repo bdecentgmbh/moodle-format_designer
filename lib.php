@@ -322,7 +322,7 @@ class format_designer extends \core_courseformat\base {
         static $courseformatoptions = false;
         $courseformatoptions = self::course_format_options_list($foreditform);
         if ($foreditform) {
-            $courseformatoptions['coursecompletiondate'] = [
+            $courseformatoptionsedit['coursecompletiondate'] = [
                 'label' => new lang_string('coursecompletiondate', 'format_designer'),
                 'element_type' => $this->designer_completion_enabled() ? 'select' : 'hidden',
                 'element_attributes' => [
@@ -594,20 +594,6 @@ class format_designer extends \core_courseformat\base {
                     'help_component' => 'format_designer',
 
                 ],
-                'coursecompletiondate' => [
-                    'label' => new lang_string('coursecompletiondate', 'format_designer'),
-                    'element_type' => 'select',
-                    'element_attributes' => [
-                        [
-                            1 => new lang_string('show'),
-                            0 => new lang_string('hide'),
-                        ],
-                    ],
-                    'help' => 'coursecompletiondate',
-                    'help_component' => 'format_designer',
-                    'disabledif' => [['enablecompletion', 'neq', 1]],
-                ],
-
                 'activityprogress' => [
                     'label' => new lang_string('activityprogress', 'format_designer'),
                     'element_type' => 'select',
