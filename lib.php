@@ -819,7 +819,8 @@ class format_designer extends \core_courseformat\base {
      * @return array array of references to the added form elements.
      */
     public function create_edit_form_elements(&$mform, $forsection = false) {
-        global $COURSE, $PAGE;
+        global $COURSE, $PAGE, $CFG;
+
         $elements = parent::create_edit_form_elements($mform, $forsection);
         if (!$forsection && (empty($COURSE->id) || $COURSE->id == SITEID)) {
             // Add "numsections" element to the create course form - it will force new course to be prepopulated
@@ -841,6 +842,7 @@ class format_designer extends \core_courseformat\base {
         } else {
             $options = $this->designer_course_format_options(true);
         }
+
         $design = \format_designer\options::get_default_options();
         foreach ($options as $optionname => $option) {
             if (isset($option['disabledif'])) {
@@ -889,7 +891,6 @@ class format_designer extends \core_courseformat\base {
                 })
             ');
         }
-
         return $elements;
     }
 
@@ -1035,6 +1036,7 @@ class format_designer extends \core_courseformat\base {
      * @return bool whether there were any changes to the options values
      */
     public function update_course_format_options($data, $oldcourse = null) {
+        global $CFG;
         $data = (array)$data;
         if ($oldcourse !== null) {
             $oldcourse = (array)$oldcourse;
@@ -1077,6 +1079,26 @@ class format_designer extends \core_courseformat\base {
         unset($data['courseprerequisites']);
         if (isset($data['coursestaff']) && is_array($data['coursestaff'])) {
             $data['coursestaff'] = implode(",", $data['coursestaff']);
+        }
+        if (isset($data['prerequisiteinfo']) && is_array($data['prerequisiteinfo'])) {
+            $editoroptions = array('maxfiles' => -1, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false,
+                'noclean' => true);
+            $context = context_course::instance($this->courseid, MUST_EXIST);
+            // Setup the editor to save areafiles. hack.
+            $data['prerequisiteinfo_editor'] = $data['prerequisiteinfo'];
+            $data = file_postupdate_standard_editor(
+                // The submitted data.
+                (object) $data,
+                // The field name in the database.
+                'prerequisiteinfo',
+                // The options.
+                $editoroptions,
+                // The combination of contextid, component, filearea, and itemid.
+                $context,
+                'local_designer',
+                'prerequisiteinfo',
+                0
+            );
         }
         return $this->update_format_options($data);
     }
@@ -1309,6 +1331,31 @@ class format_designer extends \core_courseformat\base {
             'format' => 'designer',
             'sectionid' => $sectionid
         ], '', 'name, value');
+    }
+
+    /**
+     * Returns a record from course database table plus additional fields
+     * that course format defines
+     *
+     * @return stdClass
+     */
+    public function get_course() {
+        global $CFG;
+        $course = parent::get_course();
+        if (isset($course->prerequisiteinfo) && is_string($course->prerequisiteinfo)) {
+            $coursecontext = context_course::instance($course->id);
+            $editoroptions = array('maxfiles' => -1, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false,
+                'noclean' => true);
+            $editoroptions['context'] = $coursecontext;
+            $editoroptions['subdirs'] = file_area_contains_subdirs($coursecontext, 'local_designer', 'prerequisiteinfo', 0);
+            $course = file_prepare_standard_editor(
+                $course, 'prerequisiteinfo', $editoroptions,
+                $coursecontext, 'local_designer', 'prerequisiteinfo', 0
+            );
+            $course->prerequisiteinfo = $course->prerequisiteinfo_editor;
+            unset($course->prerequisiteinfo_editor);
+        }
+        return $course;
     }
 }
 
@@ -1763,12 +1810,24 @@ function format_designer_extend_navigation_course($navigation, $course, $context
 
     // Add the course menu opition for all course pages.
     $secondarymenutocoursecontent = '';
+    // Add the module page to visible the back to main course.
+    $modbacktomain = '';
     if ($course->secondarymenutocourse) {
         $secondarymenutocoursecontent .= html_writer::start_tag("li", array("data-key" => 'designercoursehome',
         "class" => "nav-item", "role" => "none", "data-forceintomoremenu" => "true"));
         $secondarymenutocoursecontent .= html_writer::link(new moodle_url('/course/view.php', ['id' => $course->id]),
         get_string('course'), array('role' => 'menuitem', 'class' => 'designercoursehome', "tabindex" => "-1"));
         $secondarymenutocoursecontent .= html_writer::end_tag("li");
+
+        if (format_designer_has_pro() && $course->prerequisitesbackmain
+            && $maincourse = local_designer_is_prerequisites_maincourse($course)) {
+            $modbacktomain .= html_writer::start_tag("li", array("data-key" => 'backtomaincourse',
+            "class" => "nav-item", "role" => "none", "data-forceintomoremenu" => "false"));
+            $modbacktomain .= html_writer::link(new moodle_url('/course/view.php', ['id' => $maincourse->id]),
+            get_string('backtomaincourse', 'format_designer'), array('role' => 'menuitem',
+                'class' => 'backmain-course', "tabindex" => "-1"));
+            $modbacktomain .= html_writer::end_tag("li");
+        }
     }
 
     $sql = "SELECT fd.* FROM
@@ -1874,6 +1933,15 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                         $(moremenu).append('$secondarymenutocoursecontent');
                     }
                 }
+
+                // Added the course menu on the module page.
+                var backtomaincourse = document.querySelectorAll('nav.moremenu li[data-key=backtomaincourse]')[0];
+                if ('$modbacktomain' && !backtomaincourse) {
+                    if (moremenu) {
+                        $(moremenu).append('$modbacktomain');
+                    }
+                }
+
                 var secondarynav = document.querySelector('.secondary-navigation ul.nav-tabs');
                 // Return false when the secondary nav is empty.
                 if (secondarynav == undefined) {
@@ -1969,6 +2037,15 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                     }
                 }
 
+                var designercoursehome = document.querySelectorAll('.moremenu .designercoursehome')[0];
+                if (designercoursehome) {
+                        designercoursehome.classList.remove('dropdown-item');
+                        designercoursehome.classList.add('nav-link');
+                        let parent = designercoursehome.parentNode;
+                        parent.setAttribute('data-forceintomoremenu', 'false');
+                        secondarynav.insertBefore(parent, secondarynav.children[0]);
+                }
+
                 // Insert the prerequisite course link to secondary nav.
                 if ($designerpro) {
                     var prerequisites = document.querySelectorAll('.prerequisites-course')[0];
@@ -1994,15 +2071,6 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                         parent.setAttribute('data-forceintomoremenu', 'false');
                         secondarynav.insertBefore(parent, secondarynav.children[0]);
                     }
-                }
-
-                var designercoursehome = document.querySelectorAll('.moremenu .designercoursehome')[0];
-                if (designercoursehome) {
-                        designercoursehome.classList.remove('dropdown-item');
-                        designercoursehome.classList.add('nav-link');
-                        let parent = designercoursehome.parentNode;
-                        parent.setAttribute('data-forceintomoremenu', 'false');
-                        secondarynav.insertBefore(parent, secondarynav.children[0]);
                 }
 
                 MenuMore(secondarynav);
