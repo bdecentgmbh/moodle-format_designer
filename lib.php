@@ -881,6 +881,7 @@ class format_designer extends format_base {
      * @return bool whether there were any changes to the options values
      */
     public function update_course_format_options($data, $oldcourse = null) {
+        global $CFG;
         $data = (array)$data;
         if ($oldcourse !== null) {
             $oldcourse = (array)$oldcourse;
@@ -926,7 +927,52 @@ class format_designer extends format_base {
         if (isset($data['coursestaff'])) {
             $data['coursestaff'] = implode(",", $data['coursestaff']);
         }
+        if (isset($data['prerequisiteinfo']) && is_array($data['prerequisiteinfo'])) {
+            $editoroptions = array('maxfiles' => -1, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false,
+                'noclean' => true);
+            $context = context_course::instance($this->courseid, MUST_EXIST);
+            // Setup the editor to save areafiles. hack.
+            $data['prerequisiteinfo_editor'] = $data['prerequisiteinfo'];
+            $data = file_postupdate_standard_editor(
+                // The submitted data.
+                (object) $data,
+                // The field name in the database.
+                'prerequisiteinfo',
+                // The options.
+                $editoroptions,
+                // The combination of contextid, component, filearea, and itemid.
+                $context,
+                'local_designer',
+                'prerequisiteinfo',
+                0
+            );
+        }
         return $this->update_format_options($data);
+    }
+
+    /**
+     * Returns a record from course database table plus additional fields
+     * that course format defines
+     *
+     * @return stdClass
+     */
+    public function get_course() {
+        global $CFG;
+        $course = parent::get_course();
+        if (isset($course->prerequisiteinfo) && is_string($course->prerequisiteinfo)) {
+            $coursecontext = context_course::instance($course->id);
+            $editoroptions = array('maxfiles' => -1, 'maxbytes' => $CFG->maxbytes,
+                'trusttext' => false, 'noclean' => true);
+            $editoroptions['context'] = $coursecontext;
+            $editoroptions['subdirs'] = file_area_contains_subdirs($coursecontext, 'local_designer', 'prerequisiteinfo', 0);
+            $course = file_prepare_standard_editor(
+                $course, 'prerequisiteinfo', $editoroptions,
+                $coursecontext, 'local_designer', 'prerequisiteinfo', 0
+            );
+            $course->prerequisiteinfo = $course->prerequisiteinfo_editor;
+            unset($course->prerequisiteinfo_editor);
+        }
+        return $course;
     }
 
     /**
