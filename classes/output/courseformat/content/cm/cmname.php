@@ -84,7 +84,7 @@ class cmname extends \core_courseformat\output\local\content\cm\cmname {
         $removecenter = ($sectiontype == 'default') ? true : false;
         $data = (object)[
             'url' => ($mod->modname == 'videotime') ? new moodle_url('/mod/videotime/view.php', ['id' => $mod->id]) : $mod->url,
-            'instancename' => ($mod->modname == 'videotime') ? ucwords($mod->name) : $mod->get_formatted_name(),
+            'instancename' => ($mod->modname == 'videotime') ? $mod->name : $mod->get_formatted_name(),
             'uservisible' => $mod->uservisible,
             'icon' => $mod->get_icon_url(),
             'modname' => $mod->modname,

@@ -934,7 +934,8 @@ class format_designer extends \core_courseformat\base {
             'sectiondesigncompletionbackground', $sectionid, array('accepted_types' => 'images',
             'maxfiles' => 1));
             $format->set_section_option($sectionid, 'sectiondesignerbackgroundimage', $sectionbackdraftid);
-            $format->set_section_option($sectionid, 'sectiondesignercompletionbg', $sectioncompletionbackdraftid);
+            $format->set_section_option($sectionid, 'sectiondesignercompletionbg',
+                $sectioncompletionbackdraftid);
         }
         return self::section_format_options_list($foreditform);
     }

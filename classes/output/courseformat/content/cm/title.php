@@ -53,7 +53,7 @@ class title extends \core_courseformat\output\local\content\cm\title {
 
         $data = (object)[
             'url' => ($mod->modname == 'videotime') ? new moodle_url('/mod/videotime/view.php', ['id' => $mod->id]) : $mod->url,
-            'instancename' => ($mod->modname == 'videotime') ? ucwords($mod->name) : $mod->get_formatted_name(),
+            'instancename' => ($mod->modname == 'videotime') ? $mod->name : $mod->get_formatted_name(),
             'uservisible' => $mod->uservisible,
             'linkclasses' => $this->displayoptions['linkclasses'],
         ];

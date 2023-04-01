@@ -389,9 +389,6 @@ body.format-designer.editing ul.designer .section .circles-layout .activity .edi
     position: relative;
     z-index: 0;
 }
-/* .format-designer .course-content ul.designer li.section.main .section-content-wrapper {
-    margin-right: 10px;
-} */
 .format-designer .course-content ul.designer li.section.main .section-background-style.section-design-whole {
     width: 100%;
     height: 100%;
@@ -1077,6 +1074,7 @@ ul li {
     flex-wrap: wrap;
 }
 .format-designer .designer .section .content .section.link-layout li.activity {
+    width: 100%;
     padding: 0;
     margin-bottom: 5px;
     background-repeat: no-repeat;
@@ -1093,7 +1091,6 @@ ul li {
     padding-top: 0;
 }
 .format-designer .designer .section .content .section.link-layout li.activity .mod-indent-outer .activityinstance .activitytitle {
-    /* align-items: end; */
     z-index: 0;
 }
 .format-designer .designer .section .content .section.link-layout li.activity .mod-indent-outer .activityinstance .activitytitle .img-element {
@@ -1180,15 +1177,10 @@ ul li {
     right: 5px;
 }
 .format-designer .designer .section .content .section.link-layout li.activity .center-reports-block {
-    /* width: 22%; */
     float: right;
     margin-top: 18px;
     margin-right: 10px;
 }
-/* .format-designer .designer .section.desktop-one-column .content .section.link-layout li.activity .center-reports-block,
-.format-designer .designer .section.desktop-two-column .content .section.link-layout li.activity .center-reports-block {
-    width: 22%;
-} */
 .format-designer .designer .section .content .section.link-layout li.activity .center-reports-block .pull-right {
     float: none;
 }
@@ -1427,7 +1419,6 @@ ul li {
 .format-designer .designer .section .content .section.link-layout li.activity .mod-visits-block {
     display: inline-block;
     vertical-align: middle;
-    /* margin-top: 5px; */
 }
 .format-designer .designer .section .content .section.list-layout li.activity .mod-visits-block {
     margin-right: 4px;
@@ -1599,41 +1590,6 @@ ul li {
     margin-left: 35px;
     margin-bottom: 5px;
 }
-.format-designer .designer .section.desktop-one-column .content .section.card-layout li.activity {
-    width: 100%;
-    margin-right: 0;
-}
-.format-designer .designer .section.desktop-two-column .content .section.card-layout li.activity {
-    width: 49%;
-    margin-right: 0;
-}
-.format-designer .designer .section.desktop-three-column .content .section.card-layout li.activity {
-    width: 33%;
-    margin-right: 0;
-}
-.format-designer .designer .section.desktop-four-column .content .section.card-layout li.activity {
-    width: 24%;
-    margin-right: 0;
-}
-.format-designer .designer .section.desktop-five-column .content .section.card-layout li.activity {
-    width: 19%;
-    margin-right: 0;
-}
-.format-designer .designer .section.desktop-one-column .content .section.circles-layout li.activity {
-    width: 100%;
-}
-.format-designer .designer .section.desktop-two-column .content .section.circles-layout li.activity {
-    width: 49.5%;
-}
-.format-designer .designer .section.desktop-three-column .content .section.circles-layout li.activity {
-    width: 33%;
-}
-.format-designer .designer .section.desktop-four-column .content .section.circles-layout li.activity {
-    width: 24%;
-}
-.format-designer .designer .section.desktop-five-column .content .section.circles-layout li.activity {
-    width: 19.5%;
-}
 .format-designer .designer .section .content .section.card-layout li.activity .card.card-list .mod-indent-outer {
     height: 100%;
 }
@@ -1662,18 +1618,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 @media (min-width: 1500px) {
     .format-designer .designer .section.container-full .content.show .section.circles-layout li.activity {
         width: 19.5%;
-    }
-    .format-designer .designer .section.container-full.desktop-three-column .content.show .section.circles-layout li.activity {
-        width: 32%;
-    }
-    .format-designer .designer .section.container-full.desktop-two-column .content.show .section.circles-layout li.activity {
-        width: 49.5%;
-    }
-    .format-designer .designer .section.container-full.desktop-four-column .content.show .section.circles-layout li.activity {
-        width: 24%;
-    }
-    .format-designer .designer .section.desktop-one-column.container-full .content .section.circles-layout li.activity {
-        width: 100%;
     }
 }
 
@@ -1707,21 +1651,10 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 }
 
 @media (min-width: 768px) {
-    .format-designer .designer .section.tablet-three-column .content .section.link-layout li.activity {
-        width: 31%;
-    }
-    .format-designer .designer .section.tablet-two-column .content .section.link-layout li.activity {
-        width: 47%;
-    }
-    .format-designer .designer .section.tablet-one-column .content .section.link-layout li.activity {
-        width: 100%;
-        margin: 0;
-    }
     .format-designer .designer .section .content .section.card-layout li.activity .activityinstance .activity-instance {
         width: 85%;
     }
     .format-designer .designer .section .content .section.link-layout li.activity .mod-content {
-        /* width: 50%; */
         display: inline-block;
         margin-top: 5px;
         margin-right: 5px;
@@ -1735,53 +1668,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     }
 }
 
-
 @media (min-width: 992px) {
-    .format-designer .designer .section.desktop-five-column .content .section.link-layout li.activity {
-        width: 18%;
-    }
-    .format-designer .designer .section.desktop-five-column .content .section.link-layout li.activity:nth-child(5n),
-    .format-designer .designer .section.desktop-four-column .content .section.link-layout li.activity:nth-child(4n),
-    .format-designer .designer .section.desktop-three-column .content .section.link-layout li.activity:nth-child(3n),
-    .format-designer .designer .section.desktop-two-column .content .section.link-layout li.activity:nth-child(2n) {
-        margin-right: 0;
-    }
-    .format-designer .designer .section.desktop-four-column .content .section.link-layout li.activity {
-        width: 23%;
-    }
-    .format-designer .designer .section.desktop-five-column .content .section.link-layout li.activity .activityinstance,
-    .format-designer .designer .section.desktop-four-column .content .section.link-layout li.activity .activityinstance {
-        width: 100%;
-        padding: 0;
-    }
-    .format-designer .designer .section.desktop-five-column .content .section.link-layout li.activity .center-reports-block,
-    .format-designer .designer .section.desktop-four-column .content .section.link-layout li.activity .center-reports-block {
-        margin-bottom: 20px;
-        float: none;
-    }
-    .format-designer .designer .section.desktop-five-column .content .section.link-layout li.activity .mod-content,
-    .format-designer .designer .section.desktop-four-column .content .section.link-layout li.activity .mod-content {
-        width: auto;
-    }
-    .format-designer .designer .section.desktop-three-column .content .section.link-layout li.activity {
-        width: 32%;
-    }
-    .format-designer .designer .section.desktop-three-column .content .section.link-layout li.activity .activityinstance {
-        width: 55%;
-    }
-    .format-designer .designer .section.desktop-two-column .content .section.link-layout li.activity {
-        width: 48%;
-    }
-    .format-designer .designer .section.desktop-two-column .content .section.link-layout li.activity .activityinstance {
-        width: 70%;
-    }
-    .format-designer .designer .section.desktop-one-column .content .section.link-layout li.activity {
-        width: 100%;
-        margin-right: 0;
-    }
-    .format-designer .designer .section.desktop-one-column .content .section.link-layout li.activity .activityinstance {
-        width: 75%;
-    }
     .format-designer .designer .section .content .section.card-layout li.activity .card.card-list {
         min-height: 220px;
     }
@@ -1792,11 +1679,9 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     .format-designer.editing .designer .section .content .section.list-layout li.activity .activityinstance .aalink.quickeditlink,
     .format-designer.editing .designer .section .content .section.card-layout li.activity .activityinstance .aalink.quickeditlink {
         width: auto;
+        margin-right: -20px;
         position: absolute;
         right: 0;
-    }
-    .format-designer .designer .section.desktop-three-column .content .section.card-layout li.activity {
-        width: 32%;
     }
 }
 
@@ -1808,16 +1693,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     .format-designer .designer .section .content .section.card-layout li.activity .activityinstance .activity-instance {
         width: 80%;
     }
-    .format-designer .designer .section.tablet-two-column .content .section.card-layout li.activity {
-        width: 48%;
-        margin-right: 0;
-    }
-    .format-designer .designer .section.tablet-three-column .content .section.circles-layout li.activity {
-        width: 32%;
-    }
-    .format-designer .designer .section.tablet-three-column .content .section.card-layout li.activity {
-        width: 32%;
-    }
     .format-designer .designer .section .content .section li.activity .activity-block.designer .contentwithoutlink {
         width: 90%;
     }
@@ -1827,10 +1702,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 }
 
 @media (min-width: 768px) and (max-width: 991px) {
-    .format-designer .designer .section.tablet-three-column .content .section.link-layout li.activity:nth-child(3n),
-    .format-designer .designer .section.tablet-two-column .content .section.link-layout li.activity:nth-child(2n) {
-        margin-right: 0;
-    }
     .format-designer .designer .section .content .section.card-layout li.activity .card.card-list {
         min-height: 250px;
     }
@@ -1855,14 +1726,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     .format-designer .designer .section.img-text.list-layout .activity .activityinstance .activity-element {
         width: 59%;
     }
-    .format-designer .designer .section.tablet-two-column .content .section.circles-layout li.activity,
-    .format-designer .designer .section.tablet-two-column .content .section.card-layout li.activity {
-        width: 49%;
-    }
-    .format-designer .designer .section.tablet-one-column .content .section.card-layout li.activity,
-    .format-designer .designer .section.tablet-one-column .content .section.circles-layout li.activity {
-        width: 100%;
-    }
     .format-designer.editing .designer .section.img-text .activity .activityinstance .inplaceeditable .activity-instance {
         width: 84%;
     }
@@ -1872,16 +1735,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 }
 
 @media (max-width: 767px) {
-    .format-designer .designer .section.mobile-two-column .content .section.link-layout li.activity {
-        width: 48%;
-    }
-    .format-designer .designer .section.mobile-one-column .content .section.link-layout li.activity {
-        width: 100%;
-        margin-right: 0;
-    }
-    .format-designer .designer .section.mobile-two-column .content .section.link-layout li.activity:nth-child(2n) {
-        margin-right: 0;
-    }
     .format-designer .designer .section .content .section.card-layout li.activity {
         width: 100%;
         padding: 0;
@@ -1910,7 +1763,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     }
     .format-designer .designer .section .content .section li.activity .mod-indent-outer .col.align-self-center {
         text-align: left;
-        /* margin-top: 10px; */
     }
     .format-designer.editing .designer .section .content .section.link-layout li.activity .activityinstance .aalink,
     .format-designer.editing .designer .section .content .section.list-layout li.activity .activityinstance .aalink,
@@ -1946,9 +1798,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     }
     .format-designer .designer .section .content .section.link-layout li.activity .mod-indent-outer .col.align-self-center {
         text-align: right;
-    }
-    .format-designer .designer .section.tablet-two-column .content .section.circles-layout li.activity {
-        width: 49%;
     }
     .format-designer .designer .section .content .section li.activity .activity-block.designer .contentwithoutlink {
         width: 80%;
@@ -1986,37 +1835,11 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     .format-designer .designer .section .content .section.link-layout li.activity:hover .mod-visits-block {
         margin-right: 10px;
     }
-    /* .format-designer .designer .section .content .section li.activity .activity-block.designer {
-        padding: 0;
-    } */
     .format-designer .designer .section .content .section.list-layout li.activity .mod-indent-outer .col.align-self-center {
         text-align: left;
     }
     .format-designer .designer .section .content .section.link-layout li.activity .mod-indent-outer .col.align-self-center {
         text-align: right;
-    }
-    .format-designer .designer .section.mobile-one-column .content .section.card-layout li.activity,
-    .format-designer .designer .section.mobile-one-column .content .section.circles-layout li.activity {
-        width: 100%;
-        padding-right: 5px;
-        margin-right: 0;
-    }
-    .format-designer .designer .section.mobile-two-column .content .section.img-text.card-layout
-    .activity .activity-block .activityinstance {
-        margin-bottom: 20px;
-    }
-    .format-designer .designer .section.mobile-two-column .content .section.card-layout li.activity
-    .activityinstance .activity-element {
-        width: 90%;
-    }
-    .format-designer .designer .section.mobile-two-column .content .section.card-layout li.activity,
-    .format-designer .designer .section.mobile-two-column .content .section.circles-layout li.activity {
-        width: 47%;
-        margin-right: 10px;
-    }
-    .format-designer .designer .section.mobile-two-column .content .section.card-layout li.activity:nth-child(2n),
-    .format-designer .designer .section.mobile-two-column .content .section.circles-layout li.activity:nth-child(2n) {
-        margin-right: 0;
     }
 }
 
@@ -2252,7 +2075,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     font-size: 24px;
     font-weight: bold;
     color: #000;
-    /* overflow-wrap: anywhere; */
 }
 .format-designer .course-info-block .carousel .contact-element .contact-block .title-block h4 span {
     font-size: 13px;
@@ -2336,12 +2158,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     }
 }
 
-/* @media (min-width: 1551px) {
-    .format-designer .course-info-block .carousel {
-        width: 34%;
-    }
-} */
-
 @media (min-width: 992px) and (max-width: 1199px) {
     .format-designer .course-info-block > div {
         width: 19%;
@@ -2350,18 +2166,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
         width: 35%;
     }
 }
-
-/* @media (max-width: 991px) {
-
-    .format-designer .course-info-block .carousel {
-
-        width: 45%;
-
-    }
-
-} */
-
-
 
 @media (min-width: 768px) and (max-width: 991px) {
     .format-designer .course-info-block > div {
@@ -2522,9 +2326,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 .format-designer .designer .section.img-text .activity.videotime .activity-block .mod-content .panel .panel-body h4 {
     display: none;
 }
-/*.format-designer .designer .section.img-text.card-layout .activity.videotime .activity-block .activityinstance {
-    padding: 15px;
-}*/
 .format-designer .designer .section.img-text.card-layout .activity.videotime .activity-block .mod-content {
     margin: 0 0 20px 0;
 }
@@ -2581,9 +2382,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     margin: 0;
     position: static;
 }
-/*.format-designer .designer .section.img-text.card-layout .activity.videotime.label_mode .activity-block .completion-html-card {
-    margin-left: 10px;
-}*/
 .format-designer .designer .section.img-text.card-layout .activity.videotime.label_mode .activity-block
 .completion-html-card .completion-html-card {
     margin-left: 0;
@@ -2636,12 +2434,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 .format-designer .designer .section .content .section.horizontal-circles-layout li.activity {
     width: 100%;
 }
-.format-designer .designer .section.desktop-two-column .content .section.horizontal-circles-layout li.activity {
-    width: 49%;
-}
-.format-designer .designer .section.desktop-four-column .content .section.horizontal-circles-layout li.activity {
-    width: 24%;
-}
 .format-designer .designer .section .content .section.horizontal-circles-layout li.activity .card {
     border: 0;
     box-shadow: none;
@@ -2679,46 +2471,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     right: 0;
 }
 /*v-4.0+*/
-.format-designer .designer .section.desktop-one-column .content .section.horizontal-circles-layout li.activity .card .card-body {
-    min-height: auto;
-    text-align: left;
-}
-.format-designer .designer .section.desktop-one-column .content .section.horizontal-circles-layout
-li.activity .card .card-body .mod-indent-outer > div:last-child {
-    text-align: right;
-}
-.format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-li.horizontal_circles .activity-block .activityinstance .img-element {
-    text-align: center;
-    margin-bottom: 0;
-}
-.format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-li.horizontal_circles .activity-block .activityinstance {
-    width: auto;
-    float: left;
-}
-.format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-li.horizontal_circles .activity-block .activityinstance .mod-content {
-    margin-top: 5px;
-}
-.format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-li.horizontal_circles .activity-block .activityinstance ~ .completion-html-card {
-    display: inline-block;
-    margin-top: 25px;
-}
-.format-designer .designer .section.desktop-one-column .content .section.img-text.horizontal-circles-layout
-li.horizontal_circles .mod-visits-block,
-.format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-li.horizontal_circles .activity-block .action-html-card {
-    float: right;
-    margin-top: 30px;
-    margin-bottom: 0;
-    position: static;
-}
-.format-designer .designer .section.desktop-one-column .content .section.img-text.horizontal-circles-layout
-li.horizontal_circles .mod-visits-block {
-    margin-top: 35px;
-}
 
 /**/
 .format-designer .designer.kanban-board .section .content .section.img-text.horizontal-circles-layout li.activity .card {
@@ -2774,12 +2526,6 @@ li.horizontal_circles .mod-visits-block {
     margin-left: 90px;
     margin-bottom: 0;
 }
-/*.format-designer.editing .designer .section.img-text.horizontal-circles-layout li.horizontal_circles
-.activity-block .activityinstance .activity-type,
-.format-designer.editing .designer .section.img-text.horizontal-circles-layout li.horizontal_circles
-.activity-block .activityinstance .cmname-block {
-    margin-left: 15px;
-}*/
 .format-designer .designer .section .content .section.img-text.horizontal-circles-layout li.horizontal_circles .mod-visits-block {
     margin-bottom: 40px;
 }
@@ -2846,37 +2592,6 @@ li.horizontal_circles .mod-visits-block {
     }
 }
 
-@media (min-width: 576px) and (max-width: 1199px) {
-    .format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-    li.horizontal_circles .activity-block .activityinstance ~ .completion-html-card,
-    .format-designer .designer .section.desktop-one-column .content .section.img-text.horizontal-circles-layout
-    li.horizontal_circles .mod-visits-block,
-    .format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-    li.horizontal_circles .activity-block .action-html-card {
-        margin-left: 20px;
-    }
-}
-
-@media (min-width: 992px) and (max-width: 1366px) {
-    .format-designer .designer .section.desktop-four-column .content .section.card-layout li.activity .mod-visits-block,
-    .format-designer .designer .section.desktop-four-column .content .section.card-layout li.activity .action-html-card,
-    .format-designer .designer .section.desktop-four-column .section.img-text.card-layout
-    li.activity.preview_mode .activity-block .mod-icon-url {
-        position: static;
-    }
-    .format-designer .designer .section.desktop-four-column .content .section.card-layout
-    li.activity.videotime .completion-html-card {
-        display: block;
-    }
-}
-
-@media (min-width: 768px) {
-    .format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-    li.horizontal_circles .activity-block .activityinstance {
-        width: 50%;
-    }
-}
-
 @media (max-width: 767px) {
     .format-designer .designer .section .content .section.link-layout li.activity.videotime
     .activity-block.designer .contentwithoutlink {
@@ -2906,33 +2621,10 @@ li.horizontal_circles .mod-visits-block {
     .format-designer .designer .section .content .section.card-layout li.activity .completion-html-card {
         display: block;
     }
-    .format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-    li.horizontal_circles .activity-block .activityinstance {
-        width: 100%;
-    }
-    .format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-    li.horizontal_circles .activity-block .activityinstance ~ .completion-html-card {
-        margin-top: 0;
-        display: inline-block;
-        vertical-align: middle;
-        margin-left: 15px;
-    }
-    .format-designer .designer .section.desktop-one-column .content .section.img-text.horizontal-circles-layout
-    li.horizontal_circles .mod-visits-block,
-    .format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-    li.horizontal_circles .activity-block .action-html-card {
-        display: inline-block;
-        vertical-align: middle;
-        float: none;
-        margin-top: 0;
-        margin-left: 15px;
-    }
 }
 
 /*Flow layout*/
 .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content {
-    /*min-height: 450px;
-    width: 31%;*/
     min-height: 400px;
     width: 400px;
     display: inline-block;
@@ -2944,13 +2636,8 @@ li.horizontal_circles .mod-visits-block {
     margin-bottom: 30px;
     transition: all .5s ease;
 }
-/*.format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text li.activity .activity-block {
-    min-height: 450px;
-}*/
 .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content.flow-stack.collapsed {
-    /*width: 31%;*/
     width: 400px;
-    /*margin-right: 11px;*/
 }
 .format-designer .designer.course-type-flow .section .content .section.card-layout li.activity .card.card-list {
     min-height: 400px;
@@ -3126,10 +2813,6 @@ li.horizontal_circles .mod-visits-block {
     width: 100%;
     height: auto;
 }
-/*.format-designer .course-content ul.course-type-flow.designer .section.main.stack-header-collapsing
-.content.flow-open ul.section.img-text li.activity {
-    margin-left: 15px;
-}*/
 .format-designer .course-content ul.designer.course-type-flow {
     display: contents;
 }
@@ -3137,7 +2820,6 @@ li.horizontal_circles .mod-visits-block {
     display: contents;
 }
 .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text li.activity {
-    /*width: 31.7%;*/
     width: 400px;
     display: inline-block;
     vertical-align: top;
@@ -3340,89 +3022,6 @@ li.section.main.section-background-color:not(.section-header-image)
     border: 1px solid #999;
     background: none;
 }
-
-/*@media (max-width: 1560px) {
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content,
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content.flow-stack.collapsed {
-        margin-left: 8px;
-    }
-}
-
-@media (max-width: 1460px) {
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content,
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content.flow-stack.collapsed {
-        margin-right: 5px;
-    }
-}
-
-@media (min-width: 1400px) {
-    .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text
-    li.activity .activity-block.designer,
-    .format-designer .designer.course-type-flow .section .content .section.card-layout li.activity .activity-block.designer {
-        min-height: 450px;
-    }
-}
-
-@media (max-width: 1399px) {
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content,
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content.flow-stack.collapsed,
-    .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text li.activity .activity-block {
-        min-height: 400px;
-    }
-}
-
-@media (max-width: 1199px) {
-    .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text
-    li.activity .activity-block.designer,
-    .format-designer .designer.course-type-flow .section .content .section.card-layout li.activity .activity-block.designer {
-        min-height: 350px;
-    }
-}
-
-@media (min-width: 1200px) and (max-width: 1279px) {
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content,
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content.flow-stack.collapsed {
-        margin-left: 12px;
-    }
-}
-
-@media (max-width: 1199px) {
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content,
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content.flow-stack.collapsed {
-        width: 45%;
-    }
-    .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text
-    li.activity .activity-block.designer,
-    .format-designer .designer.course-type-flow .section .content .section.card-layout li.activity .activity-block.designer {
-        min-height: 350px;
-    }
-}
-
-@media (min-width: 992px) and (max-width: 1199px) {
-    .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text li.activity {
-        width: 45%;
-    }
-}
-
-@media (max-width: 991px) {
-    .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text li.activity .activity-block,
-    .format-designer .designer.course-type-flow .section .content .section.card-layout li.activity .activity-block.designer {
-        min-height: 270px;
-    }
-    .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text li.activity {
-        width: 45%;
-    }
-}
-
-@media (max-width: 767px) {
-    .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text li.activity {
-        width: 95%;
-    }
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content,
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content.flow-stack.collapsed {
-        width: 95%;
-    }
-}*/
 
 .flow-animation {
     -webkit-animation-duration: 1s;
