@@ -214,7 +214,6 @@ class behat_format_designer extends behat_base {
         global $CFG;
         if (round($CFG->version) > 2020111000) {
             // Moodle-3.11 and above.
-            $this->i_click_on_activity($activityidendifier);
             $this->execute("behat_completion::toggle_the_manual_completion_state", [$activityname]);
             $this->execute("behat_completion::manual_completion_button_displayed_as", [$activityname, "Done"]);
         } else {

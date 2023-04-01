@@ -20,8 +20,8 @@
  * @copyright  2021 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- define(['jquery', 'core/fragment', 'core/templates', 'core/loadingicon', 'core/ajax', 'core_message/toggle_contact_button'],
- function($, Fragment, Templates, Loadingicon, Ajax, Contact) {
+ define(['jquery', 'core/loadingicon', 'core/ajax', 'core_message/toggle_contact_button'],
+ function($, Loadingicon, Ajax, Contact) {
 
     var SELECTOR = {
         ACTIVITYLI: 'li.activity',
@@ -358,6 +358,7 @@
                     $('#' + sectionId).find('ul.section').removeClass(ULClasses.list);
                     $('#' + sectionId).find('ul.section').removeClass(ULClasses.default);
                     $('#' + sectionId).find('ul.section').removeClass(ULClasses.circles);
+                    $('#' + sectionId).find('ul.section').removeClass(ULClasses.horizontal_circles);
                     $('#' + sectionId).find('ul.section').addClass(ULClasses[layout]);
                 }
             });

@@ -48,7 +48,7 @@ Feature: Sections can be check activity completion element in designer format
     And I am on "Course 1" course homepage
     And I check the activity "assign1" to element "/descendant::div[contains(@class, 'notstarted')]"
     And I am on "Course 1" course homepage
-    When I toggle assignment manual completion designer "Test assignment name" "assign1"
+    And I toggle assignment manual completion designer "Test assignment name" "assign1"
     And I am on "Course 1" course homepage
     And I check the activity "assign1" to element "/descendant::div[contains(@class, 'success')]"
     And I log out

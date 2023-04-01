@@ -1977,9 +1977,7 @@ ul li {
 }
 
 .format-designer .designer .section .content .section.link-layout li.activity {
-
-    /* padding: 0; */
-
+    width: 100%;
     margin-bottom: 5px;
 
     background-repeat: no-repeat;
@@ -2003,9 +2001,6 @@ ul li {
 }
 
 .format-designer .designer .section .content .section.link-layout li.activity .mod-indent-outer {
-
-    /* padding-top: 0; */
-
     padding: 10px;
 
 }
@@ -2017,9 +2012,6 @@ ul li {
 }
 
 .format-designer .designer .section .content .section.link-layout li.activity .mod-indent-outer .activityinstance .activitytitle {
-
-    /* align-items: end; */
-
     z-index: 0;
 
 }
@@ -2125,17 +2117,6 @@ ul li {
     display: inline-block;
 
 }
-
-/* .format-designer .designer .section .content .section.link-layout li.activity .activityinstance .cmname-block {
-
-    width: 70%;
-
-    display: inline-flex;
-
-    padding-left: 0;
-
-} */
-
 .format-designer .designer .section .content .section.link-layout li.activity .action-html-card {
 
     max-width: 100px;
@@ -2173,9 +2154,6 @@ ul li {
 }
 
 .format-designer .designer .section .content .section.link-layout li.activity .center-reports-block {
-
-    /* width: 22%; */
-
     float: right;
 
     margin-top: 18px;
@@ -2674,7 +2652,6 @@ ul li {
 
     vertical-align: middle;
 
-    /* margin-top: 5px; */
 
 }
 
@@ -3012,76 +2989,6 @@ ul li {
 
 }
 
-.format-designer .designer .section.desktop-one-column .content .section.card-layout li.activity {
-
-    width: 100%;
-
-    margin-right: 0;
-
-}
-
-.format-designer .designer .section.desktop-two-column .content .section.card-layout li.activity {
-
-    width: 49.5%;
-
-    margin-right: 0;
-
-}
-
-.format-designer .designer .section.desktop-three-column .content .section.card-layout li.activity {
-
-    width: 33%;
-
-    margin-right: 0;
-
-}
-
-.format-designer .designer .section.desktop-four-column .content .section.card-layout li.activity {
-
-    width: 24.5%;
-
-    margin-right: 0;
-
-}
-
-.format-designer .designer .section.desktop-five-column .content .section.card-layout li.activity {
-
-    width: 19.5%;
-
-    margin-right: 0;
-
-}
-
-.format-designer .designer .section.desktop-one-column .content .section.circles-layout li.activity {
-
-    width: 100%;
-
-}
-
-.format-designer .designer .section.desktop-two-column .content .section.circles-layout li.activity {
-
-    width: 49.5%;
-
-}
-
-.format-designer .designer .section.desktop-three-column .content .section.circles-layout li.activity {
-
-    width: 33%;
-
-}
-
-.format-designer .designer .section.desktop-four-column .content .section.circles-layout li.activity {
-
-    width: 24%;
-
-}
-
-.format-designer .designer .section.desktop-five-column .content .section.circles-layout li.activity {
-
-    width: 19.5%;
-
-}
-
 .format-designer .designer .section .content .section.card-layout li.activity .card.card-list .mod-indent-outer {
 
     height: 100%;
@@ -3139,36 +3046,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     .format-designer .designer .section.container-full .content.show .section.circles-layout li.activity {
 
         width: 19.5%;
-
-    }
-
-    .format-designer .designer .section.container-full.desktop-three-column .content.show .section.circles-layout
-
-    li.activity {
-
-        width: 32%;
-
-    }
-
-    .format-designer .designer .section.container-full.desktop-two-column .content.show .section.circles-layout
-
-    li.activity {
-
-        width: 49.5%;
-
-    }
-
-    .format-designer .designer .section.container-full.desktop-four-column .content.show .section.circles-layout
-
-    li.activity {
-
-        width: 24%;
-
-    }
-
-    .format-designer .designer .section.desktop-one-column.container-full .content .section.circles-layout li.activity {
-
-        width: 100%;
 
     }
 
@@ -3269,30 +3146,9 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 
 
 @media (min-width: 768px) {
-
-    .format-designer .designer .section.tablet-three-column .content .section.link-layout li.activity {
-
-        width: 31%;
-
-    }
-
-    .format-designer .designer .section.tablet-two-column .content .section.link-layout li.activity {
-
-        width: 47%;
-
-    }
-
     .format-designer .designer .section .content .section.link-layout li.activity .mod-indent-outer .activityinstance .activity-element {
 
         width: 69%;
-
-    }
-
-    .format-designer .designer .section.tablet-one-column .content .section.link-layout li.activity {
-
-        width: 100%;
-
-        margin: 0;
 
     }
 
@@ -3303,8 +3159,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     }
 
     .format-designer .designer .section .content .section.link-layout li.activity .mod-content {
-
-        /* width: 50%; */
 
         display: inline-block;
 
@@ -3333,96 +3187,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 @media (min-width: 992px) {
 
     .format-designer .designer .section .content .section.link-layout li.activity .mod-indent-outer .activityinstance .activity-element {
-
-        width: 75%;
-
-    }
-
-    .format-designer .designer .section.desktop-five-column .content .section.link-layout li.activity {
-
-        width: 18%;
-
-    }
-
-    .format-designer .designer .section.desktop-five-column .content .section.link-layout li.activity:nth-child(5n),
-
-    .format-designer .designer .section.desktop-four-column .content .section.link-layout li.activity:nth-child(4n),
-
-    .format-designer .designer .section.desktop-three-column .content .section.link-layout li.activity:nth-child(3n),
-
-    .format-designer .designer .section.desktop-two-column .content .section.link-layout li.activity:nth-child(2n){
-
-        margin-right: 0;
-
-    }
-
-    .format-designer .designer .section.desktop-four-column .content .section.link-layout li.activity {
-
-        width: 23%;
-
-    }
-
-    .format-designer .designer .section.desktop-five-column .content .section.link-layout li.activity .activityinstance,
-
-    .format-designer .designer .section.desktop-four-column .content .section.link-layout li.activity .activityinstance {
-
-        width: 100%;
-
-        padding: 0;
-
-    }
-
-    .format-designer .designer .section.desktop-five-column .content .section.link-layout li.activity .center-reports-block,
-
-    .format-designer .designer .section.desktop-four-column .content .section.link-layout li.activity .center-reports-block {
-
-        margin-bottom: 20px;
-
-        float: none;
-
-    }
-
-    .format-designer .designer .section.desktop-five-column .content .section.link-layout li.activity .mod-content,
-
-    .format-designer .designer .section.desktop-four-column .content .section.link-layout li.activity .mod-content {
-
-        width: auto;
-
-    }
-
-    .format-designer .designer .section.desktop-three-column .content .section.link-layout li.activity {
-
-        width: 32%;
-
-    }
-
-    .format-designer .designer .section.desktop-three-column .content .section.link-layout li.activity .activityinstance {
-
-        width: 55%;
-
-    }
-
-    .format-designer .designer .section.desktop-two-column .content .section.link-layout li.activity {
-
-        width: 48%;
-
-    }
-
-    .format-designer .designer .section.desktop-two-column .content .section.link-layout li.activity .activityinstance {
-
-        width: 70%;
-
-    }
-
-    .format-designer .designer .section.desktop-one-column .content .section.link-layout li.activity {
-
-        width: 100%;
-
-        margin-right: 0;
-
-    }
-
-    .format-designer .designer .section.desktop-one-column .content .section.link-layout li.activity .activityinstance {
 
         width: 75%;
 
@@ -3481,13 +3245,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
         padding-bottom: 0;
 
     }
-
-    .format-designer .designer .section.desktop-three-column .content .section.card-layout li.activity {
-
-        width: 32%;
-
-    }
-
 }
 
 
@@ -3508,26 +3265,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 
     }
 
-    .format-designer .designer .section.tablet-two-column .content .section.card-layout li.activity {
-
-        width: 49.5%;
-
-        margin-right: 0;
-
-    }
-
-    .format-designer .designer .section.tablet-three-column .content .section.circles-layout li.activity {
-
-        width: 32%;
-
-    }
-
-    .format-designer .designer .section.tablet-three-column .content .section.card-layout li.activity {
-
-        width: 32%;
-
-    }
-
     .format-designer .designer .section .content .section li.activity .activity-block.designer .contentwithoutlink {
 
         width: 90%;
@@ -3541,35 +3278,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 
 
 @media (min-width: 768px) and (max-width: 991px) {
-
-    /* .format-designer .designer .section.tablet-three-column .content .section.link-layout li.activity {
-
-        width: 30%;
-
-    }
-
-    .format-designer .designer .section.tablet-two-column .content .section.link-layout li.activity {
-
-        width: 47%;
-
-    }
-
-    .format-designer .designer .section.tablet-one-column .content .section.link-layout li.activity {
-
-        width: 100%;
-
-        margin: 0;
-
-    } */
-
-    .format-designer .designer .section.tablet-three-column .content .section.link-layout li.activity:nth-child(3n),
-
-    .format-designer .designer .section.tablet-two-column .content .section.link-layout li.activity:nth-child(2n) {
-
-        margin-right: 0;
-
-    }
-
     .format-designer .designer .section .content .section.card-layout li.activity .card.card-list {
 
         min-height: 250px;
@@ -3620,48 +3328,9 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 
     }
 
-    .format-designer .designer .section.tablet-two-column .content .section.circles-layout li.activity,
-
-    .format-designer .designer .section.tablet-two-column .content .section.card-layout li.activity {
-
-        width: 49.5%;
-
-    }
-
-    .format-designer .designer .section.tablet-one-column .content .section.card-layout li.activity,
-
-    .format-designer .designer .section.tablet-one-column .content .section.circles-layout li.activity {
-
-        width: 100%;
-
-    }
-
 }
 
-
-
 @media (max-width: 767px) {
-
-    .format-designer .designer .section.mobile-two-column .content .section.link-layout li.activity {
-
-        width: 47%;
-
-    }
-
-    .format-designer .designer .section.mobile-one-column .content .section.link-layout li.activity {
-
-        width: 100%;
-
-        margin-right: 0;
-
-    }
-
-    .format-designer .designer .section.mobile-two-column .content .section.link-layout li.activity:nth-child(2n) {
-
-        margin-right: 0;
-
-    }
-
     .format-designer .designer .section .content .section.card-layout li.activity {
 
         width: 100%;
@@ -3800,12 +3469,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 
     }
 
-    .format-designer .designer .section.tablet-two-column .content .section.circles-layout li.activity {
-
-        width: 49%;
-
-    }
-
     .format-designer .designer .section .content .section li.activity .activity-block.designer .contentwithoutlink {
 
         width: 80%;
@@ -3880,12 +3543,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 
     }
 
-    /* .format-designer .designer .section .content .section li.activity .activity-block.designer {
-
-        padding: 0;
-
-    } */
-
     .format-designer .designer .section .content .section.list-layout li.activity .mod-indent-outer .col.align-self-center {
 
         text-align: left;
@@ -3901,52 +3558,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     .format-designer .designer .section .content .section.link-layout li.activity .mod-indent-outer .col.align-self-center {
 
         text-align: right;
-
-    }
-
-    .format-designer .designer .section.mobile-one-column .content .section.card-layout li.activity,
-
-    .format-designer .designer .section.mobile-one-column .content .section.circles-layout li.activity {
-
-        width: 100%;
-
-        padding-right: 5px;
-
-        margin-right: 0;
-
-    }
-
-    .format-designer .designer .section.mobile-two-column .content .section.img-text.card-layout
-
-    .activity .activity-block .activityinstance {
-
-        margin-bottom: 20px;
-
-    }
-
-    .format-designer .designer .section.mobile-two-column .content .section.card-layout li.activity
-
-    .activityinstance .activity-element {
-
-        width: 90%;
-
-    }
-
-    .format-designer .designer .section.mobile-two-column .content .section.card-layout li.activity,
-
-    .format-designer .designer .section.mobile-two-column .content .section.circles-layout li.activity {
-
-        width: 47%;
-
-        margin-right: 10px;
-
-    }
-
-    .format-designer .designer .section.mobile-two-column .content .section.card-layout li.activity:nth-child(2n),
-
-    .format-designer .designer .section.mobile-two-column .content .section.circles-layout li.activity:nth-child(2n) {
-
-        margin-right: 0;
 
     }
 
@@ -3975,8 +3586,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 
 
 /*Circle layout*/
-
-
 
 .format-designer .designer .section .circle-layout {
 
@@ -4255,7 +3864,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     float: right;
 }
 .format-designer .course-info-block .carousel .carousel-item .contact-element {
-    /* margin-bottom: 15px; */
     margin-right: 15px;
 }
 .format-designer .course-info-block .carousel .carousel-item .contact-element:last-child {
@@ -4324,10 +3932,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     font-size: 12px;
     text-align: left;
 }
-/* .format-designer .course-info-block .carousel .contact-element .contact-block .title-block h4 span i.icon,
-.format-designer .course-info-block .carousel .contact-element .contact-block .title-block h4 span span {
-    display: inline-block;
-} */
 .format-designer .course-info-block .carousel .contact-element .contact-block .info-block .header-button-group a.btn {
     padding-left: 0;
 }
@@ -4432,12 +4036,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     color: #dc3545;
 
 }
-
-/* @media (min-width: 1200px) {
-    .format-designer .course-info-block > .carousel {
-        width: 32%;
-    }
-} */
 
 @media (min-width: 1551px) {
     .format-designer .course-info-block > div {
@@ -4707,20 +4305,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 
 }
 
-.format-designer .designer.kanban-board .section.desktop-three-column .content .section.circles-layout li.activity {
-
-    width: 32%;
-
-}
-
-.format-designer .designer.kanban-board .section.desktop-four-column .content .section.circles-layout li.activity {
-
-    width: 24%;
-
-}
-
-
-
 /*Video time*/
 
 .format-designer .designer .section.img-text.card-layout .activity.videotime {
@@ -4754,12 +4338,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     bottom: 0;
 
 }
-
-/*.format-designer .designer .section.img-text.card-layout .activity.videotime .activity-block .activityinstance {
-
-    padding: 15px;
-
-}*/
 
 .format-designer .designer .section.img-text.card-layout .activity.videotime .activity-block .mod-content {
 
@@ -4881,12 +4459,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 
 }
 
-/*.format-designer .designer .section.img-text.card-layout .activity.videotime.label_mode .activity-block .completion-html-card {
-
-    margin-left: 10px;
-
-}*/
-
 .format-designer .designer .section.img-text.card-layout .activity.videotime.label_mode .activity-block
 
 .completion-html-card .completion-html-card {
@@ -4983,23 +4555,9 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 
 /*Horizontal circles*/
 
-
-
 .format-designer .designer .section .content .section.horizontal-circles-layout li.activity {
 
     width: 100%;
-
-}
-
-.format-designer .designer .section.desktop-two-column .content .section.horizontal-circles-layout li.activity {
-
-    width: 49%;
-
-}
-
-.format-designer .designer .section.desktop-four-column .content .section.horizontal-circles-layout li.activity {
-
-    width: 24%;
 
 }
 
@@ -5062,89 +4620,6 @@ li.horizontal_circles .activityinstance .inplaceeditable .activity-instance {
     right: 25px;
 
 }
-
-.format-designer .designer .section.desktop-one-column .content .section.horizontal-circles-layout li.activity .card .card-body {
-
-    min-height: auto;
-
-    text-align: left;
-
-}
-
-.format-designer .designer .section.desktop-one-column .content .section.horizontal-circles-layout
-
-li.activity .card .card-body .mod-indent-outer > div:last-child {
-
-    text-align: right;
-
-}
-
-.format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-
-li.horizontal_circles .activity-block .activityinstance .img-element {
-
-    text-align: center;
-
-    margin-bottom: 0;
-
-}
-
-.format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-
-li.horizontal_circles .activity-block .activityinstance {
-
-    width: auto;
-
-    float: left;
-
-}
-
-.format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-
-li.horizontal_circles .activity-block .activityinstance .mod-content {
-
-    margin-top: 5px;
-
-}
-
-.format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-
-li.horizontal_circles .activity-block
-
-.activityinstance ~ .completion-html-card {
-
-    display: inline-block;
-
-    margin-top: 25px;
-
-}
-
-.format-designer .designer .section.desktop-one-column .content .section.img-text.horizontal-circles-layout
-
-li.horizontal_circles .mod-visits-block,
-
-.format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-
-li.horizontal_circles .activity-block .action-html-card {
-
-    float: right;
-
-    margin-top: 30px;
-
-    margin-bottom: 0;
-
-    position: static;
-
-}
-
-.format-designer .designer .section.desktop-one-column .content .section.img-text.horizontal-circles-layout
-
-li.horizontal_circles .mod-visits-block {
-
-    margin-top: 35px;
-
-}
-
 
 
 /**/
@@ -5264,18 +4739,6 @@ li.activity .card .card-body {
     margin-bottom: 0;
 
 }
-
-/*.format-designer.editing .designer .section.img-text.horizontal-circles-layout li.horizontal_circles
-
-.activity-block .activityinstance .activity-type,
-
-.format-designer.editing .designer .section.img-text.horizontal-circles-layout li.horizontal_circles
-
-.activity-block .activityinstance .cmname-block {
-
-    margin-left: 15px;
-
-}*/
 
 .format-designer .designer .section .content .section.img-text.horizontal-circles-layout
 
@@ -5407,68 +4870,6 @@ li.horizontal_circles .mod-visits-block {
 
 
 
-@media (min-width: 576px) and (max-width: 1199px) {
-
-    .format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-
-    li.horizontal_circles .activity-block .activityinstance ~ .completion-html-card,
-
-    .format-designer .designer .section.desktop-one-column .content .section.img-text.horizontal-circles-layout
-
-    li.horizontal_circles .mod-visits-block,
-
-    .format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-
-    li.horizontal_circles .activity-block .action-html-card {
-
-        margin-left: 20px;
-
-    }
-
-}
-
-
-
-@media (min-width: 992px) and (max-width: 1366px) {
-
-    .format-designer .designer .section.desktop-four-column .content .section.card-layout li.activity .mod-visits-block,
-
-    .format-designer .designer .section.desktop-four-column .content .section.card-layout li.activity .action-html-card,
-
-    .format-designer .designer .section.desktop-four-column .section.img-text.card-layout
-
-    li.activity.preview_mode .activity-block .mod-icon-url {
-
-        position: static;
-
-    }
-
-    .format-designer .designer .section.desktop-four-column .content .section.card-layout
-
-    li.activity.videotime .completion-html-card {
-
-        display: block;
-
-    }
-
-}
-
-
-
-@media (min-width: 768px) {
-
-    .format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-
-    li.horizontal_circles .activity-block .activityinstance {
-
-        width: 50%;
-
-    }
-
-}
-
-
-
 @media (max-width: 767px) {
 
     .format-designer .designer .section .content .section.link-layout li.activity.videotime
@@ -5526,51 +4927,6 @@ li.horizontal_circles .mod-visits-block {
         display: block;
 
     }
-
-    .format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-
-    li.horizontal_circles .activity-block .activityinstance {
-
-        width: 100%;
-
-    }
-
-    .format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-
-    li.horizontal_circles .activity-block
-
-    .activityinstance ~ .completion-html-card {
-
-        margin-top: 0;
-
-        display: inline-block;
-
-        vertical-align: middle;
-
-        margin-left: 15px;
-
-    }
-
-    .format-designer .designer .section.desktop-one-column .content .section.img-text.horizontal-circles-layout
-
-    li.horizontal_circles .mod-visits-block,
-
-    .format-designer .designer .section.desktop-one-column .section.img-text.horizontal-circles-layout
-
-    li.horizontal_circles .activity-block .action-html-card {
-
-        display: inline-block;
-
-        vertical-align: middle;
-
-        float: none;
-
-        margin-top: 0;
-
-        margin-left: 15px;
-
-    }
-
 }
 
 
@@ -5578,10 +4934,6 @@ li.horizontal_circles .mod-visits-block {
 /*Flow layout*/
 
 .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content {
-
-    /*min-height: 450px;
-
-    width: 31.7%;*/
 
     min-height: 400px;
 
@@ -5609,11 +4961,7 @@ li.horizontal_circles .mod-visits-block {
 
 .section-header-content.flow-stack.collapsed {
 
-    /*width: 31%;*/
-
     width: 400px;
-
-    /*margin-right: 11px;*/
 
 }
 
@@ -5955,14 +5303,6 @@ li.horizontal_circles .mod-visits-block {
 
 }
 
-/*.format-designer .course-content ul.course-type-flow.designer .section.main.stack-header-collapsing
-
-.content.flow-open ul.section.img-text li.activity {
-
-    margin-left: 15px;
-
-}*/
-
 .format-designer .course-content ul.designer.course-type-flow {
 
     display: contents;
@@ -5976,9 +5316,6 @@ li.horizontal_circles .mod-visits-block {
 }
 
 .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text li.activity {
-
-    /*width: 31.6%;*/
-
     width: 400px;
 
     display: inline-block;
@@ -6363,140 +5700,6 @@ li.section.main.section-background-color:not(.section-header-image) .section-hea
 
 }
 
-
-
-/*@media (max-width: 1560px) {
-
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content,
-
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content.flow-stack.collapsed {
-
-        margin-right: 10px;
-
-    }
-
-}
-
-
-
-@media (max-width: 1460px) {
-
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content,
-
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content.flow-stack.collapsed {
-
-        margin-right: 5px;
-
-    }
-
-}
-
-
-
-@media (min-width: 1200px) {
-
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content,
-
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content.flow-stack.collapsed,
-
-    .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text
-
-    li.activity .activity-block.designer,
-
-    .format-designer .designer.course-type-flow .section .content .section.card-layout li.activity .activity-block.designer {
-
-        min-height: 400px;
-
-    }
-
-}
-
-
-
-@media (max-width: 1200px) {
-
-    .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text
-
-    li.activity .activity-block.designer,
-
-    .format-designer .designer.course-type-flow .section .content .section.card-layout li.activity .activity-block.designer {
-
-        min-height: 350px;
-
-    }
-
-}
-
-
-
-@media (max-width: 1199px) {
-
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content,
-
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content.flow-stack.collapsed {
-
-        width: 45%;
-
-    }
-
-}
-
-
-
-@media (min-width: 992px) and (max-width: 1199px) {
-
-    .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text li.activity {
-
-        width: 45%;
-
-    }
-
-}
-
-
-
-@media (max-width: 991px) {
-
-    .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text
-
-    li.activity .activity-block.designer,
-
-    .format-designer .designer.course-type-flow .section .content .section.card-layout li.activity .activity-block.designer {
-
-        min-height: 270px;
-
-    }
-
-    .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text li.activity {
-
-        width: 45%;
-
-    }
-
-}
-
-
-
-@media (max-width: 767px) {
-
-    .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text li.activity {
-
-        width: 45%;
-
-    }
-
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content,
-
-    .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content.flow-stack.collapsed {
-
-        width: 95%;
-
-    }
-
-}*/
-
-
-
 .flow-animation {
 
     -webkit-animation-duration: 1s;
@@ -6512,8 +5715,6 @@ li.section.main.section-background-color:not(.section-header-image) .section-hea
     animation-name: fadeInLeft;
 
 }
-
-
 
 @-webkit-keyframes fadeInLeft {
 
