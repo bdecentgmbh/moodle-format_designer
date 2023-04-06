@@ -114,9 +114,5 @@ if ($ADMIN->fulltree) {
          && file_exists($CFG->dirroot.'/local/designer/setting.php')) {
         require_once($CFG->dirroot.'/local/designer/setting.php');
     }
-
-
-    $settingspage->add($activitypage);
-
     $settings = $settingspage;
 }
