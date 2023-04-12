@@ -28,5 +28,5 @@ $plugin->version   = 2023040600;        // The current plugin version (Date: YYY
 $plugin->requires  = 2020061500;        // Requires this Moodle version.
 $plugin->component = 'format_designer';  // Full name of the plugin (used for diagnostics).
 $plugin->release = 'Version 1.4';
-$plugin->supported = [400, 400];
+$plugin->supported = [400, 401];
 $plugin->maturity  = MATURITY_STABLE;
