@@ -39,6 +39,18 @@ require_once($CFG->dirroot . '/course/lib.php');
 class lib_test extends \advanced_testcase {
 
     /**
+     * Test setup.
+     */
+    public function setUp(): void {
+        global $CFG;
+        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_course.php');
+        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_activity.php');
+
+        $this->setAdminUser();
+        $this->resetAfterTest(true);
+    }
+
+    /**
      * Tests for format_designer::get_section_name method with default section names.
      * @covers ::get_section_name
      * @return void
@@ -335,4 +347,89 @@ class lib_test extends \advanced_testcase {
             $this->assertEquals('cards', $sectiontype);
         }
     }
+
+    /**
+     * Test the Staffs for the course header.
+     * @covers ::format_designer_show_staffs_header
+     * @return void
+     */
+    public function test_format_designer_show_staffs_header() {
+        global $DB;
+        $this->resetAfterTest();
+        $user = $this->getDataGenerator()->create_user();
+        $teacherrole = $DB->get_record('role', ['shortname' => 'editingteacher']);
+        $record = ['format' => 'designer'];
+        $course = $this->getDataGenerator()->create_course($record);
+        $this->getDataGenerator()->enrol_user($user->id, $course->id, $teacherrole->id);
+        $result = format_designer_show_staffs_header($course);
+        $this->assertEquals(1, count($result));
+        $this->assertEquals($user->id, $result[0]->userid);
+    }
+
+    /**
+     * Test the Critera progress function.
+     * @covers ::critera_progress
+     * @return void
+     */
+    public function test_critera_progress() {
+        global $DB;
+        $this->resetAfterTest();
+        $studentrole = $DB->get_record('role', ['shortname' => 'student']);
+        $user = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course(['format' => 'designer', 'enablecompletion' => 1]);
+        $course1 = $this->getDataGenerator()->create_course(['format' => 'designer', 'enablecompletion' => 1]);
+        $assign1 = $this->getDataGenerator()->create_module('assign', ['course' => $course->id], ['completion' => 1]);
+        $assign2 = $this->getDataGenerator()->create_module('assign', ['course' => $course1->id], ['completion' => 1]);
+        $this->getDataGenerator()->enrol_user($user->id, $course->id, $studentrole->id);
+        $this->getDataGenerator()->enrol_user($user->id, $course1->id, $studentrole->id);
+
+        // Set completion criteria and mark the user to complete the criteria.
+        $criteriadata = (object) [
+            'id' => $course1->id,
+            'criteria_activity' => [$assign2->cmid => 1],
+        ];
+        $criterion = new \completion_criteria_activity();
+        $criterion->update_config($criteriadata);
+
+        // Set completion criteria and mark the user to complete the criteria.
+        $criteriadata = (object) [
+            'id' => $course->id,
+            'criteria_course' => [$course1->id],
+        ];
+        $criterion = new \completion_criteria_course();
+        $criterion->update_config($criteriadata);
+
+        // Set completion criteria and mark the user to complete the criteria.
+        $criteriadata = (object) [
+            'id' => $course->id,
+            'criteria_activity' => [$assign1->cmid => 1],
+        ];
+        $criterion = new \completion_criteria_activity();
+        $criterion->update_config($criteriadata);
+        $result = \format_designer\output\renderer::criteria_progress($course, $user->id);
+
+        $this->assertEquals(2, $result['count']);
+        $this->assertEquals(0, $result['completed']);
+        $this->assertEquals(0, $result['percent']);
+        $cmassign = get_coursemodule_from_id('assign', $assign1->cmid);
+        $completion = new \completion_info($course);
+        $completion->update_state($cmassign, COMPLETION_COMPLETE, $user->id);
+
+        $result = \format_designer\output\renderer::criteria_progress($course, $user->id);
+        $this->assertEquals(2, $result['count']);
+        $this->assertEquals(1, $result['completed']);
+        $this->assertEquals(50, $result['percent']);
+
+        $cmassign1 = get_coursemodule_from_id('assign', $assign2->cmid);
+        $completion = new \completion_info($course1);
+        $completion->update_state($cmassign1, COMPLETION_COMPLETE, $user->id);
+
+        $result = \format_designer\output\renderer::criteria_progress($course, $user->id);
+
+        $this->assertEquals(2, $result['count']);
+        $this->assertEquals(2, $result['completed']);
+        $this->assertEquals(100, $result['percent']);
+
+    }
 }
+

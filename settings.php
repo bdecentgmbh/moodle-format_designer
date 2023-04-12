@@ -61,12 +61,58 @@ if ($ADMIN->fulltree) {
         )
     );
 
+    // Hero activity.
+    $name = 'format_designer_hero';
+    $heading = get_string('heroactivity', 'format_designer');
+    $information = '';
+    $setting = new admin_setting_heading($name, $heading, $information);
+    $settings->add($setting);
+
+    $name = 'format_designer/sectionzeroactivities';
+    $title = get_string('sectionzeroactivities', 'format_designer');
+    $description = '';
+    $options = [
+        0 => get_string('disabled', 'format_designer'),
+        1 => get_string('makeherohide', 'format_designer'),
+        2 => get_string('makeherovisible', 'format_designer'),
+    ];
+    $setting = new admin_setting_configselect($name, $title, $description, 0, $options);
+    $settings->add($setting);
+
+    $name = 'format_designer/heroactivity';
+    $title = get_string('showastab', 'format_designer');
+    $desc = '';
+    $default = ['value' => '', 'fix' => 0];
+    $tabs = [
+        0 => get_string('disabled', 'format_designer'),
+        1 => get_string('everywhere', 'format_designer'),
+        2 => get_string('onlycoursepage', 'format_designer')
+    ];
+    $setting = new admin_setting_configselect_with_advanced($name, $title, $desc, $default, $tabs);
+    $settings->add($setting);
+
+    $name = 'format_designer/heroactivitypos';
+    $title = get_string('order');
+    $desc = '';
+    $default = ['value' => 1, 'fix' => 0];
+    $posrange = array_combine(range(-10, 10), range(-10, 10));
+    unset($posrange[0]);
+    $setting = new admin_setting_configselect_with_advanced($name, $title, $desc, $default, $posrange);
+    $settings->add($setting);
+
+    // Avoid duplicate entries.
+    $name = 'format_designer/avoidduplicate_heromodentry';
+    $title = get_string('stravoidduplicateentry', 'format_designer');
+    $desc = '';
+    $setting = new admin_setting_configcheckbox_with_advanced($name, $title, $desc, ['value' => 0]);
+    $settings->add($setting);
     $settingspage->add($settings);
+
+    $activitypage = new admin_settingpage('format_designer_activity', get_string('stractivity', 'format_designer'));
 
     if (format_designer_has_pro()
          && file_exists($CFG->dirroot.'/local/designer/setting.php')) {
         require_once($CFG->dirroot.'/local/designer/setting.php');
     }
-
     $settings = $settingspage;
 }

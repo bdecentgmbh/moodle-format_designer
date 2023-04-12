@@ -20,8 +20,9 @@
  * @copyright  2021 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- define(['jquery', 'core/fragment', 'core/templates', 'core/loadingicon', 'core/ajax', 'core_course/actions'],
- function($, Fragment, Templates, Loadingicon, Ajax, Actions) {
+ define(['jquery', 'core/fragment', 'core/templates', 'core/loadingicon', 'core/ajax',
+    'core_course/actions', 'core_message/toggle_contact_button'],
+ function($, Fragment, Templates, Loadingicon, Ajax, Actions, Contact) {
 
     var SELECTOR = {
         ACTIVITYLI: 'li.activity',
@@ -50,6 +51,9 @@
         self.contextId = contextId;
         self.popupActivities = popupActivities;
 
+        $(".course-info-block .carousel .carousel-item:nth-child(1)").addClass('active');
+        $(".course-info-block #courseStaffinfoControls.carousel").addClass('active');
+
         $('body').delegate(self.SectionController, 'click', self.sectionLayoutaction.bind(this));
         $("body").delegate(self.RestrictInfo, "click", self.moduleHandler.bind(this));
         $("body").delegate(self.sectionRestricted, "click", this.sectionRestrictHandler.bind(this));
@@ -72,6 +76,18 @@
                 $(this).parents('li.section').removeClass('stack-header-collapsing');
             });
         }
+
+        var contactModal = document.getElementsByClassName('toggle-contact-button');
+        Array.from(contactModal).forEach(function(element) {
+            element.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (e.currentTarget.dataset.userid != undefined) {
+                    Contact.enhance(e.currentTarget);
+                }
+            });
+        });
+
+        $('.progress .progress-bar[data-toggle="popover"]').popover();
 
     };
 

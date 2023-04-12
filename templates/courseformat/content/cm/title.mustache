@@ -32,11 +32,23 @@
 }}
 {{#uservisible}}
     <a href="{{url}}" class="{{linkclasses}} aalink stretched-link" onclick="{{{onclick}}}">
-        <span class="instancename" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">{{{instancename}}} {{{altname}}}</span>
+        <span class="instancename" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">
+            {{^designercmname}}
+                {{{instancename}}} {{{altname}}}
+            {{/designercmname}}
+            {{#designercmname}}
+                {{{designercmname}}}
+            {{/designercmname}}
+        </span>
     </a>
 {{/uservisible}}
 {{^uservisible}}
     <span class="instancename">
-        {{{instancename}}} {{{altname}}}
+        {{^designercmname}}
+            {{{instancename}}} {{{altname}}}
+        {{/designercmname}}
+        {{#designercmname}}
+            {{{designercmname}}}
+        {{/designercmname}}
     </span>
 {{/uservisible}}

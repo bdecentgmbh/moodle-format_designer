@@ -53,10 +53,14 @@ class title extends \core_courseformat\output\local\content\cm\title {
 
         $data = (object)[
             'url' => ($mod->modname == 'videotime') ? new moodle_url('/mod/videotime/view.php', ['id' => $mod->id]) : $mod->url,
-            'instancename' => ($mod->modname == 'videotime') ? ucwords($mod->name) : $mod->get_formatted_name(),
+            'instancename' => ($mod->modname == 'videotime') ? $mod->name : $mod->get_formatted_name(),
             'uservisible' => $mod->uservisible,
             'linkclasses' => $this->displayoptions['linkclasses'],
         ];
+        $useactivityitemcustom = \format_designer\options::get_option($mod->id, 'customtitleuseactivityitem');
+        if ($useactivityitemcustom) {
+            $data->designercmname = $this->format->get_cm_secondary_title($mod);
+        }
 
         // File type after name, for alphabetic lists (screen reader).
         if (strpos(

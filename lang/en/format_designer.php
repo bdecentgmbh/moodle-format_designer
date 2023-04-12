@@ -197,8 +197,8 @@ $string['coursecompletiondate_help'] = 'Student date of course completion displa
 $string['courseduedate'] = 'Course due date';
 $string['courseduedate_help'] = 'Course due date will shown in course timesection,
 it only works when Learning tools and time management tool will be installed and enabled';
-$string['activityprogress'] = 'Activity progress';
-$string['activityprogress_help'] = 'Activities completion progress.';
+$string['activityprogress'] = 'Progress bar';
+$string['activityprogress_help'] = 'The progress bar displays how many activities and prerequisites the student has already completed visually. A tooltip is provided to list the activities and prerequisites that are still "to do" and those that are already "completed"';
 
 $string['activity:icon'] = 'Activity icon';
 $string['activity:visits'] = 'Activity visits';
@@ -238,7 +238,7 @@ $string['coursestartdate'] = 'Course start date';
 $string['courseduedate'] = 'Course due date';
 $string['coursecompletiondate'] = 'Course completion date';
 $string['courseexpirationdate'] = 'Course expiration date';
-$string['activitiescompleted'] = '{$a->completed} of {$a->count} activities completed';
+$string['criteriacompleted'] = '{$a->completed} of {$a->count} criteria completed';
 $string['todaydue'] = '{$a->due} due today';
 $string['overdues'] = '{$a->overdues} overdues';
 
@@ -263,7 +263,7 @@ $string['generalsettings'] = 'General designer settings';
 
 $string['coursesettings'] = 'Course';
 $string['sectionsettings'] = 'Section';
-$string['activitysettings'] = 'Activity';
+$string['stractivity'] = 'Activity';
 $string['courseheader'] = 'Course header';
 $string['popupactivitiesnotinstalled'] = 'Popup format must be installed in order to display the activities in popup.';
 $string['listwidth'] = 'List width';
@@ -278,3 +278,90 @@ $string['horizontal_circles'] = 'Horizontal Circles';
 $string['modmaskimage'] = 'Activity mask image';
 $string['modmasksize'] = 'Activity mask size';
 $string['modmaskposition'] = 'Activity mask position';
+
+$string['heroactivity'] = "Hero activitiy";
+$string['everywhere'] = "Everywhere";
+$string['onlycoursepage'] = "Only on course main page";
+$string['showastab'] = "Show as tab";
+$string['disabled'] = "Disabled";
+$string['sectionzeroactivities'] = "Section 0 activities";
+$string['makeherohide'] = "Make hero activity and hide section 0";
+$string['makeherovisible'] = "Make hero activity and keep section 0 visible";
+$string['strprerequisites'] = "Prerequisites";
+$string['courseprerequisites'] = "Course prerequisites";
+$string['displaycourseprerequisites'] = "Display course prerequisites";
+$string['displaycourseprerequisites_help'] = "Define where to display the prerequisites courses";
+$string['abovecoursecontents'] = "Above course contents";
+$string['onseparatetab'] = "On separate tab";
+$string['prerequisitesautostudents'] = "Automatically enrol students";
+$string['prerequisitesautostudents_help'] = "Enrol students automatically for prerequisites courses";
+$string['autoenrolalready'] = "Only if not already enrolled";
+$string['autoenrolalways'] = "Always";
+$string['prerequisitesunenrolstudents'] = "Unenrol students from prerequisites";
+$string['prerequisitesunenrolstudents_help'] = "Unenrol students automatically for prerequisites courses";
+$string['prerequisitesgroupstudents'] = "Group students in prerequisites";
+$string['prerequisitesgroupstudents_help'] = "create group to students for prerequisites courses";
+$string['prerequisitesnewtab'] = "Open prerequisites in new tab";
+$string['prerequisitesnewtab_help'] = "Open the prerequisites courses menu in new tab";
+$string['prerequisitesbackmain'] = "Back to main course";
+$string['prerequisitesbackmain_help'] = "Return the to the main course of prerequisites course";
+$string['never'] = "Never";
+
+$string['strprerequisites_role'] = "Role for automatically enrolled students";
+$string['backtomaincourse'] = "Back to main course";
+$string['disabled'] = "Disabled";
+$string['prerequisitesdesc'] = "Please complete all of the following courses:";
+$string['courseprerequisitestitle'] = "Prerequisites title";
+$string['courseprerequisitestitle_help'] = "Prerequisites course title";
+$string['strprerequisiteinfo'] = "Prerequisite info";
+$string['strprerequisiteinfo_help'] = "Display the text above the prerequisites.";
+$string['displayheaderroleusers'] = "Choose the staff role";
+$string['displayheaderroleusers_help'] = "";
+$string['addtocontacts'] = "Add to contacts";
+$string['message'] = "Message";
+$string['mail'] = "Mail";
+$string['createprereqgroup'] = "Create prerequisites group";
+$string['assignprecourses'] = "Assign prerequisites courses";
+$string['allcourses'] = "All courses";
+$string['pregroups'] = "Prerequisite groups";
+$string['listprereqgroup'] = "Prerequisite groups";
+$string['groupnotfound'] = "Group not found";
+$string['deletegroup'] = "Delete group";
+$string['deletecheckgroup'] = 'Are you absolutely sure you want to completely delete the group {$a}, including their group and other group data?';
+$string['deletednotgroup'] = 'Could not delete group {$a} !';
+$string['deletesuccess'] = "Deleted successfully";
+$string['more'] = "More";
+$string['nogroupsfound'] = "No groups found";
+$string['addnewgroup'] = "Add new group";
+$string['nocourses'] = "No courses";
+$string['move_item'] = 'Move this course';
+$string['profilefieditem'] = '';
+$string['profilefieditem_help'] = "Display the user profile field in the course staff block.";
+$string['strcompleted'] = "Completed";
+
+$string['sectionzeroactivities_help'] = "";
+$string['heroactivitypos'] = "";
+$string['stravoidduplicateentry'] = "Avoid duplicate entry";
+$string['stractivitytype'] = 'Activity type';
+$string['stractivitytitle'] = "Activity title";
+$string['strcustom'] = "Custom";
+$string['secondarymeu_title'] = "Secondary menu title";
+$string['secondarymenu'] = '<h5 class="font-weight-normal font-italic pt-2 pb-2" > Secondary menu </h5>';
+$string['strcustomtitle'] = "Custom title";
+$string['customnameincourseindex'] = "Use custom name in course index";
+$string['customnameinactivityitem'] = "Use custom name on course/section pages";
+$string['strsecondarymenutocourse'] = "Add course to secondary menu item on all course pages";
+$string['strsecondarymenutocourse_help'] = "If checked, a link to the course is added on all pages in the course to the secondary navigation";
+$string['heroactivity_help'] = 'Designer gives teachers the option to make specific activities a "Hero activity". Hero activities are added to
+    the secondary navigation in order to make them easily accessible for students.';
+$string['sectionzeroactivities_help'] = "This setting determines wether activities in the general section should automatically become hero activities.
+    Designer can automatically hide the general section when editing is turned off. This is useful if you want students to access the activities in the general section only from the secondary navigation. This setting works as a default and can be overridden in the activity settings.";
+$string['showastab_help'] = "Use this setting to configure on which pages the menu items for the hero activities should be added to the secondary navigation menu. You can either have them displayed throughout the course or on the course main page.
+    This setting works as a default and can be overridden in the activity settings.";
+$string['heroactivitypos_help'] = "This setting gives you control over the order of the menu items in the secondary navigation menu. Menu items with negative values are added before the course menu item, menu items with positive values are added afterwards. Usually, it makes more sense to use positive numbers.
+    This setting works as a default and can be overridden in the activity settings.";
+$string['struppercompleted'] = "COMPLETED";
+$string['strtodo'] = "TODO";
+
+$string['criteriaprogressinfo_help'] = 'Tip: Click on the progress bar above to see which activities/prerequisites you have already completed and which are not completed yet.';
+$string['criteriaprogressinfo'] = 'Criteria progress bar info';

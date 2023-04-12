@@ -66,3 +66,25 @@ Feature: Users can choose different course types.
     And I press "Save and display"
     Then the "class" attribute of "#section-1 .activity" "css_element" should not contain "flow-animation"
     And "div.kanban-board-activities" "css_element" should not exist
+
+  @javascript
+  Scenario: Check for add course to secondary menu item.
+    Given I log in as "teacher1"
+    And I am on "Course 1" course homepage with editing mode on
+    Then I should see "Course" in the ".secondary-navigation" "css_element"
+    Then I am on the "Test assignment name" "assign activity" page
+    Then I should not see "Course" in the ".secondary-navigation" "css_element"
+    And I am on "Course 1" course homepage
+    And I navigate to "Settings" in current page administration
+    And I follow "Expand all"
+    And I set the following fields to these values:
+      | Add course to secondary menu item on all course pages | 1 |
+    And I press "Save and display"
+    Then I am on the "Test assignment name" "assign activity" page
+    Then I should see "Course" in the ".secondary-navigation" "css_element"
+    And I navigate to "Settings" in current page administration
+    Then I should see "Course" in the ".secondary-navigation" "css_element"
+    And I navigate to "Overrides" in current page administration
+    Then I should see "Course" in the ".secondary-navigation" "css_element"
+    And I navigate to "Advanced grading" in current page administration
+    Then I should see "Course" in the ".secondary-navigation" "css_element"

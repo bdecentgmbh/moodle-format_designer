@@ -74,16 +74,17 @@ class cmname extends \core_courseformat\output\local\content\cm\cmname {
         if (format_designer_has_pro()) {
             if ($mod->modname == 'videotime') {
                 if ($videorecord = $DB->get_record('videotime', array('id' => $mod->instance))) {
-                    if ($videorecord->label_mode == 2) {
+                    if (isset($videorecord->label_mode) && $videorecord->label_mode == 2) {
                         $useactivityimage = \format_designer\options::get_option($mod->id, 'useactivityimage');
                     }
                 }
             }
         }
-
+        $sectiontype = $format->get_section_option($mod->section, 'sectiontype') ?: 'default';
+        $removecenter = ($sectiontype == 'default') ? true : false;
         $data = (object)[
             'url' => ($mod->modname == 'videotime') ? new moodle_url('/mod/videotime/view.php', ['id' => $mod->id]) : $mod->url,
-            'instancename' => ($mod->modname == 'videotime') ? ucwords($mod->name) : $mod->get_formatted_name(),
+            'instancename' => ($mod->modname == 'videotime') ? $mod->name : $mod->get_formatted_name(),
             'uservisible' => $mod->uservisible,
             'icon' => $mod->get_icon_url(),
             'modname' => $mod->modname,
@@ -93,6 +94,7 @@ class cmname extends \core_courseformat\output\local\content\cm\cmname {
             'purpose' => plugin_supports('mod', $mod->modname, FEATURE_MOD_PURPOSE, MOD_PURPOSE_OTHER),
             'useactivityimage' => $useactivityimage,
             'activityname' => $this->get_title_data($output),
+            'removecenter' => $removecenter,
         ];
 
         // File type after name, for alphabetic lists (screen reader).
@@ -106,7 +108,6 @@ class cmname extends \core_courseformat\output\local\content\cm\cmname {
         // Get on-click attribute value if specified and decode the onclick - it
         // has already been encoded for display (puke).
         $data->onclick = htmlspecialchars_decode($mod->onclick, ENT_QUOTES);
-
         return (array) $data;
     }
 }
