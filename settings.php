@@ -61,6 +61,18 @@ if ($ADMIN->fulltree) {
         )
     );
 
+    $settings->add(new admin_setting_heading(
+        'format_designer/deftsettings',
+        new lang_string('deftsettings', 'format_designer'),
+        ''
+    ));
+    $link = '<a href="https://deftly.us" target="_blank">deftly.us</a>';
+    $settings->add(new admin_setting_configcheckbox( 'format_designer/enabledeftresponse',
+        new lang_string('enabledeftresponse', 'format_designer'),
+        new lang_string('enabledeftresponse_help', 'format_designer', $link),
+        0
+    ));
+
     // Hero activity.
     $name = 'format_designer_hero';
     $heading = get_string('heroactivity', 'format_designer');

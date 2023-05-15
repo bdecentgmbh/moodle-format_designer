@@ -70,7 +70,7 @@ $PAGE->requires->js('/course/format/designer/format.js');
 
 
 if ($ispopupactivities && !$PAGE->user_is_editing()) {
-    if (get_config('format_popups', 'enabledeftresponse')) {
+    if (get_config('format_designer', 'enabledeftresponse')) {
         $socket = new \format_popups\socket($context);
         $token = $socket->get_token();
         $PAGE->requires->js_call_amd('format_popups/deft', 'init', array(
