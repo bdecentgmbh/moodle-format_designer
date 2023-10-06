@@ -68,11 +68,19 @@ $PAGE->requires->js_call_amd('format_designer/designer_section', 'init',
 // Include course format js module.
 $PAGE->requires->js('/course/format/designer/format.js');
 
+
 if ($ispopupactivities && !$PAGE->user_is_editing()) {
-    // Include popups.
-    $PAGE->requires->js_call_amd('format_popups/popups', 'init', array(
-        $context->id, $course->id, $displaysection
-    ));
+    if (get_config('format_designer', 'enabledeftresponse')) {
+        $socket = new \format_popups\socket($context);
+        $token = $socket->get_token();
+        $PAGE->requires->js_call_amd('format_popups/deft', 'init', array(
+            $context->id, $course->id, $displaysection, $token, get_config('block_deft', 'throttle')
+        ));
+    } else {
+        $PAGE->requires->js_call_amd('format_popups/popups', 'init', array(
+            $context->id, $course->id, $displaysection
+        ));
+    }
 }
 
 format_designer_editsetting_style($PAGE);
