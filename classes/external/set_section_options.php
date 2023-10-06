@@ -54,8 +54,8 @@ trait set_section_options {
             'sectionid' => new external_value(PARAM_INT, 'Section ID'),
             'options' => new \external_multiple_structure(new external_single_structure([
                 'name' => new external_value(PARAM_TEXT, 'Option name to set on section'),
-                'value' => new external_value(PARAM_RAW, 'Value for option')
-            ]))
+                'value' => new external_value(PARAM_RAW, 'Value for option'),
+            ])),
         ]);
     }
 
@@ -73,7 +73,7 @@ trait set_section_options {
         $params = self::validate_parameters(self::set_section_options_parameters(), [
             'courseid' => $courseid,
             'sectionid' => $sectionid,
-            'options' => $options
+            'options' => $options,
         ]);
         $course = $DB->get_record('course', ['id' => $params['courseid']]);
         /** @var format_designer $format */
@@ -104,11 +104,11 @@ trait set_section_options {
      */
     public static function get_module_parameters() {
         return new external_function_parameters(
-            array(
+            [
                 'id' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
                 'sectionid' => new external_value(PARAM_INT, 'course module section id', VALUE_REQUIRED),
                 'sectionreturn' => new external_value(PARAM_INT, 'section to return to', VALUE_DEFAULT, null),
-            )
+            ]
         );
     }
 
@@ -125,7 +125,7 @@ trait set_section_options {
         global $PAGE, $OUTPUT;
         // Validate and normalize parameters.
         $params = self::validate_parameters(self::get_module_parameters(),
-            array('id' => $id, 'sectionid' => $sectionid, 'sectionreturn' => $sectionreturn));
+            ['id' => $id, 'sectionid' => $sectionid, 'sectionreturn' => $sectionreturn]);
         $id = $params['id'];
         $sectionreturn = $params['sectionreturn'];
 
@@ -186,11 +186,12 @@ trait set_section_options {
      */
     public static function section_refresh_parameters() {
         return new external_function_parameters(
-            array(
+            [
                 'courseid' => new external_value(PARAM_INT, 'course id', VALUE_REQUIRED),
                 'sectionid' => new external_value(PARAM_INT, 'section id', VALUE_REQUIRED),
                 'sectionreturn' => new external_value(PARAM_INT, 'section to return to', VALUE_DEFAULT, null),
-            ));
+            ]
+        );
     }
 
     /**
@@ -215,7 +216,7 @@ trait set_section_options {
         $PAGE->set_context($context);
         // Validate and normalize parameters.
         $params = self::validate_parameters(self::section_refresh_parameters(),
-            array('courseid' => $courseid, 'sectionid' => $sectionid, 'sectionreturn' => $sectionreturn));
+            ['courseid' => $courseid, 'sectionid' => $sectionid, 'sectionreturn' => $sectionreturn]);
         $courseid = $params['courseid'];
         $sectionid = $params['sectionid'];
         $sectionreturn = $params['sectionreturn'];

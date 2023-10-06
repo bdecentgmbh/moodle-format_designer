@@ -233,7 +233,7 @@ class lib_test extends \advanced_testcase {
             'category' => $category,
             'editoroptions' => [
                 'context' => \context_course::instance($course->id),
-                'subdirs' => 0
+                'subdirs' => 0,
             ],
             'returnto' => new \moodle_url('/'),
             'returnurl' => new \moodle_url('/'),
@@ -361,7 +361,7 @@ class lib_test extends \advanced_testcase {
         $record = ['format' => 'designer'];
         $course = $this->getDataGenerator()->create_course($record);
         $this->getDataGenerator()->enrol_user($user->id, $course->id, $teacherrole->id);
-        $result = format_designer_show_staffs_header($course);
+        $result = helper::create()->get_course_staff($course);
         $this->assertEquals(1, count($result));
         $this->assertEquals($user->id, $result[0]->userid);
     }

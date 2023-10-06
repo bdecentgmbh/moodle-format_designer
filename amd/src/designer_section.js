@@ -21,7 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
  define(['jquery', 'core/fragment', 'core/templates', 'core/loadingicon', 'core/ajax',
-    'core_course/actions', 'core_message/toggle_contact_button'],
+    'core_course/actions', 'core_message/toggle_contact_button', 'theme_boost/popover'],
  function($, Fragment, Templates, Loadingicon, Ajax, Actions, Contact) {
 
     var SELECTOR = {

@@ -210,6 +210,94 @@
     line-height: 30px;
     color: #ccc;
 }
+
+/* Course type - Normal*/
+.format-designer .course-content ul.designer.course-type-normal li.section.main {
+    border: 1px solid #eee;
+    border-radius: 0;
+    padding: 5px 15px 20px;
+    margin-right: 1.5rem;
+}
+.format-designer .course-content ul.designer.course-type-normal li.section.main:before {
+    border: 0;
+}
+.format-designer .course-content ul.designer li.section .section-header-content .goto-section {
+    float: right;
+    clear: both;
+}
+
+/* Section block */
+.format-designer .course-content ul.designer li.section .section-content-wrapper.section-progress-info-completed .section-progress-info {
+    width: auto;
+}
+/* Section activities lists */
+.format-designer .course-content ul.designer.course-type-normal li.section .section-header-content .section-summary-activities {
+    width: 80%;
+    display: inline-flex;
+    flex-wrap: wrap;
+}
+.format-designer .course-content ul.designer.course-type-normal li.section .section-header-content .section-summary-activities .img-element {
+    width: 40px;
+    height: 40px;
+    line-height: 35px;
+    text-align: center;
+    border: 2px solid #000;
+    border-radius: 50%;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    position: relative;
+}
+.format-designer .course-content ul.designer.course-type-normal li.section .section-header-content .section-summary-activities .img-element img {
+    width: 16px;
+}
+.format-designer .course-content ul.designer.course-type-normal li.section .section-header-content .section-summary-activities .img-element .activity-count {
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    color: #fff;
+    border-radius: 50%;
+    background-color: #000;
+    position: absolute;
+    top: -15px;
+    right: -10px;
+}
+/* Section activities lists */
+
+.format-designer:not(.editing) .course-content ul.designer.course-type-normal li.section.main.container {
+    width: 30%;
+}
+
+/* Section goto link */
+.format-designer .course-content ul.designer.course-type-normal li.section .section-header-content .goto-section {
+    text-indent: -999em;
+    border: 0;
+    background: none;
+    padding: 0;
+    clear: none;
+}
+.format-designer .course-content ul.designer.course-type-normal li.section .section-header-content .goto-section:focus {
+    box-shadow: none;
+}
+.format-designer .course-content ul.designer.course-type-normal li.section .section-header-content a.goto-section:after {
+    content: '\f178';
+    font-size: 30px;
+    color: #000;
+    text-indent: 0;
+    margin: 0;
+    float: left;
+}
+/* End of Section goto link */
+
+@media (min-width: 576px) {
+    .format-designer .course-content ul.designer.course-type-normal li.section.main {
+        max-width: none;
+        width: 30%;
+        flex: auto;
+    }
+}
+/* End of Course type - Normal*/
+
 .format-designer ul.designer .card.card-list.notstarted {
     border-left-color: var(--primary);
 }
@@ -536,8 +624,7 @@ span.section-collapse-icon:before {
     width: 100%;
     text-align: right;
     float: right;
-    margin-top: 15px;
-    margin-bottom: 10px;
+    margin: 10px;
 }
 .format-designer .course-content ul.designer li.section .section-progress-info .progress {
     height: 12px;
@@ -575,6 +662,7 @@ span.section-collapse-icon:before {
 }
 .format-designer .course-content ul.designer li.section.main.container {
     max-width: none;
+    width: auto;
 }
 .format-designer .course-content ul.designer.single-section-layout li.section.main {
     padding-right: 10px;
@@ -2858,11 +2946,11 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     background: #fff;
 }
 .format-designer .course-content ul.designer.course-type-flow li.section .section-header-content .section-progress-info
-.section-progress-completeted {
+.section-progress-completed {
     text-align: left;
 }
 .format-designer .course-content ul.designer.course-type-flow li.section .section-header-content .section-progress-info
-.section-progress-completeted span.badge-success {
+.section-progress-completed span.badge-success {
     font-size: 13px;
     padding: 5px 10px;
 }

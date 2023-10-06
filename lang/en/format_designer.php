@@ -289,11 +289,8 @@ $string['makeherohide'] = "Make hero activity and hide section 0";
 $string['makeherovisible'] = "Make hero activity and keep section 0 visible";
 $string['strprerequisites'] = "Prerequisites";
 $string['courseprerequisites'] = "Course prerequisites";
-$string['deftsettings'] = 'Deft response settings';
 $string['displaycourseprerequisites'] = "Display course prerequisites";
 $string['displaycourseprerequisites_help'] = "Define where to display the prerequisites courses";
-$string['enabledeftresponse'] = 'Enable Deft response';
-$string['enabledeftresponse_help'] = 'The Deft response block allows updating content users are viewing remotely when changes happen on a Moodle server. If that plugin is installed and activated and this is enabled, this format will update the course page when activities are modified. Find more information at {$a}.';
 $string['abovecoursecontents'] = "Above course contents";
 $string['onseparatetab'] = "On separate tab";
 $string['prerequisitesautostudents'] = "Automatically enrol students";
@@ -368,3 +365,61 @@ $string['strtodo'] = "TODO";
 
 $string['criteriaprogressinfo_help'] = 'Tip: Click on the progress bar above to see which activities/prerequisites you have already completed and which are not completed yet.';
 $string['criteriaprogressinfo'] = 'Criteria progress bar info';
+
+// Activity navigation.
+$string['addnavigation'] = 'Add activity navigation';
+// Course background.
+$string['coursebackground'] = 'Course Background';
+$string['coursebackgroundcolor'] = 'Course Background Color';
+$string['coursebackgroundcolor_help'] = '';
+$string['coursebackgroundimage'] = 'Course Background Image';
+$string['coursebackgroundimage_help'] = '';
+$string['coursebackgroundtransparent'] = 'Transparent Course';
+$string['coursebackgroundtransparent_help'] = '';
+
+// Course header.
+$string['courseheadertype'] = 'Type';
+$string['courseheadertype_help'] = '';
+$string['hero'] = 'Hero';
+$string['content'] = 'Content';
+$string['courseheadertimemanagement'] = 'Time Management';
+$string['courseheadertimemanagement_help'] = '';
+$string['courseprogresstype'] = 'Course Progress';
+$string['courseprogresstype_help'] = '';
+$string['progressbar'] = 'Progress bar';
+$string['donut'] = 'Donut';
+$string['sectionprogresstype'] = 'Section Progress';
+$string['sectionprogresstype_help'] = '';
+$string['courseheadersummary'] = 'Summary';
+$string['courseheadersummary_help'] = '';
+$string['trimmed'] = 'Trimmed';
+$string['full'] = 'Full';
+$string['additionalcontent'] = 'Additional Content';
+$string['additionalcontent_help'] = '';
+$string['courseheaderbgcolor'] = 'Background color';
+$string['courseheaderbgcolor_help'] = '';
+$string['courseheadertextcolor'] = 'Text color';
+$string['courseheadertextcolor_help'] = '';
+$string['courseheaderbgimage'] = 'Background image';
+$string['courseheaderbgimage_help'] = '';
+$string['courseheaderheight'] = 'Minimum Height';
+$string['courseheaderheight_help'] = '';
+$string['courseheadersize'] = 'Full Screen';
+$string['courseheadersize_help'] = '';
+$string['userfields'] = 'User profile fields';
+$string['userfields_help'] = 'Select fields to display under the staff users';
+$string['coursecustomfields'] = 'Course fields';
+$string['coursecustomfields_help'] = '';
+$string['coursecompleted'] = 'Course completed';
+$string['coursecustomfields_help'] = '';
+// ...Coursefields icon.
+$string['configcoursefield'] = 'Icon for {$a->name}';
+$string['configcourseicons'] = 'Course fields icons';
+// ...Course fields config.
+$string['configcoursefields'] = 'Course fields to display';
+$string['configcoursefields_help'] = 'Selected the course fields will be show on the course header';
+$string['summarylength'] = 'Summary length';
+$string['summarylengthdesc'] = 'Enter the length for the summary to trim';
+// ...Field value fromat.
+$string['enabled'] = 'Enabled';
+$string['disabled'] = 'Disabled';

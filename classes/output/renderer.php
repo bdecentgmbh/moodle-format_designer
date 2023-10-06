@@ -30,6 +30,7 @@ use cm_info;
 use context_course;
 use core_courseformat\base as course_format;
 use completion_info;
+use format_designer\helper;
 use html_writer;
 use moodle_page;
 use moodle_url;
@@ -87,6 +88,7 @@ class renderer extends \core_courseformat\output\section_renderer {
      * @return string coursecontent
      */
     public function render_content($widget) {
+        global $CFG;
         $data = $widget->export_for_template($this);
         $course = $data->course;
         $this->modinfo = course_get_format($course)->get_modinfo();
@@ -101,7 +103,9 @@ class renderer extends \core_courseformat\output\section_renderer {
         $data->startclass = implode(' ', $startclass);
         $data->startid = $startid;
 
-        $data->timemanagement = $this->timemanagement_details($course);
+        if (!format_designer_has_pro()) {
+            $data->timemanagement = $this->timemanagement_details($course);
+        }
         return $this->render_from_template('format_designer/courseformat/content/section', $data);
     }
 
@@ -191,7 +195,7 @@ class renderer extends \core_courseformat\output\section_renderer {
                     'pixattr' => ['class' => ''],
                     'attr' => [
                         'class' => 'dropdown-item editing_highlight menu-action',
-                        'data-action' => 'removemarker'
+                        'data-action' => 'removemarker',
                     ],
                 ];
             } else {
@@ -204,7 +208,7 @@ class renderer extends \core_courseformat\output\section_renderer {
                     'pixattr' => ['class' => ''],
                     'attr' => [
                         'class' => 'dropdown-item editing_highlight menu-action',
-                        'data-action' => 'setmarker'
+                        'data-action' => 'setmarker',
                     ],
                 ];
             }
@@ -241,7 +245,7 @@ class renderer extends \core_courseformat\output\section_renderer {
      */
     public function parentsection_edit_control_items($course, $section, $onsectionpage = false) {
         if (!$this->page->user_is_editing()) {
-            return array();
+            return [];
         }
 
         $sectionreturn = $onsectionpage ? $section->section : null;
@@ -253,7 +257,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         $baseurl = course_get_url($course, $sectionreturn);
         $baseurl->param('sesskey', sesskey());
 
-        $controls = array();
+        $controls = [];
 
         if (!$isstealth && has_capability('moodle/course:update', $coursecontext)) {
             if ($section->section > 0
@@ -263,12 +267,13 @@ class renderer extends \core_courseformat\output\section_renderer {
                 $streditsection = get_string('editsection');
             }
 
-            $controls['edit'] = array(
-                'url'   => new moodle_url('/course/editsection.php', array('id' => $section->id, 'sr' => $sectionreturn)),
+            $controls['edit'] = [
+                'url'   => new moodle_url('/course/editsection.php', ['id' => $section->id, 'sr' => $sectionreturn]),
                 'icon' => 'i/settings',
                 'name' => $streditsection,
-                'pixattr' => array('class' => ''),
-                'attr' => array('class' => 'dropdown-item edit menu-action'));
+                'pixattr' => ['class' => ''],
+                'attr' => ['class' => 'dropdown-item edit menu-action'],
+            ];
         }
 
         if ($section->section) {
@@ -278,23 +283,27 @@ class renderer extends \core_courseformat\output\section_renderer {
                     if ($section->visible) { // Show the hide/show eye.
                         $strhidefromothers = get_string('hidefromothers', 'format_'.$course->format);
                         $url->param('hide', $section->section);
-                        $controls['visiblity'] = array(
+                        $controls['visiblity'] = [
                             'url' => $url,
                             'icon' => 'i/hide',
                             'name' => $strhidefromothers,
-                            'pixattr' => array('class' => ''),
-                            'attr' => array('class' => 'dropdown-item editing_showhide menu-action',
-                                'data-sectionreturn' => $sectionreturn, 'data-action' => 'hide'));
+                            'pixattr' => ['class' => ''],
+                            'attr' => ['class' => 'dropdown-item editing_showhide menu-action',
+                                'data-sectionreturn' => $sectionreturn, 'data-action' => 'hide',
+                            ],
+                        ];
                     } else {
                         $strshowfromothers = get_string('showfromothers', 'format_'.$course->format);
                         $url->param('show',  $section->section);
-                        $controls['visiblity'] = array(
+                        $controls['visiblity'] = [
                             'url' => $url,
                             'icon' => 'i/show',
                             'name' => $strshowfromothers,
-                            'pixattr' => array('class' => ''),
-                            'attr' => array('class' => 'dropdown-item editing_showhide menu-action',
-                                'data-sectionreturn' => $sectionreturn, 'data-action' => 'show'));
+                            'pixattr' => ['class' => ''],
+                            'attr' => ['class' => 'dropdown-item editing_showhide menu-action',
+                                'data-sectionreturn' => $sectionreturn, 'data-action' => 'show',
+                            ],
+                        ];
                     }
                 }
 
@@ -305,12 +314,13 @@ class renderer extends \core_courseformat\output\section_renderer {
                             $url->param('section', $section->section);
                             $url->param('move', -1);
                             $strmoveup = get_string('moveup');
-                            $controls['moveup'] = array(
+                            $controls['moveup'] = [
                                 'url' => $url,
                                 'icon' => 'i/up',
                                 'name' => $strmoveup,
-                                'pixattr' => array('class' => ''),
-                                'attr' => array('class' => 'dropdown-item moveup menu-action'));
+                                'pixattr' => ['class' => ''],
+                                'attr' => ['class' => 'dropdown-item moveup menu-action'],
+                            ];
                         }
 
                         $url = clone($baseurl);
@@ -318,12 +328,13 @@ class renderer extends \core_courseformat\output\section_renderer {
                             $url->param('section', $section->section);
                             $url->param('move', 1);
                             $strmovedown = get_string('movedown');
-                            $controls['movedown'] = array(
+                            $controls['movedown'] = [
                                 'url' => $url,
                                 'icon' => 'i/down',
                                 'name' => $strmovedown,
-                                'pixattr' => array('class' => ''),
-                                'attr' => array('class' => 'dropdown-item movedown menu-action'));
+                                'pixattr' => ['class' => ''],
+                                'attr' => ['class' => 'dropdown-item movedown menu-action'],
+                            ];
                         }
                     }
                 }
@@ -335,20 +346,22 @@ class renderer extends \core_courseformat\output\section_renderer {
                 } else {
                     $strdelete = get_string('deletesection');
                 }
-                $url = new moodle_url('/course/editsection.php', array(
+                $url = new moodle_url('/course/editsection.php', [
                     'id' => $section->id,
                     'sr' => $sectionreturn,
                     'delete' => 1,
-                    'sesskey' => sesskey()));
-                $controls['delete'] = array(
+                    'sesskey' => sesskey(),
+                    ],
+                );
+                $controls['delete'] = [
                     'url' => $url,
                     'icon' => 'i/delete',
                     'name' => $strdelete,
-                    'pixattr' => array('class' => ''),
-                    'attr' => array('class' => 'dropdown-item editing_delete menu-action'));
+                    'pixattr' => ['class' => ''],
+                    'attr' => ['class' => 'dropdown-item editing_delete menu-action'],
+                ];
             }
         }
-
         return $controls;
     }
 
@@ -365,9 +378,9 @@ class renderer extends \core_courseformat\output\section_renderer {
         if ($completioninfo->is_enabled() && !$this->page->user_is_editing()
             && $completioninfo->is_tracked_user($USER->id) && isloggedin() && !isguestuser()) {
             $result .= html_writer::tag('div', get_string('yourprogress', 'completion') .
-                    $this->output->help_icon('completionicons', 'format_designer'), array(
-                        'id' => 'completionprogressid', 'class' => 'completionprogress'
-                    ));
+                    $this->output->help_icon('completionicons', 'format_designer'), [
+                        'id' => 'completionprogressid', 'class' => 'completionprogress',
+                    ]);
         }
         return $result;
     }
@@ -375,11 +388,14 @@ class renderer extends \core_courseformat\output\section_renderer {
     /**
      * Get course time mananagment details user current course progress and due modules course.
      *
-     * @param stdclass $course
+     * @param \stdClass $course
+     * @param bool $dataonly True then returns only the data.
+     *
      * @return string
      */
-    public function timemanagement_details(stdclass $course): string {
+    public function timemanagement_details(\stdClass $course, bool $dataonly=false) {
         global $USER, $CFG, $DB;
+
         require_once($CFG->dirroot.'/enrol/locallib.php');
 
         $context = context_course::instance($course->id);
@@ -393,39 +409,56 @@ class renderer extends \core_courseformat\output\section_renderer {
             $enrolstartdate = $course->startdate;
             $enrolenddate = $course->enddate;
         }
+
+        // Find the date options visibility status for the time management.
+        $enrolmentstartdate = (in_array('enrolmentstartdate', $course->timemanagement));
+        $enrolmentenddate = (in_array('enrolmentenddate', $course->timemanagement));
+        $courseduedate = (in_array('courseduedate', $course->timemanagement));
+        $coursecompletiondate = (in_array('coursecompletiondate', $course->timemanagement));
+
+        // Get course staffs to show on course header.
+        $coursestaffs = helper::create()->get_course_staff_users($course);
+
         $data = [
             'course' => $course,
-            'enrolmentstartdate' => ($course->enrolmentstartdate) ? $enrolstartdate : '',
-            'enrolmentenddate' => $course->enrolmentenddate ? $enrolenddate : '',
-            'coursestaffinfo' => format_designer_show_staffs_header($course),
-            'statuscoursestaffinfo' => !empty(format_designer_show_staffs_header($course)) ? true : false,
-            'slidearrow' => count(format_designer_show_staffs_header($course)) > 1 ? true : false,
+            'enrolmentstartdate' => ($enrolmentstartdate) ? $enrolstartdate : '',
+            'enrolmentenddate' => $enrolmentenddate ? $enrolenddate : '',
+            'coursestaffinfo' => $coursestaffs,
+            'statuscoursestaffinfo' => !empty($coursestaffs) ? true : false,
+            'slidearrow' => count($coursestaffs) > 1 ? true : false,
             'currentuser' => $USER->id,
             'ismessaging' => $CFG->messaging,
         ];
+
         $courseprogress = self::criteria_progress($course, $USER->id);
         $data['courseprogress'] = ($course->activityprogress) ? $courseprogress : '';
         $data['progresshelpicon'] = $this->output->help_icon('criteriaprogressinfo', 'format_designer');
-        if ($courseprogress != null) {
+        if ($courseprogress != null && $coursecompletiondate) {
             $sql = "SELECT * FROM {course_completions}
                 WHERE course = :course AND userid = :userid AND timecompleted IS NOT NULL";
             $completion = $DB->get_record_sql($sql, ['userid' => $USER->id, 'course' => $course->id]);
             $data += [
-                'showcompletiondate' => ($course->coursecompletiondate) ?: '',
+                'showcompletiondate' => ($coursecompletiondate) ?: '',
                 'completiondate' => (!empty($completion) ? $completion->timecompleted : ''),
             ];
         }
         // Find the course due date. only if the timemanagement installed.
         if (format_designer_timemanagement_installed() && function_exists('ltool_timemanagement_cal_course_duedate')) {
-            $coursedatesinfo = $DB->get_record('ltool_timemanagement_course', array('course' => $course->id));
-            if ($course->courseduedate && $coursedatesinfo) {
+            $coursedatesinfo = $DB->get_record('ltool_timemanagement_course', ['course' => $course->id]);
+            if ($courseduedate && $coursedatesinfo) {
                 $data['courseduedate'] = ltool_timemanagement_cal_course_duedate($coursedatesinfo, $enrolstartdate);
             }
         }
 
         $data['due'] = $this->due_overdue_activities_count();
 
+        // Return the data of time managmenet.
+        if ($dataonly) {
+            return $data;
+        }
+
         $html = $this->output->render_from_template('format_designer/course_time_management', $data);
+
         return $html;
     }
 
@@ -443,7 +476,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         foreach ($modinfo->sections as $modnumbers) {
             foreach ($modnumbers as $modnumber) {
                 $mod = $modinfo->cms[$modnumber];
-                if (!empty($mod) && $DB->record_exists('course_modules', array('id' => $mod->id, 'deletioninprogress' => 0))
+                if (!empty($mod) && $DB->record_exists('course_modules', ['id' => $mod->id, 'deletioninprogress' => 0])
                          && $mod->uservisible) {
                     $data = $completion->get_data($mod, true, $USER->id);
                     if ($data->completionstate != COMPLETION_COMPLETE) {
@@ -551,10 +584,10 @@ class renderer extends \core_courseformat\output\section_renderer {
         return [
             'count' => $count,
             'completed' => $completed,
-            'percent' => $percent,
+            'percent' => round($percent),
             'remain' => 100 - $percent,
             'completioncriteriahtml' => $completioncriteriahtml,
-            'uncompletioncriteriahtml' => $uncompletioncriteriahtml
+            'uncompletioncriteriahtml' => $uncompletioncriteriahtml,
         ];
     }
 
@@ -611,7 +644,9 @@ class renderer extends \core_courseformat\output\section_renderer {
         if (!isset($course->coursetype)) {
             return '';
         }
-        if ($course->coursetype == DESIGNER_TYPE_COLLAPSIBLE) {
+        if ($course->coursetype == DESIGNER_TYPE_NORMAL && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
+            $class = 'course-type-normal';
+        } else if ($course->coursetype == DESIGNER_TYPE_COLLAPSIBLE) {
             $class = 'course-type-collapsible';
         } else if ($course->coursetype == DESIGNER_TYPE_KANBAN) {
             $class = 'course-type-kanbanboard kanban-board';
@@ -656,8 +691,8 @@ class renderer extends \core_courseformat\output\section_renderer {
                 'classes' => $contentclass,
             ],
             'activity' => [
-                'classes' => $actvitiyclass
-            ]
+                'classes' => $actvitiyclass,
+            ],
         ];
     }
 
@@ -758,6 +793,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         $sectionstylerules = ($course->coursetype == DESIGNER_TYPE_KANBAN)
             ? (isset($course->listwidth) && $section->section != 0
             ? sprintf('width: %s;', $course->listwidth) : '') : '';
+
         $templatecontext = [
             'section' => $section,
             'sectiontype' => $sectiontype,
@@ -797,6 +833,28 @@ class renderer extends \core_courseformat\output\section_renderer {
         if ($zerotohero == DESIGNER_HERO_ZERO_HIDE && $section->section == 0 && !$this->page->user_is_editing()) {
             $templatecontext['hidesection'] = true;
         }
+
+        if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && $course->coursetype == DESIGNER_TYPE_NORMAL && $sectionheader) {
+            $mods = [];
+            $cmids = $modinfo->sections[$section->section] ?? [];
+            foreach ($cmids as $cmid) {
+                $thismod = $modinfo->cms[$cmid];
+
+                if ($thismod->uservisible) {
+                    if (isset($mods[$thismod->modname])) {
+                        $mods[$thismod->modname]['name'] = $thismod->modplural;
+                        $mods[$thismod->modname]['img'] = $CFG->wwwroot.'/mod/'.$thismod->modname.'/pix/monologo.png';
+                        $mods[$thismod->modname]['count']++;
+                    } else {
+                        $mods[$thismod->modname]['name'] = $thismod->modfullname;
+                        $mods[$thismod->modname]['img'] = $CFG->wwwroot.'/mod/'.$thismod->modname.'/pix/monologo.png';
+                        $mods[$thismod->modname]['count'] = 1;
+                    }
+                }
+            }
+            $templatecontext['sectioncountstatus'] = true;
+            $templatecontext['sectionmodcount'] = array_values($mods);
+        }
         if (format_designer_has_pro() && $section->section == 0) {
             require_once($CFG->dirroot. "/local/designer/lib.php");
             if ($course->displaycourseprerequisites == DESIGNER_PREREQUISITES_ABOVECOURSE
@@ -809,7 +867,10 @@ class renderer extends \core_courseformat\output\section_renderer {
                 $section, $course, $modinfo, $templatecontext
             );
         }
-
+        if (format_designer_has_pro()) {
+            $templatecontext += \local_designer\courseheader::create($format)
+                ->section_progress_type(round($sectionprogress), $sectionprogresscomp);
+        }
         if ($sectioncontent) {
             $contenttemplatename = 'format_designer/section_content_' . $sectiontype;
             return $this->render_from_template($contenttemplatename, $templatecontext);
@@ -838,11 +899,11 @@ class renderer extends \core_courseformat\output\section_renderer {
             'data-id' => $section->id,
             'data-for' => "section",
             'data-number' => $section->section,
-            'style' => $style
+            'style' => $style,
         ]);
         $templatecontext += [
             'style' => $style,
-            'sectionclass' => $sectionclass
+            'sectionclass' => $sectionclass,
         ];
         $templatecontext['sectionend'] = html_writer::end_tag('li');
 
@@ -906,7 +967,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         $useactivityimage = '';
         if (format_designer_has_pro()) {
             if ($mod->modname == 'videotime') {
-                if ($videorecord = $DB->get_record('videotime', array('id' => $mod->instance))) {
+                if ($videorecord = $DB->get_record('videotime', ['id' => $mod->instance])) {
                     if (isset($videorecord->label_mod) && $videorecord->label_mode == 2) {
                         $useactivityimage = \format_designer\options::get_option($mod->id, 'useactivityimage');
                     }
@@ -926,15 +987,15 @@ class renderer extends \core_courseformat\output\section_renderer {
             if (!empty($cmtextcontent)) {
                 if (str_word_count($cmtextcontent) >= 23) {
                     $modcontenthtml = '';
-                    $modcontenthtml .= html_writer::start_tag('div', array('class' => 'trim-summary'));
+                    $modcontenthtml .= html_writer::start_tag('div', ['class' => 'trim-summary']);
                     $modcontenthtml .= format_designer_modcontent_trim_char($cmtextcontent, 24);
                     $modcontenthtml .= \html_writer::link('javascript:void(0)', get_string('more'),
-                    array('class' => 'mod-description-action'));
+                    ['class' => 'mod-description-action']);
                     $modcontenthtml .= html_writer::end_tag('div');
-                    $modcontenthtml .= html_writer::start_tag('div', array('class' => 'fullcontent-summary summary-hide'));
+                    $modcontenthtml .= html_writer::start_tag('div', ['class' => 'fullcontent-summary summary-hide']);
                     $modcontenthtml .= $cmtextcontent;
                     $modcontenthtml .= " " .\html_writer::link('javascript:void(0)', get_string('less', 'format_designer'),
-                    array('class' => 'mod-description-action'));
+                    ['class' => 'mod-description-action']);
                     $modcontenthtml .= html_writer::end_tag('div');
                     $modcontent = $modcontenthtml;
                 } else {
@@ -947,20 +1008,22 @@ class renderer extends \core_courseformat\output\section_renderer {
             );
         }
 
-        $modvisits = $DB->count_records('logstore_standard_log', array('contextinstanceid' => $mod->id,
-            'userid' => $USER->id, 'action' => 'viewed', 'target' => 'course_module'));
+        $modvisits = $DB->count_records('logstore_standard_log', ['contextinstanceid' => $mod->id,
+            'userid' => $USER->id, 'action' => 'viewed', 'target' => 'course_module',
+        ]);
         $modvisits = !empty($modvisits) ? get_string('modvisit', 'format_designer', $modvisits) :
             get_string('notvisit', 'format_designer');
         $calltoactionhtml = $this->render(new call_to_action($mod));
         $modrestricted = ($mod->availableinfo) ?: false;
 
-        $activitylink = html_writer::empty_tag('img', array('src' => $mod->get_icon_url(),
-                'class' => 'iconlarge activityicon', 'alt' => '', 'role' => 'presentation', 'aria-hidden' => 'true'));
+        $activitylink = html_writer::empty_tag('img', ['src' => $mod->get_icon_url(),
+                'class' => 'iconlarge activityicon', 'alt' => '', 'role' => 'presentation', 'aria-hidden' => 'true',
+        ]);
         if ($mod->uservisible) {
             if (empty($url)) {
                 $url = $this->get_cmurl($mod);
             }
-            $modiconurl = html_writer::link($url, $activitylink, array('class' => 'mod-icon-url'));
+            $modiconurl = html_writer::link($url, $activitylink, ['class' => 'mod-icon-url']);
         } else {
             $modiconurl = html_writer::start_div('mod-icon-url');
             $modiconurl .= $activitylink;
@@ -970,7 +1033,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         $videotimeduration = '';
         $durationformatted = '';
         if ($mod->modname == 'videotime') {
-            $videoinstance = $DB->get_record('videotime', array('id' => $mod->instance));
+            $videoinstance = $DB->get_record('videotime', ['id' => $mod->instance]);
             $dbman = $DB->get_manager();
             if ($videoinstance && $dbman->table_exists('videotime_vimeo_video')) {
                 if ($video = $DB->get_record('videotime_vimeo_video', ['link' => $videoinstance->vimeo_url])) {
@@ -1007,7 +1070,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             'modstyle' => isset($modstyle) ? $modstyle : '',
             'useactivityimage' => $useactivityimage,
             'duration_formatted' => $durationformatted,
-            'enableactivityimage' => $enableactivityimage ?? false
+            'enableactivityimage' => $enableactivityimage ?? false,
         ];
         if (format_designer_has_pro()) {
             require_once($CFG->dirroot. "/local/designer/lib.php");
@@ -1049,7 +1112,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             $element = json_decode($option, true);
             $classes = [
                 0 => 'content-hide', 1 => 'content-show', 2 => 'content-show-hover',
-                3 => 'content-hide-hover', 4 => 'content-remove'
+                3 => 'content-hide-hover', 4 => 'content-remove',
             ];
 
             $elementclasses = array_map(function($v) use ($classes) {
@@ -1112,7 +1175,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             $linkclasses .= ' dimmed';
             $textclasses .= ' dimmed dimmed_text';
         }
-        return array($linkclasses, $textclasses);
+        return [$linkclasses, $textclasses];
     }
 
     /**

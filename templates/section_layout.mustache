@@ -26,7 +26,7 @@
     }
 }}
 
-<div class="section-content-wrapper">
+<div class="section-content-wrapper {{#sectionprogresscomp}} section-progress-info-completed {{/sectionprogresscomp}}">
 {{#sectiondesignwhole}}
     <div class="section-background-style section-design-whole" style="{{#sectionbackgroundstyle}} {{sectionbackgroundstyle}} {{/sectionbackgroundstyle}}">
         {{#maskinner}}
@@ -115,7 +115,6 @@
                 {{> core_courseformat/local/content/section/badges }}
             {{/ core_courseformat/local/content/section/badges }}
         </div>
-        
         {{^flowcourse}}
             {{#section.categorisetitle}}
             <div class="categorise-section-block">
@@ -129,6 +128,7 @@
         {{^flowcourse}}
             {{#issectioncompletion}}
             <div class="section-progress-info">
+                {{^progresspro}}
                 {{^sectionprogresscomp}}
                 <div class="section-progress-bar">
                     <div class="progress">
@@ -139,10 +139,14 @@
                 </div>
                 {{/sectionprogresscomp}}
                 {{#sectionprogresscomp}}
-                    <div class="section-progress-completeted">
+                    <div class="section-progress-completed">
                         <span class="badge badge-completion badge-success"><span><i class="fa fa-check"></i> {{#str}}sectioncompleted, format_designer{{/str}}</span></span>
                     </div>
                 {{/sectionprogresscomp}}
+                {{/progresspro}}
+                {{#progresspro}}
+                    {{{progress}}}
+                {{/progresspro}}
             </div>
             {{/issectioncompletion}}
         {{/flowcourse}}
@@ -166,6 +170,7 @@
         {{#flowcourse}}
             {{#issectioncompletion}}
             <div class="section-progress-info">
+                {{^progresspro}}
                 {{^sectionprogresscomp}}
                 <div class="section-progress-bar">
                     <div class="progress">
@@ -176,14 +181,27 @@
                 </div>
                 {{/sectionprogresscomp}}
                 {{#sectionprogresscomp}}
-                    <div class="section-progress-completeted">
+                    <div class="section-progress-completed">
                         <span class="badge badge-completion badge-success"><span><i class="fa fa-check"></i> {{#str}}sectioncompleted, format_designer{{/str}}</span></span>
                     </div>
                 {{/sectionprogresscomp}}
+                {{/progresspro}}
+                {{#progresspro}}
+                    {{{progress}}}
+                {{/progresspro}}
             </div>
             {{/issectioncompletion}}
         {{/flowcourse}}
-
+        {{#sectioncountstatus}}
+        <div class="section-summary-activities pr-2 mdl-right">
+            {{#sectionmodcount}}
+                <div class="img-element activity-img">
+                    <img src="{{img}}" alt="{{name}}" title="{{name}}">
+                    <span class="activity-count">{{count}}</span>
+                </div>
+            {{/sectionmodcount}}
+        </div>
+        {{/sectioncountstatus}}
         {{#gotosection}}
         <a href="{{{sectionurl}}}" class="goto-section btn btn-primary">{{#str}}gotosection, format_designer{{/str}}</a>
         {{/gotosection}}
