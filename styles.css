@@ -39,7 +39,8 @@
         padding-right: 0;
     }
 }
-.format-designer.path-mod .header-maxwidth {
+.format-designer.path-mod .header-maxwidth,
+.format-designer.path-admin .header-maxwidth {
     padding: 0 3rem;
     background-color: #fff;
 }
