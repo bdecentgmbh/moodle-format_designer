@@ -22,12 +22,16 @@
 }
 
 @media (min-width: 768px) {
-    .format-designer .header-maxwidth,
-    .format-designer .secondary-navigation,
     .pagelayout-standard.format-designer #page.drawers .main-inner,
     body.limitedwidth.format-designer #page.drawers .main-inner,
     .pagelayout-standard.format-designer #page.drawers .footer-popover,
     body.limitedwidth.format-designer #page.drawers .footer-popover {
+        max-width: none;
+    }
+    .format-designer.path-admin.path-admin-roles:not(.format-site) .header-maxwidth,
+    .format-designer.path-admin.path-admin-roles:not(.format-site) .secondary-navigation .navigation .nav-tabs,
+    .format-designer.path-admin.path-admin-tool-lp .header-maxwidth,
+    .format-designer.path-admin.path-admin-tool-lp .secondary-navigation .navigation .nav-tabs {
         max-width: none;
     }
     #page.drawers.format-designer {
@@ -35,7 +39,10 @@
         padding-right: 0;
     }
 }
-
+.format-designer.path-mod .header-maxwidth {
+    padding: 0 3rem;
+    background-color: #fff;
+}
 .format-designer #goto-top-link {
     z-index: 1;
 }
@@ -216,12 +223,11 @@
     border: 1px solid #eee;
     border-radius: 0;
     padding: 5px 15px 20px;
-    margin-right: 1.5rem;
 }
 .format-designer .course-content ul.designer.course-type-normal li.section.main:before {
     border: 0;
 }
-.format-designer .course-content ul.designer li.section .section-header-content .goto-section {
+.format-designer .course-content ul.designer:not(.course-type-flow) li.section .section-header-content .goto-section {
     float: right;
     clear: both;
 }
@@ -267,37 +273,7 @@
 .format-designer:not(.editing) .course-content ul.designer.course-type-normal li.section.main.container {
     width: 30%;
 }
-
-/* Section goto link */
-.format-designer .course-content ul.designer.course-type-normal li.section .section-header-content .goto-section {
-    text-indent: -999em;
-    border: 0;
-    background: none;
-    padding: 0;
-    clear: none;
-}
-.format-designer .course-content ul.designer.course-type-normal li.section .section-header-content .goto-section:focus {
-    box-shadow: none;
-}
-.format-designer .course-content ul.designer.course-type-normal li.section .section-header-content a.goto-section:after {
-    content: '\f178';
-    font-size: 30px;
-    color: #000;
-    text-indent: 0;
-    margin: 0;
-    float: left;
-}
-/* End of Section goto link */
-
-@media (min-width: 576px) {
-    .format-designer .course-content ul.designer.course-type-normal li.section.main {
-        max-width: none;
-        width: 30%;
-        flex: auto;
-    }
-}
 /* End of Course type - Normal*/
-
 .format-designer ul.designer .card.card-list.notstarted {
     border-left-color: var(--primary);
 }
@@ -462,8 +438,8 @@ body.format-designer.editing ul.designer .section .circles-layout .activity .edi
 /* format_topics CSS copied from boost to replicate basic styling for designer (based on topic) */
 .format-designer .course-content ul.designer {
     list-style: none;
-    padding: 0;
-    margin: 0;
+    padding: 0 0 20px 0;
+    margin: 0 0 20px 0;
     clear: both;
 }
 .format-designer .course-content ul.designer li.section.main {
@@ -656,6 +632,14 @@ span.section-collapse-icon:before {
     display: inline-block;
     vertical-align: middle;
 }
+.format-designer.path-course-view.pagelayout-course #page {
+    background-color: transparent;
+}
+.format-designer #page #page-content section#region-main {
+    padding: 10px;
+    border-radius: 5px;
+    overflow: auto;
+}
 .format-designer.path-course-view.pagelayout-course #page #page-content section#region-main {
     padding: 0;
     overflow: visible;
@@ -663,9 +647,6 @@ span.section-collapse-icon:before {
 .format-designer .course-content ul.designer li.section.main.container {
     max-width: none;
     width: auto;
-}
-.format-designer .course-content ul.designer.single-section-layout li.section.main {
-    padding-right: 10px;
 }
 .format-designer .course-content ul.designer li.section.main.container .section-content-wrapper .right .section-collapsemenu {
     margin-bottom: 10px;
@@ -1677,6 +1658,9 @@ ul li {
 .format-designer .designer .section .content .section.link-layout li.activity .mod-content {
     margin-left: 35px;
     margin-bottom: 5px;
+}
+.format-designer .designer .section .content .section.card-layout li.activity .card.card-list.success {
+    min-height: 250px;
 }
 .format-designer .designer .section .content .section.card-layout li.activity .card.card-list .mod-indent-outer {
     height: 100%;
@@ -2902,7 +2886,8 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     height: auto;
 }
 .format-designer .course-content ul.designer.course-type-flow {
-    display: contents;
+    /* display: contents; */
+    margin-top: 30px;
 }
 .format-designer .course-content ul.course-type-flow.designer .section.main .section-content-wrapper {
     display: contents;
@@ -2941,7 +2926,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     bottom: 20px;
     left: 20px;
 }
-.format-designer .course-content ul.designer.course-type-flow li.section .section-header-content .section-progress-info .progress {
+.format-designer .course-content ul.designer.course-type-flow li.section .section-header-content .section-progress-info > div:not(.progress-donut) .progress {
     height: 12px;
     background: #fff;
 }

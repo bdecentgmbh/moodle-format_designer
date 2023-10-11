@@ -100,10 +100,12 @@ class helper {
             $user = \core_user::get_user($userid);
             profile_load_data($user);
 
-            $extrafields = profile_get_user_fields_with_data($userid);
-            foreach ($extrafields as $formfield) {
-                if ($course->{$formfield->inputname}) {
-                    $customfield[]['value'] = $formfield->data;
+            if (format_designer_has_pro() != 1) {
+                $extrafields = profile_get_user_fields_with_data($userid);
+                foreach ($extrafields as $formfield) {
+                    if ($course->{$formfield->inputname}) {
+                        $customfield[]['value'] = $formfield->data;
+                    }
                 }
             }
             $roles = get_user_roles($coursecontext, $userid, false);

@@ -102,6 +102,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         }
         $data->startclass = implode(' ', $startclass);
         $data->startid = $startid;
+        $data->issectionpageclass = (optional_param('section', null, PARAM_INT)) ? 'section-page-layout' : '';
 
         if (!format_designer_has_pro()) {
             $data->timemanagement = $this->timemanagement_details($course);
@@ -843,17 +844,26 @@ class renderer extends \core_courseformat\output\section_renderer {
                 if ($thismod->uservisible) {
                     if (isset($mods[$thismod->modname])) {
                         $mods[$thismod->modname]['name'] = $thismod->modplural;
-                        $mods[$thismod->modname]['img'] = $CFG->wwwroot.'/mod/'.$thismod->modname.'/pix/monologo.png';
+                        if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/monologo.png')) {
+                            $mods[$thismod->modname]['img'] = $CFG->wwwroot.'/mod/'.$thismod->modname.'/pix/monologo.png';
+                        } else if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/icon.png')) {
+                            $mods[$thismod->modname]['img'] = $CFG->wwwroot.'/mod/'.$thismod->modname.'/pix/icon.png';
+                        }
                         $mods[$thismod->modname]['count']++;
                     } else {
                         $mods[$thismod->modname]['name'] = $thismod->modfullname;
-                        $mods[$thismod->modname]['img'] = $CFG->wwwroot.'/mod/'.$thismod->modname.'/pix/monologo.png';
+                        if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/monologo.png')) {
+                            $mods[$thismod->modname]['img'] = $CFG->wwwroot.'/mod/'.$thismod->modname.'/pix/monologo.png';
+                        } else if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/icon.png')) {
+                            $mods[$thismod->modname]['img'] = $CFG->wwwroot.'/mod/'.$thismod->modname.'/pix/icon.png';
+                        }
                         $mods[$thismod->modname]['count'] = 1;
                     }
                 }
             }
             $templatecontext['sectioncountstatus'] = true;
             $templatecontext['sectionmodcount'] = array_values($mods);
+            $templatecontext['sectionsingle'] = true;
         }
         if (format_designer_has_pro() && $section->section == 0) {
             require_once($CFG->dirroot. "/local/designer/lib.php");

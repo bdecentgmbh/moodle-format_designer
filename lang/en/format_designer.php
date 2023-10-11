@@ -316,7 +316,7 @@ $string['courseprerequisitestitle_help'] = "Prerequisites course title";
 $string['strprerequisiteinfo'] = "Prerequisite info";
 $string['strprerequisiteinfo_help'] = "Display the text above the prerequisites.";
 $string['displayheaderroleusers'] = "Choose the staff role";
-$string['displayheaderroleusers_help'] = "";
+$string['displayheaderroleusers_help'] = "Users with these selected roles will be displayed in the course header.";
 $string['addtocontacts'] = "Add to contacts";
 $string['message'] = "Message";
 $string['mail'] = "Mail";
@@ -371,45 +371,53 @@ $string['addnavigation'] = 'Add activity navigation';
 // Course background.
 $string['coursebackground'] = 'Course Background';
 $string['coursebackgroundcolor'] = 'Course Background Color';
-$string['coursebackgroundcolor_help'] = '';
+$string['coursebackgroundcolor_help'] = 'Use this option to choose a background color for the entire course. If a color is selected here, it will be applied as the background color for the course. This setting is optional, and you can leave it blank if you don\'t want to set a specific background color.';
 $string['coursebackgroundimage'] = 'Course Background Image';
-$string['coursebackgroundimage_help'] = '';
+$string['coursebackgroundimage_help'] = 'If you wish to have an image as the background for the entire course, you can upload it here. Once uploaded, this image will be displayed as the background for the entire course. This setting is optional, and you can leave it blank if you prefer not to have a background image.';
 $string['coursebackgroundtransparent'] = 'Transparent Course';
-$string['coursebackgroundtransparent_help'] = '';
+$string['coursebackgroundtransparent_help'] = 'If you select this option, the background color of container elements within the course that currently have a background color will be set to transparent. This can create a visually appealing effect where elements appear to float on top of the background';
 
 // Course header.
 $string['courseheadertype'] = 'Type';
-$string['courseheadertype_help'] = '';
+$string['courseheadertype_help'] = '<b>None</b>: This option will not add any header to the course page.<br>
+<b>Hero</b>: Selecting this option will make the header span the full width of the page, providing a visually impactful course introduction.<br>
+<b>Content</b>: Choosing this option will set the header width to match the course contents, maintaining a more compact design.';
 $string['hero'] = 'Hero';
 $string['content'] = 'Content';
 $string['courseheadertimemanagement'] = 'Time Management';
-$string['courseheadertimemanagement_help'] = '';
+$string['courseheadertimemanagement_help'] = 'Select the time-related elements you want to display in the course header. You can choose multiple options from enrolment start date, enrolment end date, due date, and completed date.';
 $string['courseprogresstype'] = 'Course Progress';
-$string['courseprogresstype_help'] = '';
+$string['courseprogresstype_help'] = '<b>Disabled</b>: This option will not display any course progress information in the header.<br>
+<b>Progress Bar</b>: Selecting this option will display the course progress as a bar, visually indicating how much of the course is completed.<br>
+<b>Donut</b>: Choosing this option will display the course progress as a donut chart, providing a different visual representation of progress.<br>';
 $string['progressbar'] = 'Progress bar';
 $string['donut'] = 'Donut';
 $string['sectionprogresstype'] = 'Section Progress';
-$string['sectionprogresstype_help'] = '';
+$string['sectionprogresstype_help'] = '<b>Disabled</b>: This option will not display any section progress information in the header.<br>
+<b>Progress Bar</b>: Selecting this option will display the section progress as a bar, showing the completion status of individual course sections.<br>
+<b>Donut</b>: Choosing this option will display the section progress as a donut chart, offering an alternative visual representation.<br>';
 $string['courseheadersummary'] = 'Summary';
-$string['courseheadersummary_help'] = '';
+$string['courseheadersummary_help'] = '<b>Disabled</b>: This option will not show any summary in the header.<br>
+<b>Trimmed</b>: Selecting this option will trim the course summary based on the global setting "trim length."<br>
+<b>Full</b>: Choosing this option will display the complete course summary.<br>';
 $string['trimmed'] = 'Trimmed';
 $string['full'] = 'Full';
 $string['additionalcontent'] = 'Additional Content';
-$string['additionalcontent_help'] = '';
+$string['additionalcontent_help'] = 'Add any additional content that you want to appear at the bottom of the course header.';
 $string['courseheaderbgcolor'] = 'Background color';
-$string['courseheaderbgcolor_help'] = '';
+$string['courseheaderbgcolor_help'] = 'Choose a background color to overlay on top of the background image. This color setting should support transparency if desired.';
 $string['courseheadertextcolor'] = 'Text color';
-$string['courseheadertextcolor_help'] = '';
+$string['courseheadertextcolor_help'] = 'Select the color for text elements within the course header.';
 $string['courseheaderbgimage'] = 'Background image';
-$string['courseheaderbgimage_help'] = '';
+$string['courseheaderbgimage_help'] = 'Upload a background image that you want to use for the course header.';
 $string['courseheaderheight'] = 'Minimum Height';
-$string['courseheaderheight_help'] = '';
+$string['courseheaderheight_help'] = 'Specify the minimum height, in number, for the course header.';
 $string['courseheadersize'] = 'Full Screen';
-$string['courseheadersize_help'] = '';
+$string['courseheadersize_help'] = 'If enabled, the course header will take up the full height of the screen.';
 $string['userfields'] = 'User profile fields';
-$string['userfields_help'] = 'Select fields to display under the staff users';
+$string['userfields_help'] = 'Select profile fields to display below the user in the course header.';
 $string['coursecustomfields'] = 'Course fields';
-$string['coursecustomfields_help'] = '';
+$string['coursecustomfields_help'] = 'Select the course fields from those available on the site that you want to display in the course header.';
 $string['coursecompleted'] = 'Course completed';
 $string['coursecustomfields_help'] = '';
 // ...Coursefields icon.

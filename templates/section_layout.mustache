@@ -26,7 +26,7 @@
     }
 }}
 
-<div class="section-content-wrapper {{#sectionprogresscomp}} section-progress-info-completed {{/sectionprogresscomp}}">
+<div class="section-content-wrapper {{#sectionprogresscomp}} section-progress-info-completed {{/sectionprogresscomp}}" {{#sectionsingle}} data-action="go-to-section-url" data-url="{{{sectionurl}}}" {{/sectionsingle}}>
 {{#sectiondesignwhole}}
     <div class="section-background-style section-design-whole" style="{{#sectionbackgroundstyle}} {{sectionbackgroundstyle}} {{/sectionbackgroundstyle}}">
         {{#maskinner}}
@@ -203,7 +203,7 @@
         </div>
         {{/sectioncountstatus}}
         {{#gotosection}}
-        <a href="{{{sectionurl}}}" class="goto-section btn btn-primary">{{#str}}gotosection, format_designer{{/str}}</a>
+        <a href="{{{sectionurl}}}" class="goto-section btn btn-primary" style="{{#sectiontextcolor}} {{sectiontextcolor}} {{/sectiontextcolor}}">{{#str}}gotosection, format_designer{{/str}}</a>
         {{/gotosection}}
 </div>
 

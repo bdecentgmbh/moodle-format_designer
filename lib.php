@@ -284,6 +284,7 @@ class format_designer extends \core_courseformat\base {
 
         if (format_designer_has_pro()) {
             // Include the designer pro styles.
+            $PAGE->requires->css('/local/designer/style/slick.css');
             $styleurl = \local_designer\courseoptions::create($this->get_course())->designer_include_style();
             $PAGE->requires->css($styleurl);
         }
@@ -499,13 +500,15 @@ class format_designer extends \core_courseformat\base {
                 $courseformatoptions += (new local_designer\courseoptions($PAGE->course))->course_header_options_format_list();
             }
 
-            $userprofilefields = profile_get_user_fields_with_data(0);
-            if (!empty($userprofilefields)) {
-                foreach ($userprofilefields as $field) {
-                    $courseformatoptions[$field->inputname] = [
-                        'default' => 0,
-                        'type' => PARAM_INT,
-                    ];
+            if (format_designer_has_pro() != 1 ) {
+                $userprofilefields = profile_get_user_fields_with_data(0);
+                if (!empty($userprofilefields)) {
+                    foreach ($userprofilefields as $field) {
+                        $courseformatoptions[$field->inputname] = [
+                            'default' => 0,
+                            'type' => PARAM_INT,
+                        ];
+                    }
                 }
             }
 
@@ -739,15 +742,17 @@ class format_designer extends \core_courseformat\base {
                 'help_component' => 'format_designer',
             ];
 
-            $userprofilefields = profile_get_user_fields_with_data(0);
-            if (!empty($userprofilefields)) {
-                foreach ($userprofilefields as $field) {
-                    $courseformatoptionsedit[$field->inputname] = [
-                        'label' => $field->field->name,
-                        'element_type' => 'advcheckbox',
-                        'help' => 'profilefieditem',
-                        'help_component' => 'format_designer',
-                    ];
+            if (format_designer_has_pro() != 1 ) {
+                $userprofilefields = profile_get_user_fields_with_data(0);
+                if (!empty($userprofilefields)) {
+                    foreach ($userprofilefields as $field) {
+                        $courseformatoptionsedit[$field->inputname] = [
+                            'label' => $field->field->name,
+                            'element_type' => 'advcheckbox',
+                            'help' => 'profilefieditem',
+                            'help_component' => 'format_designer',
+                        ];
+                    }
                 }
             }
 
