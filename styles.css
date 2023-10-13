@@ -243,6 +243,12 @@
 }
 
 /* Section block */
+body.format-designer.path-enrol:not(.path-enrol-manual) div#course-header {
+    margin-bottom: 2rem;
+}
+body.format-designer #page.drawers .main-inner .header-maxwidth {
+    position: relative;
+}
 .format-designer .course-content ul.designer li.section .section-content-wrapper.section-progress-info-completed .section-progress-info {
     width: auto;
 }

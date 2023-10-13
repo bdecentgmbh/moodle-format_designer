@@ -248,7 +248,7 @@ class cm_completion implements renderable, templatable {
      * @return bool
      */
     final public function is_overdue(): bool {
-        return $this->get_completion_expected() > 0 && $this->get_completion_expected() < time();
+        return $this->get_completion_expected() > 0 && $this->get_completion_expected() < strtotime("-1 day");
     }
 
     /**

@@ -252,7 +252,7 @@ class format_designer extends \core_courseformat\base {
      */
     public function course_header() {
         if (format_designer_has_pro() && class_exists('\local_designer\courseheader')) {
-            return new local_designer\courseheader($this);
+            return local_designer\courseheader::get_header_instance($this);
         }
     }
 
@@ -282,12 +282,6 @@ class format_designer extends \core_courseformat\base {
         global $PAGE;
         // If section is specified in course/view.php, make sure it is expanded in navigation.
 
-        if (format_designer_has_pro()) {
-            // Include the designer pro styles.
-            $PAGE->requires->css('/local/designer/style/slick.css');
-            $styleurl = \local_designer\courseoptions::create($this->get_course())->designer_include_style();
-            $PAGE->requires->css($styleurl);
-        }
 
         if ($navigation->includesectionnum === false) {
             $selectedsection = optional_param('section', null, PARAM_INT);
@@ -1841,6 +1835,13 @@ function format_designer_extend_navigation_course($navigation, $course, $context
     }
     $format = course_get_format($COURSE);
     $course = $format->get_course();
+
+    if (format_designer_has_pro()) {
+        // Include the designer pro styles.
+        $styleurl = \local_designer\courseoptions::create($course)->designer_include_style();
+        $PAGE->requires->css($styleurl);
+    }
+
     $isaddsecondary = ($navigation->children->count() <= 1 && $PAGE->context->contextlevel == CONTEXT_MODULE) &&
         (format_designer_course_has_heroactivity($course) || $course->secondarymenutocourse);
     $currentmodname = isset($PAGE->cm->modname) ? get_string('modulename', $PAGE->cm->modname) : '';

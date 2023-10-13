@@ -138,6 +138,10 @@
     };
 
     DesignerSection.prototype.redirectToSection = function(event) {
+        let isPadlock = event.target.classList.contains('fa-lock');
+        if (document.body.classList.contains('editing') || isPadlock) {
+            return null;
+        }
         var singlesection = event.target.closest("[data-action=go-to-section-url]")
         let sectionurl = singlesection.getAttribute('data-url');
         window.location.href = sectionurl;
