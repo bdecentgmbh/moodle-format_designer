@@ -44,6 +44,15 @@
     padding: 0 3rem;
     background-color: #fff;
 }
+.format-designer.path-mod.course-header-type-hero .header-maxwidth,
+.format-designer.path-admin.course-header-type-hero .header-maxwidth {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+.format-designer.path-mod.course-header-type-hero .header-maxwidth + #page-content,
+.format-designer.path-admin.course-header-type-hero .header-maxwidth + #page-content {
+    margin-top: 2rem;
+}
 .format-designer #goto-top-link {
     z-index: 1;
 }
@@ -637,7 +646,7 @@ span.section-collapse-icon:before {
     background-color: transparent;
 }
 .format-designer #page #page-content section#region-main {
-    padding: 10px;
+    padding: 15px 10px;
     border-radius: 5px;
     overflow: auto;
 }

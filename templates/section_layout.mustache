@@ -64,7 +64,7 @@
     >
     {{#flowcourse}}
     <div class="flow-stack-header"></div>
-    <div class="section-background-color" style="{{sectionbackcolor}}"></div> 
+    <div class="section-background-color" style="{{sectionbackcolor}}"></div>
     {{/flowcourse}}
         {{#sectiondesignheader}}
             <div class="section-background-style sectiondesign-header" style="{{sectionbackgroundstyle}}">
@@ -195,9 +195,15 @@
         {{#sectioncountstatus}}
         <div class="section-summary-activities pr-2 mdl-right">
             {{#sectionmodcount}}
-                <div class="img-element activity-img">
-                    <img src="{{img}}" alt="{{name}}" title="{{name}}">
-                    <span class="activity-count">{{count}}</span>
+                <div class="img-element activity-img" style="{{{sectionmoduleimgstyle}}}">
+                    {{#activityimgsvg}}
+                        {{{activityimgsvg}}}
+                    {{/activityimgsvg}}
+
+                    {{^activityimgsvg}}
+                        <img src="{{img}}" alt="{{name}}" title="{{name}}">
+                    {{/activityimgsvg}}
+                    <span class="activity-count" style="{{{sectionactivitycountstyle}}}">{{count}}</span>
                 </div>
             {{/sectionmodcount}}
         </div>

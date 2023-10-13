@@ -60,6 +60,7 @@
         $('body').delegate(self.fullDescription, "click", self.fullmodcontentHandler.bind(this));
         $('body').delegate(self.trimDescription, "click", self.trimmodcontentHandler.bind(this));
         $('body').delegate(self.goToURL, "click", self.redirectToModule.bind(this));
+        $('body').delegate(self.goToSectionURL, "click", self.redirectToSection.bind(this));
         window.onhashchange = function() {
             self.expandSection();
         };
@@ -95,6 +96,8 @@
      * Selector section controller.
      */
     DesignerSection.prototype.goToURL = '.designer [data-action="go-to-url"]';
+
+    DesignerSection.prototype.goToSectionURL = '.designer [data-action="go-to-section-url"]';
 
     DesignerSection.prototype.SectionController = ".designer #section-designer-action .dropdown-menu a";
 
@@ -133,6 +136,13 @@
         window.location.href = modurl;
         return true;
     };
+
+    DesignerSection.prototype.redirectToSection = function(event) {
+        var singlesection = event.target.closest("[data-action=go-to-section-url]")
+        let sectionurl = singlesection.getAttribute('data-url');
+        window.location.href = sectionurl;
+        return true;
+    }
 
     DesignerSection.prototype.expandSection = () => {
         var sectionID = window.location.hash;
