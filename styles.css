@@ -53,9 +53,6 @@
 .format-designer.path-admin.course-header-type-hero .header-maxwidth + #page-content {
     margin-top: 2rem;
 }
-.format-designer #goto-top-link {
-    z-index: 1;
-}
 .format-designer ul.designer .card.card-list {
     min-height: 78px;
     width: 100%;
@@ -66,9 +63,9 @@
 .format-designer ul.designer .card.card-list.restricted {
     border-color: #ccc;
 }
-.format-designer ul.designer .card-layout .card.card-list .card-body .mod-indent-outer > div {
+/* .format-designer ul.designer .card-layout .card.card-list .card-body .mod-indent-outer > div {
     position: relative;
-}
+} */
 .format-designer ul.designer .card.card-list .card-body .mod-indent-outer .completion-info {
     text-align: center;
     margin-bottom: 5px;
@@ -229,18 +226,55 @@
 }
 
 /* Course type - Normal*/
-.format-designer .course-content ul.designer.course-type-normal li.section.main {
-    border: 1px solid #eee;
+.format-designer .course-content .single-section-layout ul.designer.course-type-normal li.section.main {
     border-radius: 0;
-    padding: 5px 15px 20px;
+    padding: 0 15px;
+}
+.format-designer .course-content .single-section-layout ul.designer.course-type-normal li.section.main .section-header-content {
+    padding: 15px;
+}
+.format-designer .course-content .single-section-layout:not(.section-page-layout) ul.designer.course-type-normal li.section.main .section-content-wrapper {
+    height: 100%;
+    border: 1px solid #eee;
+    cursor: pointer;
 }
 .format-designer .course-content ul.designer.course-type-normal li.section.main:before {
     border: 0;
 }
+
+/* Section goto link */
 .format-designer .course-content ul.designer:not(.course-type-flow) li.section .section-header-content .goto-section {
     float: right;
     clear: both;
 }
+.format-designer .course-content ul.designer.course-type-normal li.section .section-header-content .goto-section {
+    width: 20px;
+    color: var(--primary);
+    text-indent: -999em;
+    border: 0;
+    background: none;
+    padding: 0;
+    clear: none;
+}
+.format-designer .course-content ul.designer.course-type-normal li.section .section-header-content .goto-section:focus {
+    box-shadow: none;
+}
+.format-designer .course-content ul.designer.course-type-normal li.section .section-header-content a.goto-section:after {
+    content: '\f061';
+    font-size: 24px;
+    text-indent: 0;
+    margin: 0;
+    float: left;
+}
+.format-designer .course-content ul.designer.course-type-normal li.section .section-header-content a.goto-section:after {
+    content: '\f101';
+    font-family: 'FontAwesome';
+    margin-left: 10px;
+}
+.format-designer #goto-top-link {
+    z-index: 1;
+}
+/* End of Section goto link */
 
 /* Section block */
 body.format-designer.path-enrol:not(.path-enrol-manual) div#course-header {
@@ -255,6 +289,7 @@ body.format-designer #page.drawers .main-inner .header-maxwidth {
 /* Section activities lists */
 .format-designer .course-content ul.designer.course-type-normal li.section .section-header-content .section-summary-activities {
     width: 80%;
+    margin-top: 20px;
     display: inline-flex;
     flex-wrap: wrap;
 }
@@ -286,9 +321,6 @@ body.format-designer #page.drawers .main-inner .header-maxwidth {
 }
 /* Section activities lists */
 
-.format-designer:not(.editing) .course-content ul.designer.course-type-normal li.section.main.container {
-    width: 30%;
-}
 /* End of Course type - Normal*/
 .format-designer ul.designer .card.card-list.notstarted {
     border-left-color: var(--primary);
@@ -602,11 +634,7 @@ span.section-collapse-icon:before,
 span.section-collapse-icon:before {
     content: '\f105';
 }
-.format-designer .course-content ul.designer li.section .section-header-content a.goto-section:after {
-    content: '\f101';
-    font-family: 'FontAwesome';
-    margin-left: 10px;
-}
+
 .format-designer .course-content ul.designer li.section .section-header-content.boxed-block,
 .format-designer .course-content ul.designer li.section .content .section.boxed-block {
     margin: 0 auto;
@@ -659,10 +687,6 @@ span.section-collapse-icon:before {
 .format-designer.path-course-view.pagelayout-course #page #page-content section#region-main {
     padding: 0;
     overflow: visible;
-}
-.format-designer .course-content ul.designer li.section.main.container {
-    max-width: none;
-    width: auto;
 }
 .format-designer .course-content ul.designer li.section.main.container .section-content-wrapper .right .section-collapsemenu {
     margin-bottom: 10px;
@@ -1680,6 +1704,7 @@ ul li {
 }
 .format-designer .designer .section .content .section.card-layout li.activity .card.card-list .mod-indent-outer {
     height: 100%;
+    position: relative;
 }
 .format-designer .designer .section .content .section.card-layout li.activity .card-list {
     cursor: pointer;
@@ -2518,7 +2543,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 }
 
 /*Horizontal circles*/
-
 .format-designer .designer .section .content .section.horizontal-circles-layout li.activity {
     width: 100%;
 }
@@ -2554,6 +2578,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 .format-designer.editing .designer .section.img-text.horizontal-circles-layout li.horizontal_circles .activity-actions {
     right: 25px;
 }
+
 /*v-4.0+*/
 .format-designer.editing .designer .section.img-text.horizontal-circles-layout li.horizontal_circles .activity-actions {
     right: 0;

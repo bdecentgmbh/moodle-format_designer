@@ -398,8 +398,11 @@ class renderer extends \core_courseformat\output\section_renderer {
         global $USER, $CFG, $DB;
 
         require_once($CFG->dirroot.'/enrol/locallib.php');
-
         $context = context_course::instance($course->id);
+        if (!is_enrolled($context, $USER->id)) {
+            return;
+        }
+
         if (is_enrolled($context, $USER->id)) {
             $enrolmanager = new \course_enrolment_manager($this->page, $course);
             $enrolments = $enrolmanager->get_user_enrolments($USER->id);

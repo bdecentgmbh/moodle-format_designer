@@ -993,7 +993,8 @@ class format_designer extends \core_courseformat\base {
                 $name = $name.'width';
                 $availablewidth = array_slice($width, 0, $size);
                 $sectionoptions[$name] = [
-                    'default' => isset($design->$name) && $foreditform ? $design->$name : 0,
+                    'default' => (isset($design->$name) && $foreditform ||
+                    (isset($course->coursetype) && $course->coursetype != DESIGNER_TYPE_NORMAL)) ? $design->$name : 2,
                     'type' => PARAM_INT,
                     'label' => new lang_string($name, 'format_designer'),
                     'element_type' => 'select',
@@ -1984,7 +1985,7 @@ function format_designer_extend_navigation_course($navigation, $course, $context
         require(['jquery', 'core/moremenu'], function($, MenuMore) {
             $(document).ready(function() {
                 // Added the secondary navigation when menu is empty.
-                if ('$isaddsecondary') {
+                if ('$isaddsecondary' && !document.querySelector('.secondary-navigation')) {
                     $('$secondarycontent').insertAfter('#page-header');
                 }
                 var moremenu = document.querySelector('.secondary-navigation ul.nav-tabs .dropdownmoremenu ul');
