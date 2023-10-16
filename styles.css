@@ -248,7 +248,7 @@
     clear: both;
 }
 .format-designer .course-content ul.designer.course-type-normal li.section .section-header-content .goto-section {
-    width: 20px;
+    width: 35px;
     color: var(--primary);
     text-indent: -999em;
     border: 0;
@@ -262,14 +262,10 @@
 .format-designer .course-content ul.designer.course-type-normal li.section .section-header-content a.goto-section:after {
     content: '\f061';
     font-size: 24px;
-    text-indent: 0;
-    margin: 0;
-    float: left;
-}
-.format-designer .course-content ul.designer.course-type-normal li.section .section-header-content a.goto-section:after {
-    content: '\f101';
     font-family: 'FontAwesome';
-    margin-left: 10px;
+    text-indent: 0;
+    margin: 0 0 0 10px;
+    float: left;
 }
 .format-designer #goto-top-link {
     z-index: 1;
