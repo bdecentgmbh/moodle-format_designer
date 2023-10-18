@@ -209,7 +209,7 @@
         </div>
         {{/sectioncountstatus}}
         {{#gotosection}}
-        <a href="{{{sectionurl}}}" class="goto-section btn btn-primary" style="{{#sectiontextcolor}} {{sectiontextcolor}} {{/sectiontextcolor}}">{{#str}}gotosection, format_designer{{/str}}</a>
+        <a href="{{{sectionurl}}}" class="goto-section btn btn-primary" {{#sectioncountstatus}} style="{{#sectiontextcolor}} {{sectiontextcolor}} {{/sectiontextcolor}}" {{/sectioncountstatus}}>{{#str}}gotosection, format_designer{{/str}}</a>
         {{/gotosection}}
 </div>
 

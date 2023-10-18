@@ -14,6 +14,9 @@
 .link-layout .img-element .activityiconcontainer.img-block .icon {
     filter: none;
 }
+html:has([class=""]) {
+    height: auto;
+}
 
 @media (min-width: 1200px) {
     .pagelayout-course.format-designer #page-wrapper #page.drawers .main-inner {
@@ -278,6 +281,9 @@ body.format-designer.path-enrol:not(.path-enrol-manual) div#course-header {
 }
 body.format-designer #page.drawers .main-inner .header-maxwidth {
     position: relative;
+}
+body.format-designer.path-admin #page.drawers .main-inner .header-maxwidth {
+    padding: 0 20px;
 }
 .format-designer .course-content ul.designer li.section .section-content-wrapper.section-progress-info-completed .section-progress-info {
     width: auto;

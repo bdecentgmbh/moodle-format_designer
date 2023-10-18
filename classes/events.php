@@ -54,9 +54,10 @@ class events {
         $options = $format->section_format_options();
         $sectiondata = ['id' => $sectionid];
         foreach ($options as $name => $option) {
-            $sectiondata[$name] = get_config('format_designer', $name);
+            if (get_config('format_designer', $name)) {
+                $sectiondata[$name] = get_config('format_designer', $name);
+            }
         }
-
         if (!defined('NO_OUTPUT_BUFFERING') || (defined('NO_OUTPUT_BUFFERING') && !NO_OUTPUT_BUFFERING)) {
             $format->update_section_format_options($sectiondata);
         }

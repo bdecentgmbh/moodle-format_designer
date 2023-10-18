@@ -62,10 +62,6 @@ echo $renderer->render($widget);
 
 $ispopupactivities = isset($course->popupactivities) && $course->popupactivities;
 
-$PAGE->requires->js_call_amd('format_designer/designer_section', 'init',
-    ['courseid' => $course->id, 'contextid' => $context->id, 'popupactivities' => $ispopupactivities,
-]);
-
 // Include course format js module.
 $PAGE->requires->js('/course/format/designer/format.js');
 

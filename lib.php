@@ -992,9 +992,10 @@ class format_designer extends \core_courseformat\base {
             foreach (['desktop' => 5, 'tablet' => 3, 'mobile' => 2] as $name => $size) {
                 $name = $name.'width';
                 $availablewidth = array_slice($width, 0, $size);
+                $widthdefaultvalue = isset($design->$name) ? $design->$name : '';
                 $sectionoptions[$name] = [
                     'default' => (isset($design->$name) && $foreditform ||
-                    (isset($course->coursetype) && $course->coursetype != DESIGNER_TYPE_NORMAL)) ? $design->$name : 2,
+                    (isset($course->coursetype) && $course->coursetype != DESIGNER_TYPE_NORMAL)) ?  $widthdefaultvalue : 2,
                     'type' => PARAM_INT,
                     'label' => new lang_string($name, 'format_designer'),
                     'element_type' => 'select',
@@ -1836,6 +1837,12 @@ function format_designer_extend_navigation_course($navigation, $course, $context
     }
     $format = course_get_format($COURSE);
     $course = $format->get_course();
+
+    // Include the designer section js.
+    $ispopupactivities = isset($course->popupactivities) && $course->popupactivities;
+    $PAGE->requires->js_call_amd('format_designer/designer_section', 'init',
+    ['courseid' => $course->id, 'contextid' => $context->id, 'popupactivities' => $ispopupactivities,
+    ]);
 
     if (format_designer_has_pro()) {
         // Include the designer pro styles.

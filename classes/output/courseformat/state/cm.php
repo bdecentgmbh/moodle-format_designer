@@ -41,10 +41,15 @@ class cm extends \core_courseformat\output\local\state\cm {
         $section = $this->section;
         $cm = $this->cm;
         $course = $format->get_course();
+        if (class_exists("\core_external\util")) {
+            $name = \core_external\util::format_string($cm->name, $cm->context, true);
+        } else {
+            $name = external_format_string($cm->name, $cm->context, true);
+        }
         $data = (object)[
             'id' => $cm->id,
             'anchor' => "module-{$cm->id}",
-            'name' => external_format_string($cm->name, $cm->context, true),
+            'name' => $name,
             'visible' => !empty($cm->visible),
             'sectionid' => $section->id,
             'sectionnumber' => $section->section,
