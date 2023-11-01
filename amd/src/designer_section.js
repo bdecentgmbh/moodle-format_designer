@@ -125,8 +125,10 @@
         if ((nodeName in preventionNodes)
             || document.body.classList.contains('editing') || iscircle || isDescription || isPadlock || ispopupModule) {
             if (ispopupModule && !document.body.classList.contains('editing')) {
-                var li = event.target.closest('li.activity');
-                li.querySelector('a[href]').click();
+                if (event.target.closest("button[data-action='toggle-manual-completion']") == null && event.target.closest(".mod-description-action") == null) {
+                    var li = event.target.closest('li.activity');
+                    li.querySelector('a[href]').click();
+                }
                 // event.target.closest('a').click();
             }
             return null;

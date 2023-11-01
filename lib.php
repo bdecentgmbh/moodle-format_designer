@@ -68,6 +68,8 @@ define('DESIGNER_HERO_ACTVITIY_EVERYWHERE', 1);
 
 define('DESIGNER_HERO_ACTVITIY_COURSEPAGE', 2);
 
+define('DESIGNER_MOD_TEXT_TRIMM', 0);
+
 /**
  * Main class for the Designer course format.
  *
@@ -264,8 +266,11 @@ class format_designer extends \core_courseformat\base {
      */
     public function page_set_course(moodle_page $page) {
         global $PAGE;
+        $course = $this->get_course();
+        if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
+            $PAGE->add_body_class('format-designer-single-section');
+        }
         if (format_designer_has_pro()) {
-            $course = $this->get_course();
             // Fetch classes from pro designer and attach them to the body.
             $classes = \local_designer\info::create()->generate_body_classes($course, $this);
             $PAGE->add_body_class($classes);
@@ -281,8 +286,6 @@ class format_designer extends \core_courseformat\base {
     public function extend_course_navigation($navigation, navigation_node $node) {
         global $PAGE;
         // If section is specified in course/view.php, make sure it is expanded in navigation.
-
-
         if ($navigation->includesectionnum === false) {
             $selectedsection = optional_param('section', null, PARAM_INT);
             if ($selectedsection !== null && (!defined('AJAX_SCRIPT') || AJAX_SCRIPT == '0') &&
@@ -439,6 +442,10 @@ class format_designer extends \core_courseformat\base {
                 ],
                 'showanimation' => [
                     'default' => true,
+                    'type' => PARAM_INT,
+                ],
+                'flowsize' => [
+                    'default' => 0,
                     'type' => PARAM_INT,
                 ],
                 'accordion' => [
@@ -643,6 +650,22 @@ class format_designer extends \core_courseformat\base {
                         ],
                     ],
                     'help' => 'showanimation',
+                    'help_component' => 'format_designer',
+                    'disabledif' => [
+                        ['coursetype', 'neq', DESIGNER_TYPE_FLOW],
+                    ],
+                ],
+                'flowsize' => [
+                    'label' => new lang_string('flowsize', 'format_designer'),
+                    'element_type' => 'select',
+                    'element_attributes' => [
+                        [
+                            0 => new lang_string('small', 'format_designer'),
+                            1 => new lang_string('medium', 'format_designer'),
+                            2 => new lang_string('large', 'format_designer'),
+                        ],
+                    ],
+                    'help' => 'flowsize',
                     'help_component' => 'format_designer',
                     'disabledif' => [
                         ['coursetype', 'neq', DESIGNER_TYPE_FLOW],
@@ -995,7 +1018,7 @@ class format_designer extends \core_courseformat\base {
                 $widthdefaultvalue = isset($design->$name) ? $design->$name : '';
                 $sectionoptions[$name] = [
                     'default' => (isset($design->$name) && $foreditform ||
-                    (isset($course->coursetype) && $course->coursetype != DESIGNER_TYPE_NORMAL)) ?  $widthdefaultvalue : 2,
+                    (isset($course->coursetype) && $course->coursetype != DESIGNER_TYPE_NORMAL)) ? $widthdefaultvalue : 2,
                     'type' => PARAM_INT,
                     'label' => new lang_string($name, 'format_designer'),
                     'element_type' => 'select',
@@ -1374,18 +1397,26 @@ class format_designer extends \core_courseformat\base {
     public function get_course() {
         global $CFG;
         $course = parent::get_course();
-        if (isset($course->prerequisiteinfo) && is_string($course->prerequisiteinfo)) {
-            $coursecontext = context_course::instance($course->id);
-            $editoroptions = ['maxfiles' => -1, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false, 'noclean' => true,
-            ];
-            $editoroptions['context'] = $coursecontext;
-            $editoroptions['subdirs'] = file_area_contains_subdirs($coursecontext, 'local_designer', 'prerequisiteinfo', 0);
+
+        if (!isguestuser()) {
+            if (isset($course->prerequisiteinfo) && is_string($course->prerequisiteinfo)) {
+                $coursecontext = context_course::instance($course->id);
+                $editoroptions = ['maxfiles' => -1, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false, 'noclean' => true,
+                ];
+                $editoroptions['context'] = $coursecontext;
+                $editoroptions['subdirs'] = file_area_contains_subdirs($coursecontext, 'local_designer', 'prerequisiteinfo', 0);
+                $course = file_prepare_standard_editor(
+                    $course, 'prerequisiteinfo', $editoroptions,
+                    $coursecontext, 'local_designer', 'prerequisiteinfo', 0
+                );
+                $course->prerequisiteinfo = $course->prerequisiteinfo_editor;
+                unset($course->prerequisiteinfo_editor);
+            }
+        } else {
+            $editoroptions['context'] = \context_system::instance();
             $course = file_prepare_standard_editor(
-                $course, 'prerequisiteinfo', $editoroptions,
-                $coursecontext, 'local_designer', 'prerequisiteinfo', 0
+                $course, 'prerequisiteinfo', $editoroptions, null, 'local_designer', 'prerequisiteinfo', null,
             );
-            $course->prerequisiteinfo = $course->prerequisiteinfo_editor;
-            unset($course->prerequisiteinfo_editor);
         }
         // Course fields.
         if (isset($course->coursefields)) {

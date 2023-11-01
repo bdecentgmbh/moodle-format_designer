@@ -107,6 +107,12 @@
                 </div>
             {{/modcontent}}
 
+            {{#hasname}}
+                {{$ core_courseformat/local/content/cm/badges }}
+                    {{> core_courseformat/local/content/cm/badges }}
+                {{/ core_courseformat/local/content/cm/badges }}
+            {{/hasname}}
+
             {{^modrestricted}}
                 <div class="action-html-card {{elementstate.calltoaction}}">
                     {{{calltoactionhtml}}}

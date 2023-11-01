@@ -312,7 +312,9 @@ $string['backtomaincourse'] = "Back to main course";
 $string['disabled'] = "Disabled";
 $string['prerequisitesdesc'] = "Please complete all of the following courses:";
 $string['courseprerequisitestitle'] = "Prerequisites title";
-$string['courseprerequisitestitle_help'] = "Prerequisites course title";
+$string['courseprerequisitestitle_help'] = "Prerequisites tab title";
+$string['courseprerequisitestabhead'] = "Display the prerequisites tab title.";
+$string['courseprerequisitestabhead_help'] = "Prerequisites course title";
 $string['strprerequisiteinfo'] = "Prerequisite info";
 $string['strprerequisiteinfo_help'] = "Display the text above the prerequisites.";
 $string['displayheaderroleusers'] = "Choose the staff role";
@@ -341,6 +343,7 @@ $string['strcompleted'] = "Completed";
 
 $string['sectionzeroactivities_help'] = "";
 $string['heroactivitypos'] = "";
+$string['courseprerequisitepos'] = "";
 $string['stravoidduplicateentry'] = "Avoid duplicate entry";
 $string['stractivitytype'] = 'Activity type';
 $string['stractivitytitle'] = "Activity title";
@@ -360,6 +363,8 @@ $string['showastab_help'] = "Use this setting to configure on which pages the me
     This setting works as a default and can be overridden in the activity settings.";
 $string['heroactivitypos_help'] = "This setting gives you control over the order of the menu items in the secondary navigation menu. Menu items with negative values are added before the course menu item, menu items with positive values are added afterwards. Usually, it makes more sense to use positive numbers.
     This setting works as a default and can be overridden in the activity settings.";
+$string['courseprerequisitepos_help'] = "This setting gives you control over the order of the menu items in the secondary navigation menu. Menu items with negative values are added before the course menu item, menu items with positive values are added afterwards. Usually, it makes more sense to use positive numbers.";
+
 $string['struppercompleted'] = "COMPLETED";
 $string['strtodo'] = "TODO";
 
@@ -431,3 +436,13 @@ $string['summarylengthdesc'] = 'Enter the length for the summary to trim';
 // ...Field value fromat.
 $string['enabled'] = 'Enabled';
 $string['disabled'] = 'Disabled';
+// Activity description trim length.
+$string['activitydesclength'] = 'Activity description trim';
+$string['activitydesclength_desc'] = 'This global setting determines whether the description for activities is trimmed.<br><b>Trim (Default)</b>: This option trims the description, displaying it in a condensed form, similar to the current behavior.<br>
+<b>Do Not Trim</b>: Choose this option to display the description exactly as it was entered, without any trimming.';
+$string['modtrimlength'] = "Trim Length";
+$string['modtrimlength_desc'] = 'This is a numeric input field that allows you to specify how much text should be displayed in the collapsed state. Enter the desired character count to control the length of the trimmed description.';
+$string['donottrim'] = 'Do not trim';
+// Flow size.
+$string['flowsize'] = 'Flow size';
+$string['flowsize_help'] = 'Flow size is a setting that allows you to customize the width and height of sections and activities within your course.<br><b>Small</b>: This option sets the width and height of sections and activities to 320 pixels by 320 pixels.<br><b>Medium</b>: Select this option to increase the width and height to 360 pixels by 360 pixels.<br><b>Large</b>: If you prefer a spacious layout, choose this option to set the width and height of sections and activities to 400 pixels by 400 pixels. ';

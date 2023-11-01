@@ -102,7 +102,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         }
         $data->startclass = implode(' ', $startclass);
         $data->startid = $startid;
-        $data->issectionpageclass = (optional_param('section', null, PARAM_INT)) ? 'section-page-layout' : '';
+        $data->issectionpageclass = ($data->initialsection->sectionreturnid != 0) ? 'section-page-layout' : '';
 
         if (!format_designer_has_pro()) {
             $data->timemanagement = $this->timemanagement_details($course);
@@ -832,6 +832,8 @@ class renderer extends \core_courseformat\output\section_renderer {
             'stylerules' => $sectionstylerules,
             'flowcourse' => isset($course->coursetype) && $course->coursetype == DESIGNER_TYPE_FLOW ? true : false,
             'maskimage' => (isset($section->sectiondesignermaskimage) && $section->sectiondesignermaskimage) ? true : false,
+            'flowsizeclass' => (isset($course->flowsize) && $course->coursetype == DESIGNER_TYPE_FLOW &&
+            !$this->page->user_is_editing()) ? $this->get_flow_size($course) : '',
         ];
         $zerotohero = $course->sectionzeroactivities;
         if ($zerotohero == DESIGNER_HERO_ZERO_HIDE && $section->section == 0 && !$this->page->user_is_editing()) {
@@ -848,7 +850,8 @@ class renderer extends \core_courseformat\output\section_renderer {
                     if (isset($mods[$thismod->modname])) {
                         $mods[$thismod->modname]['name'] = $thismod->modplural;
                         if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/monologo.png')) {
-                            $mods[$thismod->modname]['activityimgsvg'] =  file_get_contents($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/monologo.svg');
+                            $mods[$thismod->modname]['activityimgsvg'] = file_get_contents($CFG->dirroot.'/mod/'.$thismod->modname.
+                            '/pix/monologo.svg');
                         } else if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/icon.png')) {
                             $mods[$thismod->modname]['img'] = $CFG->wwwroot.'/mod/'.$thismod->modname.'/pix/icon.png';
                         }
@@ -856,7 +859,8 @@ class renderer extends \core_courseformat\output\section_renderer {
                     } else {
                         $mods[$thismod->modname]['name'] = $thismod->modfullname;
                         if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/monologo.png')) {
-                            $mods[$thismod->modname]['activityimgsvg'] = file_get_contents($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/monologo.svg');
+                            $mods[$thismod->modname]['activityimgsvg'] = file_get_contents($CFG->dirroot.'/mod/'.$thismod->modname.
+                            '/pix/monologo.svg');
                         } else if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/icon.png')) {
                             $mods[$thismod->modname]['img'] = $CFG->wwwroot.'/mod/'.$thismod->modname.'/pix/icon.png';
                         }
@@ -938,6 +942,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         if (!$mod->is_visible_on_course_page()) {
             return [];
         }
+        $dbman = $DB->get_manager();
         $modclasses = 'activity ' . $mod->modname . ' modtype_' . $mod->modname . ' ' . $mod->extraclasses;
 
         // Add course type flow animation class.
@@ -951,6 +956,7 @@ class renderer extends \core_courseformat\output\section_renderer {
                 $modstyle .= sprintf('animation-duration: %ss;', ($duration) ? $duration : '1');
                 $this->flowdelay = $this->flowdelay + 0.5;
             }
+            $modclasses .= isset($course->flowsize) ? $this->get_flow_size($course) : '';
         }
 
         $ispopupactivities = isset($course->popupactivities) && $course->popupactivities;
@@ -977,48 +983,60 @@ class renderer extends \core_courseformat\output\section_renderer {
         // (AFTER any icons). Otherwise it was displayed before.
         $cmtext = '';
         $videotime = $mod->modname == 'videotime';
+        $isvideotimelabel = false;
+        $useactivityimagestatus = false;
         $useactivityimage = '';
         if (format_designer_has_pro()) {
-            if ($mod->modname == 'videotime') {
-                if ($videorecord = $DB->get_record('videotime', ['id' => $mod->instance])) {
-                    if (isset($videorecord->label_mod) && $videorecord->label_mode == 2) {
+            if ($mod->modname == 'videotime' && $dbman->table_exists('videotimeplugin_pro')) {
+                if ($videorecord = $DB->get_record('videotimeplugin_pro', ['videotime' => $mod->instance])) {
+                    if (isset($videorecord->label_mode) && $videorecord->label_mode == 2) {
                         $useactivityimage = \format_designer\options::get_option($mod->id, 'useactivityimage');
+                    } else if ($videorecord->label_mode == 1) {
+                        $isvideotimelabel = true;
                     }
                 }
             }
             $useactivityimagestatus = ($videotime && $useactivityimage);
             $enableactivityimage = \format_designer\options::get_option($mod->id, 'useactivityimage');
         }
-        if (!empty($url) || (isset($useactivityimagestatus) && $useactivityimagestatus)) {
+        if (!empty($url) && !$videotime) {
             $cmtext = $mod->get_formatted_content(['overflowdiv' => true, 'noclean' => true]);
             if (isset($videotime) && $videotime) {
                 $videotime = $DB->get_record('videotime', ['id' => $mod->instance]);
                 $cmtext = $videotime->intro;
             }
             $cmtextcontent = format_string($cmtext);
+            $cmtextlength = get_config('format_designer', 'activitydesclength');
             $modcontent = '';
             if (!empty($cmtextcontent)) {
-                if (str_word_count($cmtextcontent) >= 23) {
-                    $modcontenthtml = '';
-                    $modcontenthtml .= html_writer::start_tag('div', ['class' => 'trim-summary']);
-                    $modcontenthtml .= format_designer_modcontent_trim_char($cmtextcontent, 24);
-                    $modcontenthtml .= \html_writer::link('javascript:void(0)', get_string('more'),
-                    ['class' => 'mod-description-action']);
-                    $modcontenthtml .= html_writer::end_tag('div');
-                    $modcontenthtml .= html_writer::start_tag('div', ['class' => 'fullcontent-summary summary-hide']);
-                    $modcontenthtml .= $cmtextcontent;
-                    $modcontenthtml .= " " .\html_writer::link('javascript:void(0)', get_string('less', 'format_designer'),
-                    ['class' => 'mod-description-action']);
-                    $modcontenthtml .= html_writer::end_tag('div');
-                    $modcontent = $modcontenthtml;
+                if ($cmtextlength == DESIGNER_MOD_TEXT_TRIMM) {
+                    $trimlenght = get_config('format_designer', 'modtrimlength');
+                    if (str_word_count($cmtextcontent) >= 23) {
+                        $modcontenthtml = '';
+                        $modcontenthtml .= html_writer::start_tag('div', ['class' => 'trim-summary']);
+                        $modcontenthtml .= format_designer_modcontent_trim_char($cmtextcontent, $trimlenght);
+                        $modcontenthtml .= \html_writer::link('javascript:void(0)', get_string('more'),
+                        ['class' => 'mod-description-action']);
+                        $modcontenthtml .= html_writer::end_tag('div');
+                        $modcontenthtml .= html_writer::start_tag('div', ['class' => 'fullcontent-summary summary-hide']);
+                        $modcontenthtml .= $cmtextcontent;
+                        $modcontenthtml .= " " .\html_writer::link('javascript:void(0)', get_string('less', 'format_designer'),
+                        ['class' => 'mod-description-action']);
+                        $modcontenthtml .= html_writer::end_tag('div');
+                        $modcontent = $modcontenthtml;
+                    } else {
+                        $modcontent = html_writer::tag('p', $cmtextcontent);
+                    }
                 } else {
                     $modcontent = html_writer::tag('p', $cmtextcontent);
                 }
             }
         } else {
-            $modcontent = $mod->get_formatted_content(
-                ['overflowdiv' => true, 'noclean' => true]
-            );
+            if (!$useactivityimagestatus) {
+                $modcontent = $mod->get_formatted_content(
+                    ['overflowdiv' => true, 'noclean' => true]
+                );
+            }
         }
 
         $modvisits = $DB->count_records('logstore_standard_log', ['contextinstanceid' => $mod->id,
@@ -1061,9 +1079,15 @@ class renderer extends \core_courseformat\output\section_renderer {
                 $durationformatted = gmdate('i:s', $videotimeduration);
             }
         }
+        $altcontent = $mod->get_formatted_content(
+            ['overflowdiv' => true, 'noclean' => true]
+        );
         $cmlist = [
             'id' => 'module-' . $mod->id,
+            'hasname' => ($mod->name) ? true : false,
             'cm' => $mod,
+            'modhiddenfromstudents' => (!$mod->visible) ? true : false,
+            'modstealth' => $mod->is_stealth(),
             'modtype' => $mod->get_module_type_name(),
             'modclasses' => $modclasses,
             'colorclass' => $cmcompletion->get_color_class(),
@@ -1072,6 +1096,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             'cmcompletionhtml' => $cmcompletionhtml,
             'calltoactionhtml' => $calltoactionhtml,
             'afterlink' => $mod->afterlink,
+            'altcontent' => $altcontent,
             'cmtext' => $cmtext,
             'isrestricted' => !empty($mod->availableinfo),
             'modcontent' => isset($modcontent) ? $modcontent : '',
@@ -1275,5 +1300,24 @@ class renderer extends \core_courseformat\output\section_renderer {
             }
         }
         return $this->render_from_template($templatename, $cmlistdata);
+    }
+
+    /**
+     * Return the flow course type size classes.
+     *
+     * @param stdclass $course course.
+     * @return string $flowsizeclass flow size class.
+     */
+    public function get_flow_size($course) {
+        $sizeclass = '';
+        if ($course->flowsize == 1) {
+            $sizeclass = 'flow-card-medium';
+        } else if ($course->flowsize == 2) {
+            $sizeclass = 'flow-card-large';
+        } else {
+            $sizeclass = 'flow-card-small';
+        }
+        $flowsizeclass = isset($course->flowsize) ? $sizeclass : '';
+        return $flowsizeclass;
     }
 }

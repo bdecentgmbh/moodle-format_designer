@@ -110,9 +110,30 @@ if ($ADMIN->fulltree) {
 
     $activitypage = new admin_settingpage('format_designer_activity', get_string('stractivity', 'format_designer'));
 
+    // Activity description length.
+    $name = 'format_designer/activitydesclength';
+    $title = get_string('activitydesclength', 'format_designer');
+    $desc = get_string('activitydesclength_desc', 'format_designer');
+    $options = [
+        0 => get_string('trimmed', 'format_designer'),
+        1 => get_string('donottrim', 'format_designer'),
+    ];
+    $default = 0;
+    $setting = new admin_setting_configselect($name, $title, $desc, $default, $options);
+    $activitypage->add($setting);
+
+    // Activity description trim length.
+    $setting = new admin_setting_configtext(
+        'format_designer/modtrimlength', get_string('modtrimlength', 'format_designer'),
+        get_string('modtrimlength_desc', 'format_designer'), 23, PARAM_INT);
+    $activitypage->add($setting);
+
     if (format_designer_has_pro()
          && file_exists($CFG->dirroot.'/local/designer/setting.php')) {
         require_once($CFG->dirroot.'/local/designer/setting.php');
+    } else {
+        $settingspage->add($activitypage);
     }
+
     $settings = $settingspage;
 }
