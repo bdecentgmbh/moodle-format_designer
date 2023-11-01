@@ -49,4 +49,12 @@ $functions = [
         'type'          => 'write',
         'ajax'          => true,
     ],
+    'format_designer_get_videotime_instace' => [
+        'classpath'     => '',
+        'classname'     => 'format_designer\external\external',
+        'methodname'    => 'get_videotime_instace',
+        'description'   => 'Get the videotime instance',
+        'type'          => 'write',
+        'ajax'          => true,
+    ],
 ];

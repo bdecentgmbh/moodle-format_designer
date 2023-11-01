@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+
 /**
  * Implemented designer format js.
  *
@@ -45,11 +46,12 @@
      * @param {int} contextId
      * @param {array} popupActivities
      */
-    let DesignerSection = function(courseId, contextId, popupActivities) {
+    let DesignerSection = function(courseId, contextId, popupActivities, videoTime) {
         var self = this;
         self.courseId = courseId;
         self.contextId = contextId;
         self.popupActivities = popupActivities;
+        self.videoTime = videoTime;
 
         $(".course-info-block .carousel .carousel-item:nth-child(1)").addClass('active');
         $(".course-info-block #courseStaffinfoControls.carousel").addClass('active');
@@ -217,6 +219,46 @@
         }
     };
 
+    DesignerSection.prototype.updateVideoTimeInstance = function(sectionId) {
+        var section = "#" + sectionId
+        var sectionVideotimes = "body "+ section + " .activity.videotime";
+        if ($(sectionVideotimes).length == 0) {
+            return;
+        }
+        $(sectionVideotimes).each(function(index, module) {
+            this.CreateInstance(module);
+        }.bind(this));
+    };
+
+    DesignerSection.prototype.CreateInstance = function (module) {
+        if (
+            $(module).find('.instancename').length
+            && ($(module).find('.vimeo-embed').length
+            || $(module).find('.video-js').length)
+        ) {
+            var cmId = module.getAttribute("data-id");
+            var args = {cmid : cmId};
+            // Get module instance.
+            var promises = Ajax.call([{
+                methodname: 'format_designer_get_videotime_instace',
+                args: args
+            }], true);
+            promises[0].then(function(data) {
+                var template = JSON.parse(data);
+                if (template.playertype == 'videojs') {
+                    var uniqueid =  $(module).find('.video-js').first().attr('id').replace('vimeo-embed-', '');
+                } else {
+                    var uniqueid =  $(module).find('.vimeo-embed').first().attr('id').replace('vimeo-embed-', '');
+                }
+                template.uniqueid = uniqueid;
+                Templates.render(template.templatename, template).then(function(html, js) {
+                    Templates.runTemplateJS(js);
+                    return true;
+                }).fail(Notification.exception);
+            });
+        }
+    };
+
     /**
      * Implementaion swith the section layout.
      * @param {object} event
@@ -251,11 +293,17 @@
                 }).catch();
             });
         Loadingicon.addIconToContainerRemoveOnCompletion(iconBlock, promises);
+        // If videotime exist update the module.
+        setTimeout(function() {
+            if (self.videoTime) {
+                self.updateVideoTimeInstance(sectionId);
+            }
+        }, 1500);
     };
 
     return {
-        init: function(courseId, contextId, popupActivities) {
-            return new DesignerSection(courseId, contextId, popupActivities);
+        init: function(courseId, contextId, popupActivities, videoTime) {
+            return new DesignerSection(courseId, contextId, popupActivities, videoTime);
         }
     };
 });

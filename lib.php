@@ -1853,6 +1853,20 @@ function format_designer_course_has_heroactivity($course) {
 }
 
 
+function format_designer_course_has_videotime($course) {
+    global $DB;
+    $pluginman = \core_plugin_manager::instance();
+    $plugininfo = $pluginman->get_plugin_info('mod_videotime');
+    if (!empty($plugininfo)) {
+        $videotime = $DB->get_record("modules", ['name' => 'videotime']);
+        if ($DB->record_exists('course_modules', ['course' => $course->id, 'module' => $videotime->id])) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
 /**
  * This function extends the navigation with the hero activities items
  *
@@ -1871,8 +1885,9 @@ function format_designer_extend_navigation_course($navigation, $course, $context
 
     // Include the designer section js.
     $ispopupactivities = isset($course->popupactivities) && $course->popupactivities;
+    $isvideotime = format_designer_course_has_videotime($course);
     $PAGE->requires->js_call_amd('format_designer/designer_section', 'init',
-    ['courseid' => $course->id, 'contextid' => $context->id, 'popupactivities' => $ispopupactivities,
+    ['courseid' => $course->id, 'contextid' => $context->id, 'popupactivities' => $ispopupactivities, 'isvideotime' => $isvideotime
     ]);
 
     if (format_designer_has_pro()) {
