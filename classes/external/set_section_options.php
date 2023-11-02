@@ -256,6 +256,9 @@ trait set_section_options {
 
     /**
      * Get the videotime instance.
+     *
+     * @param int $cmid cm id.
+     * @return array $data videotime instance data.
      */
     public static function get_videotime_instace($cmid) {
         global $CFG, $PAGE;
@@ -280,7 +283,7 @@ trait set_section_options {
                 'toast' => file_exists($CFG->dirroot . '/lib/amd/src/toast.js'),
                 'video_description' => $record->video_description,
                 'templatename' => 'videotimeplugin_vimeo/video_embed',
-                'playertype' => 'vimeo'
+                'playertype' => 'vimeo',
             ];
 
             if (
@@ -293,7 +296,7 @@ trait set_section_options {
                     'mimetype' => $mimetype,
                     'video' => !file_mimetype_in_typegroup($mimetype, ['web_audio']),
                     'templatename' => 'videotimeplugin_videojs/video_embed',
-                    'playertype' => 'videojs'
+                    'playertype' => 'videojs',
                 ]);
             }
         }

@@ -361,7 +361,7 @@ class lib_test extends \advanced_testcase {
         $record = ['format' => 'designer'];
         $course = $this->getDataGenerator()->create_course($record);
         $this->getDataGenerator()->enrol_user($user->id, $course->id, $teacherrole->id);
-        $result = helper::create()->get_course_staff($course);
+        $result = helper::create()->get_course_staff_users($course);
         $this->assertEquals(1, count($result));
         $this->assertEquals($user->id, $result[0]->userid);
     }

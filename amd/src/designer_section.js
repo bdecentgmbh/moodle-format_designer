@@ -22,8 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
  define(['jquery', 'core/fragment', 'core/templates', 'core/loadingicon', 'core/ajax',
-    'core_course/actions', 'core_message/toggle_contact_button', 'theme_boost/popover'],
- function($, Fragment, Templates, Loadingicon, Ajax, Actions, Contact) {
+    'core_course/actions', 'core_message/toggle_contact_button', 'theme_boost/popover', 'core/notification',],
+ function($, Fragment, Templates, Loadingicon, Ajax, Actions, Contact, Notification) {
 
     var SELECTOR = {
         ACTIVITYLI: 'li.activity',
@@ -45,6 +45,7 @@
      * @param {int} courseId
      * @param {int} contextId
      * @param {array} popupActivities
+     * @param {bool} videoTime
      */
     let DesignerSection = function(courseId, contextId, popupActivities, videoTime) {
         var self = this;
@@ -127,7 +128,8 @@
         if ((nodeName in preventionNodes)
             || document.body.classList.contains('editing') || iscircle || isDescription || isPadlock || ispopupModule) {
             if (ispopupModule && !document.body.classList.contains('editing')) {
-                if (event.target.closest("button[data-action='toggle-manual-completion']") == null && event.target.closest(".mod-description-action") == null) {
+                if (event.target.closest("button[data-action='toggle-manual-completion']") === null &&
+                event.target.closest(".mod-description-action") === null) {
                     var li = event.target.closest('li.activity');
                     li.querySelector('a[href]').click();
                 }
@@ -146,11 +148,11 @@
         if (document.body.classList.contains('editing') || isPadlock) {
             return null;
         }
-        var singlesection = event.target.closest("[data-action=go-to-section-url]")
+        var singlesection = event.target.closest("[data-action=go-to-section-url]");
         let sectionurl = singlesection.getAttribute('data-url');
         window.location.href = sectionurl;
         return true;
-    }
+    };
 
     DesignerSection.prototype.expandSection = () => {
         var sectionID = window.location.hash;
@@ -220,7 +222,7 @@
     };
 
     DesignerSection.prototype.updateVideoTimeInstance = function(sectionId) {
-        var section = "#" + sectionId
+        var section = "#" + sectionId;
         var sectionVideotimes = "body "+ section + " .activity.videotime";
         if ($(sectionVideotimes).length == 0) {
             return;

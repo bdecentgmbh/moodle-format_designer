@@ -239,6 +239,7 @@
     height: 100%;
     border: 1px solid #eee;
     cursor: pointer;
+    position: relative;
 }
 .format-designer .course-content ul.designer.course-type-normal li.section.main:before {
     border: 0;
@@ -256,19 +257,26 @@
     border: 0;
     background: none;
     padding: 0;
+    margin: 20px 0;
     clear: none;
 }
 .format-designer .course-content ul.designer.course-type-normal li.section .section-header-content .goto-section:focus {
     box-shadow: none;
 }
-.format-designer .course-content ul.designer.course-type-normal li.section .section-header-content a.goto-section:after {
+.format-designer .course-content ul.designer.course-type-normal li.section .section-header-content .goto-section i {
+    font-size: 24px;
+    text-indent: 0;
+    margin: 0 0 0 10px;
+    float: left;
+}
+/* .format-designer .course-content ul.designer.course-type-normal li.section .section-header-content a.goto-section:after {
     content: '\f061';
     font-size: 24px;
     font-family: 'FontAwesome';
     text-indent: 0;
     margin: 0 0 0 10px;
     float: left;
-}
+} */
 .format-designer #goto-top-link {
     z-index: 1;
 }
@@ -797,7 +805,8 @@ span.section-collapse-icon:before {
 .format-designer .designer .section.img-text.card-layout .activity .restrict-block .info-content-block {
     margin-right: 0;
 }
-.format-designer .designer .section.img-text .activity .restrict-block .info-content-block .availabilityinfo.isrestricted {
+.format-designer .designer .section.img-text .activity .restrict-block .info-content-block
+.availabilityinfo.isrestricted {
     min-width: 220px;
     font-size: 12px;
     color: #000;
@@ -818,7 +827,8 @@ span.section-collapse-icon:before {
     position: absolute;
     right: 55px;
 }
-.format-designer .designer .section.img-text .activity .restrict-block.show .info-content-block .availabilityinfo.isrestricted {
+.format-designer .designer .section.img-text .activity .restrict-block.show .info-content-block
+.availabilityinfo.isrestricted {
     display: inline-block;
 }
 .format-designer .designer .section.img-text.card-layout .activity .restrict-block.show .info-content-block
@@ -830,13 +840,13 @@ span.section-collapse-icon:before {
 .availabilityinfo.isrestricted {
     top: 30px;
 }
-.format-designer .designer .section.img-text .activity .restrict-block.show .info-content-block .availabilityinfo.isrestricted
-ul {
+.format-designer .designer .section.img-text .activity .restrict-block.show .info-content-block
+.availabilityinfo.isrestricted ul {
     padding: 0;
     margin: 0;
 }
-.format-designer .designer .section.img-text .activity .restrict-block.show .info-content-block .availabilityinfo.isrestricted
-ul li {
+.format-designer .designer .section.img-text .activity .restrict-block.show .info-content-block
+.availabilityinfo.isrestricted ul li {
     list-style: none;
     text-align: left;
 }
