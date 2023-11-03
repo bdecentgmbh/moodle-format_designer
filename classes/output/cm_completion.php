@@ -39,7 +39,6 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/course/format/designer/lib.php");
 
-
 /**
  * Displays completion information badge for a cm.
  *
@@ -249,7 +248,7 @@ class cm_completion implements renderable, templatable {
      * @return bool
      */
     final public function is_overdue(): bool {
-        return $this->get_completion_expected() > 0 && $this->get_completion_expected() < time();
+        return $this->get_completion_expected() > 0 && $this->get_completion_expected() < strtotime("-1 day");
     }
 
     /**
@@ -320,14 +319,14 @@ class cm_completion implements renderable, templatable {
         }
 
         $output = html_writer::start_tag('div');
-        $output .= html_writer::empty_tag('input', array(
-            'type' => 'hidden', 'name' => 'id', 'value' => $this->cm->id));
-        $output .= html_writer::empty_tag('input', array(
-            'type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
-        $output .= html_writer::empty_tag('input', array(
-            'type' => 'hidden', 'name' => 'modulename', 'value' => $this->get_cm_formatted_name()));
-        $output .= html_writer::empty_tag('input', array(
-            'type' => 'hidden', 'name' => 'completionstate', 'value' => $newstate));
+        $output .= html_writer::empty_tag('input', [
+            'type' => 'hidden', 'name' => 'id', 'value' => $this->cm->id, ]);
+        $output .= html_writer::empty_tag('input', [
+            'type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey(), ]);
+        $output .= html_writer::empty_tag('input', [
+            'type' => 'hidden', 'name' => 'modulename', 'value' => $this->get_cm_formatted_name(), ]);
+        $output .= html_writer::empty_tag('input', [
+            'type' => 'hidden', 'name' => 'completionstate', 'value' => $newstate, ]);
         $output .= html_writer::end_tag('div');
 
         $manualcompletiondata = [
@@ -335,7 +334,7 @@ class cm_completion implements renderable, templatable {
             'sesskey' => sesskey(),
             'modulename' => $this->get_cm_formatted_name(),
             'inputfield' => $output,
-            'buttonclass' => $buttonclass
+            'buttonclass' => $buttonclass,
         ];
         return $manualcompletiondata;
     }
@@ -442,7 +441,7 @@ class cm_completion implements renderable, templatable {
             $this->get_completion_fail() == false,
             'completioncomplete' => $this->get_completion_state() == COMPLETION_COMPLETE,
             'completionincompletepass' => $this->get_completion_state() == COMPLETION_COMPLETE_PASS,
-            'completionincompletefail' => $this->get_completion_fail()
+            'completionincompletefail' => $this->get_completion_fail(),
         ];
         if ($completiondate = $this->get_completion_date()) {
             $data['completiondate'] = format_designer_format_date($completiondate);
@@ -467,7 +466,7 @@ class cm_completion implements renderable, templatable {
         $diff->w = floor($diff->d / 7);
         $diff->d -= $diff->w * 7;
 
-        $string = array(
+        $string = [
             'y' => get_string('timeagoyear', 'format_designer'),
             'm' => get_string('timeagomonth', 'format_designer'),
             'w' => get_string('timeagoweek', 'format_designer'),
@@ -475,7 +474,7 @@ class cm_completion implements renderable, templatable {
             'h' => get_string('timeagohour', 'format_designer'),
             'i' => get_string('timeagominute', 'format_designer'),
             's' => get_string('timeagosecond', 'format_designer'),
-        );
+        ];
         foreach ($string as $k => &$v) {
             if ($diff->$k) {
                 $v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');

@@ -31,7 +31,7 @@ $functions = [
         'methodname'    => 'set_section_options',
         'description'   => 'Set section options.',
         'type'          => 'write',
-        'ajax'          => true
+        'ajax'          => true,
     ],
     'format_designer_get_module' => [
         'classpath'     => '',
@@ -39,7 +39,7 @@ $functions = [
         'methodname'    => 'get_module',
         'description'   => 'Get the module info.',
         'type'          => 'write',
-        'ajax'          => true
+        'ajax'          => true,
     ],
     'format_designer_section_refresh' => [
         'classpath'     => '',
@@ -47,6 +47,14 @@ $functions = [
         'methodname'    => 'section_refresh',
         'description'   => 'Refresh the section block',
         'type'          => 'write',
-        'ajax'          => true
-    ]
+        'ajax'          => true,
+    ],
+    'format_designer_get_videotime_instace' => [
+        'classpath'     => '',
+        'classname'     => 'format_designer\external\external',
+        'methodname'    => 'get_videotime_instace',
+        'description'   => 'Get the videotime instance',
+        'type'          => 'write',
+        'ajax'          => true,
+    ],
 ];

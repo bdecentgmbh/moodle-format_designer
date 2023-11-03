@@ -289,11 +289,8 @@ $string['makeherohide'] = "Make hero activity and hide section 0";
 $string['makeherovisible'] = "Make hero activity and keep section 0 visible";
 $string['strprerequisites'] = "Prerequisites";
 $string['courseprerequisites'] = "Course prerequisites";
-$string['deftsettings'] = 'Deft response settings';
 $string['displaycourseprerequisites'] = "Display course prerequisites";
 $string['displaycourseprerequisites_help'] = "Define where to display the prerequisites courses";
-$string['enabledeftresponse'] = 'Enable Deft response';
-$string['enabledeftresponse_help'] = 'The Deft response block allows updating content users are viewing remotely when changes happen on a Moodle server. If that plugin is installed and activated and this is enabled, this format will update the course page when activities are modified. Find more information at {$a}.';
 $string['abovecoursecontents'] = "Above course contents";
 $string['onseparatetab'] = "On separate tab";
 $string['prerequisitesautostudents'] = "Automatically enrol students";
@@ -315,11 +312,13 @@ $string['backtomaincourse'] = "Back to main course";
 $string['disabled'] = "Disabled";
 $string['prerequisitesdesc'] = "Please complete all of the following courses:";
 $string['courseprerequisitestitle'] = "Prerequisites title";
-$string['courseprerequisitestitle_help'] = "Prerequisites course title";
+$string['courseprerequisitestitle_help'] = "Prerequisites tab title";
+$string['courseprerequisitestabhead'] = "Display the prerequisites tab title.";
+$string['courseprerequisitestabhead_help'] = "Prerequisites course title";
 $string['strprerequisiteinfo'] = "Prerequisite info";
 $string['strprerequisiteinfo_help'] = "Display the text above the prerequisites.";
 $string['displayheaderroleusers'] = "Choose the staff role";
-$string['displayheaderroleusers_help'] = "";
+$string['displayheaderroleusers_help'] = "Users with these selected roles will be displayed in the course header.";
 $string['addtocontacts'] = "Add to contacts";
 $string['message'] = "Message";
 $string['mail'] = "Mail";
@@ -344,6 +343,7 @@ $string['strcompleted'] = "Completed";
 
 $string['sectionzeroactivities_help'] = "";
 $string['heroactivitypos'] = "";
+$string['courseprerequisitepos'] = "";
 $string['stravoidduplicateentry'] = "Avoid duplicate entry";
 $string['stractivitytype'] = 'Activity type';
 $string['stractivitytitle'] = "Activity title";
@@ -363,8 +363,86 @@ $string['showastab_help'] = "Use this setting to configure on which pages the me
     This setting works as a default and can be overridden in the activity settings.";
 $string['heroactivitypos_help'] = "This setting gives you control over the order of the menu items in the secondary navigation menu. Menu items with negative values are added before the course menu item, menu items with positive values are added afterwards. Usually, it makes more sense to use positive numbers.
     This setting works as a default and can be overridden in the activity settings.";
+$string['courseprerequisitepos_help'] = "This setting gives you control over the order of the menu items in the secondary navigation menu. Menu items with negative values are added before the course menu item, menu items with positive values are added afterwards. Usually, it makes more sense to use positive numbers.";
+
 $string['struppercompleted'] = "COMPLETED";
 $string['strtodo'] = "TODO";
 
 $string['criteriaprogressinfo_help'] = 'Tip: Click on the progress bar above to see which activities/prerequisites you have already completed and which are not completed yet.';
 $string['criteriaprogressinfo'] = 'Criteria progress bar info';
+
+// Activity navigation.
+$string['addnavigation'] = 'Add activity navigation';
+// Course background.
+$string['coursebackground'] = 'Course Background';
+$string['coursebackgroundcolor'] = 'Course Background Color';
+$string['coursebackgroundcolor_help'] = 'Use this option to choose a background color for the entire course. If a color is selected here, it will be applied as the background color for the course. This setting is optional, and you can leave it blank if you don\'t want to set a specific background color.';
+$string['coursebackgroundimage'] = 'Course Background Image';
+$string['coursebackgroundimage_help'] = 'If you wish to have an image as the background for the entire course, you can upload it here. Once uploaded, this image will be displayed as the background for the entire course. This setting is optional, and you can leave it blank if you prefer not to have a background image.';
+$string['coursebackgroundtransparent'] = 'Transparent Course';
+$string['coursebackgroundtransparent_help'] = 'If you select this option, the background color of container elements within the course that currently have a background color will be set to transparent. This can create a visually appealing effect where elements appear to float on top of the background';
+
+// Course header.
+$string['courseheadertype'] = 'Type';
+$string['courseheadertype_help'] = '<b>None</b>: This option will not add any header to the course page.<br>
+<b>Hero</b>: Selecting this option will make the header span the full width of the page, providing a visually impactful course introduction.<br>
+<b>Content</b>: Choosing this option will set the header width to match the course contents, maintaining a more compact design.';
+$string['hero'] = 'Hero';
+$string['content'] = 'Content';
+$string['courseheadertimemanagement'] = 'Time Management';
+$string['courseheadertimemanagement_help'] = 'Select the time-related elements you want to display in the course header. You can choose multiple options from enrolment start date, enrolment end date, due date, and completed date.';
+$string['courseprogresstype'] = 'Course Progress';
+$string['courseprogresstype_help'] = '<b>Disabled</b>: This option will not display any course progress information in the header.<br>
+<b>Progress Bar</b>: Selecting this option will display the course progress as a bar, visually indicating how much of the course is completed.<br>
+<b>Donut</b>: Choosing this option will display the course progress as a donut chart, providing a different visual representation of progress.<br>';
+$string['progressbar'] = 'Progress bar';
+$string['donut'] = 'Donut';
+$string['sectionprogresstype'] = 'Section Progress';
+$string['sectionprogresstype_help'] = '<b>Disabled</b>: This option will not display any section progress information in the header.<br>
+<b>Progress Bar</b>: Selecting this option will display the section progress as a bar, showing the completion status of individual course sections.<br>
+<b>Donut</b>: Choosing this option will display the section progress as a donut chart, offering an alternative visual representation.<br>';
+$string['courseheadersummary'] = 'Summary';
+$string['courseheadersummary_help'] = '<b>Disabled</b>: This option will not show any summary in the header.<br>
+<b>Trimmed</b>: Selecting this option will trim the course summary based on the global setting "trim length."<br>
+<b>Full</b>: Choosing this option will display the complete course summary.<br>';
+$string['trimmed'] = 'Trimmed';
+$string['full'] = 'Full';
+$string['additionalcontent'] = 'Additional Content';
+$string['additionalcontent_help'] = 'Add any additional content that you want to appear at the bottom of the course header.';
+$string['courseheaderbgcolor'] = 'Background color';
+$string['courseheaderbgcolor_help'] = 'The background color is applied to both the header and the secondary navigation.';
+$string['courseheadertextcolor'] = 'Text color';
+$string['courseheadertextcolor_help'] = 'To ensure good legibility, please use an appropriate background color for the course header and the secondary navigation, considering the text color being used.';
+$string['courseheaderbgimage'] = 'Background image';
+$string['courseheaderbgimage_help'] = 'The background image is utilized for the course header, not for the secondary navigation. To ensure good legibility, especially when employing a light text color, please use an appropriate background color.';
+$string['courseheaderheight'] = 'Minimum Height';
+$string['courseheaderheight_help'] = 'Specify the minimum height, in number, for the course header.';
+$string['courseheadersize'] = 'Full Screen';
+$string['courseheadersize_help'] = 'If enabled, the course header will take up the full height of the screen.';
+$string['userfields'] = 'User profile fields';
+$string['userfields_help'] = 'Select profile fields to display below the user in the course header.';
+$string['coursecustomfields'] = 'Course fields';
+$string['coursecustomfields_help'] = 'Select the course fields from those available on the site that you want to display in the course header.';
+$string['coursecompleted'] = 'Course completed';
+$string['coursecustomfields_help'] = '';
+// ...Coursefields icon.
+$string['configcoursefield'] = 'Icon for {$a->name}';
+$string['configcourseicons'] = 'Course fields icons';
+// ...Course fields config.
+$string['configcoursefields'] = 'Course fields to display';
+$string['configcoursefields_help'] = 'Selected the course fields will be show on the course header';
+$string['summarylength'] = 'Summary length';
+$string['summarylengthdesc'] = 'Enter the length for the summary to trim';
+// ...Field value fromat.
+$string['enabled'] = 'Enabled';
+$string['disabled'] = 'Disabled';
+// Activity description trim length.
+$string['activitydesclength'] = 'Activity description trim';
+$string['activitydesclength_desc'] = 'This global setting determines whether the description for activities is trimmed.<br><b>Trim (Default)</b>: This option trims the description, displaying it in a condensed form, similar to the current behavior.<br>
+<b>Do Not Trim</b>: Choose this option to display the description exactly as it was entered, without any trimming.';
+$string['modtrimlength'] = "Trim Length";
+$string['modtrimlength_desc'] = 'This is a numeric input field that allows you to specify how much text should be displayed in the collapsed state. Enter the desired character count to control the length of the trimmed description.';
+$string['donottrim'] = 'Do not trim';
+// Flow size.
+$string['flowsize'] = 'Flow size';
+$string['flowsize_help'] = 'Flow size is a setting that allows you to customize the width and height of sections and activities within your course.<br><b>Small</b>: This option sets the width and height of sections and activities to 320 pixels by 320 pixels.<br><b>Medium</b>: Select this option to increase the width and height to 360 pixels by 360 pixels.<br><b>Large</b>: If you prefer a spacious layout, choose this option to set the width and height of sections and activities to 400 pixels by 400 pixels. ';

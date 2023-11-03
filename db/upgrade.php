@@ -75,5 +75,36 @@ function xmldb_format_designer_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2022020301, 'format', 'designer');
     }
 
+    if ($oldversion < 2023040601) {
+        // Create start date.
+        $fields = ['enrolmentstartdate', 'enrolmentenddate', 'coursecompletiondate', 'courseduedate'];
+        list($insql, $inparams) = $DB->get_in_or_equal($fields, SQL_PARAMS_NAMED, 'time');
+        $sql = "SELECT * FROM {course_format_options} cf WHERE cf.name $insql";
+        $timerecords = $DB->get_records_sql($sql, $inparams);
+
+        $timemanagement = [];
+        foreach ($timerecords as $fieldid => $record) {
+            if ($record->value) {
+                $timemanagement[$record->courseid][] = $record->name;
+            }
+        }
+
+        foreach ($timemanagement as $courseid => $elements) {
+            $record = [
+                'courseid' => $courseid,
+                'format' => 'designer',
+                'name' => 'timemanagement',
+                'sectionid' => 0,
+            ];
+
+            if (!$DB->record_exists('course_format_options', $record)) {
+                $record['value'] = json_encode($elements);
+                $DB->insert_record('course_format_options', $record);
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2023040601, 'format', 'designer');
+    }
+
     return true;
 }

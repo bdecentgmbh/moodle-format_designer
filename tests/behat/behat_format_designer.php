@@ -63,7 +63,7 @@ class behat_format_designer extends behat_base {
         $xpath .= "/descendant::div[contains(@id, 'section-designer-action')]/descendant::div[contains(@class, 'dropdown-menu')]";
         // Click on layout link.
         $this->execute('behat_general::i_click_on_in_the',
-            array($strlayout, "link", $this->escape($xpath), "xpath_element")
+           [$strlayout, "link", $this->escape($xpath), "xpath_element"]
         );
     }
 

@@ -84,13 +84,13 @@ class controlmenu extends controlmenu_base {
             $url = empty($value['url']) ? '' : $value['url'];
             $icon = empty($value['icon']) ? '' : $value['icon'];
             $name = empty($value['name']) ? '' : $value['name'];
-            $attr = empty($value['attr']) ? array() : $value['attr'];
+            $attr = empty($value['attr']) ? [] : $value['attr'];
             $class = empty($value['pixattr']['class']) ? '' : $value['pixattr']['class'];
             $al = new action_menu_link_secondary(
                 new moodle_url($url),
-                new pix_icon($icon, '', null, array('class' => "smallicon " . $class)),
+                new pix_icon($icon, '', null, ['class' => "smallicon " . $class]),
                 $name,
-                $attr
+                $attr,
             );
             $menu->add($al);
         }
@@ -101,19 +101,19 @@ class controlmenu extends controlmenu_base {
                 'name' => get_string('link', 'format_designer'),
                 'active' => empty($this->format->get_section_option($section->id, 'sectiontype'))
                     || $this->format->get_section_option($section->id, 'sectiontype') == 'default',
-                'url' => new moodle_url('/course/view.php', ['id' => $this->course->id], 'section-' . $section->section)
+                'url' => new moodle_url('/course/view.php', ['id' => $this->course->id], 'section-' . $section->section),
             ],
             [
                 'type' => 'list',
                 'name' => get_string('list', 'format_designer'),
                 'active' => $this->format->get_section_option($section->id, 'sectiontype') == 'list',
-                'url' => new moodle_url('/course/view.php', ['id' => $this->course->id], 'section-' . $section->section)
+                'url' => new moodle_url('/course/view.php', ['id' => $this->course->id], 'section-' . $section->section),
             ],
             [
                 'type' => 'cards',
                 'name' => get_string('cards', 'format_designer'),
                 'active' => $this->format->get_section_option($section->id, 'sectiontype') == 'cards',
-                'url' => new moodle_url('/course/view.php', ['id' => $this->course->id], 'section-' . $section->section)
+                'url' => new moodle_url('/course/view.php', ['id' => $this->course->id], 'section-' . $section->section),
             ],
         ];
 

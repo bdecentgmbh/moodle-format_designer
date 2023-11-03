@@ -98,7 +98,7 @@ class options {
         $record->value = $value ?: '';
         $record->timemodified = time();
         if ($exitrecord = $DB->get_record('format_designer_options', [
-            'cmid' => $cmid, 'courseid' => $courseid, 'name' => $name])) {
+            'cmid' => $cmid, 'courseid' => $courseid, 'name' => $name, ])) {
             $record->id = $exitrecord->id;
             $record->timecreated = $exitrecord->timecreated;
             $DB->update_record('format_designer_options', $record);
@@ -217,7 +217,7 @@ class options {
                 'position' => isset($design->bgimagestyle_position) ? $design->bgimagestyle_position : '',
                 'position_adv' => isset($design->bgimagestyle_position_adv) ? $design->bgimagestyle_position_adv : '',
                 'repeat' => isset($design->bgimagestyle_repeat) ? $design->bgimagestyle_repeat : '',
-                'repeat_adv' => isset($design->bgimagestyle_repeat_adv) ? $design->bgimagestyle_repeat_adv : ''
+                'repeat_adv' => isset($design->bgimagestyle_repeat_adv) ? $design->bgimagestyle_repeat_adv : '',
             ];
 
             $design->maskstyle = [

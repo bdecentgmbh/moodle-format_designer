@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+
 /**
  * Implemented designer format js.
  *
@@ -21,8 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
  define(['jquery', 'core/fragment', 'core/templates', 'core/loadingicon', 'core/ajax',
-    'core_course/actions', 'core_message/toggle_contact_button'],
- function($, Fragment, Templates, Loadingicon, Ajax, Actions, Contact) {
+    'core_course/actions', 'core_message/toggle_contact_button', 'theme_boost/popover', 'core/notification',],
+ function($, Fragment, Templates, Loadingicon, Ajax, Actions, Contact, Notification) {
 
     var SELECTOR = {
         ACTIVITYLI: 'li.activity',
@@ -44,12 +45,14 @@
      * @param {int} courseId
      * @param {int} contextId
      * @param {array} popupActivities
+     * @param {bool} videoTime
      */
-    let DesignerSection = function(courseId, contextId, popupActivities) {
+    let DesignerSection = function(courseId, contextId, popupActivities, videoTime) {
         var self = this;
         self.courseId = courseId;
         self.contextId = contextId;
         self.popupActivities = popupActivities;
+        self.videoTime = videoTime;
 
         $(".course-info-block .carousel .carousel-item:nth-child(1)").addClass('active');
         $(".course-info-block #courseStaffinfoControls.carousel").addClass('active');
@@ -60,6 +63,7 @@
         $('body').delegate(self.fullDescription, "click", self.fullmodcontentHandler.bind(this));
         $('body').delegate(self.trimDescription, "click", self.trimmodcontentHandler.bind(this));
         $('body').delegate(self.goToURL, "click", self.redirectToModule.bind(this));
+        $('body').delegate(self.goToSectionURL, "click", self.redirectToSection.bind(this));
         window.onhashchange = function() {
             self.expandSection();
         };
@@ -96,6 +100,8 @@
      */
     DesignerSection.prototype.goToURL = '.designer [data-action="go-to-url"]';
 
+    DesignerSection.prototype.goToSectionURL = '.designer [data-action="go-to-section-url"]';
+
     DesignerSection.prototype.SectionController = ".designer #section-designer-action .dropdown-menu a";
 
     DesignerSection.prototype.RestrictInfo = ".designer .designer-section-content .call-action-block";
@@ -122,8 +128,11 @@
         if ((nodeName in preventionNodes)
             || document.body.classList.contains('editing') || iscircle || isDescription || isPadlock || ispopupModule) {
             if (ispopupModule && !document.body.classList.contains('editing')) {
-                var li = event.target.closest('li.activity');
-                li.querySelector('a[href]').click();
+                if (event.target.closest("button[data-action='toggle-manual-completion']") === null &&
+                event.target.closest(".mod-description-action") === null) {
+                    var li = event.target.closest('li.activity');
+                    li.querySelector('a[href]').click();
+                }
                 // event.target.closest('a').click();
             }
             return null;
@@ -131,6 +140,17 @@
         var card = event.target.closest("[data-action=go-to-url]");
         let modurl = card.getAttribute('data-url');
         window.location.href = modurl;
+        return true;
+    };
+
+    DesignerSection.prototype.redirectToSection = function(event) {
+        let isPadlock = event.target.classList.contains('fa-lock');
+        if (document.body.classList.contains('editing') || isPadlock) {
+            return null;
+        }
+        var singlesection = event.target.closest("[data-action=go-to-section-url]");
+        let sectionurl = singlesection.getAttribute('data-url');
+        window.location.href = sectionurl;
         return true;
     };
 
@@ -201,6 +221,46 @@
         }
     };
 
+    DesignerSection.prototype.updateVideoTimeInstance = function(sectionId) {
+        var section = "#" + sectionId;
+        var sectionVideotimes = "body "+ section + " .activity.videotime";
+        if ($(sectionVideotimes).length == 0) {
+            return;
+        }
+        $(sectionVideotimes).each(function(index, module) {
+            this.CreateInstance(module);
+        }.bind(this));
+    };
+
+    DesignerSection.prototype.CreateInstance = function (module) {
+        if (
+            $(module).find('.instancename').length
+            && ($(module).find('.vimeo-embed').length
+            || $(module).find('.video-js').length)
+        ) {
+            var cmId = module.getAttribute("data-id");
+            var args = {cmid : cmId};
+            // Get module instance.
+            var promises = Ajax.call([{
+                methodname: 'format_designer_get_videotime_instace',
+                args: args
+            }], true);
+            promises[0].then(function(data) {
+                var template = JSON.parse(data);
+                if (template.playertype == 'videojs') {
+                    var uniqueid =  $(module).find('.video-js').first().attr('id').replace('vimeo-embed-', '');
+                } else {
+                    var uniqueid =  $(module).find('.vimeo-embed').first().attr('id').replace('vimeo-embed-', '');
+                }
+                template.uniqueid = uniqueid;
+                Templates.render(template.templatename, template).then(function(html, js) {
+                    Templates.runTemplateJS(js);
+                    return true;
+                }).fail(Notification.exception);
+            });
+        }
+    };
+
     /**
      * Implementaion swith the section layout.
      * @param {object} event
@@ -235,11 +295,17 @@
                 }).catch();
             });
         Loadingicon.addIconToContainerRemoveOnCompletion(iconBlock, promises);
+        // If videotime exist update the module.
+        setTimeout(function() {
+            if (self.videoTime) {
+                self.updateVideoTimeInstance(sectionId);
+            }
+        }, 2000);
     };
 
     return {
-        init: function(courseId, contextId, popupActivities) {
-            return new DesignerSection(courseId, contextId, popupActivities);
+        init: function(courseId, contextId, popupActivities, videoTime) {
+            return new DesignerSection(courseId, contextId, popupActivities, videoTime);
         }
     };
 });

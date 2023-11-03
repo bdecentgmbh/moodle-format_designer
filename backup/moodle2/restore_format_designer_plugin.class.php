@@ -170,7 +170,9 @@ class restore_format_designer_plugin extends restore_format_plugin {
      */
     protected function after_restore_section() {
 
-        $this->add_related_files('format_designer', 'sectiondesignbackground', null);
-        $this->add_related_files('format_designer', 'sectiondesigncompletionbackground', null);
+        $files = \format_designer\options::get_file_areas('section');
+        foreach ($files as $file => $component) {
+            $this->add_related_files($component, $file, 'course_section');
+        }
     }
 }

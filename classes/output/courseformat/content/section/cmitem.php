@@ -94,7 +94,7 @@ class cmitem extends \core_courseformat\output\local\content\section\cmitem {
             'class' => $data['modclasses'],
             'id' => $data['anchor'],
             'data-for' => "cmitem",
-            'data-id' => $data['cm']->id
+            'data-id' => $data['cm']->id,
         ]);
         $data['moduleend'] = \html_writer::end_tag('li');
 

@@ -54,8 +54,8 @@ trait set_section_options {
             'sectionid' => new external_value(PARAM_INT, 'Section ID'),
             'options' => new \external_multiple_structure(new external_single_structure([
                 'name' => new external_value(PARAM_TEXT, 'Option name to set on section'),
-                'value' => new external_value(PARAM_RAW, 'Value for option')
-            ]))
+                'value' => new external_value(PARAM_RAW, 'Value for option'),
+            ])),
         ]);
     }
 
@@ -73,7 +73,7 @@ trait set_section_options {
         $params = self::validate_parameters(self::set_section_options_parameters(), [
             'courseid' => $courseid,
             'sectionid' => $sectionid,
-            'options' => $options
+            'options' => $options,
         ]);
         $course = $DB->get_record('course', ['id' => $params['courseid']]);
         /** @var format_designer $format */
@@ -104,11 +104,11 @@ trait set_section_options {
      */
     public static function get_module_parameters() {
         return new external_function_parameters(
-            array(
+            [
                 'id' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
                 'sectionid' => new external_value(PARAM_INT, 'course module section id', VALUE_REQUIRED),
                 'sectionreturn' => new external_value(PARAM_INT, 'section to return to', VALUE_DEFAULT, null),
-            )
+            ]
         );
     }
 
@@ -125,7 +125,7 @@ trait set_section_options {
         global $PAGE, $OUTPUT;
         // Validate and normalize parameters.
         $params = self::validate_parameters(self::get_module_parameters(),
-            array('id' => $id, 'sectionid' => $sectionid, 'sectionreturn' => $sectionreturn));
+            ['id' => $id, 'sectionid' => $sectionid, 'sectionreturn' => $sectionreturn]);
         $id = $params['id'];
         $sectionreturn = $params['sectionreturn'];
 
@@ -186,11 +186,12 @@ trait set_section_options {
      */
     public static function section_refresh_parameters() {
         return new external_function_parameters(
-            array(
+            [
                 'courseid' => new external_value(PARAM_INT, 'course id', VALUE_REQUIRED),
                 'sectionid' => new external_value(PARAM_INT, 'section id', VALUE_REQUIRED),
                 'sectionreturn' => new external_value(PARAM_INT, 'section to return to', VALUE_DEFAULT, null),
-            ));
+            ]
+        );
     }
 
     /**
@@ -215,7 +216,7 @@ trait set_section_options {
         $PAGE->set_context($context);
         // Validate and normalize parameters.
         $params = self::validate_parameters(self::section_refresh_parameters(),
-            array('courseid' => $courseid, 'sectionid' => $sectionid, 'sectionreturn' => $sectionreturn));
+            ['courseid' => $courseid, 'sectionid' => $sectionid, 'sectionreturn' => $sectionreturn]);
         $courseid = $params['courseid'];
         $sectionid = $params['sectionid'];
         $sectionreturn = $params['sectionreturn'];
@@ -240,6 +241,76 @@ trait set_section_options {
     public static function section_refresh_returns() {
         return new external_value(PARAM_RAW, 'Additional data for javascript (JSON-encoded string)');
     }
+
+
+    /**
+     * Parameters for function get_videotime_instace_parameters()
+     */
+    public static function get_videotime_instace_parameters() {
+        return new external_function_parameters(
+            [
+                'cmid' => new external_value(PARAM_INT, 'course module', VALUE_REQUIRED),
+            ]
+        );
+    }
+
+    /**
+     * Get the videotime instance.
+     *
+     * @param int $cmid cm id.
+     * @return array $data videotime instance data.
+     */
+    public static function get_videotime_instace($cmid) {
+        global $CFG, $PAGE;
+        $data = [];
+        if (file_exists($CFG->dirroot. "/mod/videotime/lib.php")) {
+            require_once($CFG->dirroot. "/mod/videotime/classes/videotime_instance.php");
+            require_once($CFG->dirroot. "/mod/videotime/lib.php");
+            $params = self::validate_parameters(self::get_videotime_instace_parameters(),
+                ['cmid' => $cmid]);
+            $cmid = $params['cmid'];
+            $cm = get_coursemodule_from_id('videotime', $cmid, 0, false, MUST_EXIST);
+            $context = context_course::instance($cm->course);
+            $PAGE->set_context($context);
+            $moduleinstance = \mod_videotime\videotime_instance::instance_by_id($cm->instance);
+            $record = $moduleinstance->to_record();
+            $data = [
+                'instance' => json_encode($record),
+                'cmid' => $cm->id,
+                'haspro' => videotime_has_pro(),
+                'interval' => $record->saveinterval ?? 5,
+                'plugins' => file_exists($CFG->dirroot . '/mod/videotime/plugin/pro/templates/plugins.mustache'),
+                'toast' => file_exists($CFG->dirroot . '/lib/amd/src/toast.js'),
+                'video_description' => $record->video_description,
+                'templatename' => 'videotimeplugin_vimeo/video_embed',
+                'playertype' => 'vimeo',
+            ];
+
+            if (
+                empty(get_config('videotimeplugin_vimeo', 'enabled'))
+                || !mod_videotime_get_vimeo_id_from_link($moduleinstance->vimeo_url)
+            ) {
+                $videojs = true;
+                $mimetype = resourcelib_guess_url_mimetype($moduleinstance->vimeo_url);
+                $data = array_merge($data, [
+                    'mimetype' => $mimetype,
+                    'video' => !file_mimetype_in_typegroup($mimetype, ['web_audio']),
+                    'templatename' => 'videotimeplugin_videojs/video_embed',
+                    'playertype' => 'videojs',
+                ]);
+            }
+        }
+        return json_encode($data);
+
+    }
+
+    /**
+     * Return structure for get_videotime_instace_returns()
+     */
+    public static function get_videotime_instace_returns() {
+        return new external_value(PARAM_RAW, 'Additional data for javascript (JSON-encoded string)');
+    }
+
 
 
 }

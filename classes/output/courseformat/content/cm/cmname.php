@@ -73,7 +73,7 @@ class cmname extends \core_courseformat\output\local\content\cm\cmname {
         $useactivityimage = '';
         if (format_designer_has_pro()) {
             if ($mod->modname == 'videotime') {
-                if ($videorecord = $DB->get_record('videotime', array('id' => $mod->instance))) {
+                if ($videorecord = $DB->get_record('videotime', ['id' => $mod->instance])) {
                     if (isset($videorecord->label_mode) && $videorecord->label_mode == 2) {
                         $useactivityimage = \format_designer\options::get_option($mod->id, 'useactivityimage');
                     }

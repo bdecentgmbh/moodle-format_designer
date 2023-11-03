@@ -32,16 +32,18 @@ class backup_format_designer_plugin extends backup_format_plugin {
      */
     public function define_module_plugin_structure() {
 
-        $designer = new backup_nested_element('format_designer_options', array('id'), array(
-            'courseid', 'cmid', 'name', 'value', 'timecreated', 'timemodified'
-        ));
+        $designer = new backup_nested_element('format_designer_options', ['id'], [
+            'courseid', 'cmid', 'name', 'value', 'timecreated', 'timemodified',
+        ]);
 
         $designer->set_source_table('format_designer_options',
             ['cmid' => backup::VAR_MODID, 'courseid' => backup::VAR_COURSEID]);
 
         $files = format_designer\options::get_file_areas('module');
-        foreach ($files as $file => $component) {
-            $designer->annotate_files($component, $file, null);
+        if ($files) {
+            foreach ($files as $file => $component) {
+                $designer->annotate_files($component, $file, null);
+            }
         }
         $plugin = $this->get_plugin_element(null, $this->get_format_condition(), 'designer');
 
@@ -52,14 +54,16 @@ class backup_format_designer_plugin extends backup_format_plugin {
      * Define the sections features to backup.
      */
     public function define_section_plugin_structure() {
-        $formatoptions = new backup_nested_element('designer', array('id'), array('backgroundimage'));
+        $formatoptions = new backup_nested_element('designer', ['id'], ['backgroundimage']);
 
         // Define sources.
-        $formatoptions->set_source_table('course_sections', array('id' => backup::VAR_SECTIONID));
+        $formatoptions->set_source_table('course_sections', ['id' => backup::VAR_SECTIONID]);
 
         $files = format_designer\options::get_file_areas('section');
-        foreach ($files as $file => $component) {
-            $formatoptions->annotate_files($component, $file, null);
+        if ($files) {
+            foreach ($files as $file => $component) {
+                $formatoptions->annotate_files($component, $file, null);
+            }
         }
         $plugin = $this->get_plugin_element(null, $this->get_format_condition(), 'designer');
 

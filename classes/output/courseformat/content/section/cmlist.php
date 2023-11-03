@@ -85,10 +85,10 @@ class cmlist extends \core_courseformat\output\local\content\section\cmlist {
                     continue;
                 }
                 if ($mod->is_visible_on_course_page()) {
-                    $item = new $this->itemclass($format, $section, $mod, $this->displayoptions);
+                    $item = new $this->itemclass($format, $section, $mod, $this->displayoptions, );
                     $data->cms[] = (object)[
                         'cmitem' => $item->export_for_template($output),
-                        'moveurl' => new moodle_url('/course/mod.php', array('moveto' => $modnumber, 'sesskey' => sesskey())),
+                        'moveurl' => new moodle_url('/course/mod.php', ['moveto' => $modnumber, 'sesskey' => sesskey()]),
                     ];
                 }
             }
