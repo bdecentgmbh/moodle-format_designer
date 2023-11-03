@@ -2033,6 +2033,7 @@ function format_designer_extend_navigation_course($navigation, $course, $context
     if (format_designer_has_pro()) {
         $course = course_get_format($course->id)->get_course();
         $prerequisitebnewtab = $course->prerequisitesnewtab;
+        $courseprerequisitepos = ($course->courseprerequisitepos > 0) ? $course->courseprerequisitepos : 0;
         $designerpro = true;
     }
 
@@ -2164,16 +2165,7 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                     }
                 }
 
-                var designercoursehome = document.querySelectorAll('.moremenu .designercoursehome')[0];
-                if (designercoursehome) {
-                        designercoursehome.classList.remove('dropdown-item');
-                        designercoursehome.classList.add('nav-link');
-                        let parent = designercoursehome.parentNode;
-                        parent.setAttribute('data-forceintomoremenu', 'false');
-                        secondarynav.insertBefore(parent, secondarynav.children[0]);
-                }
 
-                // Insert the prerequisite course link to secondary nav.
                 if ($designerpro) {
                     var prerequisites = document.querySelectorAll('.prerequisites-course')[0];
                     var moremenulink = document.querySelector('.secondary-navigation ul.nav-tabs .dropdownmoremenu a');
@@ -2188,8 +2180,21 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                         }
                         let parent = prerequisites.parentNode;
                         parent.setAttribute('data-forceintomoremenu', 'false');
-                        secondarynav.insertBefore(parent, secondarynav.children[0]);
+                        secondarynav.insertBefore(parent, secondarynav.children[$courseprerequisitepos]);
                     }
+                }
+
+                var designercoursehome = document.querySelectorAll('.moremenu .designercoursehome')[0];
+                if (designercoursehome) {
+                        designercoursehome.classList.remove('dropdown-item');
+                        designercoursehome.classList.add('nav-link');
+                        let parent = designercoursehome.parentNode;
+                        parent.setAttribute('data-forceintomoremenu', 'false');
+                        secondarynav.insertBefore(parent, secondarynav.children[0]);
+                }
+
+                // Insert the prerequisite course link to secondary nav.
+                if ($designerpro) {
                     var backmaincourse = document.querySelectorAll('.backmain-course')[0];
                     if (backmaincourse) {
                         backmaincourse.classList.remove('dropdown-item');
@@ -2199,7 +2204,6 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                         secondarynav.insertBefore(parent, secondarynav.children[0]);
                     }
                 }
-
                 MenuMore(secondarynav);
                 return true;
             });

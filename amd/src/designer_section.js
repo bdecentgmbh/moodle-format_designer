@@ -300,7 +300,7 @@
             if (self.videoTime) {
                 self.updateVideoTimeInstance(sectionId);
             }
-        }, 1500);
+        }, 2000);
     };
 
     return {

@@ -40,8 +40,10 @@ class backup_format_designer_plugin extends backup_format_plugin {
             ['cmid' => backup::VAR_MODID, 'courseid' => backup::VAR_COURSEID]);
 
         $files = format_designer\options::get_file_areas('module');
-        foreach ($files as $file => $component) {
-            $designer->annotate_files($component, $file, null);
+        if ($files) {
+            foreach ($files as $file => $component) {
+                $designer->annotate_files($component, $file, null);
+            }
         }
         $plugin = $this->get_plugin_element(null, $this->get_format_condition(), 'designer');
 
@@ -58,8 +60,10 @@ class backup_format_designer_plugin extends backup_format_plugin {
         $formatoptions->set_source_table('course_sections', ['id' => backup::VAR_SECTIONID]);
 
         $files = format_designer\options::get_file_areas('section');
-        foreach ($files as $file => $component) {
-            $formatoptions->annotate_files($component, $file, null);
+        if ($files) {
+            foreach ($files as $file => $component) {
+                $formatoptions->annotate_files($component, $file, null);
+            }
         }
         $plugin = $this->get_plugin_element(null, $this->get_format_condition(), 'designer');
 
