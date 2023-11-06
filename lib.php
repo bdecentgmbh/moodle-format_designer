@@ -1785,6 +1785,9 @@ function format_designer_editsetting_style($page) {
         $style .= '.format-designer .designer .section .activity .actions .menubar .dropdown .dropdown-menu {';
         $style .= 'top: -50px !important;left: auto !important;right: 40px !important;transform: none !important;';
         $style .= '}';
+        $style .= '.format-designer .course-content ul.designer li.section .right .dropdown.designer-menu .dropdown-menu {';
+        $style .= 'top: -90px !important;';
+        $style .= '}';
         echo html_writer::tag('style', $style, []);
     }
 }
