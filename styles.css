@@ -311,6 +311,11 @@ body.format-designer.path-admin #page.drawers .main-inner .header-maxwidth {
     width: 16px;
 }
 .format-designer .course-content ul.designer.course-type-normal li.section .section-header-content
+.section-summary-activities .img-element svg {
+    width: 24px;
+    height: 24px;
+}
+.format-designer .course-content ul.designer.course-type-normal li.section .section-header-content
 .section-summary-activities .img-element .activity-count {
     width: 20px;
     height: 20px;
@@ -625,10 +630,9 @@ span.section-collapse-icon:before,
 span.section-collapse-icon:before {
     content: '\f107';
     width: 20px;
-    font-family: var(--fa-style-family, "Font Awesome 6 Free");
+    font-family: var(--fa-style-family, "Font Awesome 6 Free", fontawesome);
     font-weight: var(--fa-style, 900);
     font-size: 24px;
-    font-weight: bold;
     line-height: 32px;
     text-align: center;
     margin-right: 10px;
@@ -2088,7 +2092,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 }
 .format-designer .designer .section-design-whole .mod-content .trim-summary a,
 .format-designer .designer .section-design-header .mod-content .trim-summary a {
-    color: var(--sectioncolor);
+    /* color: var(--sectioncolor); */
     cursor: zoom-in;
 }
 .format-designer .designer .section-design-whole .mod-content .fullcontent-summary a,
@@ -2167,7 +2171,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 }
 .format-designer .course-info-block .carousel .carousel-control:before {
     content: '\f104';
-    font-family: var(--fa-style-family, "Font Awesome 6 Free");
+    font-family: var(--fa-style-family, "Font Awesome 6 Free", fontawesome);
     font-weight: var(--fa-style, 900);
     color: #fff;
 }
