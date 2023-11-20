@@ -76,7 +76,7 @@ Feature: Users can choose different course types.
     Then I should not see "Course" in the ".secondary-navigation" "css_element"
     And I am on "Course 1" course homepage
     And I navigate to "Settings" in current page administration
-    And I follow "Expand all"
+    And I expand all fieldsets
     And I set the following fields to these values:
       | Add course to secondary menu item on all course pages | 1 |
     And I press "Save and display"
