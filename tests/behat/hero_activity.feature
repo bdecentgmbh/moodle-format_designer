@@ -32,14 +32,14 @@ Feature: Activities can be check hero activity in designer format
     And I am on "Course 1" course homepage with editing mode on
     And I press "Add an activity or resource"
     And I click on "Add a new Forum" "link" in the "Add an activity or resource" "dialogue"
-    And I follow "Expand all"
+    And I expand all fieldsets
     And I set the field "Forum name" to "My forum name"
     And I set the field "Show as tab" to "Everywhere"
     And I set the field "Order" to "1"
     And I press "Save and return to course"
     And I press "Add an activity or resource"
     And I click on "Add a new Forum" "link" in the "Add an activity or resource" "dialogue"
-    And I follow "Expand all"
+    And I expand all fieldsets
     And I set the field "Forum name" to "My forum name1"
     And I set the field "Show as tab" to "Only on course main page"
     And I set the field "Order" to "-1"
@@ -52,7 +52,7 @@ Feature: Activities can be check hero activity in designer format
     Given I log in as "admin"
     And I am on "Course 1" course homepage with editing mode on
     Then I am on the "Demo assign 1" "assign activity editing" page
-    And I follow "Expand all"
+    And I expand all fieldsets
     And I set the following fields to these values:
       | Show as tab | Everywhere |
       | Order       | 1 |
@@ -81,7 +81,7 @@ Feature: Activities can be check hero activity in designer format
     Given I log in as "admin"
     And I am on "Course 1" course homepage with editing mode on
     Then I am on the "Demo assign 1" "assign activity editing" page
-    And I follow "Expand all"
+    And I expand all fieldsets
     And I set the following fields to these values:
       | Show as tab | Everywhere |
       | Order       | 1 |
@@ -91,14 +91,14 @@ Feature: Activities can be check hero activity in designer format
     Then I am on the "Demo assign 1" "assign activity" page
     And I should see "Demo assign 1" in the ".secondary-navigation" "css_element"
     Then I am on the "Demo assign 1" "assign activity editing" page
-    And I follow "Expand all"
+    And I expand all fieldsets
     And I set the following fields to these values:
       | Secondary menu title | Activity type |
     And I press "Save and return to course"
     And I should not see "Demo assign 1" in the ".secondary-navigation" "css_element"
     And I should see "Assignment" in the ".secondary-navigation" "css_element"
     Then I am on the "Demo assign 1" "assign activity editing" page
-    And I follow "Expand all"
+    And I expand all fieldsets
     And I set the following fields to these values:
       | Secondary menu title | Custom |
       | Custom title     | Demo assign custom |
@@ -107,14 +107,14 @@ Feature: Activities can be check hero activity in designer format
     And I should not see "Assignment" in the ".secondary-navigation" "css_element"
     And I should see "Demo assign custom" in the ".secondary-navigation" "css_element"
     Then I am on the "Demo assign 1" "assign activity editing" page
-    And I follow "Expand all"
+    And I expand all fieldsets
     And I set the following fields to these values:
       | Custom title     | Demo assign (Modified)|
     And I press "Save and return to course"
     And I should not see "Demo assign custom" in the ".secondary-navigation" "css_element"
     And I should see "Demo assign (Modified)" in the ".secondary-navigation" "css_element"
     Then I am on the "Demo assign 2" "assign activity editing" page
-    And I follow "Expand all"
+    And I expand all fieldsets
     And I set the following fields to these values:
       | Show as tab | Everywhere |
       | Order       | 1 |
@@ -132,7 +132,7 @@ Feature: Activities can be check hero activity in designer format
     Given I log in as "admin"
     And I am on "Course 1" course homepage with editing mode on
     Then I am on the "Demo assign 1" "assign activity editing" page
-    And I follow "Expand all"
+    And I expand all fieldsets
     And I set the following fields to these values:
       | Show as tab | Everywhere |
       | Order       | 1 |
@@ -144,7 +144,7 @@ Feature: Activities can be check hero activity in designer format
     Then I click on ".drawer-toggler.drawer-left-toggle" "css_element"
     And I should not see "Demo Assign Test" in the "#courseindex-content" "css_element"
     Then I am on the "Demo assign 1" "assign activity editing" page
-    And I follow "Expand all"
+    And I expand all fieldsets
     And I set the following fields to these values:
       | Use custom name on course/section pages | 1 |
     And I press "Save and return to course"
@@ -153,7 +153,7 @@ Feature: Activities can be check hero activity in designer format
     Then I click on ".drawer-toggler.drawer-left-toggle" "css_element"
     And I should not see "Demo Assign Test" in the "#courseindex-content" "css_element"
     Then I am on the "Demo assign 1" "assign activity editing" page
-    And I follow "Expand all"
+    And I expand all fieldsets
     And I set the following fields to these values:
       | Use custom name in course index | 1 |
     And I press "Save and return to course"
@@ -177,7 +177,7 @@ Feature: Activities can be check hero activity in designer format
     And I should not see "Demo assign 3" in the ".secondary-navigation" "css_element"
     And I should see "General"
     And I navigate to "Settings" in current page administration
-    And I follow "Expand all"
+    And I expand all fieldsets
     And I set the following fields to these values:
       | Section 0 activities | Make hero activity and hide section 0 |
       | Show as tab         |  Everywhere |
@@ -193,7 +193,7 @@ Feature: Activities can be check hero activity in designer format
     And I should not see "Demo assign 4" in the ".secondary-navigation" "css_element"
     And I should not see "Demo assign 5" in the ".secondary-navigation" "css_element"
     And I navigate to "Settings" in current page administration
-    And I follow "Expand all"
+    And I expand all fieldsets
     And I set the following fields to these values:
       | Section 0 activities | Make hero activity and hide section 0 |
       | Show as tab         |  Everywhere |
@@ -204,7 +204,7 @@ Feature: Activities can be check hero activity in designer format
     And I should see "Demo assign 4" in the ".secondary-navigation" "css_element"
     And I am on "Course 1" course homepage
     And I navigate to "Settings" in current page administration
-    And I follow "Expand all"
+    And I expand all fieldsets
     And I set the following fields to these values:
       | Section 0 activities | Make hero activity and keep section 0 visible |
     Then I press "Save and display"
@@ -214,7 +214,7 @@ Feature: Activities can be check hero activity in designer format
     And I should see "General"
     Then I turn editing mode on
     And I navigate to "Settings" in current page administration
-    And I follow "Expand all"
+    And I expand all fieldsets
     And I set the following fields to these values:
       | Section 0 activities | Disabled |
     Then I press "Save and display"

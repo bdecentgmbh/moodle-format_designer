@@ -849,7 +849,7 @@ class renderer extends \core_courseformat\output\section_renderer {
                 if ($thismod->uservisible) {
                     if (isset($mods[$thismod->modname])) {
                         $mods[$thismod->modname]['name'] = $thismod->modplural;
-                        if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/monologo.png')) {
+                        if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/monologo.svg')) {
                             $mods[$thismod->modname]['activityimgsvg'] = file_get_contents($CFG->dirroot.'/mod/'.$thismod->modname.
                             '/pix/monologo.svg');
                         } else if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/icon.png')) {
@@ -858,7 +858,7 @@ class renderer extends \core_courseformat\output\section_renderer {
                         $mods[$thismod->modname]['count']++;
                     } else {
                         $mods[$thismod->modname]['name'] = $thismod->modfullname;
-                        if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/monologo.png')) {
+                        if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/monologo.svg')) {
                             $mods[$thismod->modname]['activityimgsvg'] = file_get_contents($CFG->dirroot.'/mod/'.$thismod->modname.
                             '/pix/monologo.svg');
                         } else if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/icon.png')) {

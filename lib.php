@@ -1785,6 +1785,9 @@ function format_designer_editsetting_style($page) {
         $style .= '.format-designer .designer .section .activity .actions .menubar .dropdown .dropdown-menu {';
         $style .= 'top: -50px !important;left: auto !important;right: 40px !important;transform: none !important;';
         $style .= '}';
+        $style .= '.format-designer .course-content ul.designer li.section .right .dropdown.designer-menu .dropdown-menu {';
+        $style .= 'top: -90px !important;';
+        $style .= '}';
         echo html_writer::tag('style', $style, []);
     }
 }
@@ -2030,6 +2033,7 @@ function format_designer_extend_navigation_course($navigation, $course, $context
 
     $designerpro = 0;
     $prerequisitebnewtab = 0;
+    $courseprerequisitepos = 0;
     if (format_designer_has_pro()) {
         $course = course_get_format($course->id)->get_course();
         $prerequisitebnewtab = $course->prerequisitesnewtab;
