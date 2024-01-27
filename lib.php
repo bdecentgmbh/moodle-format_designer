@@ -70,6 +70,12 @@ define('DESIGNER_HERO_ACTVITIY_COURSEPAGE', 2);
 
 define('DESIGNER_MOD_TEXT_TRIMM', 0);
 
+define('DESIGNERCOURSEANDSECTIONPAGE', 'courseandsection');
+
+define('DESIGNERCOURSEPAGE', 'course');
+
+define('DESIGNERSECTIONPAGE', 'section');
+
 /**
  * Main class for the Designer course format.
  *
@@ -162,6 +168,32 @@ class format_designer extends \core_courseformat\base {
         } else {
             return $this->get_default_section_name($section);
         }
+    }
+
+    /**
+     * Returns if an specific section is visible to the current user.
+     *
+     * Formats can overrride this method to implement any special section logic.
+     *
+     * @param section_info $section the section modinfo
+     * @return bool;
+     */
+    public function is_section_visible(section_info $section, $inculdehidesections = true): bool {
+        // Previous to Moodle 4.0 thas logic was hardcoded. To prevent errors in the contrib plugins
+        // the default logic is the same required for topics and weeks format and still uses
+        // a "hiddensections" format setting.
+        $course = $this->get_course();
+        if ($inculdehidesections) {
+            $hidesections = $course->hiddensections ?? true;
+        } else {
+            $hidesections = true;
+        }
+        // Show the section if the user is permitted to access it, OR if it's not available
+        // but there is some available info text which explains the reason & should display,
+        // OR it is hidden but the course has a setting to display hidden sections as unavailable.
+        return $section->uservisible ||
+            ($section->visible && !$section->available && !empty($section->availableinfo)) ||
+            (!$section->visible && !$hidesections);
     }
 
     /**
@@ -468,10 +500,19 @@ class format_designer extends \core_courseformat\base {
                     'default' => 0,
                     'type' => PARAM_INT,
                 ],
+            ];
+
+            // Include course header config.
+            if (format_designer_has_pro()) {
+                $courseformatoptions += (new local_designer\courseoptions($PAGE->course))->course_format_options_list();
+            }
+
+            $courseformatoptions += [
                 'courseheader' => [
                     'default' => get_string('courseheader', 'format_designer'),
                     'type' => PARAM_TEXT,
                 ],
+
                 'activityprogress' => [
                     'default' => 0,
                     'type' => PARAM_INT,
@@ -496,6 +537,7 @@ class format_designer extends \core_courseformat\base {
                     'type' => PARAM_TEXT,
                 ],
             ];
+
             // Include course header config.
             if (format_designer_has_pro()) {
                 $courseformatoptions += (new local_designer\courseoptions($PAGE->course))->course_header_options_format_list();
@@ -701,6 +743,7 @@ class format_designer extends \core_courseformat\base {
                 ],
             ];
             if (format_designer_has_pro()) {
+                $courseformatoptionsedit += (new local_designer\courseoptions($PAGE->course))->course_format_options_editlist();
                 $courseformatoptionsedit += (new local_designer\courseoptions($PAGE->course))->course_header_options_editlist();
             }
             if (format_designer_popup_installed()) {
@@ -929,6 +972,30 @@ class format_designer extends \core_courseformat\base {
     }
 
     /**
+     * Return an instance of moodleform to edit a specified section
+     *
+     * Default implementation returns instance of editsection_form that automatically adds
+     * additional fields defined in course_format::section_format_options()
+     *
+     * Format plugins may extend editsection_form if they want to have custom edit section form.
+     *
+     * @param mixed $action the action attribute for the form. If empty defaults to auto detect the
+     *              current url. If a moodle_url object then outputs params as hidden variables.
+     * @param array $customdata the array with custom data to be passed to the form
+     *     /course/editsection.php passes section_info object in 'cs' field
+     *     for filling availability fields
+     * @return moodleform
+     */
+    public function editsection_form($action, $customdata = array()) {
+        global $CFG;
+        require_once($CFG->dirroot. '/course/format/designer/editsection_form.php');
+        if (!array_key_exists('course', $customdata)) {
+            $customdata['course'] = $this->get_course();
+        }
+        return new editsection_form($action, $customdata);
+    }
+
+    /**
      * Definitions of the additional options that this course format uses for section
      *
      * See course_format::course_format_options() for return array definition.
@@ -1063,6 +1130,96 @@ class format_designer extends \core_courseformat\base {
             local_designer\options::update_section_format_options($data);
         }
         return $this->update_format_options($data, $data['id']);
+    }
+
+    /**
+     * Updates format options for a course or section
+     *
+     * If $data does not contain property with the option name, the option will not be updated
+     *
+     * @param stdClass|array $data return value from moodleform::get_data() or array with data
+     * @param null|int $sectionid null if these are options for course or section id (course_sections.id)
+     *     if these are options for section
+     * @return bool whether there were any changes to the options values
+     */
+    protected function update_format_options($data, $sectionid = null) {
+        global $DB;
+        $data = $this->validate_format_options((array)$data, $sectionid);
+        if (!$sectionid) {
+            $allformatoptions = $this->course_format_options();
+            $sectionid = 0;
+        } else {
+            $allformatoptions = $this->section_format_options();
+        }
+        if (empty($allformatoptions)) {
+            // Nothing to update anyway.
+            return false;
+        }
+        if (isset($allformatoptions['sectioncardcta_editor'])) {
+            unset($allformatoptions['sectioncardcta_editor']);
+        }
+        $defaultoptions = array();
+        $cached = array();
+        foreach ($allformatoptions as $key => $option) {
+            $defaultoptions[$key] = null;
+            if (array_key_exists('default', $option)) {
+                $defaultoptions[$key] = $option['default'];
+            }
+            expand_value($defaultoptions, $defaultoptions, $option, $key);
+            $cached[$key] = ($sectionid === 0 || !empty($option['cache']));
+        }
+        $records = $DB->get_records('course_format_options',
+                array('courseid' => $this->courseid,
+                      'format' => $this->format,
+                      'sectionid' => $sectionid
+                    ), '', 'name,id,value');
+        $changed = $needrebuild = false;
+        foreach ($defaultoptions as $key => $value) {
+            if (isset($records[$key])) {
+                if (array_key_exists($key, $data) && $records[$key]->value != $data[$key]) {
+                    $DB->set_field('course_format_options', 'value',
+                            $data[$key], array('id' => $records[$key]->id));
+                    $changed = true;
+                    $needrebuild = $needrebuild || $cached[$key];
+                }
+            } else {
+                if (array_key_exists($key, $data) && $data[$key] !== $value) {
+                    $newvalue = $data[$key];
+                    $changed = true;
+                    $needrebuild = $needrebuild || $cached[$key];
+                } else {
+                    $newvalue = $value;
+                    // We still insert entry in DB but there are no changes from user point of
+                    // view and no need to call rebuild_course_cache().
+                }
+                $DB->insert_record('course_format_options', array(
+                    'courseid' => $this->courseid,
+                    'format' => $this->format,
+                    'sectionid' => $sectionid,
+                    'name' => $key,
+                    'value' => $newvalue
+                ));
+            }
+        }
+        if ($needrebuild) {
+            if ($sectionid) {
+                // Invalidate the section cache by given section id.
+                course_modinfo::purge_course_section_cache_by_id($this->courseid, $sectionid);
+                // Partial rebuild sections that have been invalidated.
+                rebuild_course_cache($this->courseid, true, true);
+            } else {
+                // Full rebuild if sectionid is null.
+                rebuild_course_cache($this->courseid);
+            }
+        }
+        if ($changed) {
+            // Reset internal caches.
+            if (!$sectionid) {
+                $this->course = false;
+            }
+            unset($this->formatoptions[$sectionid]);
+        }
+        return $changed;
     }
 
     /**

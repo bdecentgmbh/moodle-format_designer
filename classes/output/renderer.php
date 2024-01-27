@@ -715,6 +715,10 @@ class renderer extends \core_courseformat\output\section_renderer {
         $sectionheader = false, $sectionreturn = 0, $sectioncontent = false) {
         global $CFG;
         $sectionurl = new \moodle_url('/course/view.php', ['id' => $course->id, 'section' => $section->section]);
+        if (format_designer_has_pro() && !$section->uservisible && $section->availableinfo
+                && !empty($section->sectioncardredirect)) {
+            $sectionurl = $section->sectioncardredirect;
+        }
         /** @var format_designer $format */
         $format = course_get_format($course);
         $sectionstyle = '';
@@ -732,7 +736,8 @@ class renderer extends \core_courseformat\output\section_renderer {
 
         $sectionrestrict = (!$section->uservisible && $section->availableinfo) ? true : false;
 
-        if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && $sectionheader && $section->section > 0) {
+        if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && $sectionheader && $section->section > 0
+			&& $format->is_section_visible($section, false)) {
             $gotosection = true;
         }
 
@@ -797,9 +802,9 @@ class renderer extends \core_courseformat\output\section_renderer {
         $sectionstylerules = ($course->coursetype == DESIGNER_TYPE_KANBAN)
             ? (isset($course->listwidth) && $section->section != 0
             ? sprintf('width: %s;', $course->listwidth) : '') : '';
-
         $templatecontext = [
             'section' => $section,
+            'sectionvisible' => $format->is_section_visible($section, false),
             'sectiontype' => $sectiontype,
             'sectionlayoutclass' => $sectionlayoutclass,
             'sectionstyle' => $sectionstyle,
@@ -825,6 +830,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             'issectioncompletion' => $issectioncompletion,
             'gotosection' => (isset($gotosection) ? $gotosection : false),
             'sectionurl' => $sectionurl,
+            'sectioncardcontentdirect' => (format_designer_has_pro() && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE)  ? $section->sectioncardtab : '',
             'sectioncollapse' => isset($sectioncollapse) ? $sectioncollapse : false,
             'sectionshow' => $sectioncollapsestatus,
             'sectionaccordion' => isset($course->accordion) && !$this->page->user_is_editing() ? $course->accordion : false,
@@ -846,27 +852,26 @@ class renderer extends \core_courseformat\output\section_renderer {
             foreach ($cmids as $cmid) {
                 $thismod = $modinfo->cms[$cmid];
 
-                if ($thismod->uservisible) {
-                    if (isset($mods[$thismod->modname])) {
-                        $mods[$thismod->modname]['name'] = $thismod->modplural;
-                        if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/monologo.svg')) {
-                            $mods[$thismod->modname]['activityimgsvg'] = file_get_contents($CFG->dirroot.'/mod/'.$thismod->modname.
-                            '/pix/monologo.svg');
-                        } else if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/icon.png')) {
-                            $mods[$thismod->modname]['img'] = $CFG->wwwroot.'/mod/'.$thismod->modname.'/pix/icon.png';
-                        }
-                        $mods[$thismod->modname]['count']++;
-                    } else {
-                        $mods[$thismod->modname]['name'] = $thismod->modfullname;
-                        if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/monologo.svg')) {
-                            $mods[$thismod->modname]['activityimgsvg'] = file_get_contents($CFG->dirroot.'/mod/'.$thismod->modname.
-                            '/pix/monologo.svg');
-                        } else if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/icon.png')) {
-                            $mods[$thismod->modname]['img'] = $CFG->wwwroot.'/mod/'.$thismod->modname.'/pix/icon.png';
-                        }
-                        $mods[$thismod->modname]['count'] = 1;
+                if (isset($mods[$thismod->modname])) {
+                    $mods[$thismod->modname]['name'] = $thismod->modplural;
+                    if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/monologo.svg')) {
+                        $mods[$thismod->modname]['activityimgsvg'] = file_get_contents($CFG->dirroot.'/mod/'.$thismod->modname.
+                        '/pix/monologo.svg');
+                    } else if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/icon.png')) {
+                        $mods[$thismod->modname]['img'] = $CFG->wwwroot.'/mod/'.$thismod->modname.'/pix/icon.png';
                     }
+                    $mods[$thismod->modname]['count']++;
+                } else {
+                    $mods[$thismod->modname]['name'] = $thismod->modfullname;
+                    if (file_exists($CFG->dirroot . '/mod/'. $thismod->modname . '/pix/monologo.svg')) {
+                        $mods[$thismod->modname]['activityimgsvg'] = file_get_contents($CFG->dirroot.'/mod/'.$thismod->modname.
+                        '/pix/monologo.svg');
+                    } else if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/icon.png')) {
+                        $mods[$thismod->modname]['img'] = $CFG->wwwroot.'/mod/'.$thismod->modname.'/pix/icon.png';
+                    }
+                    $mods[$thismod->modname]['count'] = 1;
                 }
+
             }
             $templatecontext['sectioncountstatus'] = true;
             $templatecontext['sectionmodcount'] = array_values($mods);
@@ -939,6 +944,7 @@ class renderer extends \core_courseformat\output\section_renderer {
      */
     public function render_course_module($mod, $sectionreturn, $displayoptions = [], $section=null, $cmdata=[]) {
         global $DB, $USER, $CFG;
+        $course = course_get_format($mod->get_course())->get_course();
         if (!$mod->is_visible_on_course_page()) {
             return [];
         }
@@ -947,7 +953,6 @@ class renderer extends \core_courseformat\output\section_renderer {
 
         // Add course type flow animation class.
         // TODO: check the animation settings.
-        $course = course_get_format($mod->get_course())->get_course();
         if ($course->coursetype == DESIGNER_TYPE_FLOW && !$this->page->user_is_editing()) {
             if ((isset($course->showanimation) && $course->showanimation)) {
                 $modclasses .= ' flow-animation ';

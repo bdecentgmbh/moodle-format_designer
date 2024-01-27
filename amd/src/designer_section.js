@@ -150,7 +150,12 @@
         }
         var singlesection = event.target.closest("[data-action=go-to-section-url]");
         let sectionurl = singlesection.getAttribute('data-url');
-        window.location.href = sectionurl;
+        let sectiontarget =  "_self";
+        let target = singlesection.getAttribute('data-target');
+        if (target) {
+            sectiontarget = target;
+        }
+        window.open(sectionurl, sectiontarget);
         return true;
     };
 

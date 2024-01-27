@@ -53,7 +53,7 @@ class cmname extends \core_courseformat\output\local\content\cm\cmname {
             // Nothing to be displayed to the user.
             $data = new stdClass();
             $data->mod = $mod;
-            return $data;
+            return (array) $data;
         }
 
         // Usually classes are loaded in the main cm output. However when the user uses the inplace editor

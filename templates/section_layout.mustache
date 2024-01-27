@@ -26,7 +26,8 @@
     }
 }}
 
-<div class="section-content-wrapper {{#sectionprogresscomp}} section-progress-info-completed {{/sectionprogresscomp}}" {{#sectionsingle}} data-action="go-to-section-url" data-url="{{{sectionurl}}}" {{/sectionsingle}}>
+<div class="section-content-wrapper {{#sectionprogresscomp}} section-progress-info-completed {{/sectionprogresscomp}}" {{#sectionsingle}} data-action="go-to-section-url"
+data-target="{{#sectioncardcontentdirect}}_blank{{/sectioncardcontentdirect}}" data-url="{{#sectionvisible}} {{{sectionurl}}} {{/sectionvisible}}" {{/sectionsingle}}>
 {{#sectiondesignwhole}}
     <div class="section-background-style section-design-whole" style="{{#sectionbackgroundstyle}} {{sectionbackgroundstyle}} {{/sectionbackgroundstyle}}">
         {{#maskinner}}
@@ -115,6 +116,7 @@
                 {{> core_courseformat/local/content/section/badges }}
             {{/ core_courseformat/local/content/section/badges }}
         </div>
+        {{^section.hidesectiontitle}}
         {{^flowcourse}}
             {{#section.categorisetitle}}
             <div class="categorise-section-block">
@@ -122,6 +124,7 @@
             </div>
             {{/section.categorisetitle}}
         {{/flowcourse}}
+         {{/section.hidesectiontitle}}
 
         {{! End of section badges }}
 
@@ -159,13 +162,20 @@
         </div>
         {{/availability}}
 
-        <div class="summary" style="{{#sectiondesigntextcolor}} {{sectiondesigntextcolor}} {{/sectiondesigntextcolor}}">
-        {{#summary}}
-            {{$ core_courseformat/local/content/section/summary }}
-                {{> core_courseformat/local/content/section/summary }}
-            {{/ core_courseformat/local/content/section/summary }}
-        {{/summary}}
-        </div>
+        {{^hidesectionsummary}}
+            <div class="summary" style="{{#sectiondesigntextcolor}} {{sectiondesigntextcolor}} {{/sectiondesigntextcolor}}">
+            {{#summary}}
+                {{$ core_courseformat/local/content/section/summary }}
+                    {{> core_courseformat/local/content/section/summary }}
+                {{/ core_courseformat/local/content/section/summary }}
+            {{/summary}}
+            </div>
+        {{/hidesectionsummary}}
+
+
+        {{#sectioncardctacontent}}
+            {{{sectioncardctacontent}}}
+        {{/sectioncardctacontent}}
 
         {{#flowcourse}}
             {{#issectioncompletion}}
@@ -210,7 +220,7 @@
         {{/sectioncountstatus}}
         {{#gotosection}}
             {{#sectionsingle}}
-                <a href="{{{sectionurl}}}" class="goto-section btn btn-primary" {{#sectioncountstatus}} style="{{#sectiontextcolor}} {{sectiontextcolor}} {{/sectiontextcolor}}" {{/sectioncountstatus}}><i class="fa fa-fw fa-arrow-right"></i></a>
+                <a href="{{{sectionurl}}}" target="{{#sectioncardcontentdirect}}_blank{{/sectioncardcontentdirect}}" class="goto-section btn btn-primary" {{#sectioncountstatus}} style="{{#sectiontextcolor}} {{sectiontextcolor}} {{/sectiontextcolor}}" {{/sectioncountstatus}}><i class="fa fa-fw fa-arrow-right"></i></a>
             {{/sectionsingle}}
             {{^sectionsingle}}
             	<a href="{{{sectionurl}}}" class="goto-section btn btn-primary">{{#str}}gotosection, format_designer{{/str}}</a>
