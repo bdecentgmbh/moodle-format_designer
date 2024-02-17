@@ -76,6 +76,18 @@ define('DESIGNERCOURSEPAGE', 'course');
 
 define('DESIGNERSECTIONPAGE', 'section');
 
+define('DESIGNER_PROGRESS_RELEVANTACTIVITIES', 'relevantmods');
+
+define('DESIGNER_PROGRESS_ALLACTIVITIES', 'allmods');
+
+define('DESIGNER_PROGRESS_SECTIONS', 'sections');
+
+define('DESIGNER_CMPIND_DISABLED', 'disabled');
+
+define('DESIGNER_CMPIND_BELOWPROGRESS', 'belowcourseprogress');
+
+define('DESIGNER_CMPIND_METADATA', 'coursemetadata');
+
 /**
  * Main class for the Designer course format.
  *
@@ -297,15 +309,14 @@ class format_designer extends \core_courseformat\base {
      * @return void
      */
     public function page_set_course(moodle_page $page) {
-        global $PAGE;
         $course = $this->get_course();
         if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
-            $PAGE->add_body_class('format-designer-single-section');
+            $page->add_body_class('format-designer-single-section');
         }
         if (format_designer_has_pro()) {
             // Fetch classes from pro designer and attach them to the body.
             $classes = \local_designer\info::create()->generate_body_classes($course, $this);
-            $PAGE->add_body_class($classes);
+            $page->add_body_class($classes);
         }
     }
     /**
@@ -1079,13 +1090,14 @@ class format_designer extends \core_courseformat\base {
         $course = course_get_format($PAGE->course)->get_course();
         $settingspage = ($PAGE->course->id == SITEID);
         if ($settingspage || (isset($course->coursetype) && $course->coursetype != DESIGNER_TYPE_FLOW)) {
-            foreach (['desktop' => 5, 'tablet' => 3, 'mobile' => 2] as $name => $size) {
+            foreach (['desktop' => ['size' => 5, 'default' => '2'], 'tablet' => ['size' => 3, 'default' => 1],
+                'mobile' => ['size' => 2, 'default' => '2']] as $name => $options) {
                 $name = $name.'width';
-                $availablewidth = array_slice($width, 0, $size);
+                $availablewidth = array_slice($width, 0, $options['size']);
                 $widthdefaultvalue = isset($design->$name) ? $design->$name : '';
                 $sectionoptions[$name] = [
                     'default' => (isset($design->$name) && $foreditform ||
-                    (isset($course->coursetype) && $course->coursetype != DESIGNER_TYPE_NORMAL)) ? $widthdefaultvalue : 2,
+                    (isset($course->coursetype) && $course->coursetype != DESIGNER_TYPE_NORMAL)) ? $widthdefaultvalue : $options['default'],
                     'type' => PARAM_INT,
                     'label' => new lang_string($name, 'format_designer'),
                     'element_type' => 'select',
@@ -1693,7 +1705,9 @@ function format_designer_get_section_background_image($section, $course, $modinf
         $coursecontext = \context_course::instance($course->id);
         $itemid = $section->id;
         $filearea = 'sectiondesignbackground';
-        if (\format_designer\options::is_section_completed($section, $course, $modinfo, true)
+        $realtiveactivities = isset($course->calsectionprogress) &&
+        ($course->calsectionprogress == DESIGNER_PROGRESS_RELEVANTACTIVITIES) ? true : false;
+        if (\format_designer\options::is_section_completed($section, $course, $modinfo, true, $realtiveactivities)
             && (isset($section->sectiondesignerusecompletionbg) && $section->sectiondesignerusecompletionbg)) {
             $filearea = 'sectiondesigncompletionbackground';
         }
@@ -1776,7 +1790,7 @@ function format_designer_coursemodule_standard_elements($formwrapper, $mform) {
         }
 
         // Activity elements list to manage the visibility.
-        $elements = ['icon', 'visits', 'calltoaction', 'title', 'description', 'modname', 'completionbadge'];
+        $elements = ['icon' => 1, 'visits' => 4, 'calltoaction' => 4, 'title' => 1, 'description' => 1, 'modname'  => 4, 'completionbadge'  => 1];
         $choice = [
             0 => get_string('hide'),
             1 => get_string('show'),
@@ -1787,14 +1801,14 @@ function format_designer_coursemodule_standard_elements($formwrapper, $mform) {
 
         $mform->addElement('header', 'moduledesign', get_string('activitydesign', 'format_designer'));
         $mform->addElement('html', get_string('activityelementsdisplay', 'format_designer'));
-        foreach ($elements as $element) {
+        foreach ($elements as $element => $defalut) {
             // Module background image repeat.
             $name = 'designer_activityelements['.$element.']';
             $title = get_string('activity:'.$element, 'format_designer');
             $mform->addElement('select', $name, $title, $choice);
             $mform->setType($name, PARAM_INT);
-            $mform->setDefault($name, 1);
-            if (isset($design->activityelements[$element])) {
+            $mform->setDefault($name, $defalut);
+            if (isset($design->activityelements[$element]) && !empty($design->activityelements[$element])) {
                 $mform->setDefault($name, $design->activityelements[$element]);
             }
             $adv = 'activityelements_'.$element.'_adv';
@@ -1889,6 +1903,7 @@ function format_designer_coursemodule_edit_post_actions($data, $course) {
             'designer_customtitleuseactivityitem',
             'designer_heroactivity',
             'designer_heroactivitypos',
+            'designer_purpose'
         ];
         foreach ($fields as $field) {
             if (!isset($data->$field)) {
@@ -1944,6 +1959,12 @@ function format_designer_editsetting_style($page) {
         $style .= '}';
         $style .= '.format-designer .course-content ul.designer li.section .right .dropdown.designer-menu .dropdown-menu {';
         $style .= 'top: -90px !important;';
+        $style .= '}';
+        $style .= '.format-designer .designer .section .activity .actions .menubar .dropdown .dropdown-menu .dropdown-subpanel .dropdown-menu {';
+        $style .= 'right: 175px !important;';
+        $style .= '}';
+        $style .= '.format-designer .course-content ul.designer li.section .right .dropdown .dropdown-menu .dropdown-subpanel .dropdown-menu {';
+        $style .= 'right: 175px !important;';
         $style .= '}';
         echo html_writer::tag('style', $style, []);
     }
@@ -2050,9 +2071,14 @@ function format_designer_extend_navigation_course($navigation, $course, $context
     // Include the designer section js.
     $ispopupactivities = isset($course->popupactivities) && $course->popupactivities;
     $isvideotime = format_designer_course_has_videotime($course);
-    $PAGE->requires->js_call_amd('format_designer/designer_section', 'init',
-    ['courseid' => $course->id, 'contextid' => $context->id, 'popupactivities' => $ispopupactivities, 'isvideotime' => $isvideotime,
-    ]);
+    $jsparams = [
+        'courseid' => $course->id,
+        'contextid' => $context->id,
+        'popupactivities' => $ispopupactivities,
+        'isvideotime' => $isvideotime,
+        'issubpanel' => format_designer_is_support_subpanel(),
+    ];
+    $PAGE->requires->js_call_amd('format_designer/designer_section', 'init', $jsparams);
 
     if (format_designer_has_pro()) {
         // Include the designer pro styles.
@@ -2413,4 +2439,34 @@ function format_designer_get_coursetypes() {
         DESIGNER_TYPE_FLOW => get_string('type_flow', 'format_designer'),
     ];
     return $coursetypes;
+}
+/**
+ * Update the custom or other selected values.
+ */
+function format_designer_fill_custom_values($data, $name, $custom, $csselement) {
+    if ((isset($data->{$name}) && $data->{$name})) {
+        if ($data->{$name} == 'custom') {
+            $value = $data->{$custom};
+        } else {
+            $value = $data->{$name};
+        }
+        if ($csselement) {
+            return sprintf("$csselement: %s;", $value);
+        } else {
+            return $value;
+        }
+    }
+    return "";
+}
+
+/**
+ * Check the subpanel class exit or not.
+ *
+ * @return boolean
+ */
+function format_designer_is_support_subpanel() {
+    if (class_exists('\core\output\local\action_menu\subpanel')) {
+        return true;
+    }
+    return false;
 }

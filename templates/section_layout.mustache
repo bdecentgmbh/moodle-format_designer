@@ -205,15 +205,21 @@ data-target="{{#sectioncardcontentdirect}}_blank{{/sectioncardcontentdirect}}" d
         {{#sectioncountstatus}}
         <div class="section-summary-activities pr-2 mdl-right">
             {{#sectionmodcount}}
-                <div class="img-element activity-img" style="{{{sectionmoduleimgstyle}}}">
+                <div class="img-element activity-img {{customclass}}" style="{{{sectionmoduleimgstyle}}}">
                     {{#activityimgsvg}}
                         {{{activityimgsvg}}}
                     {{/activityimgsvg}}
 
                     {{^activityimgsvg}}
-                        <img src="{{img}}" alt="{{name}}" title="{{name}}">
+                        {{#img}}
+                            <img src="{{img}}" alt="{{name}}" title="{{name}}">
+                        {{/img}}
                     {{/activityimgsvg}}
-                    <span class="activity-count" style="{{{sectionactivitycountstyle}}}">{{count}}</span>
+
+                    {{#icon}}
+                        <i class="fa {{icon}}" data-purpose="{{name}}"> </i>
+                    {{/icon}}
+                    <span class="activity-count" style="{{{sectionactivitycountstyle}}}" data-name={{name}}>{{count}}</span>
                 </div>
             {{/sectionmodcount}}
         </div>

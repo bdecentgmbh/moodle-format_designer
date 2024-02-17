@@ -249,6 +249,8 @@ $string['popupactivities'] = 'Display activities in popups';
 $string['popupactivities_help'] = 'Display the resources in popup, if enabled some type of resources will display in the popup.';
 $string['displayprogress'] = 'Display Progress';
 $string['useactivityimage'] = 'Use activity image';
+$string['subcourseuseactivityimage'] = 'Use Subcourse image as activity image';
+$string['subcoursedisplayprogress'] = 'Use Subcourse progress as activity Progress';
 $string['small'] = 'Small';
 $string['medium'] = 'Medium';
 $string['large'] = 'Large';
@@ -264,11 +266,13 @@ $string['generalsettings'] = 'General designer settings';
 $string['coursesettings'] = 'Course';
 $string['sectionsettings'] = 'Section';
 $string['stractivity'] = 'Activity';
+$string['strsection'] = "Section";
 $string['courseheader'] = 'Course header';
 $string['popupactivitiesnotinstalled'] = 'Popup format must be installed in order to display the activities in popup.';
 $string['listwidth'] = 'List width';
 
 $string['general'] = 'General';
+$string['general_settings'] = "General settings";
 $string['flowanimationduration'] = 'Flow animation duration';
 $string['flowanimationduration_help'] = 'Change the animation duration for the flow animation';
 $string['showanimation'] = 'Flow animation';
@@ -392,6 +396,30 @@ $string['content'] = 'Content';
 $string['courseheadertimemanagement'] = 'Time Management';
 $string['courseheadertimemanagement_help'] = 'Select the time-related elements you want to display in the course header. You can choose multiple options from enrolment start date, enrolment end date, due date, and completed date.';
 $string['courseprogresstype'] = 'Course Progress';
+$string['calcourseprogress'] = "Calculation of course progress";
+$string['calcourseprogress_help'] = "
+<b> Relevant activities: </b> progress shall include only activities that are conditions for course completion.<br>
+<b> All activities: </b> progress shall include all activities that have completion tracking configured.<br>
+<b> Sections: </b> progress shall be based upon sections, not activities.<br>
+";
+
+$string['completionindicator_help'] = "
+<b> Disabled: </b> do not display the indicator <br>
+<b> Below course progress: </b> show it below the course progress (depending on the configuration, this could be either the circle or the bar) <br>
+<b> With course metadata: </b> show it next to the 'course completion date' <br>
+";
+$string['calsectionprogress'] = "Calculation of section progress";
+$string['calsectionprogress_help'] = "
+<b> Relevant activities: </b>progress shall include only activities that are conditions for course completion.<br>
+<b> All activities: </b> progress shall include all activities that have completion tracking configured.<br>
+";
+$string['completionindicator'] = "Completion status indicator";
+$string['completionstatusindicator'] = "Completion status indicator";
+$string['relevantactivities'] = "Relevant activities";
+$string['allactivities'] = "All activities";
+$string['sections'] = "Sections";
+$string['belowcourseprogress'] = "Below course progress";
+$string['withcoursemetadata'] = "With course metadata";
 $string['courseprogresstype_help'] = '<b>Disabled</b>: This option will not display any course progress information in the header.<br>
 <b>Progress Bar</b>: Selecting this option will display the course progress as a bar, visually indicating how much of the course is completed.<br>
 <b>Donut</b>: Choosing this option will display the course progress as a donut chart, providing a different visual representation of progress.<br>';
@@ -449,7 +477,7 @@ $string['flowsize_help'] = 'Flow size is a setting that allows you to customize 
 
 $string['displayunavailableactivities'] = "Display unavailable activities";
 $string['displayunavailableactivities_help'] = "
-<b> Hide </b — activities are not displayed if the current user has no access to the section.
+<b> Hide </b> — activities are not displayed if the current user has no access to the section.
 <b> Show </b> — activities are displayed, even if the current user cannot access them as long as they are visible.
 ";
 
@@ -468,3 +496,57 @@ $string['sectioncardtab'] = "Redirect to external URL";
 $string['displayoncourseandsectionpage'] = "Display on course and section page";
 $string['displayoncoursepage'] = "Display on course page";
 $string['displayonsectionpageonly'] = "Display on section page only";
+
+$string['initial'] = "Initial";
+$string['lefttop'] = "Left Top";
+$string['leftcenter'] = "Left Center";
+$string['leftbottom'] = "Left Bottom";
+$string['righttop'] = "Right Top";
+$string['rightcenter'] = "Right Center";
+$string['rightbottom'] = "Right Bottom";
+$string['centertop'] = "Center Top";
+$string['centercenter'] = "Center Center";
+$string['centerbottom'] = "Center Bottom";
+
+$string['auto'] = "Auto";
+$string['cover'] = "Cover";
+$string['contain'] = "Contain";
+
+$string['designercustombgposition'] = "Custom Background Position";
+$string['designercustombgsize'] = "Custom Background Size";
+$string['designercustom_masksize'] = "Custom Mask Size";
+$string['designercustom_maskposition'] = "Custom Mask Position";
+
+$string['completioncheckmark'] = "Display checkmark upon course completion";
+$string['completioncheckmark_help'] = "It displays a checkmark instead of 100% in the donuts.";
+
+$string['strcompleted'] = "Completed";
+$string['strinprogress'] = "In progress";
+$string['strenrolled'] = "Enrolled";
+$string['managepurposes'] = "Manage purposes";
+$string['create_purpose'] = 'Create Purpose';
+$string['purpose'] = "Purpose";
+$string['purposeicon'] = "Purpose Icon";
+
+$string['purposeadministration'] = 'Administration';
+$string['purposeassessment'] = 'Assessment';
+$string['purposecollaboration'] = 'Collaboration';
+$string['purposecommunication'] = 'Communication';
+$string['purposecontent'] = 'Content';
+$string['purposeinterface'] = 'Interface';
+$string['purposeother'] = 'Other';
+
+$string['purpose_created'] = 'Purpose successfully created';
+$string['edit_purpose'] = 'Edit purposes';
+$string['edit_purpose'] = 'Edit purposes';
+$string['purpose_edited'] = 'Purpose successfully edited';
+$string['purpose_deleted'] = "Purpose successfully deleted";
+$string['delete_purpose'] = "Delete purpose";
+
+$string['title'] = "Title";
+$string['modulepurposes'] = '<h5 class="font-weight-normal font-italic pt-2 pb-2"  > Module purposes </h5>';
+$string['purpose'] = "Purpose";
+$string['purposesetting'] = "Purpose";
+$string['purposeclass'] = "Custom class for styling";
+$string['sectionlink'] = 'Permalink';
+$string['courseindicator'] = "Course status: ";

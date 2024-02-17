@@ -137,3 +137,19 @@ if ($ADMIN->fulltree) {
 
     $settings = $settingspage;
 }
+
+$settings->visiblename = get_string('general_settings', 'format_designer');
+
+$ADMIN->add('formatsettings', new admin_category('format_designer', get_string('pluginname', 'format_designer')));
+
+$ADMIN->add('format_designer', $settings);
+
+
+$settings = null;
+
+if (format_designer_has_pro()) {
+    // Tell core we already added the settings structure.
+    $ADMIN->add('format_designer', new admin_externalpage('managepurposes', get_string('managepurposes', 'format_designer'),
+    new moodle_url('/local/designer/purposes.php')));
+}
+

@@ -47,17 +47,20 @@
      * @param {array} popupActivities
      * @param {bool} videoTime
      */
-    let DesignerSection = function(courseId, contextId, popupActivities, videoTime) {
+    let DesignerSection = function(courseId, contextId, popupActivities, videoTime, issubpanel) {
         var self = this;
         self.courseId = courseId;
         self.contextId = contextId;
         self.popupActivities = popupActivities;
         self.videoTime = videoTime;
+        self.isSubpanel = issubpanel;
 
         $(".course-info-block .carousel .carousel-item:nth-child(1)").addClass('active');
         $(".course-info-block #courseStaffinfoControls.carousel").addClass('active');
 
         $('body').delegate(self.SectionController, 'click', self.sectionLayoutaction.bind(this));
+        $('body').delegate(self.SectionSubmenuSwitcher, 'click', self.sectionLayoutaction.bind(this));
+
         $("body").delegate(self.RestrictInfo, "click", self.moduleHandler.bind(this));
         $("body").delegate(self.sectionRestricted, "click", this.sectionRestrictHandler.bind(this));
         $('body').delegate(self.fullDescription, "click", self.fullmodcontentHandler.bind(this));
@@ -104,6 +107,8 @@
 
     DesignerSection.prototype.SectionController = ".designer #section-designer-action .dropdown-menu a";
 
+    DesignerSection.prototype.SectionSubmenuSwitcher = ".designer .section_action_menu .dropdown-subpanel a[data-value=section-designer-action] + .dropdown-menu a"
+
     DesignerSection.prototype.RestrictInfo = ".designer .designer-section-content .call-action-block";
 
     DesignerSection.prototype.moduleBlock = ".designer .designer-section-content li.activity";
@@ -125,15 +130,17 @@
         let isDescription = event.target.classList.contains('mod-description-action');
         let isPadlock = event.target.classList.contains('fa-lock');
         let ispopupModule = event.target.closest('li.activity').classList.contains('popmodule');
+        let isModHasURL = event.target.closest('li.activity div[data-action="go-to-url"]').getAttribute('data-url');
+        let isCompletionButton = event.target.closest('button[data-action="toggle-manual-completion"]');
         if ((nodeName in preventionNodes)
-            || document.body.classList.contains('editing') || iscircle || isDescription || isPadlock || ispopupModule) {
+            || document.body.classList.contains('editing') || iscircle || isDescription || isPadlock || ispopupModule
+            || isModHasURL == '' || isCompletionButton) {
             if (ispopupModule && !document.body.classList.contains('editing')) {
                 if (event.target.closest("button[data-action='toggle-manual-completion']") === null &&
-                event.target.closest(".mod-description-action") === null) {
+                    event.target.closest(".mod-description-action") === null) {
                     var li = event.target.closest('li.activity');
                     li.querySelector('a[href]').click();
                 }
-                // event.target.closest('a').click();
             }
             return null;
         }
@@ -271,8 +278,11 @@
      * @param {object} event
      */
     DesignerSection.prototype.sectionLayoutaction = function(event) {
+        event.preventDefault();
         var self = this;
         let sectionId = event.target.closest('li.section').getAttribute('id');
+        var sectionid = event.target.closest('li.section').getAttribute('data-id');
+        var sectionitem = document.getElementById(sectionId);
         var iconBlock = "#" + sectionId + " " + self.loadingElement;
         var layout = $(event.currentTarget).data('value');
         var layouttext = $(event.currentTarget).text();
@@ -294,10 +304,25 @@
             }], true);
             $.when.apply($, promises)
             .done(function() {
-                const sectionpromise = Actions.refreshSection('#' + sectionId, dataid, 0);
-                sectionpromise.then(() => {
-                   return '';
-                }).catch();
+                if (self.isSubpanel) {
+                    const promise = Fragment.loadFragment(
+                        'core_courseformat',
+                        'section',
+                        self.contextId,
+                        {
+                            id: sectionid,
+                            courseid: self.courseId,
+                        }
+                    );
+                    promise.then((html, js) => {
+                        Templates.replaceNode(sectionitem, html, js);
+                    }).catch();
+                } else {
+                    const sectionpromise = Actions.refreshSection('#' + sectionId, dataid, 0);
+                    sectionpromise.then(() => {
+                        return '';
+                    }).catch();
+                }
             });
         Loadingicon.addIconToContainerRemoveOnCompletion(iconBlock, promises);
         // If videotime exist update the module.
@@ -309,8 +334,8 @@
     };
 
     return {
-        init: function(courseId, contextId, popupActivities, videoTime) {
-            return new DesignerSection(courseId, contextId, popupActivities, videoTime);
+        init: function(courseId, contextId, popupActivities, videoTime, issubpanel) {
+            return new DesignerSection(courseId, contextId, popupActivities, videoTime, issubpanel);
         }
     };
 });

@@ -96,7 +96,9 @@ class header extends \core_courseformat\output\local\content\section\header {
             }
         }
         $data->name = get_section_name($course, $section);
-        $data->selecttext = $format->get_format_string('selectsection', $data->name);
+        if (method_exists($format, 'get_format_string')) {
+            $data->selecttext = $format->get_format_string('selectsection', $data->name);
+        }
 
         if (!$format->get_section_number()) {
             $data->sectionbulk = true;
