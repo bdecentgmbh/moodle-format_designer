@@ -491,7 +491,7 @@ $string['sectioncardtitle'] = "Section title";
 $string['sectioncardsummary'] = "Section summary";
 $string['sectioncardcta'] = "Not available CTA";
 $string['sectioncardredirect'] = "Redirect to external URL";
-$string['sectioncardtab'] = "Redirect to external URL";
+$string['sectioncardtab'] = "Open redirect in new tab";
 
 $string['displayoncourseandsectionpage'] = "Display on course and section page";
 $string['displayoncoursepage'] = "Display on course page";

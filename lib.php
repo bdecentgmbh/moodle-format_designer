@@ -515,7 +515,10 @@ class format_designer extends \core_courseformat\base {
 
             // Include course header config.
             if (format_designer_has_pro()) {
-                $courseformatoptions += (new local_designer\courseoptions($PAGE->course))->course_format_options_list();
+                $courseoptions = new local_designer\courseoptions($PAGE->course);
+                if (method_exists($courseoptions, 'course_format_options_list')) {
+                    $courseformatoptions += $courseoptions->course_format_options_list();
+                }
             }
 
             $courseformatoptions += [
@@ -754,8 +757,13 @@ class format_designer extends \core_courseformat\base {
                 ],
             ];
             if (format_designer_has_pro()) {
-                $courseformatoptionsedit += (new local_designer\courseoptions($PAGE->course))->course_format_options_editlist();
-                $courseformatoptionsedit += (new local_designer\courseoptions($PAGE->course))->course_header_options_editlist();
+                $courseoptions = new local_designer\courseoptions($PAGE->course);
+                if (method_exists($courseoptions, 'course_format_options_editlist')) {
+                    $courseformatoptionsedit += $courseoptions->course_format_options_editlist();
+                }
+                if (method_exists($courseoptions, 'course_header_options_editlist')) {
+                    $courseformatoptionsedit += $courseoptions->course_header_options_editlist();
+                }
             }
             if (format_designer_popup_installed()) {
                 $courseformatoptionsedit['popupactivities'] = [
@@ -1090,13 +1098,18 @@ class format_designer extends \core_courseformat\base {
         $course = course_get_format($PAGE->course)->get_course();
         $settingspage = ($PAGE->course->id == SITEID);
         if ($settingspage || (isset($course->coursetype) && $course->coursetype != DESIGNER_TYPE_FLOW)) {
-            foreach (['desktop' => ['size' => 5, 'default' => '2'], 'tablet' => ['size' => 3, 'default' => 1],
-                'mobile' => ['size' => 2, 'default' => '2']] as $name => $options) {
+            $lists = [
+                'desktop' => ['size' => 5, 'default' => '2'],
+                'tablet' => ['size' => 3, 'default' => 1],
+                'mobile' => ['size' => 2, 'default' => '2']
+            ];
+
+            foreach ($lists as $name => $options) {
                 $name = $name.'width';
                 $availablewidth = array_slice($width, 0, $options['size']);
-                $widthdefaultvalue = isset($design->$name) ? $design->$name : '';
+                $widthdefaultvalue = isset($design->$name) ? $width[$design->$name] : '';
                 $sectionoptions[$name] = [
-                    'default' => (isset($design->$name) && $foreditform ||
+                    'default' => (isset($design->$name) ||
                     (isset($course->coursetype) && $course->coursetype != DESIGNER_TYPE_NORMAL)) ? $widthdefaultvalue : $options['default'],
                     'type' => PARAM_INT,
                     'label' => new lang_string($name, 'format_designer'),
@@ -1107,13 +1120,13 @@ class format_designer extends \core_courseformat\base {
                     'help' => $name,
                     'help_component' => 'format_designer',
                 ];
-
                 $adv = $name.'_adv';
                 if (isset($design->$adv) && $design->$adv) {
                     $sectionoptions[$name]['adv'] = true;
                 }
             }
         }
+
         // Include pro feature options for section.
         if (format_designer_has_pro()) {
             require_once($CFG->dirroot."/local/designer/lib.php");
@@ -1961,10 +1974,10 @@ function format_designer_editsetting_style($page) {
         $style .= 'top: -90px !important;';
         $style .= '}';
         $style .= '.format-designer .designer .section .activity .actions .menubar .dropdown .dropdown-menu .dropdown-subpanel .dropdown-menu {';
-        $style .= 'right: 175px !important;';
+        $style .= 'right: 100% !important;';
         $style .= '}';
         $style .= '.format-designer .course-content ul.designer li.section .right .dropdown .dropdown-menu .dropdown-subpanel .dropdown-menu {';
-        $style .= 'right: 175px !important;';
+        $style .= 'right: 100% !important;';
         $style .= '}';
         echo html_writer::tag('style', $style, []);
     }
