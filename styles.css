@@ -1004,6 +1004,7 @@ span.section-collapse-icon:before {
     display: inline-block;
 }
 .format-designer .designer .section.img-text.circles-layout .activity .activityinstance .inplaceeditable {
+    width: 100%;
     display: flex;
     flex-direction: column;
 }
