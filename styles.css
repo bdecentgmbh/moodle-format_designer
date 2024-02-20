@@ -1384,8 +1384,8 @@ span.section-collapse-icon:before {
 .format-designer .designer .section .content .section li.activity .activityinstance .activity-type.content-remove p {
     display: none;
 }
-.format-designer .designer .section .content .section li.activity .activityinstance .no-overflow > h2,
-.format-designer .designer .section .content .section li.activity .activityinstance .no-overflow > p {
+.format-designer .designer .section .content .section li.activity:not(.circle-layout) .activityinstance .no-overflow > h2,
+.format-designer .designer .section .content .section li.activity:not(.circle-layout) .activityinstance .no-overflow > p {
     font-size: 20px;
     font-weight: bold;
     color: #6a737b;
@@ -2069,6 +2069,10 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 .activity-instance .activitytitle .img-element {
     display: none;
 }
+.format-designer .designer .section.img-text .circle-layout .activity-block .activityinstance .activity-altcontent {
+    text-align: left;
+    margin-left: 90px;
+}
 .format-designer .designer .section .content .section li.activity.circle-layout .activityinstance .activity-type {
     margin-left: 0;
     margin-bottom: 5px;
@@ -2637,7 +2641,8 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     padding-bottom: 50px;
 }
 .format-designer .designer .section.img-text.horizontal-circles-layout li.horizontal_circles .activity-block .activityinstance {
-    display: block;
+    display: inline-block;
+    vertical-align: top;
 }
 .format-designer .designer .section.img-text.circles-layout .circle-layout.circle-size-medium .activity-block
 .activityinstance .img-element,

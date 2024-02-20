@@ -2422,17 +2422,19 @@ function format_designer_section_zero_tomake_hero($reports, $course) {
     $course = course_get_format($course->id)->get_course();
     if ($course->sectionzeroactivities) {
         $modinfo = get_fast_modinfo($course);
-        foreach ($modinfo->sections[0] as $modnumber) {
-            if ($DB->record_exists('course_modules', ['deletioninprogress' => 0, 'id' => $modnumber])) {
-                if (isset($reports[$modnumber]) && !$reports[$modnumber]['heroactivity']) {
-                    $reports[$modnumber]['heroactivity'] = ($course->heroactivity == DESIGNER_HERO_ACTVITIY_COURSEPAGE
-                        && isset($PAGE->cm->id)) ? 0 : ($course->heroactivity == true);
-                    $reports[$modnumber]['heroactivitypos'] = $course->heroactivitypos;
-                } else if (!isset($reports[$modnumber])) {
-                    $reports[$modnumber]['heroactivity'] = ($course->heroactivity == DESIGNER_HERO_ACTVITIY_COURSEPAGE
-                        && isset($PAGE->cm->id)) ? 0 : ($course->heroactivity == true);
-                    $reports[$modnumber]['heroactivitypos'] = $course->heroactivitypos;
-                    $reports[$modnumber]['cmid'] = $modnumber;
+        if (isset($modinfo->sections[0])) {
+            foreach ($modinfo->sections[0] as $modnumber) {
+                if ($DB->record_exists('course_modules', ['deletioninprogress' => 0, 'id' => $modnumber])) {
+                    if (isset($reports[$modnumber]) && !$reports[$modnumber]['heroactivity']) {
+                        $reports[$modnumber]['heroactivity'] = ($course->heroactivity == DESIGNER_HERO_ACTVITIY_COURSEPAGE
+                            && isset($PAGE->cm->id)) ? 0 : ($course->heroactivity == true);
+                        $reports[$modnumber]['heroactivitypos'] = $course->heroactivitypos;
+                    } else if (!isset($reports[$modnumber])) {
+                        $reports[$modnumber]['heroactivity'] = ($course->heroactivity == DESIGNER_HERO_ACTVITIY_COURSEPAGE
+                            && isset($PAGE->cm->id)) ? 0 : ($course->heroactivity == true);
+                        $reports[$modnumber]['heroactivitypos'] = $course->heroactivitypos;
+                        $reports[$modnumber]['cmid'] = $modnumber;
+                    }
                 }
             }
         }
