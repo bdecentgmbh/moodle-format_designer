@@ -1337,6 +1337,7 @@ class format_designer extends \core_courseformat\base {
         if (format_designer_has_pro()) {
             local_designer\options::update_course_format_options($data, $this->courseid);
         }
+        theme_reset_all_caches();
         return $this->update_format_options($data);
     }
 

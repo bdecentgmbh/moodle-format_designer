@@ -48,7 +48,7 @@ class header extends \core_courseformat\output\local\content\section\header {
      * @return array data context for a mustache template
      */
     public function export_for_template(\renderer_base $output): stdClass {
-
+        global $PAGE;
         $format = $this->format;
         $section = $this->section;
         $course = $format->get_course();
@@ -100,7 +100,9 @@ class header extends \core_courseformat\output\local\content\section\header {
             $data->selecttext = $format->get_format_string('selectsection', $data->name);
         }
 
-        if (!$format->get_section_number()) {
+        $bodyclasses = explode(" ", $PAGE->bodyclasses);
+
+        if (!$format->get_section_number() || !in_array('format-designer-single-section', $bodyclasses)) {
             $data->sectionbulk = true;
         }
 

@@ -36,6 +36,9 @@
     data-for="cmitem"
     data-id="{{cm.id}}">
     {{#cmformat.moveicon}} {{{cmformat.moveicon}}} {{/cmformat.moveicon}}
+    {{$ core_courseformat/local/content/cm/bulkselect }}
+        {{> core_courseformat/local/content/cm/bulkselect }}
+    {{/ core_courseformat/local/content/cm/bulkselect }}
     <div class="activity-block activity-basis designer
         activity-item {{#modstealth}}hiddenactivity{{/modstealth}}{{!
         }}{{#modhiddenfromstudents}}hiddenactivity{{/modhiddenfromstudents}}{{!

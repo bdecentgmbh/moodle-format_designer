@@ -618,7 +618,7 @@ body.format-designer.editing ul.designer .section .circles-layout .activity .edi
     display: inline-block;
 }
 .format-designer .course-content ul.designer li.section .section-header-content .sectionname {
-    max-width: none;
+    max-width: 300px;
     display: inline-block;
 }
 .format-designer .course-content ul.designer li.section .section-header-content .sectionbadges {
@@ -1183,6 +1183,38 @@ span.section-collapse-icon:before {
     padding-top: 0;
     margin-top: 10px;
     margin-bottom: 10px;
+}
+.format-designer.editing .course-content ul.designer li.section .section-header-content .section-head-text .bulkselect {
+    position: absolute;
+    top: 15px;
+}
+.format-designer .designer .section .content .section.link-layout li.activity .activity-block .bulkselect {
+    top: 10px;
+    left: 10px;
+    z-index: 0;
+}
+.format-designer .designer .section .content .section.list-layout li.activity .activity-block .bulkselect {
+    top: 2rem;
+    z-index: 0;
+
+}
+.format-designer .designer .section .content .section.card-layout li.activity .bulkselect {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 0;
+}
+.format-designer .designer.kanban-board .section .content .section.card-layout li.activity .bulkselect {
+    left: 20px;
+}
+.format-designer .course-content ul.designer.kanban-board li.section.main .section-head-text .bulkselect {
+    top: -5px;
+    left: -5px;
+}
+.format-designer .designer .section .content .section.circles-layout li.activity .activity-block .bulkselect {
+    top: 10px;
+    left: 10px;
+    z-index: 0;
 }
 .format-designer .designer .section .content .section li.activity .activity-block.designer {
     height: 100%;

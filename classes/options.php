@@ -182,9 +182,13 @@ class options {
 
         if ($totalmods) {
             $sectionprogress = $cmcompleted / $totalmods * 100;
-            $issectioncompletion = 1;
+            $issectioncompletion = true;
         } else {
-            $sectionprogress = 0;
+            $sectionprogress = false;
+        }
+
+        if (isguestuser()) {
+            $issectioncompletion = false;
         }
 
         $sectionprogresscomp = ($sectionprogress == 100) ? true : false;

@@ -933,6 +933,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             'sectionname' => $sectionname,
             'sectionrestrict' => $sectionrestrict,
             'courseid' => $course->id,
+            'hasviewsectionprogress' => !isguestuser() ? true : false,
             'sectionprogress' => isset($sectionprogress) ? round($sectionprogress) : '',
             'sectionprogresscomp' => isset($sectionprogresscomp) ? round($sectionprogresscomp) : '',
             'sectioncategorisetitle' => isset($section->categorisetitle) ? $section->categorisetitle : '',
@@ -951,7 +952,8 @@ class renderer extends \core_courseformat\output\section_renderer {
             'issectioncompletion' => $issectioncompletion,
             'gotosection' => (isset($gotosection) ? $gotosection : false),
             'sectionurl' => $sectionurl,
-            'sectioncardcontentdirect' => (format_designer_has_pro() && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE)  ? $section->sectioncardtab : '',
+            'sectioncardcontentdirect' => (format_designer_has_pro() && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE)
+                && !empty($section->sectioncardredirect)  ? $section->sectioncardtab : '',
             'sectioncollapse' => isset($sectioncollapse) ? $sectioncollapse : false,
             'sectionshow' => $sectioncollapsestatus,
             'sectionaccordion' => isset($course->accordion) && !$this->page->user_is_editing() ? $course->accordion : false,
@@ -973,7 +975,10 @@ class renderer extends \core_courseformat\output\section_renderer {
 
             foreach ($cmids as $cmid) {
                 $thismod = $modinfo->cms[$cmid];
-                if (!$thismod->get_course_module_record()->deletioninprogress && $thismod->is_visible_on_course_page()) {
+                if (!$thismod->get_course_module_record()->deletioninprogress) {
+                    if (!$thismod->is_visible_on_course_page() && !$course->displayunavailableactivities) {
+                        continue;
+                    }
                     if (format_designer_has_pro() && isset($course->activitydisplaymode)
                         && ($course->activitydisplaymode == 'bypurpose')) {
                             \local_designer\options::process_purpose_modules($mods, $course, $thismod);
@@ -998,6 +1003,7 @@ class renderer extends \core_courseformat\output\section_renderer {
                             $mods[$thismod->modname]['count'] = 1;
                         }
                     }
+
                 }
             }
 
@@ -1237,6 +1243,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             'id' => 'module-' . $mod->id,
             'hasname' => ($mod->name) ? true : false,
             'cm' => $mod,
+            'cmid' => $mod->id,
             'modhiddenfromstudents' => (!$mod->visible) ? true : false,
             'modstealth' => $mod->is_stealth(),
             'modtype' => $mod->get_module_type_name(),
