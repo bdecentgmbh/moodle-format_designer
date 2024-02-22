@@ -36,6 +36,7 @@
 {{/ core_courseformat/local/content/section/bulkselect }}
 {{/sectionbulk}}
 
+{{^section.hidesectiontitle}}
 {{#headerdisplaymultipage}}
     <h3 class="sectionid-{{id}}-title sectionname">
         {{{title}}}
@@ -56,3 +57,4 @@
         </div>
     {{/sitehome}}
 {{/headerdisplaymultipage}}
+{{/section.hidesectiontitle}}

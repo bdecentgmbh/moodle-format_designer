@@ -94,20 +94,19 @@ data-target="{{#sectioncardcontentdirect}}_blank{{/sectioncardcontentdirect}}" d
         {{/flowcourse}}
 
         {{! Section name header }}
-        {{^section.hidesectiontitle}}
-            <div class="section-head-text" style="{{#sectiondesigntextcolor}} {{sectiondesigntextcolor}} {{/sectiondesigntextcolor}}">
-                {{#singleheader}}
-                {{$ format_designer/courseformat/content/section/header }}
-                    {{> format_designer/courseformat/content/section/header }}
-                {{/ format_designer/courseformat/content/section/header }}
-                {{/singleheader}}
-                {{#header}}
-                {{$ format_designer/courseformat/content/section/header }}
-                    {{> format_designer/courseformat/content/section/header }}
-                {{/ format_designer/courseformat/content/section/header }}
-                {{/header}}
-            </div>
-        {{/section.hidesectiontitle}}
+        <div class="section-head-text" style="{{#sectiondesigntextcolor}} {{sectiondesigntextcolor}} {{/sectiondesigntextcolor}}">
+            {{#singleheader}}
+            {{$ format_designer/courseformat/content/section/header }}
+                {{> format_designer/courseformat/content/section/header }}
+            {{/ format_designer/courseformat/content/section/header }}
+            {{/singleheader}}
+            {{#header}}
+            {{$ format_designer/courseformat/content/section/header }}
+                {{> format_designer/courseformat/content/section/header }}
+            {{/ format_designer/courseformat/content/section/header }}
+            {{/header}}
+        </div>
+
         {{! End of section name }}
 
         {{! Section badges }}
