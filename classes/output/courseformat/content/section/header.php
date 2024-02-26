@@ -41,7 +41,7 @@ use stdClass;
  */
 class header extends \core_courseformat\output\local\content\section\header {
 
-     /**
+    /**
      * Export this data so it can be used as the context for a mustache template.
      *
      * @param renderer_base $output typically, the renderer that's calling this function
@@ -102,7 +102,8 @@ class header extends \core_courseformat\output\local\content\section\header {
 
         $bodyclasses = explode(" ", $PAGE->bodyclasses);
 
-        if (!$format->get_section_number() || !in_array('format-designer-single-section', $bodyclasses)) {
+        if ((!$format->get_section_number() || !in_array('format-designer-single-section', $bodyclasses))
+            && class_exists('core_courseformat\output\local\content\bulkedittoggler')) {
             $data->sectionbulk = true;
         }
 

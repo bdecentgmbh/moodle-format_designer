@@ -388,6 +388,7 @@ class renderer extends \core_courseformat\output\section_renderer {
 
     /**
      * Get course completion indicator details.
+     * @param object $course
      */
     public static function get_course_completion_indicator($course) {
         global $USER;
@@ -440,7 +441,6 @@ class renderer extends \core_courseformat\output\section_renderer {
             $enrolstartdate = $course->startdate;
             $enrolenddate = $course->enddate;
         }
-
 
         // Find the date options visibility status for the time management.
         $enrolmentstartdate = (in_array('enrolmentstartdate', $course->timemanagement));
@@ -499,9 +499,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         if ($dataonly) {
             return $data;
         }
-
         $html = $this->output->render_from_template('format_designer/course_time_management', $data);
-
         return $html;
     }
 
@@ -535,14 +533,12 @@ class renderer extends \core_courseformat\output\section_renderer {
 
     /**
      * Obtains a list of activities for which completion is enabled on the
-     * course. The list is ordered by the section order of those activities.
-     *
+     * @param object $course The list is ordered by the section order of those activities.
      * @return cm_info[] Array from $cmid => $cm of all activities with completion enabled,
-     *   empty array if none
      */
     public static function get_completion_activities($course) {
         $modinfo = get_fast_modinfo($course);
-        $result = array();
+        $result = [];
         foreach ($modinfo->get_cms() as $cm) {
             if ($cm->completion != COMPLETION_TRACKING_NONE && !$cm->deletioninprogress
                 && $cm->is_visible_on_course_page()) {
@@ -552,7 +548,12 @@ class renderer extends \core_courseformat\output\section_renderer {
         return $result;
     }
 
-
+    /**
+     * Get the count section in the course.
+     *
+     * @param [object] $course
+     * @return int
+     */
     public static function get_count_sections_incourse($course) {
         $sections = 0;
         $modinfo = get_fast_modinfo($course);
@@ -576,7 +577,7 @@ class renderer extends \core_courseformat\output\section_renderer {
      * @return array Modules progress
      */
     public static function criteria_progress($course, $userid) {
-        global $PAGE, $USER;
+        global $USER;
         $completion = new \completion_info($course);
         $modinfo = get_fast_modinfo($course);
         $context = \context_course::instance($course->id);
@@ -609,7 +610,6 @@ class renderer extends \core_courseformat\output\section_renderer {
                 $count = self::get_count_sections_incourse($course);
             }
         }
-
         if (!$count) {
             return null;
         }
@@ -635,6 +635,22 @@ class renderer extends \core_courseformat\output\section_renderer {
             }
         }
 
+        if ($complteioncourses && !isset($course->calcourseprogress)) {
+            foreach ($complteioncourses as $coursecriteria) {
+                $courseid = $coursecriteria->courseinstance;
+                $course = get_course($courseid);
+                $completion = new \completion_info($course);
+                $coursetooltiplink = html_writer::link(new moodle_url('/course/view.php',
+                ['id' => $course->id]), $course->fullname);
+                if ($completion->is_course_complete($userid)) {
+                    $completed += 1;
+                    $completedcriteria[] = $coursetooltiplink;
+                } else {
+                    $uncompletedcriteria[] = $coursetooltiplink;
+                }
+            }
+        }
+
         if (format_designer_has_pro()) {
 
             if ($course->calcourseprogress == DESIGNER_PROGRESS_SECTIONS && !empty($modinfo->sections)) {
@@ -647,30 +663,16 @@ class renderer extends \core_courseformat\output\section_renderer {
                                 get_string('strsection', 'format_designer') . " ". $sectionname);
                         $realtiveactivities = isset($course->calsectionprogress) &&
                                 ($course->calsectionprogress == DESIGNER_PROGRESS_RELEVANTACTIVITIES) ? true : false;
-                        if (\format_designer\options::is_section_completed($section, $course, $modinfo, true, $realtiveactivities)) {
+                        if (\format_designer\options::is_section_completed($section, $course, $modinfo,
+                            true, $realtiveactivities)) {
                             $completed += 1;
                             $completedcriteria[] = $sectiontooltiplink;
                         } else {
-                            if (\format_designer\options::is_vaild_section_completed($section, $course, $modinfo, $realtiveactivities)) {
+                            if (\format_designer\options::is_vaild_section_completed($section, $course,
+                                $modinfo, $realtiveactivities)) {
                                 $uncompletedcriteria[] = $sectiontooltiplink;
                             }
                         }
-                    }
-                }
-            }
-
-            if ($complteioncourses && $course->calcourseprogress == DESIGNER_PROGRESS_RELEVANTACTIVITIES) {
-                foreach ($complteioncourses as $coursecriteria) {
-                    $courseid = $coursecriteria->courseinstance;
-                    $course = get_course($courseid);
-                    $completion = new \completion_info($course);
-                    $coursetooltiplink = html_writer::link(new moodle_url('/course/view.php',
-                    ['id' => $course->id]), $course->fullname);
-                    if ($completion->is_course_complete($userid)) {
-                        $completed += 1;
-                        $completedcriteria[] = $coursetooltiplink;
-                    } else {
-                        $uncompletedcriteria[] = $coursetooltiplink;
                     }
                 }
             }
@@ -855,8 +857,8 @@ class renderer extends \core_courseformat\output\section_renderer {
 
         $sectionrestrict = (!$section->uservisible && $section->availableinfo) ? true : false;
 
-        if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && $sectionheader && $section->section > 0
-			&& $format->is_section_visible($section, false)) {
+        if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && $sectionheader
+            && $section->section > 0 && $format->is_section_visible($section, false)) {
             $gotosection = true;
         }
 
@@ -953,7 +955,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             'gotosection' => (isset($gotosection) ? $gotosection : false),
             'sectionurl' => $sectionurl,
             'sectioncardcontentdirect' => (format_designer_has_pro() && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE)
-                && !empty($section->sectioncardredirect)  ? $section->sectioncardtab : '',
+                && !empty($section->sectioncardredirect) ? $section->sectioncardtab : '',
             'sectioncollapse' => isset($sectioncollapse) ? $sectioncollapse : false,
             'sectionshow' => $sectioncollapsestatus,
             'sectionaccordion' => isset($course->accordion) && !$this->page->user_is_editing() ? $course->accordion : false,
@@ -985,20 +987,20 @@ class renderer extends \core_courseformat\output\section_renderer {
                     } else {
                         if (isset($mods[$thismod->modname])) {
                             $mods[$thismod->modname]['name'] = $thismod->modplural;
-                            if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/monologo.svg')) {
-                                $mods[$thismod->modname]['activityimgsvg'] = file_get_contents($CFG->dirroot.'/mod/'.$thismod->modname.
-                                '/pix/monologo.svg');
+                            if (file_exists($CFG->dirroot . '/mod/' . $thismod->modname . '/pix/monologo.svg')) {
+                                $mods[$thismod->modname]['activityimgsvg'] = file_get_contents($CFG->dirroot . '/mod/' .
+                                $thismod->modname . '/pix/monologo.svg');
                             } else if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/icon.png')) {
-                                $mods[$thismod->modname]['img'] = $CFG->wwwroot.'/mod/'.$thismod->modname.'/pix/icon.png';
+                                $mods[$thismod->modname]['img'] = $CFG->wwwroot . '/mod/' . $thismod->modname . '/pix/icon.png';
                             }
                             $mods[$thismod->modname]['count']++;
                         } else {
                             $mods[$thismod->modname]['name'] = $thismod->modfullname;
                             if (file_exists($CFG->dirroot . '/mod/'. $thismod->modname . '/pix/monologo.svg')) {
-                                $mods[$thismod->modname]['activityimgsvg'] = file_get_contents($CFG->dirroot.'/mod/'.$thismod->modname.
-                                '/pix/monologo.svg');
-                            } else if (file_exists($CFG->dirroot.'/mod/'.$thismod->modname.'/pix/icon.png')) {
-                                $mods[$thismod->modname]['img'] = $CFG->wwwroot.'/mod/'.$thismod->modname.'/pix/icon.png';
+                                $mods[$thismod->modname]['activityimgsvg'] = file_get_contents($CFG->dirroot . '/mod/'.
+                                $thismod->modname . '/pix/monologo.svg');
+                            } else if (file_exists($CFG->dirroot . '/mod/'. $thismod->modname . '/pix/icon.png')) {
+                                $mods[$thismod->modname]['img'] = $CFG->wwwroot . '/mod/' . $thismod->modname . '/pix/icon.png';
                             }
                             $mods[$thismod->modname]['count'] = 1;
                         }
@@ -1024,8 +1026,9 @@ class renderer extends \core_courseformat\output\section_renderer {
             );
         }
         if (format_designer_has_pro()) {
+            $sectionbackgroundcolor = isset($section->sectiondesignerbackgroundcolor) ? $section->sectiondesignerbackgroundcolor : '';
             $templatecontext += \local_designer\courseheader::create($format)
-                ->section_progress_type(round($sectionprogress), $sectionprogresscomp);
+                ->section_progress_type(round($sectionprogress), $sectionprogresscomp, $sectionbackgroundcolor);
         }
         if ($sectioncontent) {
             $contenttemplatename = 'format_designer/section_content_' . $sectiontype;
@@ -1125,8 +1128,6 @@ class renderer extends \core_courseformat\output\section_renderer {
         $isvideotimelabel = false;
         $useactivityimagestatus = false;
         $useactivityimage = '';
-
-
         if (format_designer_has_pro()) {
             if ($mod->modname == 'videotime' && $dbman->table_exists('videotimeplugin_pro')) {
                 if ($videorecord = $DB->get_record('videotimeplugin_pro', ['videotime' => $mod->instance])) {
@@ -1140,7 +1141,6 @@ class renderer extends \core_courseformat\output\section_renderer {
             $useactivityimagestatus = ($videotime && $useactivityimage);
             $enableactivityimage = \format_designer\options::get_option($mod->id, 'useactivityimage');
         }
-
 
         if (!empty($url) && !$videotime) {
             $cmtext = $mod->get_formatted_content(['overflowdiv' => true, 'noclean' => true]);
@@ -1217,7 +1217,6 @@ class renderer extends \core_courseformat\output\section_renderer {
             }
         }
 
-
         if ($videotimeduration) {
             if ($videotimeduration >= 3600) {
                 $durationformatted = gmdate('H:i:s', $videotimeduration);
@@ -1267,6 +1266,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             'useactivityimage' => $useactivityimage,
             'duration_formatted' => $durationformatted,
             'enableactivityimage' => $enableactivityimage ?? false,
+            'hascmbulk' => class_exists('core_courseformat\output\local\content\bulkedittoggler') ? true : false,
         ];
         if (format_designer_has_pro()) {
             require_once($CFG->dirroot. "/local/designer/lib.php");

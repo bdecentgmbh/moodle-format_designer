@@ -196,7 +196,7 @@ class controlmenu extends controlmenu_base {
                     'Section Layout',
                     $this->get_choice_list($section),
                     ['data-value' => 'section-designer-action'],
-                    new pix_icon('t/hide', '', 'moodle', array('class' => 'iconsmall'))
+                    new pix_icon('t/hide', '', 'moodle', ['class' => 'iconsmall'])
                 );
             }
 
@@ -359,6 +359,7 @@ class controlmenu extends controlmenu_base {
 
     /**
      * Get the availability choice list.
+     * @param object $section
      * @return choicelist
      */
     public function get_choice_list($section): choicelist {
@@ -373,6 +374,7 @@ class controlmenu extends controlmenu_base {
 
     /**
      * Create a choice list for the dropdown.
+     * @param object $section
      * @return choicelist the choice list
      */
     protected function create_choice_list($section): choicelist {
@@ -402,10 +404,9 @@ class controlmenu extends controlmenu_base {
     }
 
 
-     /**
+    /**
      * Get the data for the option.
-     * @param string $name the name of the option
-     * @param string $action the state action of the option
+     * @param string $value the value of the option
      * @return array
      */
     private function get_option_data(string $value): array {
@@ -418,7 +419,7 @@ class controlmenu extends controlmenu_base {
             'extras' => [
                 'data-option' => 'sectiontype',
                 'data-value'  => $value,
-            ]
+            ],
         ];
     }
 

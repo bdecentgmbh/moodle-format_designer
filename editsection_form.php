@@ -1,8 +1,28 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
-}
+/**
+ * Contains the default section course format output class.
+ *
+ * @package    format_designer
+ * @copyright  2021 bdecent gmbh <https://bdecent.de>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->libdir.'/filelib.php');
@@ -16,7 +36,10 @@ require_once($CFG->libdir.'/gradelib.php');
  */
 class editsection_form extends moodleform {
 
-    function definition() {
+    /**
+     * Definition of the form
+     */
+    public function definition() {
 
         $mform  = $this->_form;
         $course = $this->_customdata['course'];
@@ -29,10 +52,9 @@ class editsection_form extends moodleform {
             'customvalue' => $sectioninfo->name,
         ], ['size' => 30, 'maxlength' => 255]);
         $mform->setDefault('name', false);
-        $mform->addGroupRule('name', array('name' => array(array(get_string('maximumchars', '', 255), 'maxlength', 255))));
+        $mform->addGroupRule('name', ['name' => [[get_string('maximumchars', '', 255), 'maxlength', 255]]]);
 
-        /// Prepare course and the editor
-
+        // Prepare course and the editor.
         $mform->addElement('editor', 'summary_editor', get_string('summary'), null, $this->_customdata['editoroptions']);
         $mform->addHelpButton('summary_editor', 'summary');
         $mform->setType('summary_editor', PARAM_RAW);
@@ -40,7 +62,7 @@ class editsection_form extends moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
-        // additional fields that course format has defined
+        // Additional fields that course format has defined.
         $courseformat = course_get_format($course);
         $formatoptions = $courseformat->section_format_options(true);
         if (!empty($formatoptions)) {
@@ -50,6 +72,9 @@ class editsection_form extends moodleform {
         $mform->_registerCancelButton('cancel');
     }
 
+    /**
+     * Definition of the after form submitted.
+     */
     public function definition_after_data() {
         global $CFG, $DB;
 
@@ -77,27 +102,28 @@ class editsection_form extends moodleform {
     /**
      * Load in existing data as form defaults
      *
-     * @param stdClass|array $default_values object or array of default values
+     * @param stdClass|array $defaultvalues object or array of default values
      */
-    function set_data($default_values) {
-        if (!is_object($default_values)) {
-            // we need object for file_prepare_standard_editor
-            $default_values = (object)$default_values;
+    public function set_data($defaultvalues) {
+        if (!is_object($defaultvalues)) {
+            // We need object for file_prepare_standard_editor.
+            $defaultvalues = (object)$defaultvalues;
         }
 
         $course = $this->_customdata['course'];
         $editoroptions = $this->_customdata['editoroptions'];
-        $default_values = file_prepare_standard_editor($default_values, 'summary', $editoroptions,
-        $editoroptions['context'], 'course', 'section', $default_values->id);
+        $defaultvalues = file_prepare_standard_editor($defaultvalues, 'summary', $editoroptions,
+        $editoroptions['context'], 'course', 'section', $defaultvalues->id);
 
         if (format_designer_has_pro() && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
-            $default_values = \local_designer\options::prepare_sectioncardcta_editor_files($default_values, $this->_customdata['course']);
+            $defaultvalues = \local_designer\options::prepare_sectioncardcta_editor_files($defaultvalues,
+                $this->_customdata['course']);
         }
 
-        if (strval($default_values->name) === '') {
-            $default_values->name = false;
+        if (strval($defaultvalues->name) === '') {
+            $defaultvalues->name = false;
         }
-        parent::set_data($default_values);
+        parent::set_data($defaultvalues);
     }
 
     /**
@@ -106,7 +132,7 @@ class editsection_form extends moodleform {
      *
      * @return object submitted data; NULL if not valid or not submitted or cancelled
      */
-    function get_data() {
+    public function get_data() {
         $data = parent::get_data();
         if ($data !== null) {
             $editoroptions = $this->_customdata['editoroptions'];
@@ -118,7 +144,7 @@ class editsection_form extends moodleform {
                     $editoroptions['context'], 'course', 'section', $data->id);
             $course = $this->_customdata['course'];
             foreach (course_get_format($course)->section_format_options() as $option => $unused) {
-                // fix issue with unset checkboxes not being returned at all
+                // Fix issue with unset checkboxes not being returned at all.
                 if (!isset($data->$option)) {
                     $data->$option = null;
                 }
@@ -127,9 +153,16 @@ class editsection_form extends moodleform {
         return $data;
     }
 
+    /**
+     * Form validation
+     *
+     * @param array $data
+     * @param array $files
+     * @return array $errors An array of errors
+     */
     public function validation($data, $files) {
         global $CFG;
-        $errors = array();
+        $errors = [];
 
         // Availability: Check availability field does not have errors.
         if (!empty($CFG->enableavailability)) {

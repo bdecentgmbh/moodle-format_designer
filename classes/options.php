@@ -123,6 +123,15 @@ class options {
         return false;
     }
 
+    /**
+     * Check the section able to complete.
+     *
+     * @param [object] $section
+     * @param [object] $course
+     * @param [object] $modinfo
+     * @param boolean $onlyrelative
+     * @return boolean
+     */
     public static function is_vaild_section_completed($section, $course, $modinfo, $onlyrelative = false) {
 
         $completioninfo = new \completion_info($course);
@@ -152,6 +161,7 @@ class options {
      * @param stdclass $course Course instance record.
      * @param \Course_modinfo $modinfo Course mod info.
      * @param bool $result True to only for REsult, False for current progress.
+     * @param bool $onlyrelative
      * @return bool|array Result of section completion or Current progress data.
      */
     public static function is_section_completed($section, $course, $modinfo, $result = false, $onlyrelative = false) {

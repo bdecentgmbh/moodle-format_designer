@@ -42,9 +42,11 @@
         }}{{#modinline}}activityinline{{/modinline}}"
         data-activityname="{{cmformat.activityname}}"
         style="{{#prostyle}} {{{prostyle}}} {{/prostyle}} ">
-    {{$ core_courseformat/local/content/cm/bulkselect }}
-        {{> core_courseformat/local/content/cm/bulkselect }}
-    {{/ core_courseformat/local/content/cm/bulkselect }}
+    {{#hascmbulk}}
+        {{$ core_courseformat/local/content/cm/bulkselect }}
+            {{> core_courseformat/local/content/cm/bulkselect }}
+        {{/ core_courseformat/local/content/cm/bulkselect }}
+    {{/hascmbulk}}
     <div class="activity-background-style" style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
     </div>
     {{#modbackoverlaycolor}}

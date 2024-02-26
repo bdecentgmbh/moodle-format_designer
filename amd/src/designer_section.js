@@ -46,6 +46,7 @@
      * @param {int} contextId
      * @param {array} popupActivities
      * @param {bool} videoTime
+     * @param {bool} issubpanel
      */
     let DesignerSection = function(courseId, contextId, popupActivities, videoTime, issubpanel) {
         var self = this;
@@ -107,7 +108,8 @@
 
     DesignerSection.prototype.SectionController = ".designer #section-designer-action .dropdown-menu a";
 
-    DesignerSection.prototype.SectionSubmenuSwitcher = ".designer .section_action_menu .dropdown-subpanel a[data-value=section-designer-action] + .dropdown-menu a"
+    DesignerSection.prototype.SectionSubmenuSwitcher
+        = ".designer .section_action_menu .dropdown-subpanel a[data-value=section-designer-action] + .dropdown-menu a";
 
     DesignerSection.prototype.RestrictInfo = ".designer .designer-section-content .call-action-block";
 

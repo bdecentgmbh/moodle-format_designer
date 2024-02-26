@@ -82,7 +82,7 @@ class cmlist extends \core_courseformat\output\local\content\section\cmlist {
                 $mod = $modinfo->cms[$modnumber];
                 // Check module state in deletionprogress.
                 // If the old non-ajax move is necessary, we do not print the selected cm.
-                if (($showmovehere && $USER->activitycopy == $mod->id))  {
+                if (($showmovehere && $USER->activitycopy == $mod->id)) {
                     continue;
                 }
                 if ($mod->is_visible_on_course_page()) {

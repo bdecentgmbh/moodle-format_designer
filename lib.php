@@ -188,6 +188,7 @@ class format_designer extends \core_courseformat\base {
      * Formats can overrride this method to implement any special section logic.
      *
      * @param section_info $section the section modinfo
+     * @param bool $inculdehidesections
      * @return bool;
      */
     public function is_section_visible(section_info $section, $inculdehidesections = true): bool {
@@ -1005,7 +1006,7 @@ class format_designer extends \core_courseformat\base {
      *     for filling availability fields
      * @return moodleform
      */
-    public function editsection_form($action, $customdata = array()) {
+    public function editsection_form($action, $customdata = []) {
         global $CFG;
         require_once($CFG->dirroot. '/course/format/designer/editsection_form.php');
         if (!array_key_exists('course', $customdata)) {
@@ -1101,7 +1102,7 @@ class format_designer extends \core_courseformat\base {
             $lists = [
                 'desktop' => ['size' => 5, 'default' => '2'],
                 'tablet' => ['size' => 3, 'default' => 1],
-                'mobile' => ['size' => 2, 'default' => '2']
+                'mobile' => ['size' => 2, 'default' => '2'],
             ];
 
             foreach ($lists as $name => $options) {
@@ -1110,7 +1111,8 @@ class format_designer extends \core_courseformat\base {
                 $widthdefaultvalue = isset($design->$name) ? $width[$design->$name] : '';
                 $sectionoptions[$name] = [
                     'default' => (isset($design->$name) ||
-                    (isset($course->coursetype) && $course->coursetype != DESIGNER_TYPE_NORMAL)) ? $widthdefaultvalue : $options['default'],
+                    (isset($course->coursetype) && $course->coursetype != DESIGNER_TYPE_NORMAL))
+                        ? $widthdefaultvalue : $options['default'],
                     'type' => PARAM_INT,
                     'label' => new lang_string($name, 'format_designer'),
                     'element_type' => 'select',
@@ -1183,8 +1185,8 @@ class format_designer extends \core_courseformat\base {
         if (isset($allformatoptions['sectioncardcta_editor'])) {
             unset($allformatoptions['sectioncardcta_editor']);
         }
-        $defaultoptions = array();
-        $cached = array();
+        $defaultoptions = [];
+        $cached = [];
         foreach ($allformatoptions as $key => $option) {
             $defaultoptions[$key] = null;
             if (array_key_exists('default', $option)) {
@@ -1194,16 +1196,16 @@ class format_designer extends \core_courseformat\base {
             $cached[$key] = ($sectionid === 0 || !empty($option['cache']));
         }
         $records = $DB->get_records('course_format_options',
-                array('courseid' => $this->courseid,
+                ['courseid' => $this->courseid,
                       'format' => $this->format,
-                      'sectionid' => $sectionid
-                    ), '', 'name,id,value');
+                      'sectionid' => $sectionid,
+                ], '', 'name,id,value');
         $changed = $needrebuild = false;
         foreach ($defaultoptions as $key => $value) {
             if (isset($records[$key])) {
                 if (array_key_exists($key, $data) && $records[$key]->value != $data[$key]) {
                     $DB->set_field('course_format_options', 'value',
-                            $data[$key], array('id' => $records[$key]->id));
+                            $data[$key], ['id' => $records[$key]->id]);
                     $changed = true;
                     $needrebuild = $needrebuild || $cached[$key];
                 }
@@ -1217,13 +1219,13 @@ class format_designer extends \core_courseformat\base {
                     // We still insert entry in DB but there are no changes from user point of
                     // view and no need to call rebuild_course_cache().
                 }
-                $DB->insert_record('course_format_options', array(
+                $DB->insert_record('course_format_options', [
                     'courseid' => $this->courseid,
                     'format' => $this->format,
                     'sectionid' => $sectionid,
                     'name' => $key,
-                    'value' => $newvalue
-                ));
+                    'value' => $newvalue,
+                ]);
             }
         }
         if ($needrebuild) {
@@ -1804,7 +1806,15 @@ function format_designer_coursemodule_standard_elements($formwrapper, $mform) {
         }
 
         // Activity elements list to manage the visibility.
-        $elements = ['icon' => 1, 'visits' => 4, 'calltoaction' => 4, 'title' => 1, 'description' => 1, 'modname'  => 4, 'completionbadge'  => 1];
+        $elements = [
+            'icon' => 1,
+            'visits' => 4,
+            'calltoaction' => 4,
+            'title' => 1,
+            'description' => 1,
+            'modname'  => 4,
+            'completionbadge' => 1,
+        ];
         $choice = [
             0 => get_string('hide'),
             1 => get_string('show'),
@@ -1917,7 +1927,7 @@ function format_designer_coursemodule_edit_post_actions($data, $course) {
             'designer_customtitleuseactivityitem',
             'designer_heroactivity',
             'designer_heroactivitypos',
-            'designer_purpose'
+            'designer_purpose',
         ];
         foreach ($fields as $field) {
             if (!isset($data->$field)) {
@@ -1974,10 +1984,12 @@ function format_designer_editsetting_style($page) {
         $style .= '.format-designer .course-content ul.designer li.section .right .dropdown.designer-menu .dropdown-menu {';
         $style .= 'top: -90px !important;';
         $style .= '}';
-        $style .= '.format-designer .designer .section .activity .actions .menubar .dropdown .dropdown-menu .dropdown-subpanel .dropdown-menu {';
+        $style .= '.format-designer .designer .section .activity .actions .menubar .dropdown .dropdown-menu .dropdown-subpanel
+         .dropdown-menu {';
         $style .= 'right: 100% !important;';
         $style .= '}';
-        $style .= '.format-designer .course-content ul.designer li.section .right .dropdown .dropdown-menu .dropdown-subpanel .dropdown-menu {';
+        $style .= '.format-designer .course-content ul.designer li.section .right .dropdown .dropdown-menu .dropdown-subpanel
+         .dropdown-menu {';
         $style .= 'right: 100% !important;';
         $style .= '}';
         echo html_writer::tag('style', $style, []);
@@ -2456,8 +2468,15 @@ function format_designer_get_coursetypes() {
     ];
     return $coursetypes;
 }
+
 /**
  * Update the custom or other selected values.
+ *
+ * @param [object] $data
+ * @param [string] $name
+ * @param [string] $custom
+ * @param [string] $csselement
+ * @return void
  */
 function format_designer_fill_custom_values($data, $name, $custom, $csselement) {
     if ((isset($data->{$name}) && $data->{$name})) {
