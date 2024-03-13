@@ -100,13 +100,16 @@ class renderer extends \core_courseformat\output\section_renderer {
             $startclass[] = 'kanban-board';
             $data->kanbanmode = true;
         }
-        $data->startclass = implode(' ', $startclass);
         $data->startid = $startid;
         $data->issectionpageclass = ($data->initialsection->sectionreturnid != 0) ? 'section-page-layout' : '';
 
         if (!format_designer_has_pro()) {
             $data->headermetadata = $this->course_header_metadata_details($course);
         }
+        if (format_designer_has_pro()) {
+            $startclass[] = ($course->activitydisplaymode == 'bypurpose') ? 'activity-purpose-mode' : 'activity-default-mode';
+        }
+        $data->startclass = implode(' ', $startclass);
         return $this->render_from_template('format_designer/courseformat/content/section', $data);
     }
 
@@ -393,7 +396,8 @@ class renderer extends \core_courseformat\output\section_renderer {
     public static function get_course_completion_indicator($course) {
         global $USER;
 
-        $progress = \core_completion\progress::get_course_progress_percentage($course, $USER->id);
+        $courseprogress = self::criteria_progress($course, $USER->id);
+        $progress = isset($courseprogress['percent']) ? $courseprogress['percent'] : 0;
         $context = context_course::instance($course->id);
         $status = "";
         $class = "";
@@ -1026,7 +1030,8 @@ class renderer extends \core_courseformat\output\section_renderer {
             );
         }
         if (format_designer_has_pro()) {
-            $sectionbackgroundcolor = isset($section->sectiondesignerbackgroundcolor) ? $section->sectiondesignerbackgroundcolor : '';
+            $sectionbackgroundcolor = isset($section->sectiondesignerbackgroundcolor) ?
+                $section->sectiondesignerbackgroundcolor : '';
             $templatecontext += \local_designer\courseheader::create($format)
                 ->section_progress_type(round($sectionprogress), $sectionprogresscomp, $sectionbackgroundcolor);
         }

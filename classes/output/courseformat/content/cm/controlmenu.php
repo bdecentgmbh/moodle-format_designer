@@ -55,13 +55,13 @@ class controlmenu extends controlmenu_base {
         $controls = $this->cm_control_items();
 
         if (empty($controls) || (isset($mod->get_course()->coursedisplay) &&
-            $mod->get_course()->coursedisplay== COURSE_DISPLAY_MULTIPAGE)) {
+            $mod->get_course()->coursedisplay == COURSE_DISPLAY_MULTIPAGE)) {
             return null;
         }
 
         // Convert control array into an action_menu.
         $menu = new action_menu();
-        if (method_exists($menu, 'set_kebab_trigger')) {;
+        if (method_exists($menu, 'set_kebab_trigger')) {
             $menu->set_kebab_trigger(get_string('edit'));
         } else {
             $icon = $output->pix_icon('i/menu', get_string('edit'));

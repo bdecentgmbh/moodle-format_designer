@@ -1580,28 +1580,29 @@ class format_designer extends \core_courseformat\base {
      * @return stdClass
      */
     public function get_course() {
-        global $CFG;
+        global $CFG, $PAGE;
         $course = parent::get_course();
-
-        if (!isguestuser()) {
-            if (isset($course->prerequisiteinfo) && is_string($course->prerequisiteinfo)) {
-                $coursecontext = context_course::instance($course->id);
-                $editoroptions = ['maxfiles' => -1, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false, 'noclean' => true,
-                ];
-                $editoroptions['context'] = $coursecontext;
-                $editoroptions['subdirs'] = file_area_contains_subdirs($coursecontext, 'local_designer', 'prerequisiteinfo', 0);
+        if ($PAGE->pagetype == 'course-edit') {
+            if (!isguestuser() &&  isloggedin()) {
+                if (isset($course->prerequisiteinfo) && is_string($course->prerequisiteinfo)) {
+                    $coursecontext = context_course::instance($course->id);
+                    $editoroptions = ['maxfiles' => -1, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false, 'noclean' => true,
+                    ];
+                    $editoroptions['context'] = $coursecontext;
+                    $editoroptions['subdirs'] = file_area_contains_subdirs($coursecontext, 'local_designer', 'prerequisiteinfo', 0);
+                    $course = file_prepare_standard_editor(
+                        $course, 'prerequisiteinfo', $editoroptions,
+                        $coursecontext, 'local_designer', 'prerequisiteinfo', 0
+                    );
+                    $course->prerequisiteinfo = $course->prerequisiteinfo_editor;
+                    unset($course->prerequisiteinfo_editor);
+                }
+            } else {
+                $editoroptions['context'] = \context_system::instance();
                 $course = file_prepare_standard_editor(
-                    $course, 'prerequisiteinfo', $editoroptions,
-                    $coursecontext, 'local_designer', 'prerequisiteinfo', 0
+                    $course, 'prerequisiteinfo', $editoroptions, null, 'local_designer', 'prerequisiteinfo', null,
                 );
-                $course->prerequisiteinfo = $course->prerequisiteinfo_editor;
-                unset($course->prerequisiteinfo_editor);
             }
-        } else {
-            $editoroptions['context'] = \context_system::instance();
-            $course = file_prepare_standard_editor(
-                $course, 'prerequisiteinfo', $editoroptions, null, 'local_designer', 'prerequisiteinfo', null,
-            );
         }
         // Course fields.
         if (isset($course->coursefields)) {
@@ -1614,7 +1615,7 @@ class format_designer extends \core_courseformat\base {
             $course->timemanagement = is_string($timemanagement) ? explode(',', $timemanagement) : $timemanagement;
         }
 
-        if (format_designer_has_pro()) {
+        if ($PAGE->pagetype == 'course-edit' && format_designer_has_pro()) {
             // Update the pro fields course values strucuture, Prepare files.
             local_designer\options::update_structure_get_course($course);
         }
@@ -1991,6 +1992,10 @@ function format_designer_editsetting_style($page) {
         $style .= '.format-designer .course-content ul.designer li.section .right .dropdown .dropdown-menu .dropdown-subpanel
          .dropdown-menu {';
         $style .= 'right: 100% !important;';
+        $style .= '}';
+        $style .= '.format-designer .course-content ul.designer.kanban-board li.section#section-1 .right .dropdown
+         .dropdown-menu .dropdown-subpanel .dropdown-menu {';
+        $style .= 'right: 40px !important;';
         $style .= '}';
         echo html_writer::tag('style', $style, []);
     }

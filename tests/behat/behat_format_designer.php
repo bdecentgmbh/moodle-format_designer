@@ -49,22 +49,32 @@ class behat_format_designer extends behat_base {
      */
     public function i_edit_the_section_layout($sectionnumber, $layouttype) {
         // If javascript is on, link is inside a menu.
-        if ($this->running_javascript()) {
-            $this->i_open_section_layout_edit_menu($sectionnumber);
-        }
+        global $CFG;
+        // Lower 4.3.
+        if ($CFG->version < 2023092300) {
+            if ($this->running_javascript()) {
+                $this->i_open_section_layout_edit_menu($sectionnumber);
+            }
 
-        // We need to know the course format as the text strings depends on them.
-        if (get_string_manager()->string_exists($layouttype, 'format_designer')) {
-            $strlayout = get_string($layouttype, 'format_designer');
+            // We need to know the course format as the text strings depends on them.
+            if (get_string_manager()->string_exists($layouttype, 'format_designer')) {
+                $strlayout = get_string($layouttype, 'format_designer');
+            } else {
+                $strlayout = get_string('link', 'format_designer');
+            }
+            $xpath = $this->execute("behat_course::section_exists", $sectionnumber);
+            $xpath .= "/descendant::div[contains(@id, 'section-designer-action')]/descendant::
+                div[contains(@class, 'dropdown-menu')]";
+            // Click on layout link.
+            $this->execute('behat_general::i_click_on_in_the',
+            [$strlayout, "link", $this->escape($xpath), "xpath_element"]
+            );
         } else {
-            $strlayout = get_string('link', 'format_designer');
+            $this->execute('behat_course::i_open_section_edit_menu', [$sectionnumber]);
+            $actionmenu = "Section Layout > ". get_string($layouttype, 'format_designer');
+            $this->execute('behat_action_menu::i_choose_in_the_open_action_menu', [$actionmenu]);
+            $this->execute('behat_general::reload', []);
         }
-        $xpath = $this->execute("behat_course::section_exists", $sectionnumber);
-        $xpath .= "/descendant::div[contains(@id, 'section-designer-action')]/descendant::div[contains(@class, 'dropdown-menu')]";
-        // Click on layout link.
-        $this->execute('behat_general::i_click_on_in_the',
-           [$strlayout, "link", $this->escape($xpath), "xpath_element"]
-        );
     }
 
     /**
@@ -106,6 +116,37 @@ class behat_format_designer extends behat_base {
         $config = $this->evaluate_script($script);
         if (strpos($config, $name) !== false) {
             throw new ExpectationException("Doesn't working correct $config", $this->getSession());
+        }
+    }
+
+    /**
+     * I set the completion.
+     *
+     * @Given /^I set the designer manual completion$/
+     * @throws DriverException The step is not available when Javascript is disabled
+     */
+    public function i_set_the_manual_completion() {
+        global $CFG;
+        if ($CFG->version < 2023092300) {
+            $this->execute("behat_forms::i_set_the_field_to", ['completion', 1]);
+        } else {
+            $this->execute("behat_forms::i_set_the_field_to", ['Students must manually mark the activity as done', 1]);
+        }
+    }
+
+    /**
+     * I set the completion expected.
+     *
+     * @Given /^I set the designer completion expected "(?P<value>(?:[^"]|\\")*)"$/
+     * @throws DriverException The step is not available when Javascript is disabled
+     * @param string $value
+     */
+    public function i_set_completion_expected($value) {
+        global $CFG;
+        if ($CFG->version < 2023092300) {
+            $this->execute("behat_forms::i_set_the_field_to", ['Expect completed on', $value]);
+        } else {
+            $this->execute("behat_forms::i_set_the_field_to", ['Set reminder in Timeline', $value]);
         }
     }
 
