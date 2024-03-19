@@ -2108,6 +2108,7 @@ function format_designer_extend_navigation_course($navigation, $course, $context
         'popupactivities' => $ispopupactivities,
         'isvideotime' => $isvideotime,
         'issubpanel' => format_designer_is_support_subpanel(),
+        'sectionreturn' => optional_param('section', 0, PARAM_INT),
     ];
     $PAGE->requires->js_call_amd('format_designer/designer_section', 'init', $jsparams);
 

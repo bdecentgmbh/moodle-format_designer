@@ -124,6 +124,7 @@ class behat_format_designer extends behat_base {
      *
      * @Given /^I set the designer manual completion$/
      * @throws DriverException The step is not available when Javascript is disabled
+     * @param string $selector
      */
     public function i_set_the_manual_completion() {
         global $CFG;
@@ -139,7 +140,7 @@ class behat_format_designer extends behat_base {
      *
      * @Given /^I set the designer completion expected "(?P<value>(?:[^"]|\\")*)"$/
      * @throws DriverException The step is not available when Javascript is disabled
-     * @param string $value
+     * @param string $selector
      */
     public function i_set_completion_expected($value) {
         global $CFG;

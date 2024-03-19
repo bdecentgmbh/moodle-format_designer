@@ -73,6 +73,12 @@ class controlmenu extends controlmenu_base {
 
         $section = $this->section;
 
+        $hassectiontypes = true;
+        if (($this->course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && !$this->format->get_section_number())
+            || $this->course->coursetype == DESIGNER_TYPE_FLOW)  {
+           $hassectiontypes = false;
+        }
+
         $controls = $this->section_control_items();
 
         if (empty($controls)) {
@@ -140,7 +146,7 @@ class controlmenu extends controlmenu_base {
             'id' => $section->id,
             'seciontypes' => $sectiontypes,
             'is_subpanel' => format_designer_is_support_subpanel(),
-            'hassectiontypes' => ($this->course->coursetype != DESIGNER_TYPE_FLOW),
+            'hassectiontypes' => $hassectiontypes,
         ];
 
         return $data;
@@ -153,7 +159,6 @@ class controlmenu extends controlmenu_base {
      * method is almost a clone of the previous section_control_items from the course/renderer.php.
      *
      * This method must remain public until the final deprecation of section_edit_control_items.
-     *
      * @return array of edit control items
      */
     public function section_control_items() {
@@ -191,9 +196,15 @@ class controlmenu extends controlmenu_base {
                 'attr' => ['class' => 'icon edit'],
             ];
 
-            if (format_designer_is_support_subpanel() && $course->coursetype != DESIGNER_TYPE_FLOW) {
+            $hassectiontypes = true;
+            if (($this->course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && !$this->format->get_section_number())
+                || $this->course->coursetype == DESIGNER_TYPE_FLOW)  {
+                $hassectiontypes = false;
+            }
+
+            if (format_designer_is_support_subpanel() && $hassectiontypes) {
                 $controls['sectionlayout'] = new action_menu_subpanel(
-                    'Section Layout',
+                    get_string('strsectionlayout', 'format_designer'),
                     $this->get_choice_list($section),
                     ['data-value' => 'section-designer-action'],
                     new pix_icon('t/hide', '', 'moodle', ['class' => 'iconsmall'])

@@ -48,13 +48,14 @@
      * @param {bool} videoTime
      * @param {bool} issubpanel
      */
-    let DesignerSection = function(courseId, contextId, popupActivities, videoTime, issubpanel) {
+    let DesignerSection = function(courseId, contextId, popupActivities, videoTime, issubpanel, sectionreturn) {
         var self = this;
         self.courseId = courseId;
         self.contextId = contextId;
         self.popupActivities = popupActivities;
         self.videoTime = videoTime;
         self.isSubpanel = issubpanel;
+        self.sectionReturn = sectionreturn;
 
         $(".course-info-block .carousel .carousel-item:nth-child(1)").addClass('active');
         $(".course-info-block #courseStaffinfoControls.carousel").addClass('active');
@@ -314,6 +315,7 @@
                         {
                             id: sectionid,
                             courseid: self.courseId,
+                            sr: self.sectionReturn,
                         }
                     );
                     promise.then((html, js) => {
@@ -336,8 +338,8 @@
     };
 
     return {
-        init: function(courseId, contextId, popupActivities, videoTime, issubpanel) {
-            return new DesignerSection(courseId, contextId, popupActivities, videoTime, issubpanel);
+        init: function(courseId, contextId, popupActivities, videoTime, issubpanel, sectionreturn) {
+            return new DesignerSection(courseId, contextId, popupActivities, videoTime, issubpanel, sectionreturn);
         }
     };
 });
