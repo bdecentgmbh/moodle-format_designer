@@ -47,6 +47,7 @@
      * @param {array} popupActivities
      * @param {bool} videoTime
      * @param {bool} issubpanel
+     * @param {int} sectionreturn
      */
     let DesignerSection = function(courseId, contextId, popupActivities, videoTime, issubpanel, sectionreturn) {
         var self = this;

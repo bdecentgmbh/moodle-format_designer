@@ -197,8 +197,10 @@ $string['coursecompletiondate_help'] = 'Student date of course completion displa
 $string['courseduedate'] = 'Course due date';
 $string['courseduedate_help'] = 'Course due date will shown in course timesection,
 it only works when Learning tools and time management tool will be installed and enabled';
-$string['activityprogress'] = 'Progress bar';
-$string['activityprogress_help'] = 'The progress bar displays how many activities and prerequisites the student has already completed visually. A tooltip is provided to list the activities and prerequisites that are still "to do" and those that are already "completed"';
+$string['activityprogress'] = 'Extended progress bar';
+$string['activityprogress_help'] = '
+The extended progress bar displays the progress of the student, based on the chosen calculation of course progress. Below the extended progress bar, the current progress is provided in text form (with support for Time Management due dates). A tooltip provides links to activities, prerequisites or sections.
+';
 
 $string['activity:icon'] = 'Activity icon';
 $string['activity:visits'] = 'Activity visits';
@@ -267,6 +269,7 @@ $string['coursesettings'] = 'Course';
 $string['sectionsettings'] = 'Section';
 $string['stractivity'] = 'Activity';
 $string['strsection'] = "Section";
+$string['strcourse'] = "Course";
 $string['courseheader'] = 'Course header';
 $string['popupactivitiesnotinstalled'] = 'Popup format must be installed in order to display the activities in popup.';
 $string['listwidth'] = 'List width';
@@ -398,6 +401,7 @@ $string['courseheadertimemanagement_help'] = 'Select the time-related elements y
 $string['courseprogresstype'] = 'Course Progress';
 $string['calcourseprogress'] = "Calculation of course progress";
 $string['calcourseprogress_help'] = "
+<b> Completion criteria: </b> progress shall include all criteria that are conditions for course completion.<br>
 <b> Relevant activities: </b> progress shall include only activities that are conditions for course completion.<br>
 <b> All activities: </b> progress shall include all activities that have completion tracking configured.<br>
 <b> Sections: </b> progress shall be based upon sections, not activities.<br>
@@ -551,3 +555,4 @@ $string['purposeclass'] = "Custom class for styling";
 $string['sectionlink'] = 'Permalink';
 $string['courseindicator'] = "Course status: ";
 $string['strsectionlayout'] = "Section Layout";
+$string['completioncriteria'] = "Completion criteria";

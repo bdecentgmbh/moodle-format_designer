@@ -101,8 +101,9 @@ class renderer extends \core_courseformat\output\section_renderer {
             $data->kanbanmode = true;
         }
         $data->startid = $startid;
+
         $data->issectionpageclass = ($data->initialsection->sectionreturnid != 0) ? 'section-page-layout' : '';
-        
+
         if (!format_designer_has_pro()) {
             $data->headermetadata = $this->course_header_metadata_details($course);
         }
@@ -599,7 +600,18 @@ class renderer extends \core_courseformat\output\section_renderer {
         $completionactivities = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY);
         $complteioncourses = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_COURSE);
 
-        $count = count($completionactivities) + count($complteioncourses);
+        $count = count($completionactivities);
+
+        $isapplycompletioncourses = false;
+        if (!isset($course->calcourseprogress)) {
+            $isapplycompletioncourses = true;
+        } else if ($course->calcourseprogress == DESIGNER_PROGRESS_CRITERIA) {
+            $isapplycompletioncourses = true;
+        }
+
+        if ($isapplycompletioncourses) {
+            $count += count($complteioncourses);
+        }
         $cmidentifier = "moduleinstance";
 
         if (format_designer_has_pro()) {
@@ -628,7 +640,7 @@ class renderer extends \core_courseformat\output\section_renderer {
                     $completed += ($data->completionstate == COMPLETION_COMPLETE ||
                         $data->completionstate == COMPLETION_COMPLETE_PASS) ? 1 : 0;
                     $modtooltiplink = html_writer::link($modules[$cmid]->url,
-                        get_string('stractivity', 'format_designer') . " ". $modules[$cmid]->name);
+                        get_string('stractivity', 'format_designer') . ": " . $modules[$cmid]->name);
                     if ($data->completionstate == COMPLETION_COMPLETE ||
                             $data->completionstate == COMPLETION_COMPLETE_PASS) {
                         $completedcriteria[] = $modtooltiplink;
@@ -639,13 +651,13 @@ class renderer extends \core_courseformat\output\section_renderer {
             }
         }
 
-        if ($complteioncourses && !isset($course->calcourseprogress)) {
+        if ($isapplycompletioncourses  && $complteioncourses) {
             foreach ($complteioncourses as $coursecriteria) {
                 $courseid = $coursecriteria->courseinstance;
                 $course = get_course($courseid);
                 $completion = new \completion_info($course);
                 $coursetooltiplink = html_writer::link(new moodle_url('/course/view.php',
-                ['id' => $course->id]), $course->fullname);
+                ['id' => $course->id]), get_string('strcourse', 'format_designer') . ": " . $course->fullname);
                 if ($completion->is_course_complete($userid)) {
                     $completed += 1;
                     $completedcriteria[] = $coursetooltiplink;
@@ -657,14 +669,15 @@ class renderer extends \core_courseformat\output\section_renderer {
 
         if (format_designer_has_pro()) {
 
-            if ($course->calcourseprogress == DESIGNER_PROGRESS_SECTIONS && !empty($modinfo->sections)) {
+            if (isset($course->calcourseprogress) && $course->calcourseprogress == DESIGNER_PROGRESS_SECTIONS
+                && !empty($modinfo->sections)) {
                 foreach ($modinfo->sections as $sectionno => $modnumbers) {
                     $section = course_get_format($course)->get_section($sectionno);
                     if ($section->visible) {
                         $sectionname = get_section_name($course, $section);
                         $sectionurl = new moodle_url('/course/view.php', ['id' => $course->id, 'section' => $sectionno]);
                         $sectiontooltiplink = html_writer::link($sectionurl,
-                                get_string('strsection', 'format_designer') . " ". $sectionname);
+                                get_string('strsection', 'format_designer') . ": ". $sectionname);
                         $realtiveactivities = isset($course->calsectionprogress) &&
                                 ($course->calsectionprogress == DESIGNER_PROGRESS_RELEVANTACTIVITIES) ? true : false;
                         if (\format_designer\options::is_section_completed($section, $course, $modinfo,
@@ -917,7 +930,6 @@ class renderer extends \core_courseformat\output\section_renderer {
         if ($course->coursetype == DESIGNER_TYPE_FLOW && count($modinfo->sections) <= 1) {
             $sectioncollapsestatus = 'show';
         }
-
         // Calculate section width for single section format.
         $section->widthclass = ($course->coursedisplay && !$this->page->user_is_editing() && !$onsectionpage && $sectionheader)
             ? $this->generate_section_widthclass($section) : '';
@@ -1094,7 +1106,6 @@ class renderer extends \core_courseformat\output\section_renderer {
         $modclasses = 'activity ' . $mod->modname . ' modtype_' . $mod->modname . ' ' . $mod->extraclasses;
 
         // Add course type flow animation class.
-        // TODO: check the animation settings.
         if ($course->coursetype == DESIGNER_TYPE_FLOW && !$this->page->user_is_editing()) {
             if ((isset($course->showanimation) && $course->showanimation)) {
                 $modclasses .= ' flow-animation ';

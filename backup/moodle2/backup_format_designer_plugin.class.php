@@ -65,6 +65,11 @@ class backup_format_designer_plugin extends backup_format_plugin {
                 $formatoptions->annotate_files($component, $file, null);
             }
         }
+        $formatoptions->annotate_files('local_designer', 'courseheaderbgimage', null);
+        $formatoptions->annotate_files('local_designer', 'coursebgimage', null);
+        $formatoptions->annotate_files('local_designer', 'additionalcontent', null);
+        $formatoptions->annotate_files('local_designer', 'prerequisiteinfo', null);
+
         $plugin = $this->get_plugin_element(null, $this->get_format_condition(), 'designer');
 
         return $plugin->add_child($formatoptions);
