@@ -75,8 +75,8 @@ class controlmenu extends controlmenu_base {
 
         $hassectiontypes = true;
         if (($this->course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && !$this->format->get_section_number())
-            || $this->course->coursetype == DESIGNER_TYPE_FLOW)  {
-           $hassectiontypes = false;
+            || $this->course->coursetype == DESIGNER_TYPE_FLOW) {
+            $hassectiontypes = false;
         }
 
         $controls = $this->section_control_items();
@@ -198,7 +198,7 @@ class controlmenu extends controlmenu_base {
 
             $hassectiontypes = true;
             if (($this->course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && !$this->format->get_section_number())
-                || $this->course->coursetype == DESIGNER_TYPE_FLOW)  {
+                || $this->course->coursetype == DESIGNER_TYPE_FLOW) {
                 $hassectiontypes = false;
             }
 
