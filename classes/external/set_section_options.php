@@ -146,7 +146,8 @@ trait set_section_options {
         $renderer = $PAGE->get_renderer('format_designer');
 
         $format = course_get_format($course);
-        $sectiontype = $format->get_section_option($sectionid, 'sectiontype') ?: 'default';
+        $sectiontype = $format->get_section_option($sectionid, 'sectiontype') ?:
+        get_config('format_designer', 'sectiontype');
 
         $section = (object) ['sectiontype' => $sectiontype];
         $cmlistdata = $renderer->render_course_module($cm, $sectionreturn, [], $section);

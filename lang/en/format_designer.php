@@ -556,3 +556,6 @@ $string['sectionlink'] = 'Permalink';
 $string['courseindicator'] = "Course status: ";
 $string['strsectionlayout'] = "Section Layout";
 $string['completioncriteria'] = "Completion criteria";
+$string['strsecondarymenucourse'] = "Course";
+$string['section_layout'] = "Section layout";
+$string['section_layout_desc'] = "";

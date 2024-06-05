@@ -100,7 +100,8 @@ class cmlist extends \core_courseformat\output\local\content\section\cmlist {
         }
 
         $sectionlayoutclass = 'link-layout';
-        $sectiontype = $this->format->get_section_option($section->id, 'sectiontype') ?: 'default';
+        $sectiontype = $this->format->get_section_option($section->id, 'sectiontype') ?:
+        get_config('format_designer', 'sectiontype');
         if ($sectiontype == 'list') {
             $sectionlayoutclass = "list-layout";
         } else if ($sectiontype == 'cards') {

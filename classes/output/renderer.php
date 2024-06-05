@@ -902,7 +902,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         $prodata = [];
 
         $sectionlayoutclass = 'link-layout';
-        $sectiontype = $format->get_section_option($section->id, 'sectiontype') ?: 'default';
+        $sectiontype = $format->get_section_option($section->id, 'sectiontype') ?: get_config('format_designer', 'sectiontype');
         if ($sectiontype == 'list') {
             $sectionlayoutclass = "list-layout";
         } else if ($sectiontype == 'cards') {
@@ -1464,7 +1464,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         $cmlist = new $cmlistclass($format, $section, $cm, $displayoptions);
         $output = $this->page->get_renderer('format_designer');
         $cmlistdata = $cmlist->export_for_template($this);
-        $sectiontype = $format->get_section_option($section->id, 'sectiontype') ?: 'default';
+        $sectiontype = $format->get_section_option($section->id, 'sectiontype') ?: get_config('format_designer', 'sectiontype');
         $templatename = 'format_designer/cm/module_layout_' . $sectiontype;
         $prolayouts = format_designer_get_pro_layouts();
         if (in_array($sectiontype, $prolayouts)) {

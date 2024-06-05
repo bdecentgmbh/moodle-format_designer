@@ -1096,7 +1096,7 @@ class format_designer extends \core_courseformat\base {
                 'type' => PARAM_ALPHANUMEXT,
                 'label' => '',
                 'element_type' => 'hidden',
-                'default' => 'default',
+                'default' => get_config('format_designer', 'sectiontype'),
             ],
         ];
         $width = [
@@ -2004,7 +2004,7 @@ function format_designer_editsetting_style($page) {
  * @return string|null
  */
 function format_designer_get_module_layoutclass($format, $section) {
-    $sectiontype = $format->get_section_option($section->id, 'sectiontype') ?: 'default';
+    $sectiontype = $format->get_section_option($section->id, 'sectiontype') ?: get_config('format_designer', 'sectiontype');
 
     if ($sectiontype == 'list') {
         $sectionlayoutclass = " position-relative ";
@@ -2154,7 +2154,7 @@ function format_designer_extend_navigation_course($navigation, $course, $context
         "class" => "nav-item", "role" => "none", "data-forceintomoremenu" => "true", ]
         );
         $secondarymenutocoursecontent .= html_writer::link(new moodle_url('/course/view.php', ['id' => $course->id]),
-        get_string('course'), ['role' => 'menuitem', 'class' => 'designercoursehome', "tabindex" => "-1" ]);
+        get_string('strsecondarymenucourse', 'format_designer'), ['role' => 'menuitem', 'class' => 'designercoursehome', "tabindex" => "-1" ]);
         $secondarymenutocoursecontent .= html_writer::end_tag("li");
 
         if (format_designer_has_pro() && $course->prerequisitesbackmain
@@ -2505,4 +2505,20 @@ function format_designer_is_support_subpanel() {
         return true;
     }
     return false;
+}
+
+/**
+ * Get the list of all layouts.
+ *
+ * @return array list.
+ */
+function format_designer_get_all_layouts() {
+    $layouts = [
+        'default' => get_string('link', 'format_designer'),
+        'list' => get_string('list', 'format_designer'),
+        'cards' => get_string('cards', 'format_designer')
+    ];
+    $prolayouts = array_keys(core_component::get_plugin_list('layouts'));
+    $prolayouts = (array) get_strings($prolayouts, 'format_designer');
+    return array_merge($layouts, $prolayouts);
 }

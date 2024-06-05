@@ -376,7 +376,7 @@ class controlmenu extends controlmenu_base {
     public function get_choice_list($section): choicelist {
 
         $sectiontype = $this->format->get_section_option($section->id, 'sectiontype');
-        $sectiontype = $sectiontype ? $sectiontype : 'default';
+        $sectiontype = $sectiontype ? $sectiontype : get_config('format_designer', 'sectiontype');
         $choice = $this->create_choice_list($section);
         $choice->set_selected_value($sectiontype);
         return $choice;
