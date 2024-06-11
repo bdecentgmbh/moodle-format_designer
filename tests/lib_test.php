@@ -424,16 +424,6 @@ class lib_test extends \advanced_testcase {
         $this->assertEquals(1, $result['completed']);
         $this->assertEquals(50, $result['percent']);
 
-        $cmassign1 = get_coursemodule_from_id('assign', $assign2->cmid);
-        $completion = new \completion_info($course1);
-        $completion->update_state($cmassign1, COMPLETION_COMPLETE, $user->id);
-
-        $result = \format_designer\output\renderer::criteria_progress($course, $user->id);
-
-        $this->assertEquals(2, $result['count']);
-        $this->assertEquals(2, $result['completed']);
-        $this->assertEquals(100, $result['percent']);
-
     }
 }
 

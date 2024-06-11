@@ -117,8 +117,38 @@ class options {
     public static function is_mod_completed($mod) {
         $cmcompletion = new \format_designer\output\cm_completion($mod);
         $cmcompletionstate = $cmcompletion->get_completion_state();
-        if ($cmcompletionstate == COMPLETION_COMPLETE || $cmcompletionstate == COMPLETION_COMPLETE_PASS ) {
+        if ($cmcompletionstate == COMPLETION_COMPLETE || $cmcompletionstate == COMPLETION_COMPLETE_PASS) {
             return true;
+        }
+        return false;
+    }
+
+    /**
+     * Check the section able to complete.
+     *
+     * @param [object] $section
+     * @param [object] $course
+     * @param [object] $modinfo
+     * @param boolean $onlyrelative
+     * @return boolean
+     */
+    public static function is_vaild_section_completed($section, $course, $modinfo, $onlyrelative = false) {
+
+        $completioninfo = new \completion_info($course);
+        $completionactivities = array_column($completioninfo->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY), 'moduleinstance');
+        if (!empty($modinfo->sections[$section->section]) && $section->uservisible) {
+            foreach ($modinfo->sections[$section->section] as $modnumber) {
+                $mod = $modinfo->cms[$modnumber];
+                if (!empty($mod)) {
+                    if ($onlyrelative && !in_array($mod->id, $completionactivities)) {
+                        continue;
+                    }
+                    $cmcompletion = new cm_completion($mod);
+                    if ($mod->is_visible_on_course_page() && $cmcompletion->get_completion_mode() != COMPLETION_TRACKING_NONE) {
+                        return true;
+                    }
+                }
+            }
         }
         return false;
     }
@@ -131,11 +161,13 @@ class options {
      * @param stdclass $course Course instance record.
      * @param \Course_modinfo $modinfo Course mod info.
      * @param bool $result True to only for REsult, False for current progress.
+     * @param bool $onlyrelative
      * @return bool|array Result of section completion or Current progress data.
      */
-    public static function is_section_completed($section, $course, $modinfo, $result=false) {
+    public static function is_section_completed($section, $course, $modinfo, $result = false, $onlyrelative = false) {
 
         $completioninfo = new \completion_info($course);
+        $completionactivities = array_column($completioninfo->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY), 'moduleinstance');
         $cmcompleted = 0;
         $totalmods = 0;
         $issectioncompletion = 0;
@@ -143,8 +175,11 @@ class options {
             foreach ($modinfo->sections[$section->section] as $modnumber) {
                 $mod = $modinfo->cms[$modnumber];
                 if (!empty($mod)) {
+                    if ($onlyrelative && !in_array($mod->id, $completionactivities)) {
+                        continue;
+                    }
                     $cmcompletion = new cm_completion($mod);
-                    if ($mod->uservisible && $cmcompletion->get_completion_mode() != COMPLETION_TRACKING_NONE) {
+                    if ($mod->is_visible_on_course_page() && $cmcompletion->get_completion_mode() != COMPLETION_TRACKING_NONE) {
                         $totalmods++;
                         $cmcompletionstate = $cmcompletion->get_completion_state();
                         if ($cmcompletionstate == COMPLETION_COMPLETE || $cmcompletionstate == COMPLETION_COMPLETE_PASS ) {
@@ -157,10 +192,15 @@ class options {
 
         if ($totalmods) {
             $sectionprogress = $cmcompleted / $totalmods * 100;
-            $issectioncompletion = 1;
+            $issectioncompletion = true;
         } else {
-            $sectionprogress = 0;
+            $sectionprogress = false;
         }
+
+        if (isguestuser()) {
+            $issectioncompletion = false;
+        }
+
         $sectionprogresscomp = ($sectionprogress == 100) ? true : false;
 
         return ($result) ? $sectionprogresscomp : [

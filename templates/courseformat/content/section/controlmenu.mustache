@@ -26,6 +26,8 @@
     }
 }}
 {{#hasmenu}}
+{{#hassectiontypes}}
+{{^is_subpanel}}
 <div class="dropdown designer-menu"  id="section-designer-action" data-sectionid="{{id}}">
     <button class="btn btn-primary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         {{#seciontypes}}
@@ -38,6 +40,8 @@
         {{/seciontypes}}
     </div>
 </div>
+{{/is_subpanel}}
+{{/hassectiontypes}}
 <div class="section_action_menu ml-auto" data-sectionid="{{id}}">
     {{{menu}}}
 </div>

@@ -108,6 +108,21 @@ if ($ADMIN->fulltree) {
     $settings->add($setting);
     $settingspage->add($settings);
 
+    $sectionpage = new admin_settingpage('format_designer_section', get_string('sectionsettings', 'format_designer'));
+    // Section mask images.
+    $name = 'formaty_designer_sectiongeneral';
+    $heading = get_string('general', 'format_designer');
+    $information = '';
+    $setting = new admin_setting_heading($name, $heading, $information);
+    $sectionpage->add($setting);
+    // Section layout - Global setting - DES-866.
+    $name = 'format_designer/sectiontype';
+    $title = get_string('strsectionlayout', 'format_designer');
+    $description = get_string('section_layout_desc', 'format_designer');
+    $layouts = [];
+    $setting = new admin_setting_configselect($name , $title, $description, 'link', format_designer_get_all_layouts());
+    $sectionpage->add($setting);
+
     $activitypage = new admin_settingpage('format_designer_activity', get_string('stractivity', 'format_designer'));
 
     // Activity description length.
@@ -132,8 +147,25 @@ if ($ADMIN->fulltree) {
          && file_exists($CFG->dirroot.'/local/designer/setting.php')) {
         require_once($CFG->dirroot.'/local/designer/setting.php');
     } else {
+        $settingspage->add($sectionpage);
         $settingspage->add($activitypage);
     }
 
     $settings = $settingspage;
 }
+
+$settings->visiblename = get_string('general_settings', 'format_designer');
+
+$ADMIN->add('formatsettings', new admin_category('format_designer', get_string('pluginname', 'format_designer')));
+
+$ADMIN->add('format_designer', $settings);
+
+
+$settings = null;
+
+if (format_designer_has_pro()) {
+    // Tell core we already added the settings structure.
+    $ADMIN->add('format_designer', new admin_externalpage('managepurposes', get_string('managepurposes', 'format_designer'),
+    new moodle_url('/local/designer/purposes.php')));
+}
+

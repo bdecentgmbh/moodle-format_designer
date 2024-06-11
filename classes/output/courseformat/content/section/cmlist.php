@@ -80,12 +80,13 @@ class cmlist extends \core_courseformat\output\local\content\section\cmlist {
         if (!empty($modinfo->sections[$section->section])) {
             foreach ($modinfo->sections[$section->section] as $modnumber) {
                 $mod = $modinfo->cms[$modnumber];
+                // Check module state in deletionprogress.
                 // If the old non-ajax move is necessary, we do not print the selected cm.
-                if ($showmovehere && $USER->activitycopy == $mod->id) {
+                if (($showmovehere && $USER->activitycopy == $mod->id)) {
                     continue;
                 }
                 if ($mod->is_visible_on_course_page()) {
-                    $item = new $this->itemclass($format, $section, $mod, $this->displayoptions, );
+                    $item = new $this->itemclass($format, $section, $mod, $this->displayoptions);
                     $data->cms[] = (object)[
                         'cmitem' => $item->export_for_template($output),
                         'moveurl' => new moodle_url('/course/mod.php', ['moveto' => $modnumber, 'sesskey' => sesskey()]),
@@ -99,7 +100,8 @@ class cmlist extends \core_courseformat\output\local\content\section\cmlist {
         }
 
         $sectionlayoutclass = 'link-layout';
-        $sectiontype = $this->format->get_section_option($section->id, 'sectiontype') ?: 'default';
+        $sectiontype = $this->format->get_section_option($section->id, 'sectiontype') ?:
+        get_config('format_designer', 'sectiontype');
         if ($sectiontype == 'list') {
             $sectionlayoutclass = "list-layout";
         } else if ($sectiontype == 'cards') {

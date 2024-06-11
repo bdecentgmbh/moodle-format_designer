@@ -372,9 +372,12 @@ class cm_completion implements renderable, templatable {
             if ($this->get_completion_mode() == COMPLETION_TRACKING_NONE) {
                 return 'secondary';
             }
-
             if (in_array($this->get_completion_state(), [COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS])) {
-                return 'success';
+                if ($this->get_completion_expected() && $this->get_completion_expected() < time()) {
+                    return 'due-success';
+                } else {
+                    return 'success';
+                }
             }
 
             if ($this->get_completion_fail() == COMPLETION_COMPLETE_FAIL) {

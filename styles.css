@@ -9,7 +9,6 @@
     --activity-bg-size: center;
     --activity-bg-repeat: no-repeat;
 }
-
 .link-layout .img-element .activityiconcontainer.img-block .activityicon,
 .link-layout .img-element .activityiconcontainer.img-block .icon {
     filter: none;
@@ -189,6 +188,13 @@
     clear: both;
     margin-top: 10px;
 }
+.format-designer .course-content ul.designer.course-type-flow li.section .availability-section-block + div {
+    max-height: 66%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+}
 .format-designer .course-content ul.designer li.section .availability-section-block .section_availability .availabilityinfo {
     font-size: 12px;
     border: 1px solid #ccc;
@@ -329,8 +335,8 @@ body.format-designer.path-admin #page.drawers .main-inner .header-maxwidth {
     right: -10px;
 }
 /* Section activities lists */
-
 /* End of Course type - Normal*/
+
 .format-designer ul.designer .card.card-list.notstarted {
     border-left-color: var(--primary);
 }
@@ -380,6 +386,19 @@ body.format-designer.path-admin #page.drawers .main-inner .header-maxwidth {
 }
 .format-designer .designer .badge-success {
     background-color: #28a744;
+}
+.format-designer .designer .badge-due-success,
+.format-designer .designer .badge-due-success:active,
+.format-designer .designer .badge-due-success:focus:active {
+    color: #fff;
+    border-color: #000;
+    background-color: #000;
+    box-shadow: none;
+}
+.format-designer .designer .badge-due-success.btn-outline-success:not(:disabled):not(.disabled):active:focus,
+.format-designer .designer .badge-due-success.btn-outline-success:not(:disabled):not(.disabled).active:focus,
+.format-designer .designer .badge-due-success.show > .btn-outline-success.dropdown-toggle:focus {
+    box-shadow: none;
 }
 .format-designer ul.designer .text-notstarted {
     color: var(--primary);
@@ -599,7 +618,7 @@ body.format-designer.editing ul.designer .section .circles-layout .activity .edi
     display: inline-block;
 }
 .format-designer .course-content ul.designer li.section .section-header-content .sectionname {
-    max-width: none;
+    max-width: 300px;
     display: inline-block;
 }
 .format-designer .course-content ul.designer li.section .section-header-content .sectionbadges {
@@ -643,7 +662,6 @@ span.section-collapse-icon:before,
 span.section-collapse-icon:before {
     content: '\f105';
 }
-
 .format-designer .course-content ul.designer li.section .section-header-content.boxed-block,
 .format-designer .course-content ul.designer li.section .content .section.boxed-block {
     margin: 0 auto;
@@ -739,7 +757,6 @@ span.section-collapse-icon:before {
         margin-left: 0;
     }
 }
-
 .format-designer .course-content ul.designer li.section .left,
 .format-designer .course-content ul.designer li.section .right {
     width: auto;
@@ -770,7 +787,6 @@ span.section-collapse-icon:before {
         display: none;
     }
 }
-
 .format-designer .designer .section.img-text .activity .row > div:nth-child(2) .pull-right {
     text-align: center;
     float: none;
@@ -988,6 +1004,7 @@ span.section-collapse-icon:before {
     display: inline-block;
 }
 .format-designer .designer .section.img-text.circles-layout .activity .activityinstance .inplaceeditable {
+    width: 100%;
     display: flex;
     flex-direction: column;
 }
@@ -1057,6 +1074,7 @@ span.section-collapse-icon:before {
     width: 80%;
 }
 /*End of v-4.0*/
+
 .format-designer .designer .section.img-text.list-layout .activity .activityinstance {
     padding-right: 30px;
 }
@@ -1165,6 +1183,38 @@ span.section-collapse-icon:before {
     padding-top: 0;
     margin-top: 10px;
     margin-bottom: 10px;
+}
+.format-designer.editing .course-content ul.designer li.section .section-header-content .section-head-text .bulkselect {
+    position: absolute;
+    top: 15px;
+}
+.format-designer .designer .section .content .section.link-layout li.activity .activity-block .bulkselect {
+    top: 10px;
+    left: 10px;
+    z-index: 0;
+}
+.format-designer .designer .section .content .section.list-layout li.activity .activity-block .bulkselect {
+    top: 2rem;
+    z-index: 0;
+
+}
+.format-designer .designer .section .content .section.card-layout li.activity .bulkselect {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 0;
+}
+.format-designer .designer.kanban-board .section .content .section.card-layout li.activity .bulkselect {
+    left: 20px;
+}
+.format-designer .course-content ul.designer.kanban-board li.section.main .section-head-text .bulkselect {
+    top: -5px;
+    left: -5px;
+}
+.format-designer .designer .section .content .section.circles-layout li.activity .activity-block .bulkselect {
+    top: 10px;
+    left: 10px;
+    z-index: 0;
 }
 .format-designer .designer .section .content .section li.activity .activity-block.designer {
     height: 100%;
@@ -1367,8 +1417,8 @@ span.section-collapse-icon:before {
 .format-designer .designer .section .content .section li.activity .activityinstance .activity-type.content-remove p {
     display: none;
 }
-.format-designer .designer .section .content .section li.activity .activityinstance .no-overflow > h2,
-.format-designer .designer .section .content .section li.activity .activityinstance .no-overflow > p {
+.format-designer .designer .section .content .section li.activity:not(.circle-layout) .activityinstance .no-overflow > h2,
+.format-designer .designer .section .content .section li.activity:not(.circle-layout) .activityinstance .no-overflow > p {
     font-size: 20px;
     font-weight: bold;
     color: #6a737b;
@@ -1391,10 +1441,13 @@ span.section-collapse-icon:before {
     display: inline-flex;
 }
 /*v-4.0+*/
+
 .format-designer .designer .section .content .section li.activity.circle-layout .activityinstance .aalink {
     display: block;
+    z-index: 1;
 }
 /*End of v-4.0+*/
+
 .format-designer .designer .section .content .section.list-layout li.activity .activityinstance .aalink {
     width: 100%;
     display: flex;
@@ -1566,7 +1619,7 @@ span.section-collapse-icon:before {
 .format-designer .designer .section .content .section li.activity .action-html-card {
     text-align: center;
     margin-top: 10px;
-    margin-left: 50px;
+    margin-left: 30px;
     float: right;
 }
 .format-designer .designer .section .content .section li.activity .action-html-card.content-show a {
@@ -1737,7 +1790,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 .format-designer .designer .section .content .section.link-layout li.activity {
     display: inline-block;
     margin-right: 15px;
-    margin-bottom: 15px;
+    margin-top: 15px;
 }
 .format-designer .designer .section .content .section.link-layout li.activity:last-child {
     margin-right: 0;
@@ -1932,7 +1985,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     }
 }
 
-
 @media (max-width: 575px) {
     .format-designer .designer .section .content .section.card-layout li.activity {
         width: 99%;
@@ -2050,6 +2102,10 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 .activity-instance .activitytitle .img-element {
     display: none;
 }
+.format-designer .designer .section.img-text .circle-layout .activity-block .activityinstance .activity-altcontent {
+    text-align: left;
+    margin-left: 90px;
+}
 .format-designer .designer .section .content .section li.activity.circle-layout .activityinstance .activity-type {
     margin-left: 0;
     margin-bottom: 5px;
@@ -2092,7 +2148,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 }
 .format-designer .designer .section-design-whole .mod-content .trim-summary a,
 .format-designer .designer .section-design-header .mod-content .trim-summary a {
-    /* color: var(--sectioncolor); */
     cursor: zoom-in;
 }
 .format-designer .designer .section-design-whole .mod-content .fullcontent-summary a,
@@ -2122,6 +2177,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 }
 
 /*Course Integrate time management*/
+
 .format-designer .course-info-block {
     margin: 15px 0;
     clear: both;
@@ -2345,6 +2401,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     margin: 0;
 }
 .format-designer .course-content ul.designer.kanban-board .kanban-board-activities {
+    padding-top: 25px;
     overflow: auto;
     display: flex;
 }
@@ -2436,6 +2493,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 }
 
 /*Video time*/
+
 .format-designer .designer .section.img-text.card-layout .activity.videotime {
     display: inline-block !important;
 }
@@ -2488,6 +2546,9 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     left: 0;
     bottom: 0;
 }
+.format-designer .designer .section .content .section.img-text li.activity.circle-layout .activity-block.designer .video-progress {
+    position: static;
+}
 .format-designer .course-content ul.designer.course-type-flow li.section .content.collapse.in {
     display: contents;
 }
@@ -2504,6 +2565,10 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 .format-designer .designer .section .content .section.img-text li.activity.videotime .activity-block.designer
 .contentwithoutlink .videotimetabs {
     display: none;
+}
+.format-designer .designer .section .content .section.img-text li.activity.videotime .activity-block.designer {
+    padding-left: 0;
+    padding-right: 0;
 }
 .format-designer .designer .section.img-text.card-layout .activity.videotime .activity-block
 .completion-html-card .completion-html-card {
@@ -2559,6 +2624,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 }
 
 /*Horizontal circles*/
+
 .format-designer .designer .section .content .section.horizontal-circles-layout li.activity {
     width: 100%;
 }
@@ -2601,7 +2667,6 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 }
 /*v-4.0+*/
 
-/**/
 .format-designer .designer.kanban-board .section .content .section.img-text.horizontal-circles-layout li.activity .card {
     background: none;
 }
@@ -2609,7 +2674,8 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     padding-bottom: 50px;
 }
 .format-designer .designer .section.img-text.horizontal-circles-layout li.horizontal_circles .activity-block .activityinstance {
-    display: block;
+    display: inline-block;
+    vertical-align: top;
 }
 .format-designer .designer .section.img-text.circles-layout .circle-layout.circle-size-medium .activity-block
 .activityinstance .img-element,
@@ -2753,6 +2819,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 }
 
 /*Flow layout*/
+
 .format-designer .course-content ul.course-type-flow.designer .section.main .section-header-content {
     min-height: 400px;
     width: 400px;
@@ -2981,7 +3048,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     float: none;
     position: absolute;
     bottom: 10px;
-    right: 10px;
+    left: 10px;
 }
 .format-designer .course-content ul.designer.course-type-flow li.section .section-header-content
 .section-progress-info > div:not(.progress-donut) .progress {
@@ -2997,7 +3064,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     font-size: 13px;
     padding: 5px 10px;
 }
-.format-designer .course-content ul.designer.course-type-flow li.section .content .section li.activity:not(.videotime)
+.format-designer .course-content ul.designer.course-type-flow li.section .content .section li.activity:not(.videotime):not(.poster)
 .mod-indent-outer .completion-html-card {
     margin-bottom: 10px;
     position: absolute;
@@ -3244,7 +3311,6 @@ li.section.main.section-background-color:not(.section-header-image)
         transform: translate3d(-100%, 0, 0);
         transform-origin: center;
     }
-
     to {
         opacity: 1;
         -webkit-transform: translate3d(0, 0, 0);
@@ -3260,7 +3326,6 @@ li.section.main.section-background-color:not(.section-header-image)
         transform: translate3d(-100%, 0, 0);
         transform-origin: center;
     }
-
     to {
         opacity: 1;
         -webkit-transform: translate3d(0, 0, 0);
