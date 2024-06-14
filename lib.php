@@ -2062,7 +2062,7 @@ function format_designer_timemanagement_installed() {
 function format_designer_editsetting_style($page) {
     if ($page->user_is_editing()) {
         // Fixed the overlapping issue by make this css rule as important. Moodle CI doesn't allow important.
-        $style .= '.format-designer .course-content ul.designer .kanban-board-activities li.section:first-child .right .dropdown
+        $style = '.format-designer .course-content ul.designer .kanban-board-activities li.section:first-child .right .dropdown
          .dropdown-menu .dropdown-subpanel .dropdown-menu {';
         $style .= 'left: 100% !important;';
         $style .= '}';
