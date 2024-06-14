@@ -96,13 +96,12 @@ class header extends \core_courseformat\output\local\content\section\header {
             }
         }
         $data->name = get_section_name($course, $section);
-        if (method_exists($format, 'get_format_string')) {
-            $data->selecttext = $format->get_format_string('selectsection', $data->name);
-        }
+        $data->selecttext = $format->get_format_string('selectsection', $data->name);
 
         $bodyclasses = explode(" ", $PAGE->bodyclasses);
 
-        if ((!$format->get_section_number() || !in_array('format-designer-single-section', $bodyclasses))
+        $sectionreturn = $format->get_sectionnum();
+        if ((!$sectionreturn || !in_array('format-designer-single-section', $bodyclasses))
             && class_exists('core_courseformat\output\local\content\bulkedittoggler')) {
             $data->sectionbulk = true;
         }

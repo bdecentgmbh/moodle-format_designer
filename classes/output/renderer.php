@@ -40,7 +40,6 @@ use stdclass;
 use format_designer\output\call_to_action;
 use format_designer\output\cm_completion;
 
-require_once($CFG->dirroot.'/course/format/renderer.php');
 require_once($CFG->dirroot.'/course/format/designer/lib.php');
 
 /**
@@ -100,13 +99,19 @@ class renderer extends \core_courseformat\output\section_renderer {
             $startclass[] = 'kanban-board';
             $data->kanbanmode = true;
         }
+
         $data->startid = $startid;
 
-        $data->issectionpageclass = ($data->initialsection->sectionreturnid != 0) ? 'section-page-layout' : '';
+        $format = course_get_format($course);
+        $singlesection = $format->get_sectionnum();
+
+        $data->issectionpageclass = $singlesection || ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE)
+            ? 'section-page-layout' : '';
 
         if (!format_designer_has_pro()) {
             $data->headermetadata = $this->course_header_metadata_details($course);
         }
+
         if (format_designer_has_pro()) {
             $startclass[] = ($course->activitydisplaymode == 'bypurpose') ? 'activity-purpose-mode' : 'activity-default-mode';
         }
@@ -875,7 +880,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         $sectionrestrict = (!$section->uservisible && $section->availableinfo) ? true : false;
 
         if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && $sectionheader
-            && $section->section > 0 && $format->is_section_visible($section, false)) {
+            && $format->is_section_visible($section, false)) {
             $gotosection = true;
         }
 
@@ -931,7 +936,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             $sectioncollapsestatus = 'show';
         }
         // Calculate section width for single section format.
-        $section->widthclass = ($course->coursedisplay && !$this->page->user_is_editing() && !$onsectionpage && $sectionheader)
+        $sectionwidthclass = ($course->coursedisplay && !$this->page->user_is_editing() && !$onsectionpage && $sectionheader)
             ? $this->generate_section_widthclass($section) : '';
 
         if ($course->coursedisplay && !$onsectionpage) {
@@ -941,6 +946,8 @@ class renderer extends \core_courseformat\output\section_renderer {
         $sectionstylerules = ($course->coursetype == DESIGNER_TYPE_KANBAN)
             ? (isset($course->listwidth) && $section->section != 0
             ? sprintf('width: %s;', $course->listwidth) : '') : '';
+
+        $showprerequisites = ($section->section == 0) || $format->get_sectionid() ? true : false;
         $templatecontext = [
             'section' => $section,
             'sectionvisible' => $format->is_section_visible($section, false),
@@ -959,7 +966,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             'sectioncontainerwidth' => $sectioncontainerwidth,
             'sectioncontentwidth' => $sectioncontentwidth,
             'sectiondesignwhole' => $sectiondesignwhole,
-            'showprerequisites' => ($section->section == 0) ? true : false,
+            'showprerequisites' => $showprerequisites,
             'prerequisitesnewtab' => isset($course->prerequisitesnewtab) ? $course->prerequisitesnewtab : false,
             'sectiondesignheader' => $sectiondesignheader,
             'sectiondesigntextcolor' => $sectiondesigntextcolor,
@@ -1029,7 +1036,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             $templatecontext['sectionmodcount'] = array_values($mods);
             $templatecontext['sectionsingle'] = true;
         }
-        if (format_designer_has_pro() && $section->section == 0) {
+        if (format_designer_has_pro() && $showprerequisites) {
             require_once($CFG->dirroot. "/local/designer/lib.php");
             if ($course->displaycourseprerequisites == DESIGNER_PREREQUISITES_ABOVECOURSE
                 && function_exists('local_designer_import_prerequisites_courses')) {
@@ -1053,7 +1060,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         }
         $sectionclass = ' section-type-'.$sectiontype;
         $sectionclass .= ($sectionrestrict) ? 'restricted' : '';
-        $sectionclass .= $section->widthclass;
+        $sectionclass .= $sectionwidthclass;
         $sectionclass .= ($templatecontext['sectionstyle']) ?? ' '.$templatecontext['sectionstyle'];
         $sectionclass .= isset($templatecontext['onlysummary']) && $templatecontext['onlysummary'] ? ' section-summary ' : '';
         $sectionclass .= isset($templatecontext['ishidden']) && $templatecontext['ishidden'] ? ' hidden ' : '';

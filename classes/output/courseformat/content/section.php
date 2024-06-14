@@ -26,6 +26,7 @@ namespace format_designer\output\courseformat\content;
 
 use renderer_base;
 use stdClass;
+use context_course;
 
 /**
  * Base class to render a course section.
@@ -45,7 +46,7 @@ class section extends \core_courseformat\output\local\content\section {
      * @return bool if the cm has name data
      */
     protected function add_format_data(stdClass &$data, array $haspartials, renderer_base $output): bool {
-        global $PAGE;
+        global $PAGE, $CFG;
 
         $section = $this->section;
         $format = $this->format;
@@ -56,6 +57,8 @@ class section extends \core_courseformat\output\local\content\section {
             $data->collapsemenu = true;
         }
 
+        $data->contentcollapsed = $this->is_section_collapsed();
+
         if ($format->is_section_current($section)) {
             $data->iscurrent = true;
             $data->currentlink = get_accesshide(
@@ -64,15 +67,58 @@ class section extends \core_courseformat\output\local\content\section {
         }
 
         $renderer = $this->format->get_renderer($PAGE);
-        if ($data->iscoursedisplaymultipage && !$format->get_section_number()) {
-            $formatdata = (array) $renderer->render_section_data($this->section, $this->format->get_course(), false, true);
+        $sectionnum = $format->get_sectionnum();
+
+        if ($data->iscoursedisplaymultipage && !$sectionnum) {
+            $pagesection = optional_param('section', -1, PARAM_INT);
+            $sectionnum = empty($sectionnum) && ($pagesection >= 0) ? 0 : false;
+            if ($pagesection >= 0) {
+                $formatdata = (array) $renderer->render_section_data($this->section, $this->format->get_course(), $sectionnum);
+            } else {
+                $formatdata = (array) $renderer->render_section_data($this->section, $this->format->get_course(), false, true);
+            }
         } else {
             $formatdata = (array) $renderer->render_section_data(
-                $this->section, $this->format->get_course(), $format->get_section_number()
+                $this->section, $this->format->get_course(), $sectionnum
             );
         }
         $data = (object) array_merge((array) $data, $formatdata);
 
+        return true;
+    }
+
+    /**
+     * Add the section editor attributes to the data structure.
+     *
+     * @param stdClass $data the current cm data reference
+     * @param renderer_base $output typically, the renderer that's calling this function
+     * @return bool if the cm has name data
+     */
+    protected function add_editor_data(stdClass &$data, renderer_base $output): bool {
+        $course = $this->format->get_course();
+        $coursecontext = context_course::instance($course->id);
+        $editcaps = [];
+        if (has_capability('moodle/course:sectionvisibility', $coursecontext)) {
+            $editcaps = ['moodle/course:sectionvisibility'];
+        }
+        if (!$this->format->show_editor($editcaps)) {
+            return false;
+        }
+
+        // In a single section page the control menu is located in the page header.
+        if (empty($this->hidecontrols)) {
+            $controlmenu = new $this->controlmenuclass($this->format, $this->section);
+            $data->controlmenu = $controlmenu->export_for_template($output);
+        }
+
+        $singlesection = $this->format->get_sectionnum();
+        if (!$this->isstealth) {
+            $data->cmcontrols = $output->course_section_add_cm_control(
+                $course,
+                $this->section->section,
+                $singlesection
+            );
+        }
         return true;
     }
 }

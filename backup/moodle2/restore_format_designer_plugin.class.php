@@ -177,11 +177,13 @@ class restore_format_designer_plugin extends restore_format_plugin {
             }
 
             // Restore the courseheaderbgimage.
-            $this->add_related_files('local_designer', 'courseheaderbgimage', null, null, $this->step->get_task()->get_old_courseid());
+            $this->add_related_files('local_designer', 'courseheaderbgimage', null, null,
+                $this->step->get_task()->get_old_courseid());
             // Restore the coursebgimage.
             $this->add_related_files('local_designer', 'coursebgimage', null, null, $this->step->get_task()->get_old_courseid());
             // Restore the additionalcontent.
-            $this->add_related_files('local_designer', 'additionalcontent', null, null, $this->step->get_task()->get_old_courseid());
+            $this->add_related_files('local_designer', 'additionalcontent', null, null,
+                $this->step->get_task()->get_old_courseid());
             // Restore the prerequisiteinfo.
             $this->add_related_files('local_designer', 'prerequisiteinfo', null, null, $this->step->get_task()->get_old_courseid());
         }

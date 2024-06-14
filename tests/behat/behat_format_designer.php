@@ -325,17 +325,23 @@ class behat_format_designer extends behat_base {
      */
     public function i_turn_block_editing_mode_on() {
         global $CFG;
-
-        if ($CFG->branch >= "400") {
-            $this->execute('behat_forms::i_set_the_field_to', [get_string('editmode'), 1]);
-            if (!$this->running_javascript()) {
-                $this->execute('behat_general::i_click_on', [
-                    get_string('setmode', 'core'),
-                    'button',
-                ]);
-            }
-        } else {
-            $this->execute('behat_general::i_click_on', ['Blocks editing on', 'button']);
+        $this->execute('behat_forms::i_set_the_field_to', [get_string('editmode'), 1]);
+        if (!$this->running_javascript()) {
+            $this->execute('behat_general::i_click_on', [
+                get_string('setmode', 'core'),
+                'button',
+            ]);
         }
     }
+
+    /**
+     * Turns block editing mode on.
+     * @Given I check the designer section general section
+     */
+    public function i_check_the_designer_section_general_section() {
+        global $CFG;
+        $this->execute('behat_forms::the_field_matches_value', ["Section name" , ""]);
+        $this->execute('behat_general::assert_page_contains_text', ["General"]);
+    }
+
 }

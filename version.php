@@ -24,10 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2024060500;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version   = 2024061300;        // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires  = 2020061500;        // Requires this Moodle version.
 $plugin->component = 'format_designer';  // Full name of the plugin (used for diagnostics).
 $plugin->release = 'Version 1.5';
-$plugin->incompatible = [404];
-$plugin->supported = [400, 403];
+$plugin->supported = [404, 404];
 $plugin->maturity  = MATURITY_STABLE;
