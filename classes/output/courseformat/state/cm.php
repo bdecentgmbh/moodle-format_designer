@@ -38,53 +38,22 @@ class cm extends \core_courseformat\output\local\state\cm {
         global $USER, $CFG;
 
         $format = $this->format;
-        $section = $this->section;
-        $cm = $this->cm;
         $course = $format->get_course();
-        if (class_exists("\core_external\util")) {
-            $name = \core_external\util::format_string($cm->name, $cm->context, true);
-        } else {
-            $name = external_format_string($cm->name, $cm->context, true);
-        }
-        $data = (object)[
-            'id' => $cm->id,
-            'anchor' => "module-{$cm->id}",
-            'name' => $name,
-            'visible' => !empty($cm->visible),
-            'sectionid' => $section->id,
-            'sectionnumber' => $section->section,
-            'uservisible' => $cm->uservisible,
-            'hascmrestrictions' => $this->get_has_restrictions(),
-        ];
-
+        $format = $this->format;
+        $cm = $this->cm;
+        $data = parent::export_for_template($output);
         $usecourseindexcustom = \format_designer\options::get_option($cm->id, 'customtitleusecourseindex');
         if ($usecourseindexcustom) {
             $data->designercmname = $format->get_cm_secondary_title($cm);
         }
-        // Check the user access type to this cm.
-        $info = new info_module($cm);
-        $data->accessvisible = ($data->visible && $info->is_available_for_all());
-
-        // Add url if the activity is compatible.
-        $url = $cm->url;
-        if ($url) {
-            $data->url = $url->out();
-        }
-
-        if ($this->exportcontent) {
-            $data->content = $output->course_section_updated_cm_item($format, $section, $cm);
-        }
 
         // Completion status.
         $completioninfo = new completion_info($course);
-        $data->istrackeduser = $completioninfo->is_tracked_user($USER->id);
         if ($data->istrackeduser && $completioninfo->is_enabled($cm)) {
             $completiondata = $completioninfo->get_data($cm);
             $data->completionstate = $completiondata->completionstate;
         }
-
         return $data;
     }
-
 
 }

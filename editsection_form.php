@@ -56,7 +56,6 @@ class editsection_form extends moodleform {
 
         // Prepare course and the editor.
         $mform->addElement('editor', 'summary_editor', get_string('summary'), null, $this->_customdata['editoroptions']);
-        $mform->addHelpButton('summary_editor', 'summary');
         $mform->setType('summary_editor', PARAM_RAW);
 
         $mform->addElement('hidden', 'id');
@@ -69,7 +68,7 @@ class editsection_form extends moodleform {
             $elements = $courseformat->create_edit_form_elements($mform, true);
         }
         // Check the moodle 4.3 higher.
-        if ($CFG->version >= 2023092300 && !empty($CFG->enableavailability)) {
+        if ($CFG->branch >= 403 && !empty($CFG->enableavailability)) {
 
             $mform->addElement('header', 'availabilityconditions',
                 get_string('restrictaccess', 'availability'));
@@ -105,7 +104,7 @@ class editsection_form extends moodleform {
 
         if (!empty($CFG->enableavailability)) {
             // Check the moodle 4.3 lower.
-            if ($CFG->version < 2023092300) {
+            if ($CFG->branch < 403) {
                 $mform->addElement('header', 'availabilityconditions',
                         get_string('restrictaccess', 'availability'));
                 $mform->setExpanded('availabilityconditions', false);
@@ -116,6 +115,7 @@ class editsection_form extends moodleform {
                 $mform->addElement('textarea', 'availabilityconditionsjson',
                         get_string('accessrestrictions', 'availability'));
             }
+
             \core_availability\frontend::include_all_javascript($course, null,
                     $this->_customdata['cs']);
         }
@@ -129,6 +129,7 @@ class editsection_form extends moodleform {
      * @param stdClass|array $defaultvalues object or array of default values
      */
     public function set_data($defaultvalues) {
+        global $CFG;
         if (!is_object($defaultvalues)) {
             // We need object for file_prepare_standard_editor.
             $defaultvalues = (object)$defaultvalues;
@@ -143,7 +144,6 @@ class editsection_form extends moodleform {
             $defaultvalues = \local_designer\options::prepare_sectioncardcta_editor_files($defaultvalues,
                 $this->_customdata['course']);
         }
-
         if (strval($defaultvalues->name) === '') {
             $defaultvalues->name = false;
         }

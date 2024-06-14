@@ -43,17 +43,60 @@ class content extends content_base {
      */
     protected $hasaddsection = true;
 
+
     /**
      * Export this data so it can be used as the context for a mustache template (core/inplace_editable).
      *
-     * @param renderer_base $output typically, the renderer that's calling this function
-     * @return stdClass data context for a mustache template
+     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @return \stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output) {
-        global $PAGE;
-        $data = parent::export_for_template($output);
-        $data->course = $this->format->get_course();
+        global $PAGE, $CFG;
+        $format = $this->format;
+        $course = $this->format->get_course();
 
+        $sections = $this->export_sections($output);
+        $initialsection = '';
+
+        if (!empty($sections)) {
+            $initialsection = array_shift($sections);
+        }
+
+        $data = (object) [
+            'title' => $format->page_title(), // This method should be in the course_format class.
+            'initialsection' => $initialsection,
+            'sections' => $sections,
+            'format' => $format->get_format(),
+            'sectionreturn' => 0,
+        ];
+
+        $singlesection = $format->get_section_number();
+
+        // The single section format has extra navigation.
+        if ($singlesection) {
+            if (!$PAGE->theme->usescourseindex) {
+                $sectionnavigation = new $this->sectionnavigationclass($format, $singlesection);
+                $data->sectionnavigation = $sectionnavigation->export_for_template($output);
+
+                $sectionselector = new $this->sectionselectorclass($format, $sectionnavigation);
+                $data->sectionselector = $sectionselector->export_for_template($output);
+            }
+            $data->hasnavigation = true;
+            $data->singlesection = array_shift($data->sections);
+            $data->sectionreturn = $singlesection;
+        }
+
+        if ($this->hasaddsection) {
+            $addsection = new $this->addsectionclass($format);
+            $data->numsections = $addsection->export_for_template($output);
+        }
+
+        if ($CFG->branch >= 402 && method_exists($format, 'show_editor') && $format->show_editor()) {
+            $bulkedittools = new $this->bulkedittoolsclass($format);
+            $data->bulkedittools = $bulkedittools->export_for_template($output);
+        }
+
+        $data->course = $course;
         return $data;
     }
 
@@ -73,6 +116,7 @@ class content extends content_base {
         $sections = [];
         $stealthsections = [];
         $numsections = $format->get_last_section_number();
+
         foreach ($this->get_sections_to_display($modinfo) as $sectionnum => $thissection) {
             // The course/view.php check the section existence but the output can be called
             // from other parts so we need to check it.
@@ -131,7 +175,6 @@ class content extends content_base {
                 $modinfo->get_section_info($singlesection),
             ];
         }
-
         return $modinfo->get_section_info_all();
     }
 

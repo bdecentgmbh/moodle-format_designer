@@ -26,6 +26,7 @@ namespace format_designer\output\courseformat\content;
 
 use renderer_base;
 use stdClass;
+use context_course;
 
 /**
  * Base class to render a course section.
@@ -45,7 +46,7 @@ class section extends \core_courseformat\output\local\content\section {
      * @return bool if the cm has name data
      */
     protected function add_format_data(stdClass &$data, array $haspartials, renderer_base $output): bool {
-        global $PAGE;
+        global $PAGE, $CFG;
 
         $section = $this->section;
         $format = $this->format;
@@ -56,6 +57,19 @@ class section extends \core_courseformat\output\local\content\section {
             $data->collapsemenu = true;
         }
 
+        if (method_exists($this, 'is_section_collapsed')) {
+            $data->contentcollapsed = $this->is_section_collapsed();
+        } else {
+            $data->contentcollapsed = false;
+            $preferences = $format->get_sections_preferences();
+            if (isset($preferences[$section->id])) {
+                $sectionpreferences = $preferences[$section->id];
+                if (!empty($sectionpreferences->contentcollapsed)) {
+                    $data->contentcollapsed = true;
+                }
+            }
+        }
+
         if ($format->is_section_current($section)) {
             $data->iscurrent = true;
             $data->currentlink = get_accesshide(
@@ -64,11 +78,13 @@ class section extends \core_courseformat\output\local\content\section {
         }
 
         $renderer = $this->format->get_renderer($PAGE);
-        if ($data->iscoursedisplaymultipage && !$format->get_section_number()) {
+        $sectionnum = $format->get_section_number();
+
+        if ($data->iscoursedisplaymultipage && !$sectionnum) {
             $formatdata = (array) $renderer->render_section_data($this->section, $this->format->get_course(), false, true);
         } else {
             $formatdata = (array) $renderer->render_section_data(
-                $this->section, $this->format->get_course(), $format->get_section_number()
+                $this->section, $this->format->get_course(), $sectionnum
             );
         }
         $data = (object) array_merge((array) $data, $formatdata);

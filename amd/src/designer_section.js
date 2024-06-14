@@ -75,20 +75,8 @@
         };
         this.expandSection();
 
-        if ($('.course-type-flow').length > 0) {
-            $('.collapse').on('show.bs.collapse', function() {
-                $(this).parents('li.section').addClass('stack-header-collapsing');
-                var sectionid = $(this).parents('li.section').attr('id');
-                var section = document.getElementById(sectionid);
-                var distance = section.offsetTop - document.body.scrollTop;
-                setTimeout(() => window.scroll(0, distance), 50);
-            }).on('shown.bs.collapse', function() {
-                $(this).parents('li.section').removeClass('stack-header-collapsing');
-            });
-        }
-
-        var contactModal = document.getElementsByClassName('toggle-contact-button');
-        Array.from(contactModal).forEach(function(element) {
+        var contactModalHandler = document.getElementsByClassName('toggle-contact-button');
+        Array.from(contactModalHandler).forEach(function(element) {
             element.addEventListener('click', function(e) {
                 e.preventDefault();
                 if (e.currentTarget.dataset.userid != undefined) {

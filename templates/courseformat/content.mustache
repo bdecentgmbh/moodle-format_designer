@@ -189,11 +189,11 @@
                 {{> core_courseformat/local/content/sectionnavigation }}
             {{/ core_courseformat/local/content/sectionnavigation }}
         {{/sectionnavigation}}
-        <ul class="{{format}} {{startclass}}">
-        {{#singlesection}}
-            {{$content}}  {{/content}}
-        {{/singlesection}}
-        </ul>
+            <ul class="{{format}} {{startclass}}">
+                {{#singlesection}}
+                    {{$content}}  {{/content}}
+                {{/singlesection}}
+            </ul>
         {{#sectionselector}}
             {{$ core_courseformat/local/content/sectionselector }}
                 {{> core_courseformat/local/content/sectionselector }}
@@ -202,9 +202,11 @@
     </div>
     {{/hasnavigation}}
     {{#numsections}}
-        {{$ core_courseformat/local/content/addsection}}
-            {{> core_courseformat/local/content/addsection}}
-        {{/ core_courseformat/local/content/addsection}}
+        {{^singlesection}}
+            {{$ core_courseformat/local/content/addsection}}
+                {{> core_courseformat/local/content/addsection}}
+            {{/ core_courseformat/local/content/addsection}}
+        {{/singlesection}}
     {{/numsections}}
     {{#bulkedittools}}
         {{$ core_courseformat/local/content/bulkedittools}}

@@ -45,22 +45,44 @@ use core\output\choicelist;
  */
 class controlmenu extends controlmenu_base {
 
-    /** @var course_format the course format class */
-    protected $format;
-
-    /** @var section_info the course section class */
-    protected $section;
-
     /**
-     * Constructor.
+     * Generate the default section action menu.
      *
-     * @param course_format $format the course format
-     * @param section_info $section the section info
+     * This method is public in case some block needs to modify the menu before output it.
+     *
+     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @return action_menu|null the activity action menu
      */
-    public function __construct(course_format $format, section_info $section) {
-        $this->format = $format;
-        $this->course = $format->get_course();
-        $this->section = $section;
+    public function get_default_action_menu(\renderer_base $output): ?action_menu {
+        $controls = $this->section_control_items();
+        if (empty($controls)) {
+            return null;
+        }
+
+        // Convert control array into an action_menu.
+        $menu = new action_menu();
+        $menu->set_kebab_trigger(get_string('edit'));
+        $menu->attributes['class'] .= ' section-actions';
+
+        foreach ($controls as $value) {
+            $value = (array) $value;
+            $url = empty($value['url']) ? '' : $value['url'];
+            $icon = empty($value['icon']) ? '' : $value['icon'];
+            if ($icon instanceof pix_icon) {
+                $icon = $icon->pix;
+            }
+            $name = empty($value['name']) ? '' : $value['name'];
+            $attr = empty($value['attr']) ? [] : $value['attr'];
+            $class = empty($value['pixattr']['class']) ? '' : $value['pixattr']['class'];
+            $al = new action_menu_link_secondary(
+                new moodle_url($url),
+                new pix_icon($icon, '', null, ['class' => "smallicon " . $class]),
+                $name,
+                $attr
+            );
+            $menu->add($al);
+        }
+        return $menu;
     }
 
     /**
@@ -74,8 +96,13 @@ class controlmenu extends controlmenu_base {
         $section = $this->section;
 
         $hassectiontypes = true;
-        if (($this->course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && !$this->format->get_section_number())
-            || $this->course->coursetype == DESIGNER_TYPE_FLOW) {
+
+        $sectionnum = $this->format->get_section_number();
+
+        $course = $this->format->get_course();
+
+        if (($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && !$sectionnum)
+            || $course->coursetype == DESIGNER_TYPE_FLOW) {
             $hassectiontypes = false;
         }
 
@@ -117,30 +144,30 @@ class controlmenu extends controlmenu_base {
                     'name' => get_string('link', 'format_designer'),
                     'active' => empty($this->format->get_section_option($section->id, 'sectiontype'))
                         || $this->format->get_section_option($section->id, 'sectiontype') == 'default',
-                    'url' => new moodle_url('/course/view.php', ['id' => $this->course->id], 'section-' . $section->section),
+                    'url' => new moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $section->section),
                 ],
                 [
                     'type' => 'list',
                     'name' => get_string('list', 'format_designer'),
                     'active' => $this->format->get_section_option($section->id, 'sectiontype') == 'list',
-                    'url' => new moodle_url('/course/view.php', ['id' => $this->course->id], 'section-' . $section->section),
+                    'url' => new moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $section->section),
                 ],
                 [
                     'type' => 'cards',
                     'name' => get_string('cards', 'format_designer'),
                     'active' => $this->format->get_section_option($section->id, 'sectiontype') == 'cards',
-                    'url' => new moodle_url('/course/view.php', ['id' => $this->course->id], 'section-' . $section->section),
+                    'url' => new moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $section->section),
                 ],
             ];
 
             if (format_designer_has_pro()) {
-                $prosectiontypes = \local_designer\info::get_layout_menu($this->format, $section, $this->course);
+                $prosectiontypes = \local_designer\info::get_layout_menu($this->format, $section, $course);
                 $sectiontypes = array_merge($sectiontypes, $prosectiontypes);
             }
 
         }
 
-        $data = (object)[
+        $data = (object) [
             'menu' => $output->render($menu),
             'hasmenu' => true,
             'id' => $section->id,
@@ -148,7 +175,6 @@ class controlmenu extends controlmenu_base {
             'is_subpanel' => format_designer_is_support_subpanel(),
             'hassectiontypes' => $hassectiontypes,
         ];
-
         return $data;
     }
 
@@ -162,12 +188,13 @@ class controlmenu extends controlmenu_base {
      * @return array of edit control items
      */
     public function section_control_items() {
-        global $USER;
+        global $USER, $PAGE, $CFG;
 
         $format = $this->format;
         $section = $this->section;
         $course = $format->get_course();
         $sectionreturn = $format->get_section_number();
+
         $user = $USER;
 
         $usecomponents = $format->supports_components();
@@ -178,9 +205,12 @@ class controlmenu extends controlmenu_base {
         $baseurl = course_get_url($course, $sectionreturn);
         $baseurl->param('sesskey', sesskey());
 
+        $course = $format->get_course();
+
         $controls = [];
 
         if (!$isstealth && has_capability('moodle/course:update', $coursecontext, $user)) {
+
             if ($section->section > 0
                 && get_string_manager()->string_exists('editsection', 'format_'.$format->get_format())) {
                 $streditsection = get_string('editsection', 'format_'.$format->get_format());
@@ -196,31 +226,33 @@ class controlmenu extends controlmenu_base {
                 'attr' => ['class' => 'icon edit'],
             ];
 
-            $hassectiontypes = true;
-            if (($this->course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && !$this->format->get_section_number())
-                || $this->course->coursetype == DESIGNER_TYPE_FLOW) {
-                $hassectiontypes = false;
-            }
+            if ($CFG->branch >= 402) {
+                $hassectiontypes = true;
+                if (($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && !$sectionreturn)
+                    || $course->coursetype == DESIGNER_TYPE_FLOW) {
+                    $hassectiontypes = false;
+                }
 
-            if (format_designer_is_support_subpanel() && $hassectiontypes) {
-                $controls['sectionlayout'] = new action_menu_subpanel(
-                    get_string('strsectionlayout', 'format_designer'),
-                    $this->get_choice_list($section),
-                    ['data-value' => 'section-designer-action'],
-                    new pix_icon('t/hide', '', 'moodle', ['class' => 'iconsmall'])
-                );
-            }
+                if (format_designer_is_support_subpanel() && $hassectiontypes) {
+                    $controls['sectionlayout'] = new action_menu_subpanel(
+                        get_string('strsectionlayout', 'format_designer'),
+                        $this->get_choice_list($section),
+                        ['data-value' => 'section-designer-action'],
+                        new pix_icon('t/hide', '', 'moodle', ['class' => 'iconsmall'])
+                    );
+                }
 
-            $duplicatesectionurl = clone($baseurl);
-            $duplicatesectionurl->param('section', $section->section);
-            $duplicatesectionurl->param('duplicatesection', $section->section);
-            $controls['duplicate'] = [
-                'url' => $duplicatesectionurl,
-                'icon' => 't/copy',
-                'name' => get_string('duplicate'),
-                'pixattr' => ['class' => ''],
-                'attr' => ['class' => 'icon duplicate'],
-            ];
+                $duplicatesectionurl = clone($baseurl);
+                $duplicatesectionurl->param('section', $section->section);
+                $duplicatesectionurl->param('duplicatesection', $section->section);
+                $controls['duplicate'] = [
+                    'url' => $duplicatesectionurl,
+                    'icon' => 't/copy',
+                    'name' => get_string('duplicate'),
+                    'pixattr' => ['class' => ''],
+                    'attr' => ['class' => 'icon duplicate'],
+                ];
+            }
         }
 
         if ($section->section) {
@@ -239,7 +271,7 @@ class controlmenu extends controlmenu_base {
                             'attr' => [
                                 'class' => 'icon editing_showhide',
                                 'data-sectionreturn' => $sectionreturn,
-                                'data-action' => ($usecomponents) ? 'sectionHide' : 'hide',
+                                'data-action' => ($usecomponents) && ($CFG->branch > 400) ? 'sectionHide' : 'hide',
                                 'data-id' => $section->id,
                                 'data-swapname' => $strshowfromothers,
                                 'data-swapicon' => 'i/show',
@@ -341,12 +373,13 @@ class controlmenu extends controlmenu_base {
                 ];
             }
         }
+
         if (
             has_any_capability([
                 'moodle/course:movesections',
                 'moodle/course:update',
                 'moodle/course:sectionvisibility',
-            ], $coursecontext)
+            ], $coursecontext) && $CFG->branch >= 402
         ) {
             $sectionlink = new moodle_url(
                 '/course/view.php',
@@ -374,7 +407,6 @@ class controlmenu extends controlmenu_base {
      * @return choicelist
      */
     public function get_choice_list($section): choicelist {
-
         $sectiontype = $this->format->get_section_option($section->id, 'sectiontype');
         $sectiontype = $sectiontype ? $sectiontype : get_config('format_designer', 'sectiontype');
         $choice = $this->create_choice_list($section);
@@ -398,8 +430,9 @@ class controlmenu extends controlmenu_base {
             'list' => get_string('list', 'format_designer'),
             'cards' => get_string('cards', 'format_designer'),
         ];
+
         if (format_designer_has_pro()) {
-            $prosectiontypes = \local_designer\info::get_layout_menu($this->format, $section, $this->course);
+            $prosectiontypes = \local_designer\info::get_layout_menu($this->format, $section, $this->format->get_course());
             $lists = array_merge($lists, array_column($prosectiontypes, 'name', 'type'));
         }
 
@@ -407,7 +440,7 @@ class controlmenu extends controlmenu_base {
             $choice->add_option(
                 $key,
                 $value,
-                $this->get_option_data( $key)
+                $this->get_option_data($key)
             );
         }
 
