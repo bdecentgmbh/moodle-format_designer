@@ -147,6 +147,32 @@ if ($ADMIN->fulltree) {
         get_string('modtrimlength_desc', 'format_designer'), 23, PARAM_INT);
     $activitypage->add($setting);
 
+    // Activity elements list to manage the visibility - Activity page continue.
+    $elements = [
+        'icon' => 1,
+        'visits' => 4,
+        'calltoaction' => 4,
+        'title' => 1,
+        'description' => 1,
+        'modname' => 4,
+        'completionbadge' => 1,
+    ];
+    $choice = [
+        1 => get_string('show'),
+        0 => get_string('hide'),
+        2 => get_string('showonhover', 'format_designer'),
+        3 => get_string('hideonhover', 'format_designer'),
+        4 => get_string('remove'),
+    ];
+    foreach ($elements as $element => $defaultvalue) {
+        $name = 'format_designer/activityelements_'.$element;
+        $title = get_string('activity:'.$element, 'format_designer');
+        $desc = '';
+        $default = ['value' => $defaultvalue, 'fix' => 0];
+        $setting = new admin_setting_configselect_with_advanced($name, $title, $desc, $default, $choice);
+        $activitypage->add($setting);
+    }
+
     if (format_designer_has_pro()
          && file_exists($CFG->dirroot.'/local/designer/setting.php')) {
         require_once($CFG->dirroot.'/local/designer/setting.php');

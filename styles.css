@@ -189,7 +189,6 @@
     margin-top: 10px;
 }
 .format-designer .course-content ul.designer.course-type-flow li.section .availability-section-block + div {
-    max-height: 66%;
     overflow: hidden;
     text-overflow: ellipsis;
     -webkit-box-orient: vertical;
@@ -3085,6 +3084,8 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 }
 .format-designer .course-content ul.designer.course-type-flow {
     margin-top: 30px;
+    display: flex;
+    flex-wrap: wrap;
 }
 .format-designer .course-content ul.course-type-flow.designer .section.main .section-content-wrapper {
     display: contents;
@@ -3330,12 +3331,15 @@ li.section.main.section-background-color:not(.section-header-image)
     }
     .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text li.activity.flow-card-small {
         width: 320px;
+        max-width: 320px;
     }
     .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text li.activity.flow-card-medium {
         width: 360px;
+        max-width: 360px;
     }
     .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text li.activity.flow-card-large {
         width: 400px;
+        max-width: 400px;
     }
     .format-designer .designer.course-type-flow .section .content .section.card-layout li.activity.flow-card-small .card.card-list {
         min-height: 320px;
