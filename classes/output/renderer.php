@@ -460,7 +460,6 @@ class renderer extends \core_courseformat\output\section_renderer {
 
         // Get course staffs to show on course header.
         $coursestaffs = helper::create()->get_course_staff_users($course);
-
         $data = [
             'course' => $course,
             'enrolmentstartdate' => ($enrolmentstartdate) ? $enrolstartdate : '',
@@ -1491,11 +1490,11 @@ class renderer extends \core_courseformat\output\section_renderer {
     public function get_flow_size($course) {
         $sizeclass = '';
         if ($course->flowsize == 1) {
-            $sizeclass = 'flow-card-medium';
+            $sizeclass = 'flow-card-medium ';
         } else if ($course->flowsize == 2) {
-            $sizeclass = 'flow-card-large';
+            $sizeclass = 'flow-card-large ';
         } else {
-            $sizeclass = 'flow-card-small';
+            $sizeclass = 'flow-card-small ';
         }
         $flowsizeclass = isset($course->flowsize) ? $sizeclass : '';
         return $flowsizeclass;

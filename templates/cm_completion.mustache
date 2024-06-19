@@ -38,7 +38,7 @@
         {{^ispreview}}
             {{! Show completion info for users/students }}
             {{#completiontrackingmanual}}
-            <form action="{{{completioncheckbox.url}}}" method="post" class="togglecompletion preventjs">
+            <form action="{{{completioncheckbox.url}}}" method="post">
                 {{#completioncheckbox}} {{{completioncheckbox.inputfield}}} {{/completioncheckbox}}
                 {{#completionincomplete}}
                 <button class="{{completioncheckbox.buttonclass}} btn-outline-secondary border-badge-{{colorclass}}" data-action="toggle-manual-completion" 
