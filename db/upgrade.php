@@ -106,5 +106,17 @@ function xmldb_format_designer_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2023040601, 'format', 'designer');
     }
 
+
+    if ($oldversion < 2024073100) {
+        $deletesql = <<<EOF
+            SELECT fdo.id AS optionid
+                FROM {format_designer_options} fdo
+                LEFT JOIN {course_modules} cm ON cm.id = fdo.cmid
+                WHERE cm.id IS NULL
+        EOF;
+        $DB->delete_records_subquery('format_designer_options', 'id', 'optionid', $deletesql);
+        upgrade_plugin_savepoint(true, 2024073100, 'format', 'designer');
+    }
+
     return true;
 }
