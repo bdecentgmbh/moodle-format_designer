@@ -106,7 +106,6 @@ function xmldb_format_designer_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2023040601, 'format', 'designer');
     }
 
-
     if ($oldversion < 2024073000) {
         $deletesql = <<<EOF
             SELECT fdo.id AS optionid
