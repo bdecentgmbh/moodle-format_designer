@@ -89,8 +89,10 @@ class helper {
 
         // Course context.
         $coursecontext = \context_course::instance($course->id);
+
         // List of staff users ids for the course.
         $staffids = $this->get_staffs_users($course);
+
         // Staff users are not found.
         if (empty($staffids)) {
             return [];
@@ -108,6 +110,7 @@ class helper {
                     }
                 }
             }
+
             $roles = get_user_roles($coursecontext, $userid, false);
             array_map(function($role) {
                 $role->name = role_get_name($role);
@@ -154,17 +157,12 @@ class helper {
      */
     protected function get_staffs_users($course) {
         $staffids = [];
-        $staffroleids = explode(",", $course->coursestaff);
-        $enrolusers = enrol_get_course_users_roles($course->id);
-        if (!empty($enrolusers)) {
-            foreach ($enrolusers as $userid => $roles) {
-                foreach ($staffroleids as $staffid) {
-                    if (isset($roles[$staffid])) {
-                        $staffids[] = $userid;
-                    }
-                }
-            }
+        if (!empty($course->coursestaff)) {
+            $staffroleids = explode(",", $course->coursestaff);
+            $coursecontext = \context_course::instance($course->id);
+            $staffids = get_role_users($staffroleids, $coursecontext, false, 'ra.id, u.lastname, u.firstname, u.id');
         }
-        return array_unique($staffids);
+        return array_keys($staffids);
+
     }
 }

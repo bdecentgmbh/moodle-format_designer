@@ -447,6 +447,7 @@ class format_designer extends \core_courseformat\base {
         return $this->designer_course_format_options($foreditform);
     }
 
+
     /**
      * Designer course format options list.
      *
@@ -458,6 +459,7 @@ class format_designer extends \core_courseformat\base {
         static $courseformatoptions = false;
         $teacher = get_archetype_roles('editingteacher');
         $teacher = reset($teacher);
+        $courseformatoptionsedit = [];
         if ($courseformatoptions === false) {
             $courseconfig = get_config('moodlecourse');
             $courseformatoptions = [
@@ -569,6 +571,12 @@ class format_designer extends \core_courseformat\base {
                             'default' => 0,
                             'type' => PARAM_INT,
                         ];
+                        $courseformatoptionsedit[$field->inputname] = [
+                            'label' => $field->field->name,
+                            'element_type' => 'advcheckbox',
+                            'help' => 'profilefieditem',
+                            'help_component' => 'format_designer',
+                        ];
                     }
                 }
             }
@@ -600,7 +608,7 @@ class format_designer extends \core_courseformat\base {
         }
 
         if ($foreditform && !isset($courseformatoptions['coursedisplay']['label'])) {
-            $courseformatoptionsedit = [
+            $courseformatoptionsedit += [
                 'hiddensections' => [
                     'label' => new lang_string('hiddensections'),
                     'help' => 'hiddensections',
@@ -825,7 +833,7 @@ class format_designer extends \core_courseformat\base {
                 'help_component' => 'format_designer',
             ];
 
-            if (format_designer_has_pro() != 1 ) {
+           /*  if (format_designer_has_pro() != 1 ) {
                 $userprofilefields = profile_get_user_fields_with_data(0);
                 if (!empty($userprofilefields)) {
                     foreach ($userprofilefields as $field) {
@@ -837,7 +845,9 @@ class format_designer extends \core_courseformat\base {
                         ];
                     }
                 }
-            }
+            } */
+
+
 
             $courseformatoptionsedit['courseheroactivityheader'] = [
                 'label' => new lang_string('heroactivity', 'format_designer'),
@@ -1658,7 +1668,6 @@ class format_designer extends \core_courseformat\base {
      */
     public function get_section_options(int $sectionid): array {
         global $DB;
-
         return $DB->get_records_menu('course_format_options', [
             'courseid' => $this->courseid,
             'format' => 'designer',
@@ -2161,7 +2170,6 @@ function format_designer_course_has_videotime($course) {
  */
 function format_designer_extend_navigation_course($navigation, $course, $context) {
     global $DB, $PAGE, $COURSE;
-
     if ($course->format != 'designer') {
         return;
     }
@@ -2242,12 +2250,11 @@ function format_designer_extend_navigation_course($navigation, $course, $context
             $modbacktomain .= html_writer::end_tag("li");
         }
     }
-
     $sql = "SELECT fd.* FROM
-        {format_designer_options} fd
-        JOIN {course_modules} cm ON fd.cmid = cm.id
-        WHERE courseid = :courseid AND cm.deletioninprogress = 0 AND
-        (fd.name='heroactivity' OR fd.name='heroactivitypos') ORDER BY fd.cmid DESC";
+            {format_designer_options} fd
+            JOIN {course_modules} cm ON fd.cmid = cm.id
+            WHERE courseid = :courseid AND cm.deletioninprogress = 0 AND
+            (fd.name='heroactivity' OR fd.name='heroactivitypos') ORDER BY fd.cmid DESC";
     $records = $DB->get_records_sql($sql, ['courseid' => $course->id]);
     $neg = [];
     $pos = [];
@@ -2258,9 +2265,11 @@ function format_designer_extend_navigation_course($navigation, $course, $context
             $reports[$record->cmid]['cmid'] = $record->cmid;
         }
     }
+
     $neg = [];
     $pos = [];
     $reports = format_designer_section_zero_tomake_hero($reports, $course);
+
     if ($reports) {
         foreach ($reports as $report) {
             if ($report['heroactivitypos'] < 0) {
@@ -2580,4 +2589,9 @@ function format_designer_is_support_subpanel() {
         return true;
     }
     return false;
+}
+
+
+function format_designer_get_cache_object() {
+    return cache::make('format_designer', 'designeroptions');
 }

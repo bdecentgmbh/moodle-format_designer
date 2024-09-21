@@ -38,7 +38,43 @@ $observers = [
         'callback' => '\format_designer\events::course_module_deleted',
     ],
     [
+        'eventname' => 'core\event\course_completed',
+        'callback' => '\format_designer\events::course_completed',
+    ],
+    [
+        'eventname' => 'core\event\course_module_completion_updated',
+        'callback' => '\format_designer\events::course_module_completion_updated',
+    ],
+    [
         'eventname' => 'core\event\course_deleted',
         'callback' => '\format_designer\events::course_deleted',
+    ],
+    [
+        'eventname' => 'core\event\course_completion_updated',
+        'callback' => '\format_designer\events::course_completion_updated',
+    ],
+    [
+        'eventname' => 'core\event\course_updated',
+        'callback' => '\format_designer\events::course_updated',
+    ],
+    [
+        'eventname' => 'core\event\course_module_created',
+        'callback' => '\format_designer\events::course_module_created',
+    ],
+    [
+        'eventname' => 'core\event\course_module_updated',
+        'callback' => '\format_designer\events::course_module_updated',
+    ],
+    [
+        'eventname' => 'core\event\course_module_deleted',
+        'callback' => '\format_designer\events::course_module_deleted',
+    ],
+    [
+        'eventname' => 'core\event\course_section_deleted',
+        'callback' => '\format_designer\events::course_section_deleted',
+    ],
+    [
+        'eventname' => 'core\event\course_section_updated',
+        'callback' => '\format_designer\events::course_section_updated',
     ],
 ];

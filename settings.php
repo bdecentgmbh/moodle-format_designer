@@ -167,6 +167,7 @@ if ($ADMIN->fulltree) {
         3 => get_string('hideonhover', 'format_designer'),
         4 => get_string('remove'),
     ];
+
     foreach ($elements as $element => $defaultvalue) {
         $name = 'format_designer/activityelements_'.$element;
         $title = get_string('activity:'.$element, 'format_designer');

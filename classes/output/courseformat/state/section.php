@@ -58,6 +58,7 @@ class section extends \core_courseformat\output\local\state\section {
         if ($sectionurlinfo instanceof moodle_url) {
             $sectionurl = $sectionurlinfo->out(false);
         }
+
         $data = [
             'id' => $section->id,
             'section' => $section->section,

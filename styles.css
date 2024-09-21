@@ -38,6 +38,7 @@
         padding-right: 0;
     }
 }
+
 .format-designer.path-mod .header-maxwidth,
 .format-designer.path-admin .header-maxwidth {
     padding: 0 3rem;
@@ -526,8 +527,6 @@ body.format-designer.editing ul.designer .section .circles-layout .activity .edi
     border: 0;
     background-size: cover;
     background-repeat: no-repeat;
-    /* position: relative;
-    z-index: 0; */
 }
 .format-designer .course-content ul.designer li.section.main .section-content-wrapper {
     position: relative;
@@ -713,7 +712,6 @@ span.section-collapse-icon:before {
 .format-designer #page #page-content section#region-main {
     padding: 15px 10px;
     border-radius: 5px;
-    overflow: auto;
 }
 .format-designer.path-course-view.pagelayout-course #page #page-content section#region-main {
     padding: 0;
@@ -761,6 +759,7 @@ span.section-collapse-icon:before {
         margin-left: 0;
     }
 }
+
 .format-designer .course-content ul.designer li.section .left,
 .format-designer .course-content ul.designer li.section .right {
     width: auto;
@@ -791,6 +790,7 @@ span.section-collapse-icon:before {
         display: none;
     }
 }
+
 .format-designer .designer .section.img-text .activity .row > div:nth-child(2) .pull-right {
     text-align: center;
     float: none;
