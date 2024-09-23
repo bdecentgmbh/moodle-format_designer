@@ -48,9 +48,6 @@ class loader extends \cache_application {
     public function delete_vaild_section_completed_cache($courseid, $sectionid = 0) {
         $store = $this->get_store();
         $prefix = "v_s_c_c_{$courseid}";
-        if ($sectionid) {
-            $prefix .= "_s_{$sectionid}";
-        }
         if ($list = $store->find_by_prefix($prefix)) {
             $keys = array_map(function($key) {
                 $key = current(explode('-', $key));

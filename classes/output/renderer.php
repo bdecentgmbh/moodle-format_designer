@@ -675,7 +675,7 @@ class renderer extends \core_courseformat\output\section_renderer {
                 }
             }
 
-            if ($isapplycompletioncourses  && $complteioncourses) {
+            if ($isapplycompletioncourses && $complteioncourses) {
                 foreach ($complteioncourses as $coursecriteria) {
                     $courseid = $coursecriteria->courseinstance;
                     $course = get_course($courseid);
@@ -690,6 +690,7 @@ class renderer extends \core_courseformat\output\section_renderer {
                     }
                 }
             }
+
 
             if (format_designer_has_pro()) {
                 $sectiontooltiplink = '';
@@ -706,8 +707,8 @@ class renderer extends \core_courseformat\output\section_renderer {
                                     ($course->calsectionprogress == DESIGNER_PROGRESS_RELEVANTACTIVITIES) ? true : false;
                             if (\format_designer\options::is_section_completed($section, $course, $modinfo,
                                 true, $realtiveactivities)) {
-                                $completed += 1;
-                                $completedcriteria[] = $sectiontooltiplink;
+                                    $completed += 1;
+                                    $completedcriteria[] = $sectiontooltiplink;
                             } else {
                                 if (\format_designer\options::is_vaild_section_completed($section, $course,
                                     $modinfo, $realtiveactivities) == "true") {
@@ -717,8 +718,9 @@ class renderer extends \core_courseformat\output\section_renderer {
                         }
                     }
                 }
-                $completedcriteria[] = $sectiontooltiplink;
             }
+
+
 
             $percent = ($completed / $count) * 100;
             $completioncriteriahtml = '';
