@@ -58,7 +58,8 @@ class events {
                 $sectiondata[$name] = get_config('format_designer', $name);
             }
         }
-        if (!defined('NO_OUTPUT_BUFFERING') || (defined('NO_OUTPUT_BUFFERING') && !NO_OUTPUT_BUFFERING)) {
+        if (!defined('NO_OUTPUT_BUFFERING') || (defined('NO_OUTPUT_BUFFERING') && !NO_OUTPUT_BUFFERING)
+            && (!defined('AJAX_SCRIPT') || AJAX_SCRIPT == '0')) {
             $format->update_section_format_options($sectiondata);
         }
     }

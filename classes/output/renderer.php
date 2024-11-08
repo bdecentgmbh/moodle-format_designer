@@ -700,7 +700,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             }
         }
 
-        $percent = ($completed / $count) * 100;
+        $percent = ($count > 0) ? (($completed / $count) * 100) : 0;
         $completioncriteriahtml = '';
         $uncompletioncriteriahtml = '';
 
