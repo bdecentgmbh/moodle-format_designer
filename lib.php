@@ -458,6 +458,7 @@ class format_designer extends \core_courseformat\base {
         static $courseformatoptions = false;
         $teacher = get_archetype_roles('editingteacher');
         $teacher = reset($teacher);
+        $courseformatoptionsedit = [];
         if ($courseformatoptions === false) {
             $courseconfig = get_config('moodlecourse');
             $courseformatoptions = [
@@ -569,6 +570,12 @@ class format_designer extends \core_courseformat\base {
                             'default' => 0,
                             'type' => PARAM_INT,
                         ];
+                        $courseformatoptionsedit[$field->inputname] = [
+                            'label' => $field->field->name,
+                            'element_type' => 'advcheckbox',
+                            'help' => 'profilefieditem',
+                            'help_component' => 'format_designer',
+                        ];
                     }
                 }
             }
@@ -600,7 +607,7 @@ class format_designer extends \core_courseformat\base {
         }
 
         if ($foreditform && !isset($courseformatoptions['coursedisplay']['label'])) {
-            $courseformatoptionsedit = [
+            $courseformatoptionsedit += [
                 'hiddensections' => [
                     'label' => new lang_string('hiddensections'),
                     'help' => 'hiddensections',
@@ -824,20 +831,6 @@ class format_designer extends \core_courseformat\base {
                 'help' => 'displayheaderroleusers',
                 'help_component' => 'format_designer',
             ];
-
-            if (format_designer_has_pro() != 1 ) {
-                $userprofilefields = profile_get_user_fields_with_data(0);
-                if (!empty($userprofilefields)) {
-                    foreach ($userprofilefields as $field) {
-                        $courseformatoptionsedit[$field->inputname] = [
-                            'label' => $field->field->name,
-                            'element_type' => 'advcheckbox',
-                            'help' => 'profilefieditem',
-                            'help_component' => 'format_designer',
-                        ];
-                    }
-                }
-            }
 
             $courseformatoptionsedit['courseheroactivityheader'] = [
                 'label' => new lang_string('heroactivity', 'format_designer'),
@@ -2577,4 +2570,12 @@ function format_designer_is_support_subpanel() {
         return true;
     }
     return false;
+}
+
+/**
+ * Designer get the cache object.
+ * @return cache_application|cache_session|cache_store
+ */
+function format_designer_get_cache_object() {
+    return cache::make('format_designer', 'designeroptions');
 }
