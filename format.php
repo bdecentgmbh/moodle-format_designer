@@ -52,7 +52,7 @@ course_create_sections_if_missing($course, 0);
 $renderer = $PAGE->get_renderer('format_designer');
 
 if (!empty($displaysection)) {
-    $format->set_section_number($displaysection);
+    $format->set_sectionnum($displaysection);
 }
 $outputclass = $format->get_output_classname('content');
 

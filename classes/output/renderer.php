@@ -40,7 +40,6 @@ use stdclass;
 use format_designer\output\call_to_action;
 use format_designer\output\cm_completion;
 
-require_once($CFG->dirroot.'/course/format/renderer.php');
 require_once($CFG->dirroot.'/course/format/designer/lib.php');
 
 /**
@@ -100,13 +99,19 @@ class renderer extends \core_courseformat\output\section_renderer {
             $startclass[] = 'kanban-board';
             $data->kanbanmode = true;
         }
+
         $data->startid = $startid;
 
-        $data->issectionpageclass = ($data->initialsection->sectionreturnid != 0) ? 'section-page-layout' : '';
+        $format = course_get_format($course);
+        $singlesection = $format->get_sectionnum();
+
+        $data->issectionpageclass = $singlesection || ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE)
+            ? 'section-page-layout' : '';
 
         if (!format_designer_has_pro()) {
             $data->headermetadata = $this->course_header_metadata_details($course);
         }
+
         if (format_designer_has_pro()) {
             $startclass[] = ($course->activitydisplaymode == 'bypurpose') ? 'activity-purpose-mode' : 'activity-default-mode';
         }
@@ -455,7 +460,6 @@ class renderer extends \core_courseformat\output\section_renderer {
 
         // Get course staffs to show on course header.
         $coursestaffs = helper::create()->get_course_staff_users($course);
-
         $data = [
             'course' => $course,
             'enrolmentstartdate' => ($enrolmentstartdate) ? $enrolstartdate : '',
@@ -515,25 +519,29 @@ class renderer extends \core_courseformat\output\section_renderer {
      */
     public function due_overdue_activities_count(): array {
         global $USER, $DB;
-        $duecount = $overduecount = 0;
-        $modinfo = $this->modinfo;
-        $completion = new \completion_info($this->modinfo->get_course());
-
-        foreach ($modinfo->sections as $modnumbers) {
-            foreach ($modnumbers as $modnumber) {
-                $mod = $modinfo->cms[$modnumber];
-                if (!empty($mod) && $DB->record_exists('course_modules', ['id' => $mod->id, 'deletioninprogress' => 0])
-                         && $mod->uservisible) {
-                    $data = $completion->get_data($mod, true, $USER->id);
-                    if ($data->completionstate != COMPLETION_COMPLETE) {
-                        $cmcompletion = new cm_completion($mod);
-                        $overduecount = ($cmcompletion->is_overdue()) ? $overduecount + 1 : $overduecount;
-                        $duecount = ($cmcompletion->is_due_today()) ? $duecount + 1 : $duecount;
+        $cache = format_designer_get_cache_object();
+        $cachekey = "d_o_a_c_c{$this->modinfo->get_course()->id}_u{$USER->id}";
+        if (!$cache->get($cachekey)) {
+            $duecount = $overduecount = 0;
+            $modinfo = $this->modinfo;
+            $completion = new \completion_info($this->modinfo->get_course());
+            foreach ($modinfo->sections as $modnumbers) {
+                foreach ($modnumbers as $modnumber) {
+                    $mod = $modinfo->cms[$modnumber];
+                    if (!empty($mod) && $DB->record_exists('course_modules', ['id' => $mod->id, 'deletioninprogress' => 0])
+                            && $mod->uservisible) {
+                        $data = $completion->get_data($mod, true, $USER->id);
+                        if ($data->completionstate != COMPLETION_COMPLETE) {
+                            $cmcompletion = new cm_completion($mod);
+                            $overduecount = ($cmcompletion->is_overdue()) ? $overduecount + 1 : $overduecount;
+                            $duecount = ($cmcompletion->is_due_today()) ? $duecount + 1 : $duecount;
+                        }
                     }
                 }
             }
+            $cache->set($cachekey, ['dues' => $duecount, 'overdues' => $overduecount]);
         }
-        return ['dues' => $duecount, 'overdues' => $overduecount];
+        return $cache->get($cachekey);
     }
 
     /**
@@ -542,15 +550,20 @@ class renderer extends \core_courseformat\output\section_renderer {
      * @return cm_info[] Array from $cmid => $cm of all activities with completion enabled,
      */
     public static function get_completion_activities($course) {
-        $modinfo = get_fast_modinfo($course);
-        $result = [];
-        foreach ($modinfo->get_cms() as $cm) {
-            if ($cm->completion != COMPLETION_TRACKING_NONE && !$cm->deletioninprogress
-                && $cm->is_visible_on_course_page()) {
-                $result[$cm->id] = $cm;
+        $cache = format_designer_get_cache_object();
+        $key = "g_c_a{$course->id}";
+        if (!$cache->get($key)) {
+            $modinfo = get_fast_modinfo($course);
+            $result = [];
+            foreach ($modinfo->get_cms() as $cm) {
+                if ($cm->completion != COMPLETION_TRACKING_NONE && !$cm->deletioninprogress
+                    && $cm->is_visible_on_course_page()) {
+                    $result[$cm->id] = $cm;
+                }
             }
+            $cache->set($key, $result);
         }
-        return $result;
+        return $cache->get($key);
     }
 
     /**
@@ -560,18 +573,23 @@ class renderer extends \core_courseformat\output\section_renderer {
      * @return int
      */
     public static function get_count_sections_incourse($course) {
-        $sections = 0;
-        $modinfo = get_fast_modinfo($course);
-        $realtiveactivities = isset($course->calsectionprogress) &&
-            ($course->calsectionprogress == DESIGNER_PROGRESS_RELEVANTACTIVITIES) ? true : false;
+        $cache = format_designer_get_cache_object();
+        $key = "g_c_s_ic{$course->id}";
+        if (!$cache->get($key)) {
+            $sections = 0;
+            $modinfo = get_fast_modinfo($course);
+            $realtiveactivities = isset($course->calsectionprogress) &&
+                ($course->calsectionprogress == DESIGNER_PROGRESS_RELEVANTACTIVITIES) ? true : false;
 
-        foreach ($modinfo->sections as $sectionno => $modnumbers) {
-            $section = course_get_format($course)->get_section($sectionno);
-            if (\format_designer\options::is_vaild_section_completed($section, $course, $modinfo, $realtiveactivities)) {
-                $sections += 1;
+            foreach ($modinfo->sections as $sectionno => $modnumbers) {
+                $section = course_get_format($course)->get_section($sectionno);
+                if (\format_designer\options::is_vaild_section_completed($section, $course, $modinfo, $realtiveactivities) == "true") {
+                    $sections += 1;
+                }
             }
+            $cache->set($key, $sections);
         }
-        return $sections;
+        return $cache->get($key);
     }
 
     /**
@@ -583,153 +601,166 @@ class renderer extends \core_courseformat\output\section_renderer {
      */
     public static function criteria_progress($course, $userid) {
         global $USER;
-        $completion = new \completion_info($course);
-        $modinfo = get_fast_modinfo($course);
-        $context = \context_course::instance($course->id);
-        // First, let's make sure completion is enabled.
-        if (!$completion->is_enabled()) {
-            return null;
-        }
+        $cache = format_designer_get_cache_object();
+        $cachekey = "c_p_c{$course->id}_u_{$userid}";
+        if ($cache->get($cachekey) === false) {
 
-        $result = [];
-        $completedcriteria = [];
-        $uncompletedcriteria = [];
-
-        // Get the number of modules that support completion.
-        $modules = self::get_completion_activities($course);
-        $completionactivities = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY);
-        $complteioncourses = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_COURSE);
-
-        $count = count($completionactivities);
-
-        $isapplycompletioncourses = false;
-        if (!isset($course->calcourseprogress)) {
-            $isapplycompletioncourses = true;
-        } else if ($course->calcourseprogress == DESIGNER_PROGRESS_CRITERIA) {
-            $isapplycompletioncourses = true;
-        }
-
-        if ($isapplycompletioncourses) {
-            $count += count($complteioncourses);
-        }
-        $cmidentifier = "moduleinstance";
-
-        if (format_designer_has_pro()) {
-            $format = course_get_format($course);
-            $course = $format->get_course();
-            if ($course->calcourseprogress == DESIGNER_PROGRESS_ALLACTIVITIES) {
-                $count = count($modules);
-                $completionactivities = $modules;
-                $cmidentifier = "id";
-            } else if ($course->calcourseprogress == DESIGNER_PROGRESS_SECTIONS) {
-                $completionactivities = [];
-                $count = self::get_count_sections_incourse($course);
+            $completion = new \completion_info($course);
+            if (!$completion->is_enabled()) {
+                $cache->set($cachekey, null);
             }
-        }
-        if (!$count) {
-            return null;
-        }
 
-        // Get the number of modules that have been completed.
-        $completed = 0;
-        if ($completionactivities) {
-            foreach ($completionactivities as $activity) {
-                $cmid = $activity->{$cmidentifier};
-                if (isset($modules[$cmid])) {
-                    $data = $completion->get_data($modules[$cmid], true, $userid);
-                    $completed += ($data->completionstate == COMPLETION_COMPLETE ||
-                        $data->completionstate == COMPLETION_COMPLETE_PASS) ? 1 : 0;
-                    $modtooltiplink = html_writer::link($modules[$cmid]->url,
-                        get_string('stractivity', 'format_designer') . ": " . $modules[$cmid]->name);
-                    if ($data->completionstate == COMPLETION_COMPLETE ||
-                            $data->completionstate == COMPLETION_COMPLETE_PASS) {
-                        $completedcriteria[] = $modtooltiplink;
-                    } else {
-                        $uncompletedcriteria[] = $modtooltiplink;
-                    }
+            $modinfo = get_fast_modinfo($course);
+            $context = \context_course::instance($course->id);
+            // First, let's make sure completion is enabled.
+
+            $result = [];
+            $completedcriteria = [];
+            $uncompletedcriteria = [];
+
+            // Get the number of modules that support completion.
+            $modules = self::get_completion_activities($course);
+            $completionactivities = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY);
+            $complteioncourses = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_COURSE);
+
+            $count = count($completionactivities);
+
+            $isapplycompletioncourses = false;
+            if (!isset($course->calcourseprogress)) {
+                $isapplycompletioncourses = true;
+            } else if ($course->calcourseprogress == DESIGNER_PROGRESS_CRITERIA) {
+                $isapplycompletioncourses = true;
+            }
+
+            if ($isapplycompletioncourses) {
+                $count += count($complteioncourses);
+            }
+            $cmidentifier = "moduleinstance";
+
+            if (format_designer_has_pro()) {
+                $format = course_get_format($course);
+                $course = $format->get_course();
+                if ($course->calcourseprogress == DESIGNER_PROGRESS_ALLACTIVITIES) {
+                    $count = count($modules);
+                    $completionactivities = $modules;
+                    $cmidentifier = "id";
+                } else if ($course->calcourseprogress == DESIGNER_PROGRESS_SECTIONS) {
+                    $completionactivities = [];
+                    $count = self::get_count_sections_incourse($course);
                 }
             }
-        }
 
-        if ($isapplycompletioncourses  && $complteioncourses) {
-            foreach ($complteioncourses as $coursecriteria) {
-                $courseid = $coursecriteria->courseinstance;
-                $course = get_course($courseid);
-                $completion = new \completion_info($course);
-                $coursetooltiplink = html_writer::link(new moodle_url('/course/view.php',
-                ['id' => $course->id]), get_string('strcourse', 'format_designer') . ": " . $course->fullname);
-                if ($completion->is_course_complete($userid)) {
-                    $completed += 1;
-                    $completedcriteria[] = $coursetooltiplink;
-                } else {
-                    $uncompletedcriteria[] = $coursetooltiplink;
-                }
+            if (!$count) {
+                $cache->set($cachekey, null);
             }
-        }
 
-        if (format_designer_has_pro()) {
-
-            if (isset($course->calcourseprogress) && $course->calcourseprogress == DESIGNER_PROGRESS_SECTIONS
-                && !empty($modinfo->sections)) {
-                foreach ($modinfo->sections as $sectionno => $modnumbers) {
-                    $section = course_get_format($course)->get_section($sectionno);
-                    if ($section->visible) {
-                        $sectionname = get_section_name($course, $section);
-                        $sectionurl = new moodle_url('/course/view.php', ['id' => $course->id, 'section' => $sectionno]);
-                        $sectiontooltiplink = html_writer::link($sectionurl,
-                                get_string('strsection', 'format_designer') . ": ". $sectionname);
-                        $realtiveactivities = isset($course->calsectionprogress) &&
-                                ($course->calsectionprogress == DESIGNER_PROGRESS_RELEVANTACTIVITIES) ? true : false;
-                        if (\format_designer\options::is_section_completed($section, $course, $modinfo,
-                            true, $realtiveactivities)) {
-                            $completed += 1;
-                            $completedcriteria[] = $sectiontooltiplink;
+            // Get the number of modules that have been completed.
+            $completed = 0;
+            if ($completionactivities) {
+                foreach ($completionactivities as $activity) {
+                    $cmid = $activity->{$cmidentifier};
+                    if (isset($modules[$cmid])) {
+                        $data = $completion->get_data($modules[$cmid], true, $userid);
+                        $completed += ($data->completionstate == COMPLETION_COMPLETE ||
+                            $data->completionstate == COMPLETION_COMPLETE_PASS) ? 1 : 0;
+                        $modtooltiplink = html_writer::link($modules[$cmid]->url,
+                            get_string('stractivity', 'format_designer') . ": " . $modules[$cmid]->name);
+                        if ($data->completionstate == COMPLETION_COMPLETE ||
+                                $data->completionstate == COMPLETION_COMPLETE_PASS) {
+                            $completedcriteria[] = $modtooltiplink;
                         } else {
-                            if (\format_designer\options::is_vaild_section_completed($section, $course,
-                                $modinfo, $realtiveactivities)) {
-                                $uncompletedcriteria[] = $sectiontooltiplink;
-                            }
+                            $uncompletedcriteria[] = $modtooltiplink;
                         }
                     }
                 }
             }
-        }
 
-        $percent = ($completed / $count) * 100;
-        $completioncriteriahtml = '';
-        $uncompletioncriteriahtml = '';
+            if ($isapplycompletioncourses  && $complteioncourses) {
+                foreach ($complteioncourses as $coursecriteria) {
+                    $courseid = $coursecriteria->courseinstance;
+                    $course = get_course($courseid);
+                    $completion = new \completion_info($course);
+                    $coursetooltiplink = html_writer::link(new moodle_url('/course/view.php',
+                    ['id' => $course->id]), get_string('strcourse', 'format_designer') . ": " . $course->fullname);
+                    if ($completion->is_course_complete($userid)) {
+                        $completed += 1;
+                        $completedcriteria[] = $coursetooltiplink;
+                    } else {
+                        $uncompletedcriteria[] = $coursetooltiplink;
+                    }
+                }
+            }
 
-        if (!empty($completedcriteria)) {
-            $completioncriteriahtml = html_writer::start_div('completion-criteria-toolblock designer-criteria-tooltip');
-                $completioncriteriahtml .= html_writer::start_div('head-block');
-                    $completioncriteriahtml .= get_string('struppercompleted', 'format_designer');
+            if (format_designer_has_pro()) {
+                $sectiontooltiplink = '';
+                if (isset($course->calcourseprogress) && $course->calcourseprogress == DESIGNER_PROGRESS_SECTIONS
+                    && !empty($modinfo->sections)) {
+                    foreach ($modinfo->sections as $sectionno => $modnumbers) {
+                        $section = course_get_format($course)->get_section($sectionno);
+                        if ($section->visible) {
+                            $sectionname = get_section_name($course, $section);
+                            $sectionurl = new moodle_url('/course/view.php', ['id' => $course->id, 'section' => $sectionno]);
+                            $sectiontooltiplink = html_writer::link($sectionurl,
+                                    get_string('strsection', 'format_designer') . ": ". $sectionname);
+                            $realtiveactivities = isset($course->calsectionprogress) &&
+                                    ($course->calsectionprogress == DESIGNER_PROGRESS_RELEVANTACTIVITIES) ? true : false;
+                            if (\format_designer\options::is_section_completed($section, $course, $modinfo,
+                                true, $realtiveactivities)) {
+                                $completed += 1;
+                                $completedcriteria[] = $sectiontooltiplink;
+                            } else {
+                                if (\format_designer\options::is_vaild_section_completed($section, $course,
+                                    $modinfo, $realtiveactivities) == "true") {
+                                    $uncompletedcriteria[] = $sectiontooltiplink;
+                                }
+                            }
+                        }
+                    }
+                }
+                $completedcriteria[] = $sectiontooltiplink;
+            }
+
+            $percent = ($count > 0) ? (($completed / $count) * 100) : 0;
+            $completioncriteriahtml = '';
+            $uncompletioncriteriahtml = '';
+
+            if (!empty($completedcriteria)) {
+                $completioncriteriahtml = html_writer::start_div('completion-criteria-toolblock designer-criteria-tooltip');
+                    $completioncriteriahtml .= html_writer::start_div('head-block');
+                        $completioncriteriahtml .= get_string('struppercompleted', 'format_designer');
+                    $completioncriteriahtml .= html_writer::end_div();
+                    $completioncriteriahtml .= html_writer::start_div('info-block');
+                    $completioncriteriahtml .= implode("<br>", $completedcriteria);
+                    $completioncriteriahtml .= html_writer::end_div();
+
                 $completioncriteriahtml .= html_writer::end_div();
-                $completioncriteriahtml .= html_writer::start_div('info-block');
-                $completioncriteriahtml .= implode("<br>", $completedcriteria);
-                $completioncriteriahtml .= html_writer::end_div();
+            }
 
-            $completioncriteriahtml .= html_writer::end_div();
+            if (!empty($uncompletedcriteria)) {
+                $uncompletioncriteriahtml = html_writer::start_div('uncompletion-criteria-toolblock designer-criteria-tooltip');
+                $uncompletioncriteriahtml .= html_writer::start_div('head-block');
+                    $uncompletioncriteriahtml .= get_string('strtodo', 'format_designer');
+                $uncompletioncriteriahtml .= html_writer::end_div();
+                $uncompletioncriteriahtml .= html_writer::start_div('info-block');
+                    $uncompletioncriteriahtml .= implode("<br>", $uncompletedcriteria);
+                $uncompletioncriteriahtml .= html_writer::end_div();
+                $uncompletioncriteriahtml .= html_writer::end_div();
+            }
+
+            $cachedata =  [
+                'count' => $count,
+                'completed' => $completed,
+                'percent' => round($percent),
+                'remain' => 100 - $percent,
+                'completioncriteriahtml' => $completioncriteriahtml,
+                'uncompletioncriteriahtml' => $uncompletioncriteriahtml,
+            ];
+
+            if (!$cache->get($cachekey)) {
+                $cache->set($cachekey, $cachedata);
+            }
         }
-
-        if (!empty($uncompletedcriteria)) {
-            $uncompletioncriteriahtml = html_writer::start_div('uncompletion-criteria-toolblock designer-criteria-tooltip');
-            $uncompletioncriteriahtml .= html_writer::start_div('head-block');
-                $uncompletioncriteriahtml .= get_string('strtodo', 'format_designer');
-            $uncompletioncriteriahtml .= html_writer::end_div();
-            $uncompletioncriteriahtml .= html_writer::start_div('info-block');
-                $uncompletioncriteriahtml .= implode("<br>", $uncompletedcriteria);
-            $uncompletioncriteriahtml .= html_writer::end_div();
-            $uncompletioncriteriahtml .= html_writer::end_div();
-        }
-
-        return [
-            'count' => $count,
-            'completed' => $completed,
-            'percent' => round($percent),
-            'remain' => 100 - $percent,
-            'completioncriteriahtml' => $completioncriteriahtml,
-            'uncompletioncriteriahtml' => $uncompletioncriteriahtml,
-        ];
+        return $cache->get($cachekey);
     }
 
 
@@ -875,7 +906,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         $sectionrestrict = (!$section->uservisible && $section->availableinfo) ? true : false;
 
         if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && $sectionheader
-            && $section->section > 0 && $format->is_section_visible($section, false)) {
+            && $format->is_section_visible($section, false)) {
             $gotosection = true;
         }
 
@@ -931,7 +962,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             $sectioncollapsestatus = 'show';
         }
         // Calculate section width for single section format.
-        $section->widthclass = ($course->coursedisplay && !$this->page->user_is_editing() && !$onsectionpage && $sectionheader)
+        $sectionwidthclass = ($course->coursedisplay && !$this->page->user_is_editing() && !$onsectionpage && $sectionheader)
             ? $this->generate_section_widthclass($section) : '';
 
         if ($course->coursedisplay && !$onsectionpage) {
@@ -941,6 +972,8 @@ class renderer extends \core_courseformat\output\section_renderer {
         $sectionstylerules = ($course->coursetype == DESIGNER_TYPE_KANBAN)
             ? (isset($course->listwidth) && $section->section != 0
             ? sprintf('width: %s;', $course->listwidth) : '') : '';
+
+        $showprerequisites = ($section->section == 0) || $format->get_sectionid() ? true : false;
         $templatecontext = [
             'section' => $section,
             'sectionvisible' => $format->is_section_visible($section, false),
@@ -959,7 +992,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             'sectioncontainerwidth' => $sectioncontainerwidth,
             'sectioncontentwidth' => $sectioncontentwidth,
             'sectiondesignwhole' => $sectiondesignwhole,
-            'showprerequisites' => ($section->section == 0) ? true : false,
+            'showprerequisites' => $showprerequisites,
             'prerequisitesnewtab' => isset($course->prerequisitesnewtab) ? $course->prerequisitesnewtab : false,
             'sectiondesignheader' => $sectiondesignheader,
             'sectiondesigntextcolor' => $sectiondesigntextcolor,
@@ -1029,7 +1062,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             $templatecontext['sectionmodcount'] = array_values($mods);
             $templatecontext['sectionsingle'] = true;
         }
-        if (format_designer_has_pro() && $section->section == 0) {
+        if (format_designer_has_pro() && $showprerequisites) {
             require_once($CFG->dirroot. "/local/designer/lib.php");
             if ($course->displaycourseprerequisites == DESIGNER_PREREQUISITES_ABOVECOURSE
                 && function_exists('local_designer_import_prerequisites_courses')) {
@@ -1053,7 +1086,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         }
         $sectionclass = ' section-type-'.$sectiontype;
         $sectionclass .= ($sectionrestrict) ? 'restricted' : '';
-        $sectionclass .= $section->widthclass;
+        $sectionclass .= $sectionwidthclass;
         $sectionclass .= ($templatecontext['sectionstyle']) ?? ' '.$templatecontext['sectionstyle'];
         $sectionclass .= isset($templatecontext['onlysummary']) && $templatecontext['onlysummary'] ? ' section-summary ' : '';
         $sectionclass .= isset($templatecontext['ishidden']) && $templatecontext['ishidden'] ? ' hidden ' : '';
@@ -1114,7 +1147,7 @@ class renderer extends \core_courseformat\output\section_renderer {
                 $modstyle .= sprintf('animation-duration: %ss;', ($duration) ? $duration : '1');
                 $this->flowdelay = $this->flowdelay + 0.5;
             }
-            $modclasses .= isset($course->flowsize) ? $this->get_flow_size($course) : '';
+           $modclasses .= isset($course->flowsize) ? $this->get_flow_size($course) : '';
         }
 
         $ispopupactivities = isset($course->popupactivities) && $course->popupactivities;
@@ -1484,11 +1517,11 @@ class renderer extends \core_courseformat\output\section_renderer {
     public function get_flow_size($course) {
         $sizeclass = '';
         if ($course->flowsize == 1) {
-            $sizeclass = 'flow-card-medium';
+            $sizeclass = 'flow-card-medium ';
         } else if ($course->flowsize == 2) {
-            $sizeclass = 'flow-card-large';
+            $sizeclass = 'flow-card-large ';
         } else {
-            $sizeclass = 'flow-card-small';
+            $sizeclass = 'flow-card-small ';
         }
         $flowsizeclass = isset($course->flowsize) ? $sizeclass : '';
         return $flowsizeclass;

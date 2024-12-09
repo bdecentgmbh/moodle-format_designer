@@ -133,24 +133,33 @@ class options {
      * @return boolean
      */
     public static function is_vaild_section_completed($section, $course, $modinfo, $onlyrelative = false) {
-
-        $completioninfo = new \completion_info($course);
-        $completionactivities = array_column($completioninfo->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY), 'moduleinstance');
-        if (!empty($modinfo->sections[$section->section]) && $section->uservisible) {
-            foreach ($modinfo->sections[$section->section] as $modnumber) {
-                $mod = $modinfo->cms[$modnumber];
-                if (!empty($mod)) {
-                    if ($onlyrelative && !in_array($mod->id, $completionactivities)) {
-                        continue;
-                    }
-                    $cmcompletion = new cm_completion($mod);
-                    if ($mod->is_visible_on_course_page() && $cmcompletion->get_completion_mode() != COMPLETION_TRACKING_NONE) {
-                        return true;
+        $cache = format_designer_get_cache_object();
+        // vaild section completed c _courseid _sectionid_.
+        $key = "v_s_c_c_{$course->id}_s_{$section->id}";
+        if (!$cache->get($key)) {
+            $completioninfo = new \completion_info($course);
+            $completionactivities = array_column($completioninfo->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY), 'moduleinstance');
+            if (!empty($modinfo->sections[$section->section]) && $section->uservisible) {
+                foreach ($modinfo->sections[$section->section] as $modnumber) {
+                    $mod = $modinfo->cms[$modnumber];
+                    if (!empty($mod)) {
+                        if ($onlyrelative && !in_array($mod->id, $completionactivities)) {
+                            continue;
+                        }
+                        $cmcompletion = new cm_completion($mod);
+                        if ($mod->is_visible_on_course_page() && $cmcompletion->get_completion_mode() != COMPLETION_TRACKING_NONE) {
+                            $cache->set($key, "true");
+                            break;
+                        }
                     }
                 }
             }
+
+            if (!$cache->get($key)) {
+                $cache->set($key, "false");
+            }
         }
-        return false;
+        return $cache->get($key);
     }
 
     /**
@@ -165,29 +174,41 @@ class options {
      * @return bool|array Result of section completion or Current progress data.
      */
     public static function is_section_completed($section, $course, $modinfo, $result = false, $onlyrelative = false) {
-
+        global $USER;
         $completioninfo = new \completion_info($course);
         $completionactivities = array_column($completioninfo->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY), 'moduleinstance');
         $cmcompleted = 0;
         $totalmods = 0;
         $issectioncompletion = 0;
-        if (!empty($modinfo->sections[$section->section]) && $section->uservisible) {
-            foreach ($modinfo->sections[$section->section] as $modnumber) {
-                $mod = $modinfo->cms[$modnumber];
-                if (!empty($mod)) {
-                    if ($onlyrelative && !in_array($mod->id, $completionactivities)) {
-                        continue;
-                    }
-                    $cmcompletion = new cm_completion($mod);
-                    if ($mod->is_visible_on_course_page() && $cmcompletion->get_completion_mode() != COMPLETION_TRACKING_NONE) {
-                        $totalmods++;
-                        $cmcompletionstate = $cmcompletion->get_completion_state();
-                        if ($cmcompletionstate == COMPLETION_COMPLETE || $cmcompletionstate == COMPLETION_COMPLETE_PASS ) {
-                            $cmcompleted++;
+        $cache = format_designer_get_cache_object();
+        // vaild section completed c _courseid _sectionid_.
+        $cachekey = "s_c_c_{$course->id}_s_{$section->id}_u_{$USER->id}";
+        if (!$cache->get($cachekey)) {
+            if (!empty($modinfo->sections[$section->section]) && $section->uservisible) {
+                foreach ($modinfo->sections[$section->section] as $modnumber) {
+                    $mod = $modinfo->cms[$modnumber];
+                    if (!empty($mod)) {
+                        if ($onlyrelative && !in_array($mod->id, $completionactivities)) {
+                            continue;
+                        }
+                        $cmcompletion = new cm_completion($mod);
+                        if ($mod->is_visible_on_course_page() && $cmcompletion->get_completion_mode() != COMPLETION_TRACKING_NONE) {
+                            $totalmods++;
+                            $cmcompletionstate = $cmcompletion->get_completion_state();
+                            if ($cmcompletionstate == COMPLETION_COMPLETE || $cmcompletionstate == COMPLETION_COMPLETE_PASS ) {
+                                $cmcompleted++;
+                            }
                         }
                     }
                 }
             }
+            $cache->set($cachekey, ['totalmods' => $totalmods, 'cmcompleted' => $cmcompleted]);
+        }
+
+        if ($cache->get($cachekey)) {
+            $cachedata = $cache->get($cachekey);
+            $totalmods = $cachedata['totalmods'];
+            $cmcompleted = $cachedata['cmcompleted'];
         }
 
         if ($totalmods) {

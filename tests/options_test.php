@@ -41,12 +41,21 @@ require_once($CFG->dirroot . '/course/lib.php');
 class options_test extends \advanced_testcase {
 
     /**
+     * @var object
+     */
+    public $course;
+
+    /**
+     * @var object
+     */
+    public $coursecontext;
+
+    /**
      * Setup testing cases.
      *
      * @return void
      */
     public function setUp(): void {
-        global $CFG;
 
         $this->resetAfterTest(true);
         // Remove the output display of cron task.

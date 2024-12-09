@@ -69,6 +69,7 @@ class cmitem extends \core_courseformat\output\local\content\section\cmitem {
             'cmformat' => $item->export_for_template($output),
             'hasinfo' => $hasinfo,
             'indent' => ($format->uses_indentation()) ? $mod->indent : 0,
+            'groupmode' => $mod->groupmode,
         ];
         $this->render_course_module($mod, $data, $output);
         return (object) $data;

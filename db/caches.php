@@ -15,18 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details.
+ * Code to be executed after the plugin's database scheme has been installed is defined here.
  *
- * @package   format_designer
- * @copyright 2022 bdecent gmbh <https://bdecent.de>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     report_lmsace_reports
+ * @copyright   Lmsace dev team
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2024110800;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2024042200;        // Requires this Moodle version.
-$plugin->component = 'format_designer';  // Full name of the plugin (used for diagnostics).
-$plugin->release = 'Version 1.6';
-$plugin->supported = [404, 404];
-$plugin->maturity  = MATURITY_STABLE;
+$definitions = array(
+    'designeroptions' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => false,
+        'overrideclass' => '\format_designer\cache\loader',
+    ),
+);

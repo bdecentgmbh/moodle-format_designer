@@ -273,7 +273,6 @@ $string['strcourse'] = "Course";
 $string['courseheader'] = 'Course header';
 $string['popupactivitiesnotinstalled'] = 'Popup format must be installed in order to display the activities in popup.';
 $string['listwidth'] = 'List width';
-
 $string['general'] = 'General';
 $string['general_settings'] = "General settings";
 $string['flowanimationduration'] = 'Flow animation duration';
@@ -539,6 +538,7 @@ $string['purposecommunication'] = 'Communication';
 $string['purposecontent'] = 'Content';
 $string['purposeinterface'] = 'Interface';
 $string['purposeother'] = 'Other';
+$string['purposeinteractivecontent'] = "Interactive Content";
 
 $string['purpose_created'] = 'Purpose successfully created';
 $string['edit_purpose'] = 'Edit purposes';
@@ -556,6 +556,8 @@ $string['sectionlink'] = 'Permalink';
 $string['courseindicator'] = "Course status: ";
 $string['strsectionlayout'] = "Section Layout";
 $string['completioncriteria'] = "Completion criteria";
+$string['plugin_description'] = 'Mix and match layouts to create unique and visually appealing course designs.';
 $string['strsecondarymenucourse'] = "Course";
+
 $string['section_layout'] = "Section layout";
 $string['section_layout_desc'] = "";

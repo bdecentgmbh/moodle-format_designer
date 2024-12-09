@@ -109,19 +109,23 @@ if ($ADMIN->fulltree) {
     $settingspage->add($settings);
 
     $sectionpage = new admin_settingpage('format_designer_section', get_string('sectionsettings', 'format_designer'));
+
     // Section mask images.
     $name = 'formaty_designer_sectiongeneral';
     $heading = get_string('general', 'format_designer');
     $information = '';
     $setting = new admin_setting_heading($name, $heading, $information);
     $sectionpage->add($setting);
+
+
     // Section layout - Global setting - DES-866.
     $name = 'format_designer/sectiontype';
     $title = get_string('strsectionlayout', 'format_designer');
     $description = get_string('section_layout_desc', 'format_designer');
     $layouts = [];
-    $setting = new admin_setting_configselect($name , $title, $description, 'link', format_designer_get_all_layouts());
+    $setting = new admin_setting_configselect($name , $title, $description, 'default', format_designer_get_all_layouts());
     $sectionpage->add($setting);
+
 
     $activitypage = new admin_settingpage('format_designer_activity', get_string('stractivity', 'format_designer'));
 
@@ -142,6 +146,36 @@ if ($ADMIN->fulltree) {
         'format_designer/modtrimlength', get_string('modtrimlength', 'format_designer'),
         get_string('modtrimlength_desc', 'format_designer'), 23, PARAM_INT);
     $activitypage->add($setting);
+
+
+    // Activity elements list to manage the visibility - Activity page continue.
+    $elements = [
+        'icon' => 1,
+        'visits' => 4,
+        'calltoaction' => 4,
+        'title' => 1,
+        'description' => 1,
+        'modname' => 4,
+        'completionbadge' => 1,
+    ];
+
+
+    $choice = [
+        1 => get_string('show'),
+        0 => get_string('hide'),
+        2 => get_string('showonhover', 'format_designer'),
+        3 => get_string('hideonhover', 'format_designer'),
+        4 => get_string('remove'),
+    ];
+
+    foreach ($elements as $element => $defaultvalue) {
+        $name = 'format_designer/activityelements_'.$element;
+        $title = get_string('activity:'.$element, 'format_designer');
+        $desc = '';
+        $default = ['value' => $defaultvalue, 'fix' => 0];
+        $setting = new admin_setting_configselect_with_advanced($name, $title, $desc, $default, $choice);
+        $activitypage->add($setting);
+    }
 
     if (format_designer_has_pro()
          && file_exists($CFG->dirroot.'/local/designer/setting.php')) {

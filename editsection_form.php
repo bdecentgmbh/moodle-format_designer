@@ -47,16 +47,22 @@ class editsection_form extends moodleform {
 
         $mform->addElement('header', 'generalhdr', get_string('general'));
 
-        $mform->addElement('defaultcustom', 'name', get_string('sectionname'), [
-            'defaultvalue' => $this->_customdata['defaultsectionname'],
-            'customvalue' => $sectioninfo->name,
-        ], ['size' => 30, 'maxlength' => 255]);
-        $mform->setDefault('name', false);
-        $mform->addGroupRule('name', ['name' => [[get_string('maximumchars', '', 255), 'maxlength', 255]]]);
+        $mform->addElement(
+            'text',
+            'name',
+            get_string('sectionname'),
+            [
+                'placeholder' => $this->_customdata['defaultsectionname'],
+                'size' => 30,
+                'maxlength' => 255,
+            ],
+        );
+        $mform->setType('name', PARAM_RAW);
+        $mform->setDefault('name', $sectioninfo->name);
+        $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
         // Prepare course and the editor.
         $mform->addElement('editor', 'summary_editor', get_string('summary'), null, $this->_customdata['editoroptions']);
-        $mform->addHelpButton('summary_editor', 'summary');
         $mform->setType('summary_editor', PARAM_RAW);
 
         $mform->addElement('hidden', 'id');
@@ -68,8 +74,9 @@ class editsection_form extends moodleform {
         if (!empty($formatoptions)) {
             $elements = $courseformat->create_edit_form_elements($mform, true);
         }
+
         // Check the moodle 4.3 higher.
-        if ($CFG->version >= 2023092300 && !empty($CFG->enableavailability)) {
+        if (!empty($CFG->enableavailability)) {
 
             $mform->addElement('header', 'availabilityconditions',
                 get_string('restrictaccess', 'availability'));
@@ -104,18 +111,6 @@ class editsection_form extends moodleform {
         $course = $this->_customdata['course'];
 
         if (!empty($CFG->enableavailability)) {
-            // Check the moodle 4.3 lower.
-            if ($CFG->version < 2023092300) {
-                $mform->addElement('header', 'availabilityconditions',
-                        get_string('restrictaccess', 'availability'));
-                $mform->setExpanded('availabilityconditions', false);
-
-                // Availability field. This is just a textarea; the user interface
-                // interaction is all implemented in JavaScript. The field is named
-                // availabilityconditionsjson for consistency with moodleform_mod.
-                $mform->addElement('textarea', 'availabilityconditionsjson',
-                        get_string('accessrestrictions', 'availability'));
-            }
             \core_availability\frontend::include_all_javascript($course, null,
                     $this->_customdata['cs']);
         }
@@ -129,6 +124,7 @@ class editsection_form extends moodleform {
      * @param stdClass|array $defaultvalues object or array of default values
      */
     public function set_data($defaultvalues) {
+        global $CFG;
         if (!is_object($defaultvalues)) {
             // We need object for file_prepare_standard_editor.
             $defaultvalues = (object)$defaultvalues;
@@ -142,10 +138,6 @@ class editsection_form extends moodleform {
         if (format_designer_has_pro() && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
             $defaultvalues = \local_designer\options::prepare_sectioncardcta_editor_files($defaultvalues,
                 $this->_customdata['course']);
-        }
-
-        if (strval($defaultvalues->name) === '') {
-            $defaultvalues->name = false;
         }
         parent::set_data($defaultvalues);
     }
