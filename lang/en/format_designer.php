@@ -561,3 +561,5 @@ $string['strsecondarymenucourse'] = "Course";
 
 $string['section_layout'] = "Section layout";
 $string['section_layout_desc'] = "";
+$string['sectionestimatetime'] = 'Estimated time';
+$string['sectionestimatetime_help'] = 'Enter the estimated time for the section.';   
