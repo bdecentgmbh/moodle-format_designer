@@ -1155,6 +1155,13 @@ class format_designer extends \core_courseformat\base {
                     $sectionoptions[$name]['adv'] = true;
                 }
             }
+
+            $sectionoptions['sectionestimatetime'] = [
+                'type' => PARAM_INT,
+                'element_type' => 'date_time_selector',
+                'default' => 0,
+                'label' => get_string('sectionestimatetime', 'format_designer'),
+            ];
         }
 
         // Include pro feature options for section.
