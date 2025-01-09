@@ -1157,9 +1157,8 @@ class format_designer extends \core_courseformat\base {
             }
 
             $sectionoptions['sectionestimatetime'] = [
-                'type' => PARAM_INT,
-                'element_type' => 'date_time_selector',
-                'default' => 0,
+                'type' => PARAM_TEXT,
+                'element_type' => 'text',
                 'label' => get_string('sectionestimatetime', 'format_designer'),
             ];
         }
