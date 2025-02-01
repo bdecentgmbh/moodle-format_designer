@@ -75,8 +75,8 @@
         };
         this.expandSection();
 
-        var contactModalHandler = document.getElementsByClassName('toggle-contact-button');
-        Array.from(contactModalHandler).forEach(function(element) {
+        var contactModal = document.getElementsByClassName('toggle-contact-button');
+        Array.from(contactModal).forEach(function(element) {
             element.addEventListener('click', function(e) {
                 e.preventDefault();
                 if (e.currentTarget.dataset.userid != undefined) {
@@ -124,9 +124,10 @@
         let ispopupModule = event.target.closest('li.activity').classList.contains('popmodule');
         let isModHasURL = event.target.closest('li.activity div[data-action="go-to-url"]').getAttribute('data-url');
         let isCompletionButton = event.target.closest('button[data-action="toggle-manual-completion"]');
+        let isonClickevent = event.target.getAttribute('onclick');
         if ((nodeName in preventionNodes)
             || document.body.classList.contains('editing') || iscircle || isDescription || isPadlock || ispopupModule
-            || isModHasURL == '' || isCompletionButton) {
+            || isModHasURL == '' || isCompletionButton || isonClickevent) {
             if (ispopupModule && !document.body.classList.contains('editing')) {
                 if (event.target.closest("button[data-action='toggle-manual-completion']") === null &&
                     event.target.closest(".mod-description-action") === null) {

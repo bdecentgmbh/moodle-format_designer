@@ -38,6 +38,7 @@
         padding-right: 0;
     }
 }
+
 .format-designer.path-mod .header-maxwidth,
 .format-designer.path-admin .header-maxwidth {
     padding: 0 3rem;
@@ -637,6 +638,9 @@ body.format-designer.editing ul.designer .section .circles-layout .activity .edi
 .format-designer.editing .course-content ul.designer li.section .section-header-content .sectionname
 .inplaceeditable .quickeditlink .quickediticon {
     margin-left: 5px;
+}
+.format-designer .course-content .designer li.section .section-header-content a {
+    text-decoration: none;
 }
 .format-designer .course-content .designer li.section .section-header-content
 span.section-collapse-icon {
