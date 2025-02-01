@@ -75,7 +75,9 @@ data-target="{{#sectioncardcontentdirect}}_blank{{/sectioncardcontentdirect}}" d
             </div>
         {{/sectiondesignheader}}
         {{#sectioncollapse}}
-        <span class="section-collapse-icon" style="{{{sectiondesigntextcolor}}}"></span>
+        <a data-toggle="collapse" href="#section-content-{{section.section}}">
+            <span class="section-collapse-icon" style="{{{sectiondesigntextcolor}}}"></span>
+        </a>
         {{/sectioncollapse}}
 
         {{#bgoverlay}}
