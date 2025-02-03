@@ -134,11 +134,12 @@ class options {
      */
     public static function is_vaild_section_completed($section, $course, $modinfo, $onlyrelative = false) {
         $cache = format_designer_get_cache_object();
-        // vaild section completed c _courseid _sectionid_.
+        // Vaild section completed c _courseid _sectionid_.
         $key = "v_s_c_c_{$course->id}_s_{$section->id}";
         if (!$cache->get($key)) {
             $completioninfo = new \completion_info($course);
-            $completionactivities = array_column($completioninfo->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY), 'moduleinstance');
+            $completionactivities = array_column($completioninfo->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY),
+                'moduleinstance');
             if (!empty($modinfo->sections[$section->section]) && $section->uservisible) {
                 foreach ($modinfo->sections[$section->section] as $modnumber) {
                     $mod = $modinfo->cms[$modnumber];
@@ -181,7 +182,7 @@ class options {
         $totalmods = 0;
         $issectioncompletion = 0;
         $cache = format_designer_get_cache_object();
-        // vaild section completed c _courseid _sectionid_.
+        // Vaild section completed c _courseid _sectionid_.
         $cachekey = "s_c_c_{$course->id}_s_{$section->id}_u_{$USER->id}";
         if (!$cache->get($cachekey)) {
             if (!empty($modinfo->sections[$section->section]) && $section->uservisible) {

@@ -48,6 +48,9 @@ class loader extends \cache_application {
     public function delete_vaild_section_completed_cache($courseid, $sectionid = 0) {
         $store = $this->get_store();
         $prefix = "v_s_c_c_{$courseid}";
+        if ($sectionid) {
+            $prefix .= "_s_{$sectionid}";
+        }
         if ($list = $store->find_by_prefix($prefix)) {
             $keys = array_map(function($key) {
                 $key = current(explode('-', $key));
@@ -57,13 +60,24 @@ class loader extends \cache_application {
         }
     }
 
-
+    /**
+     * Delete user section completed cache.
+     * @param mixed $courseid
+     * @param mixed $sectionid
+     * @param mixed $userid
+     * @return void
+     */
     public function delete_user_section_completed_cache($courseid, $sectionid = 0, $userid = 0) {
         $prefix = "s_c_c_{$courseid}";
         $this->delete_prefix_cache($prefix);
     }
 
-
+    /**
+     * Delete due overdue activities count.
+     * @param mixed $courseid
+     * @param mixed $userid
+     * @return void
+     */
     public function delete_due_overdue_activities_count($courseid, $userid = 0) {
         $prefix = "d_o_a_c_c{$courseid}";
         if ($userid) {
@@ -72,7 +86,12 @@ class loader extends \cache_application {
         $this->delete_prefix_cache($prefix);
     }
 
-
+    /**
+     * Delete course progress uncompletion criteria.
+     * @param mixed $courseid
+     * @param mixed $userid
+     * @return void
+     */
     public function delete_course_progress_uncompletion_criteria($courseid, $userid = 0) {
         $prefix = "u_c_c_s{$courseid}";
         if ($userid) {
@@ -81,6 +100,12 @@ class loader extends \cache_application {
         $this->delete_prefix_cache($prefix);
     }
 
+    /**
+     * Delete_criteria_progress.
+     * @param mixed $courseid
+     * @param mixed $userid
+     * @return void
+     */
     public function delete_criteria_progress($courseid, $userid = 0) {
         $prefix = "c_p_c{$courseid}";
         if ($userid) {
@@ -89,12 +114,20 @@ class loader extends \cache_application {
         $this->delete_prefix_cache($prefix);
     }
 
-
+    /**
+     * Delete_prerequisites_courses.
+     * @return void
+     */
     public function delete_prerequisites_courses() {
         $prefix = "data_prereq_main_c";
         $this->delete_prefix_cache($prefix);
     }
 
+    /**
+     * Delete the cache files by the prefix.
+     * @param mixed $prefix
+     * @return void
+     */
     public function delete_prefix_cache($prefix) {
         $store = $this->get_store();
         if ($list = $store->find_by_prefix($prefix)) {
