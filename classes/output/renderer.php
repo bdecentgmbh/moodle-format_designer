@@ -844,7 +844,7 @@ class renderer extends \core_courseformat\output\section_renderer {
      */
     public function course_type_sectionclasses($course, $section, $modinfo) {
         $attrs = $contentattrs = [];
-        $contentclass = $actvitiyclass = '';
+        $contentclass = $activityclass = '';
         $class = "";
         if ($course->coursetype == DESIGNER_TYPE_COLLAPSIBLE) {
             $attrs[] = 'data-toggle="collapse"';
@@ -864,7 +864,7 @@ class renderer extends \core_courseformat\output\section_renderer {
                 'classes' => $contentclass,
             ],
             'activity' => [
-                'classes' => $actvitiyclass,
+                'classes' => $activityclass,
             ],
         ];
     }
