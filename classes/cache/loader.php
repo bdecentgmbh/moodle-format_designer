@@ -26,7 +26,9 @@ namespace format_designer\cache;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/cache/classes/loaders.php');
+if (version_compare($CFG->version, '2024100700', '<')) {
+    require_once($CFG->dirroot.'/cache/classes/loaders.php');
+}
 
 /**
  * Custom cache loader to handle the smart menus and items deletion.
