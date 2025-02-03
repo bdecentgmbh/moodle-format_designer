@@ -137,9 +137,18 @@
             }
             return null;
         }
-        var card = event.target.closest("[data-action=go-to-url]");
-        let modurl = card.getAttribute('data-url');
-        window.location.href = modurl;
+
+        let moduleid = "li.activity#"+ event.target.closest('li.activity').getAttribute('id');
+        let moduleHandler = document.querySelector(moduleid + " .aalink");
+        if (moduleHandler.getAttribute('onclick') || document.querySelector(moduleid).classList.contains('popmodule')) {
+            event.preventDefault();
+            var li = event.target.closest('li.activity');
+            li.querySelector('a[href]').click();
+        } else {
+            var card = event.target.closest("[data-action=go-to-url]");
+            let modurl = card.getAttribute('data-url');
+            window.location.href = modurl;
+        }
         return true;
     };
 
