@@ -39,20 +39,20 @@
 {{^hidesectiontitle}}
 {{#headerdisplaymultipage}}
     <h3 class="sectionid-{{id}}-title sectionname">
-        {{{title}}}
+        <a data-toggle="collapse" href="#"> {{{title}}} </a>
     </h3>
 {{/headerdisplaymultipage}}
 {{^headerdisplaymultipage}}
     {{#sitehome}}
         <h2 class="sectionid-{{id}}-title sectionname">
-            {{{title}}}
+             <a data-toggle="collapse" href="#"> {{{title}}} </a>
         </h2>
     {{/sitehome}}
     {{^sitehome}}
         <div class="align-items-start position-relative">
             <h3 class="sectionid-{{id}}-title sectionname course-content-item d-flex align-self-stretch align-items-center mb-0"
                 id="coursecontentsection{{num}}" data-for="section_title" data-id="{{id}}" data-number="{{num}}">
-                {{{title}}}
+                <a data-toggle="collapse" href="#"> {{{title}}} </a>
             </h3>
         </div>
     {{/sitehome}}
