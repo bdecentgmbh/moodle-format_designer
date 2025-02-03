@@ -62,11 +62,11 @@ define('DESIGNER_HERO_ZERO_HIDE', 1);
 
 define('DESIGNER_HERO_ZERO_VISIBLE', 2);
 
-define('DESIGNER_HERO_ACTVITIY_DISABLED', 0);
+define('DESIGNER_HERO_ACTIVITY_DISABLED', 0);
 
-define('DESIGNER_HERO_ACTVITIY_EVERYWHERE', 1);
+define('DESIGNER_HERO_ACTIVITY_EVERYWHERE', 1);
 
-define('DESIGNER_HERO_ACTVITIY_COURSEPAGE', 2);
+define('DESIGNER_HERO_ACTIVITY_COURSEPAGE', 2);
 
 define('DESIGNER_MOD_TEXT_TRIMM', 0);
 
@@ -2123,7 +2123,7 @@ function format_designer_popup_installed() {
 function format_designer_course_has_heroactivity($course) {
     global $DB, $PAGE;
     $iscourseheroactivity = ($course->sectionzeroactivities &&
-        $course->heroactivity == DESIGNER_HERO_ACTVITIY_EVERYWHERE) ? true : false;
+        $course->heroactivity == DESIGNER_HERO_ACTIVITY_EVERYWHERE) ? true : false;
     $sql = "SELECT fd.value FROM {format_designer_options} fd
         WHERE fd.courseid = :courseid AND fd.name = :optionname AND fd.value = :optionvalue AND fd.cmid != :currentcm";
     $iscoursemodheroactivity = $DB->record_exists_sql($sql, ['optionname' => 'heroactivity',
@@ -2291,7 +2291,7 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                 $nodepos = $report['heroactivitypos'];
                 $cmtitle = $format->get_cm_secondary_title($cm);
                 if ($PAGE->context->contextlevel == CONTEXT_MODULE) {
-                    if ($report['heroactivity'] == DESIGNER_HERO_ACTVITIY_EVERYWHERE) {
+                    if ($report['heroactivity'] == DESIGNER_HERO_ACTIVITY_EVERYWHERE) {
                         if ($cm->id == $PAGE->cm->id && $heroactivityduplicate) {
                             $ishidecurrentcmid = true;
                         }
@@ -2514,11 +2514,11 @@ function format_designer_section_zero_tomake_hero($reports, $course) {
             foreach ($modinfo->sections[0] as $modnumber) {
                 if ($DB->record_exists('course_modules', ['deletioninprogress' => 0, 'id' => $modnumber])) {
                     if (isset($reports[$modnumber]) && !$reports[$modnumber]['heroactivity']) {
-                        $reports[$modnumber]['heroactivity'] = ($course->heroactivity == DESIGNER_HERO_ACTVITIY_COURSEPAGE
+                        $reports[$modnumber]['heroactivity'] = ($course->heroactivity == DESIGNER_HERO_ACTIVITY_COURSEPAGE
                             && isset($PAGE->cm->id)) ? 0 : ($course->heroactivity == true);
                         $reports[$modnumber]['heroactivitypos'] = $course->heroactivitypos;
                     } else if (!isset($reports[$modnumber])) {
-                        $reports[$modnumber]['heroactivity'] = ($course->heroactivity == DESIGNER_HERO_ACTVITIY_COURSEPAGE
+                        $reports[$modnumber]['heroactivity'] = ($course->heroactivity == DESIGNER_HERO_ACTIVITY_COURSEPAGE
                             && isset($PAGE->cm->id)) ? 0 : ($course->heroactivity == true);
                         $reports[$modnumber]['heroactivitypos'] = $course->heroactivitypos;
                         $reports[$modnumber]['cmid'] = $modnumber;
