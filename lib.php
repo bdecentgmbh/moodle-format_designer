@@ -62,11 +62,11 @@ define('DESIGNER_HERO_ZERO_HIDE', 1);
 
 define('DESIGNER_HERO_ZERO_VISIBLE', 2);
 
-define('DESIGNER_HERO_ACTVITIY_DISABLED', 0);
+define('DESIGNER_HERO_ACTIVITY_DISABLED', 0);
 
-define('DESIGNER_HERO_ACTVITIY_EVERYWHERE', 1);
+define('DESIGNER_HERO_ACTIVITY_EVERYWHERE', 1);
 
-define('DESIGNER_HERO_ACTVITIY_COURSEPAGE', 2);
+define('DESIGNER_HERO_ACTIVITY_COURSEPAGE', 2);
 
 define('DESIGNER_MOD_TEXT_TRIMM', 0);
 
@@ -833,22 +833,6 @@ class format_designer extends \core_courseformat\base {
                 'help_component' => 'format_designer',
             ];
 
-           /*  if (format_designer_has_pro() != 1 ) {
-                $userprofilefields = profile_get_user_fields_with_data(0);
-                if (!empty($userprofilefields)) {
-                    foreach ($userprofilefields as $field) {
-                        $courseformatoptionsedit[$field->inputname] = [
-                            'label' => $field->field->name,
-                            'element_type' => 'advcheckbox',
-                            'help' => 'profilefieditem',
-                            'help_component' => 'format_designer',
-                        ];
-                    }
-                }
-            } */
-
-
-
             $courseformatoptionsedit['courseheroactivityheader'] = [
                 'label' => new lang_string('heroactivity', 'format_designer'),
                 'element_type' => 'header',
@@ -1155,6 +1139,12 @@ class format_designer extends \core_courseformat\base {
                     $sectionoptions[$name]['adv'] = true;
                 }
             }
+
+            $sectionoptions['sectionestimatetime'] = [
+                'type' => PARAM_TEXT,
+                'element_type' => 'text',
+                'label' => get_string('sectionestimatetime', 'format_designer'),
+            ];
         }
 
         // Include pro feature options for section.
@@ -2133,7 +2123,7 @@ function format_designer_popup_installed() {
 function format_designer_course_has_heroactivity($course) {
     global $DB, $PAGE;
     $iscourseheroactivity = ($course->sectionzeroactivities &&
-        $course->heroactivity == DESIGNER_HERO_ACTVITIY_EVERYWHERE) ? true : false;
+        $course->heroactivity == DESIGNER_HERO_ACTIVITY_EVERYWHERE) ? true : false;
     $sql = "SELECT fd.value FROM {format_designer_options} fd
         WHERE fd.courseid = :courseid AND fd.name = :optionname AND fd.value = :optionvalue AND fd.cmid != :currentcm";
     $iscoursemodheroactivity = $DB->record_exists_sql($sql, ['optionname' => 'heroactivity',
@@ -2301,7 +2291,7 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                 $nodepos = $report['heroactivitypos'];
                 $cmtitle = $format->get_cm_secondary_title($cm);
                 if ($PAGE->context->contextlevel == CONTEXT_MODULE) {
-                    if ($report['heroactivity'] == DESIGNER_HERO_ACTVITIY_EVERYWHERE) {
+                    if ($report['heroactivity'] == DESIGNER_HERO_ACTIVITY_EVERYWHERE) {
                         if ($cm->id == $PAGE->cm->id && $heroactivityduplicate) {
                             $ishidecurrentcmid = true;
                         }
@@ -2524,11 +2514,11 @@ function format_designer_section_zero_tomake_hero($reports, $course) {
             foreach ($modinfo->sections[0] as $modnumber) {
                 if ($DB->record_exists('course_modules', ['deletioninprogress' => 0, 'id' => $modnumber])) {
                     if (isset($reports[$modnumber]) && !$reports[$modnumber]['heroactivity']) {
-                        $reports[$modnumber]['heroactivity'] = ($course->heroactivity == DESIGNER_HERO_ACTVITIY_COURSEPAGE
+                        $reports[$modnumber]['heroactivity'] = ($course->heroactivity == DESIGNER_HERO_ACTIVITY_COURSEPAGE
                             && isset($PAGE->cm->id)) ? 0 : ($course->heroactivity == true);
                         $reports[$modnumber]['heroactivitypos'] = $course->heroactivitypos;
                     } else if (!isset($reports[$modnumber])) {
-                        $reports[$modnumber]['heroactivity'] = ($course->heroactivity == DESIGNER_HERO_ACTVITIY_COURSEPAGE
+                        $reports[$modnumber]['heroactivity'] = ($course->heroactivity == DESIGNER_HERO_ACTIVITY_COURSEPAGE
                             && isset($PAGE->cm->id)) ? 0 : ($course->heroactivity == true);
                         $reports[$modnumber]['heroactivitypos'] = $course->heroactivitypos;
                         $reports[$modnumber]['cmid'] = $modnumber;
@@ -2591,7 +2581,10 @@ function format_designer_is_support_subpanel() {
     return false;
 }
 
-
+/**
+ * Summary of format_designer_get_cache_object
+ * @return cache_application|cache_session|cache_store|core_cache\application_cache|core_cache\session_cache|core_cache\store
+ */
 function format_designer_get_cache_object() {
     return cache::make('format_designer', 'designeroptions');
 }

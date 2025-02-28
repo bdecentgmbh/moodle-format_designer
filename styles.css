@@ -637,6 +637,9 @@ body.format-designer.editing ul.designer .section .circles-layout .activity .edi
 .inplaceeditable .quickeditlink .quickediticon {
     margin-left: 5px;
 }
+.format-designer .course-content .designer li.section .section-header-content a {
+    text-decoration: none;
+}
 .format-designer .course-content .designer li.section .section-header-content
 span.section-collapse-icon {
     display: inline-block;

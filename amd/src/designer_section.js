@@ -124,9 +124,10 @@
         let ispopupModule = event.target.closest('li.activity').classList.contains('popmodule');
         let isModHasURL = event.target.closest('li.activity div[data-action="go-to-url"]').getAttribute('data-url');
         let isCompletionButton = event.target.closest('button[data-action="toggle-manual-completion"]');
+        let isonClickevent = event.target.getAttribute('onclick');
         if ((nodeName in preventionNodes)
             || document.body.classList.contains('editing') || iscircle || isDescription || isPadlock || ispopupModule
-            || isModHasURL == '' || isCompletionButton) {
+            || isModHasURL == '' || isCompletionButton || isonClickevent) {
             if (ispopupModule && !document.body.classList.contains('editing')) {
                 if (event.target.closest("button[data-action='toggle-manual-completion']") === null &&
                     event.target.closest(".mod-description-action") === null) {
@@ -136,9 +137,18 @@
             }
             return null;
         }
-        var card = event.target.closest("[data-action=go-to-url]");
-        let modurl = card.getAttribute('data-url');
-        window.location.href = modurl;
+
+        let moduleid = "li.activity#"+ event.target.closest('li.activity').getAttribute('id');
+        let moduleHandler = document.querySelector(moduleid + " .aalink");
+        if (moduleHandler.getAttribute('onclick') || document.querySelector(moduleid).classList.contains('popmodule')) {
+            event.preventDefault();
+            var li = event.target.closest('li.activity');
+            li.querySelector('a[href]').click();
+        } else {
+            var card = event.target.closest("[data-action=go-to-url]");
+            let modurl = card.getAttribute('data-url');
+            window.location.href = modurl;
+        }
         return true;
     };
 

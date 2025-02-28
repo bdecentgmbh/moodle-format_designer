@@ -285,7 +285,7 @@ $string['modmaskimage'] = 'Activity mask image';
 $string['modmasksize'] = 'Activity mask size';
 $string['modmaskposition'] = 'Activity mask position';
 
-$string['heroactivity'] = "Hero activitiy";
+$string['heroactivity'] = "Hero activity";
 $string['everywhere'] = "Everywhere";
 $string['onlycoursepage'] = "Only on course main page";
 $string['showastab'] = "Show as tab";
@@ -561,3 +561,5 @@ $string['strsecondarymenucourse'] = "Course";
 
 $string['section_layout'] = "Section layout";
 $string['section_layout_desc'] = "";
+$string['sectionestimatetime'] = 'Estimated time';
+$string['sectionestimatetime_help'] = 'Enter the estimated time for the section.';
