@@ -320,6 +320,10 @@ class format_designer extends \core_courseformat\base {
             // Fetch classes from pro designer and attach them to the body.
             $classes = \local_designer\info::create()->generate_body_classes($course, $this);
             $page->add_body_class($classes);
+
+            // Include the designer pro styles.
+            $styleurl = \local_designer\courseoptions::create($course)->designer_include_style();
+            $page->requires->css($styleurl);
         }
     }
     /**
@@ -2178,12 +2182,6 @@ function format_designer_extend_navigation_course($navigation, $course, $context
         'sectionreturn' => optional_param('section', 0, PARAM_INT),
     ];
     $PAGE->requires->js_call_amd('format_designer/designer_section', 'init', $jsparams);
-
-    if (format_designer_has_pro()) {
-        // Include the designer pro styles.
-        $styleurl = \local_designer\courseoptions::create($course)->designer_include_style();
-        $PAGE->requires->css($styleurl);
-    }
 
     $isaddsecondary = ($navigation->children->count() <= 1 && $PAGE->context->contextlevel == CONTEXT_MODULE) &&
         (format_designer_course_has_heroactivity($course) || $course->secondarymenutocourse);
