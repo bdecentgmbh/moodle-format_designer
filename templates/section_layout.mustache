@@ -226,12 +226,14 @@ data-target="{{#sectioncardcontentdirect}}_blank{{/sectioncardcontentdirect}}" d
         </div>
         {{/sectioncountstatus}}
         {{#gotosection}}
+        <div class="moodle-actionmenu">
             {{#sectionsingle}}
                 <a href="{{{sectionurl}}}" target="{{#sectioncardcontentdirect}}_blank{{/sectioncardcontentdirect}}" class="goto-section btn btn-primary" {{#sectioncountstatus}} style="{{#sectiontextcolor}} {{sectiontextcolor}} {{/sectiontextcolor}}" {{/sectioncountstatus}}><i class="fa fa-fw fa-arrow-right"></i></a>
             {{/sectionsingle}}
             {{^sectionsingle}}
             	<a href="{{{sectionurl}}}" class="goto-section btn btn-primary">{{#str}}gotosection, format_designer{{/str}}</a>
             {{/sectionsingle}}
+        </div>
         {{/gotosection}}
 </div>
 

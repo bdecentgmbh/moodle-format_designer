@@ -26,14 +26,12 @@ namespace format_designer\cache;
 
 defined('MOODLE_INTERNAL') || die();
 
-if (version_compare($CFG->version, '2024100700', '<')) {
-    require_once($CFG->dirroot.'/cache/classes/loaders.php');
-}
+global $CFG;
 
 /**
- * Custom cache loader to handle the smart menus and items deletion.
+ * Common cache methods trait to avoid duplication.
  */
-class loader extends \cache_application {
+trait loader_common_methods {
 
     /**
      * Delete the cached menus or menu items for all of its users.
@@ -141,4 +139,33 @@ class loader extends \cache_application {
             $this->delete_many($keys);
         }
     }
+}
+
+if (version_compare($CFG->version, '2024100700', '<')) {
+    require_once($CFG->dirroot.'/cache/classes/loaders.php');
+    /**
+     * Custom cache loader to handle the smart menus and items deletion for older Moodle versions.
+     */
+    class loader extends \cache_application {
+        use loader_common_methods;
+    }
+} else {
+
+    /**
+     * Format Designer - Custom cache loader newer class.
+     *
+     * @package   format_designer
+     * @copyright 2021 bdecent gmbh <https://bdecent.de>
+     * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+     */
+
+    /**
+     * Custom cache loader for newer Moodle versions that use the core_cache namespace.
+     */
+    class loader_newer extends \core_cache\application_cache {
+        use loader_common_methods;
+    }
+
+    // Use class_alias to create the loader class with the correct parent.
+    class_alias('format_designer\cache\loader_newer', 'format_designer\cache\loader');
 }
