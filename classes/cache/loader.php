@@ -45,10 +45,10 @@ class loader extends \cache_application {
      * Delete all the files using delete_many method.
      *
      * @param int $courseid Course id.
-     * @param int $sectionid Section id.
+     * @param ?int $sectionid Section id.
      * @return void
      */
-    public function delete_vaild_section_completed_cache($courseid, $sectionid = 0) {
+    public function delete_vaild_section_completed_cache(int $courseid, ?int $sectionid = 0) {
         $store = $this->get_store();
         $prefix = "v_s_c_c_{$courseid}";
         if ($sectionid) {

@@ -42,7 +42,7 @@ class title extends \core_courseformat\output\local\content\cm\title {
      * Return the title template data to be used inside the inplace editable.
      *
      */
-    protected function get_title_displayvalue (): string {
+    protected function get_title_displayvalue(): string {
         global $PAGE, $CFG;
 
         // Inplace editable uses core renderer by default. However, course elements require

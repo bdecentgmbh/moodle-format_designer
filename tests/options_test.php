@@ -38,7 +38,7 @@ require_once($CFG->dirroot . '/course/lib.php');
  * @copyright  2021 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class options_test extends \advanced_testcase {
+final class options_test extends \advanced_testcase {
 
     /**
      * @var object
@@ -58,6 +58,9 @@ class options_test extends \advanced_testcase {
     public function setUp(): void {
 
         $this->resetAfterTest(true);
+
+        parent::setUp();
+
         // Remove the output display of cron task.
         $this->course = $this->getDataGenerator()->create_course(['format' => 'designer', 'enablecompletion' => 1]);
         $this->coursecontext = context_course::instance($this->course->id);
@@ -67,7 +70,7 @@ class options_test extends \advanced_testcase {
      * Test isjson method find the string is json or not.
      * @covers \format_designer\options::is_json
      */
-    public function test_optionisjson() {
+    public function test_optionisjson(): void {
         $elements = [
             'icon' => 2, 'visits' => 1, 'calltoaction' => 2,
             'title' => 1, 'description' => 2, 'modname' => 3, 'completionbadge' => 3,
@@ -89,7 +92,7 @@ class options_test extends \advanced_testcase {
      * Test module elements visibility settings are added with module form. It updates the data to table.
      * @covers ::get_activity_elementclasses
      */
-    public function test_moduleelements() {
+    public function test_moduleelements(): void {
         global $DB, $PAGE;
         $elements = [
             'icon' => 2, 'visits' => 1, 'calltoaction' => 2, 'title' => 1,
@@ -120,7 +123,7 @@ class options_test extends \advanced_testcase {
      * Test ismodcompleted method process the user module completion.
      * @covers \format_designer\options::is_mod_completed
      */
-    public function test_modcompletion() {
+    public function test_modcompletion(): void {
         global $DB;
         $module = $this->getDataGenerator()->create_module('page', [
             'course' => $this->course, 'section' => 1, 'name' => 'Test page', 'content' => 'Test the module',
@@ -157,7 +160,7 @@ class options_test extends \advanced_testcase {
      * Test section completion find the logged in user status of section.
      * @covers \format_designer\options::is_section_completed
      */
-    public function test_sectioncompletion() {
+    public function test_sectioncompletion(): void {
         global $DB;
         $module = $this->getDataGenerator()->create_module('page', [
             'course' => $this->course, 'section' => 1, 'name' => 'Test page', 'content' => 'Test the module',

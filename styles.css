@@ -2555,7 +2555,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 /*Video time*/
 
 .format-designer .designer .section.img-text.card-layout .activity.videotime {
-    display: inline-block !important;
+    display: inline-block !important; /* stylelint-disable-line declaration-no-important */
 }
 .format-designer .designer .section.img-text .activity.videotime .activity-block.progress-element .card {
     border-left: 0;
@@ -2677,7 +2677,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     display: block;
 }
 .path-course-view.format-designer ul.designer .section .content .section.circles-layout li.activity.videotime {
-    display: inline-block !important;
+    display: inline-block !important; /* stylelint-disable-line declaration-no-important */
 }
 .path-course-view.format-designer ul.designer .section .content .section.circles-layout li.activity.videotime.preview_mode {
     float: none;
