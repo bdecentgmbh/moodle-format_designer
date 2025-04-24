@@ -22,6 +22,10 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// Let codechecker ignore some sniffs for this file as it is perfectly well ordered, just not alphabetically.
+// phpcs:disable moodle.Files.LangFilesOrdering.UnexpectedComment
+// phpcs:disable moodle.Files.LangFilesOrdering.IncorrectOrder
+
 $string['addsections'] = 'Add designer sections';
 $string['currentsection'] = 'This designer section';
 $string['dateformat'] = 'Date format';
@@ -127,7 +131,6 @@ $string['sectionbackgroundtype'] = "<b> Section header selected </b>, The backgr
 <b> Whole section selected </b>, The background shall be applied to the whole section ";
 $string['backgroundimage'] = "Background image";
 $string['completionbackgroundimage'] = 'Background image (completed)';
-$string['textcolor'] = "Text color";
 $string['sectiondesignertextcolor_help'] = "Text color shall be only applied to the section title and section summary";
 $string['hidesectiontitle'] = "Hide section title";
 $string['sectiondesignertextcolor'] = "Text color shall be only applied to the section title and section summary";
@@ -237,8 +240,6 @@ $string['maskimage_help'] = 'Selected mask image will displayed in section block
 $string['timemanagementmissing'] = 'Learning Tools Pro required for this feature. <a href="https://bdecent.de/product/learning-tools-pro/">Learn more</a>.';
 $string['completiontrackingmissing'] = 'Turn on completion tracking to display completion date.';
 $string['coursestartdate'] = 'Course start date';
-$string['courseduedate'] = 'Course due date';
-$string['coursecompletiondate'] = 'Course completion date';
 $string['courseexpirationdate'] = 'Course expiration date';
 $string['criteriacompleted'] = '{$a->completed} of {$a->count} criteria completed';
 $string['todaydue'] = '{$a->due} due today';
@@ -315,7 +316,6 @@ $string['never'] = "Never";
 
 $string['strprerequisites_role'] = "Role for automatically enrolled students";
 $string['backtomaincourse'] = "Back to main course";
-$string['disabled'] = "Disabled";
 $string['prerequisitesdesc'] = "Please complete all of the following courses:";
 $string['courseprerequisitestitle'] = "Prerequisites title";
 $string['courseprerequisitestitle_help'] = "Prerequisites tab title";
@@ -347,7 +347,6 @@ $string['profilefieditem'] = '';
 $string['profilefieditem_help'] = "Display the user profile field in the course staff block.";
 $string['strcompleted'] = "Completed";
 
-$string['sectionzeroactivities_help'] = "";
 $string['heroactivitypos'] = "";
 $string['courseprerequisitepos'] = "";
 $string['stravoidduplicateentry'] = "Avoid duplicate entry";
@@ -437,7 +436,6 @@ $string['courseheadersummary_help'] = '<b>Disabled</b>: This option will not sho
 <b>Trimmed</b>: Selecting this option will trim the course summary based on the global setting "trim length."<br>
 <b>Full</b>: Choosing this option will display the complete course summary.<br>';
 $string['trimmed'] = 'Trimmed';
-$string['full'] = 'Full';
 $string['additionalcontent'] = 'Additional Content';
 $string['additionalcontent_help'] = 'Add any additional content that you want to appear at the bottom of the course header.';
 $string['courseheaderbgcolor'] = 'Background color';
@@ -466,7 +464,6 @@ $string['summarylength'] = 'Summary length';
 $string['summarylengthdesc'] = 'Enter the length for the summary to trim';
 // ...Field value fromat.
 $string['enabled'] = 'Enabled';
-$string['disabled'] = 'Disabled';
 // Activity description trim length.
 $string['activitydesclength'] = 'Activity description trim';
 $string['activitydesclength_desc'] = 'This global setting determines whether the description for activities is trimmed.<br><b>Trim (Default)</b>: This option trims the description, displaying it in a condensed form, similar to the current behavior.<br>
@@ -523,7 +520,6 @@ $string['designercustom_maskposition'] = "Custom Mask Position";
 $string['completioncheckmark'] = "Display checkmark upon course completion";
 $string['completioncheckmark_help'] = "It displays a checkmark instead of 100% in the donuts.";
 
-$string['strcompleted'] = "Completed";
 $string['strinprogress'] = "In progress";
 $string['strenrolled'] = "Enrolled";
 $string['managepurposes'] = "Manage purposes";
@@ -547,7 +543,6 @@ $string['purpose_edited'] = 'Purpose successfully edited';
 $string['purpose_deleted'] = "Purpose successfully deleted";
 $string['delete_purpose'] = "Delete purpose";
 
-$string['title'] = "Title";
 $string['modulepurposes'] = '<h5 class="font-weight-normal font-italic pt-2 pb-2"  > Module purposes </h5>';
 $string['purpose'] = "Purpose";
 $string['purposesetting'] = "Purpose";
