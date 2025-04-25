@@ -1,3 +1,5 @@
+[![Moodle Plugin CI](https://github.com/bdecentgmbh/moodle-format_designer/actions/workflows/moodle-ci.yml/badge.svg?branch=MOODLE_404_STABLE)](https://github.com/bdecentgmbh/moodle-format_designer/actions/workflows/moodle-ci.yml)
+
 Designer course format for Moodle
 ========================
 The Designer course format is a course builder — teachers can choose different layouts for each section in order to display activities and resources in a more meaningful and beautiful way. Moodle provides robust activities for effective learning and teaching, but the course home page often lacks visual appeal and teachers are overwhelmed to create a beautiful course with core tools. 

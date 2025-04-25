@@ -1787,7 +1787,7 @@ function format_designer_get_all_layouts() {
     $layouts = [
         'default' => get_string('link', 'format_designer'),
         'list' => get_string('list', 'format_designer'),
-        'cards' => get_string('cards', 'format_designer')
+        'cards' => get_string('cards', 'format_designer'),
     ];
     $prolayouts = array_keys(core_component::get_plugin_list('layouts'));
     $prolayouts = (array) get_strings($prolayouts, 'format_designer');

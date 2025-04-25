@@ -174,7 +174,7 @@ class content extends content_base {
      * @param course_modinfo $modinfo the current course modinfo object
      * @return section_info[] an array of section_info to display
      */
-    private function get_sections_to_display(course_modinfo $modinfo): array {
+    protected function get_sections_to_display(course_modinfo $modinfo): array {
         global $CFG;
         $singlesection = $this->format->get_sectionnum();
         $course = $this->format->get_course();
