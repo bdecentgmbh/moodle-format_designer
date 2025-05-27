@@ -106,6 +106,8 @@ class header extends \core_courseformat\output\local\content\section\header {
             $data->sectionbulk = true;
         }
 
+        // Delegated sections in main course page need to have h4 tag, h3 otherwise.
+        $data->headinglevel = ($section->is_delegated() && is_null($format->get_sectionid())) ? 4 : 3;
         return $data;
     }
 
