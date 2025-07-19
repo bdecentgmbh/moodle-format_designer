@@ -132,14 +132,20 @@ class events {
         $userid = $event->relateduserid;
         $courseid = $event->courseid;
         self::course_user_cache_updated($courseid, $userid);
-        $records = $DB->get_records('course_completion_criteria', ['courseinstance' => $courseid]);
-        if ($records) {
-            foreach ($records as $record) {
-                if ($record) {
-                    self::course_user_cache_updated($record->course, $userid);
-                }
-            }
+        
+        $recordrs = $DB->get_recordset_sql(
+            <<<'EOT'
+            SELECT DISTINCT course
+            FROM {course_completion_criteria}
+            WHERE
+                courseinstance = ?
+            EOT,
+            [ $courseid ]
+        );
+        foreach ($recordrs as $record) {
+            self::course_user_cache_updated($record->course, $userid);
         }
+        $recordrs->close();
     }
 
     /**

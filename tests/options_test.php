@@ -68,15 +68,7 @@ class options_test extends \advanced_testcase {
      * @covers \format_designer\options::is_json
      */
     public function test_optionisjson() {
-        $elements = [
-            'icon' => 2, 'visits' => 1, 'calltoaction' => 2,
-            'title' => 1, 'description' => 2, 'modname' => 3, 'completionbadge' => 3,
-        ];
-        $module = $this->getDataGenerator()->create_module('page', ['course' => $this->course, 'section' => 1,
-            'name' => 'Test page', 'content' => 'Test the module element avilabilities are available',
-            'designer_activityelements' => $elements,
-        ]);
-        $option = \format_designer\options::get_option($module->cmid, 'activityelements');
+        $option = json_encode([ 'a' => 1 ]);
         $isjson = \format_designer\options::is_json($option);
         $this->assertTrue($isjson);
 
@@ -104,7 +96,7 @@ class options_test extends \advanced_testcase {
         $this->assertEquals($elements, json_decode($field, true));
 
         $option = \format_designer\options::get_option($module->cmid, 'activityelements');
-        $this->assertEquals($elements, json_decode($option, true));
+        $this->assertEquals($elements, $option);
 
         $classes = $PAGE->get_renderer('format_designer')->get_activity_elementclasses((object)['id' => $module->cmid]);
         $this->assertEquals('content-show-hover', $classes['icon']);

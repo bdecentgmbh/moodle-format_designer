@@ -1445,16 +1445,24 @@ class format_designer extends \core_courseformat\base {
      */
     public function setup_kanban_layouts($course) {
         global $DB;
-        $sections = $DB->get_records('course_sections', ['course' => $course['id']]);
-        foreach ($sections as $section) {
-            if ($section->section == 0) {
-                continue;
-            }
+        $sectionrs = $DB->get_recordset_sql(
+            <<<'EOT'
+            SELECT
+                id
+            FROM {course_sections}
+            WHERE
+                section <> 0
+                AND course = ?
+            EOT,
+            [ $course['id'] ]
+        );
+        foreach ($sectionrs as $section) {
             $this->set_section_option($section->id, 'sectiontype', 'cards');
             $this->set_section_option($section->id, 'layoutmobilecolumn', '1');
             $this->set_section_option($section->id, 'layouttabletcolumn', '1');
             $this->set_section_option($section->id, 'layoutdesktopcolumn', '1');
         }
+        $sectionrs->close();
     }
 
     /**
@@ -1788,7 +1796,7 @@ function format_designer_get_all_layouts() {
     $layouts = [
         'default' => get_string('link', 'format_designer'),
         'list' => get_string('list', 'format_designer'),
-        'cards' => get_string('cards', 'format_designer')
+        'cards' => get_string('cards', 'format_designer'),
     ];
     $prolayouts = array_keys(core_component::get_plugin_list('layouts'));
     $prolayouts = (array) get_strings($prolayouts, 'format_designer');
@@ -2143,13 +2151,19 @@ function format_designer_course_has_videotime($course) {
     global $DB;
     $pluginman = \core_plugin_manager::instance();
     $plugininfo = $pluginman->get_plugin_info('mod_videotime');
-    if (!empty($plugininfo)) {
-        $videotime = $DB->get_record("modules", ['name' => 'videotime']);
-        if ($DB->record_exists('course_modules', ['course' => $course->id, 'module' => $videotime->id])) {
-            return true;
-        }
-    }
-    return false;
+    return !empty($plugininfo) && $DB->record_exists_sql(
+        <<<'EOT'
+        SELECT
+            1
+        FROM {modules} m
+        JOIN {course_modules} cm
+            ON cm.module = m.id
+            AND cm.course = ?
+        WHERE
+            m.name = ?
+        EOT,
+        [ $course->id, 'videotime' ]
+    );
 }
 
 /**
