@@ -36,6 +36,13 @@ use format_designer\output\cm_completion;
 class options {
 
     /**
+     * Cache for options per cmid.
+     *
+     * @var array
+     */
+    public static $optionspercmid = [];
+
+    /**
      * Find the given string is JSON format or not.
      *
      * @param string $string
@@ -60,7 +67,6 @@ class options {
      * Get designer additional fields values for the given module.
      *
      * @param int $cmid course module id.
-     * @return stdclass $options List of additional field values
      */
     public static function get_options($cmid) {
         global $DB;
@@ -88,6 +94,7 @@ class options {
         return $optionspercmid[$cmid];
 
     }
+
 
     /**
      * Insert the additional module fields data to the table.
@@ -250,6 +257,8 @@ class options {
     public static function get_file_areas($structure='module') {
         if (format_designer_has_pro()) {
             return \local_designer\options::get_file_areas($structure);
+        } else {
+            return [];
         }
     }
 

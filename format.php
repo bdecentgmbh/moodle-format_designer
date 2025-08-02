@@ -65,7 +65,7 @@ $ispopupactivities = isset($course->popupactivities) && $course->popupactivities
 // Include course format js module.
 $PAGE->requires->js('/course/format/designer/format.js');
 
-if ($ispopupactivities && !$PAGE->user_is_editing()) {
+if ($ispopupactivities && !$PAGE->user_is_editing() && format_designer_popup_installed()) {
     // Include popups.
     $PAGE->requires->js_call_amd('format_popups/popups', 'init', [
         $context->id, $course->id, $displaysection, ]);

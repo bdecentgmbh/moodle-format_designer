@@ -132,7 +132,7 @@ class events {
         $userid = $event->relateduserid;
         $courseid = $event->courseid;
         self::course_user_cache_updated($courseid, $userid);
-        
+
         $recordrs = $DB->get_recordset_sql(
             <<<'EOT'
             SELECT DISTINCT course

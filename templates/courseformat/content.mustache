@@ -159,7 +159,7 @@
         }
     }
 }}
-<div id="{{uniqid}}-course-format" class="{{#startclass}}single-section-layout{{/startclass}} {{#issectionpageclass}} {{issectionpageclass}} {{/issectionpageclass}}">
+<div id="course-format-{{uniqid}}" class="{{#startclass}}single-section-layout{{/startclass}} {{#issectionpageclass}} {{issectionpageclass}} {{/issectionpageclass}}">
     {{#headermetadata}}
         {{{headermetadata}}}
     {{/headermetadata}}
@@ -216,6 +216,6 @@
 </div>
 {{#js}}
 require(['core_courseformat/local/content'], function(component) {
-    component.init('{{uniqid}}-course-format', {}, {{sectionreturn}});
+    component.init('course-format-{{uniqid}}', {}, {{sectionreturn}});
 });
 {{/js}}

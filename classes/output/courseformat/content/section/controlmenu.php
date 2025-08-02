@@ -97,7 +97,13 @@ class controlmenu extends controlmenu_base {
 
         $hassectiontypes = true;
 
-        $sectionnum = $this->format->get_sectionnum();
+        $format = $this->format;
+
+        if (method_exists($format, 'get_sectionnum')) {
+            $sectionnum = $format->get_sectionnum();
+        } else {
+            $sectionnum = $format->get_section_number();
+        }
 
         $course = $this->format->get_course();
 
@@ -203,7 +209,8 @@ class controlmenu extends controlmenu_base {
         $numsections = $format->get_last_section_number();
         $isstealth = $section->section > $numsections;
 
-        $baseurl = course_get_url($course, $sectionreturn);
+        $baseurl = course_get_url($course, $sectionreturn, ['navigation' => true]);
+
         $baseurl->param('sesskey', sesskey());
 
         $course = $format->get_course();

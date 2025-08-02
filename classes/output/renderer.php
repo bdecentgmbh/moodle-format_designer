@@ -103,7 +103,12 @@ class renderer extends \core_courseformat\output\section_renderer {
         $data->startid = $startid;
 
         $format = course_get_format($course);
-        $singlesection = $format->get_sectionnum();
+
+        if (method_exists($format, 'get_sectionnum')) {
+            $singlesection = $format->get_sectionnum();
+        } else {
+            $singlesection = $format->get_section_number();
+        }
 
         $data->issectionpageclass = $singlesection || ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE)
             ? 'section-page-layout' : '';
@@ -264,7 +269,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         $numsections = course_get_format($course)->get_last_section_number();
         $isstealth = $section->section > $numsections;
 
-        $baseurl = course_get_url($course, $sectionreturn);
+        $baseurl = course_get_url($course, $sectionreturn, ['navigation' => true]);
         $baseurl->param('sesskey', sesskey());
 
         $controls = [];
@@ -469,6 +474,11 @@ class renderer extends \core_courseformat\output\section_renderer {
             'slidearrow' => count($coursestaffs) > 1 ? true : false,
             'currentuser' => $USER->id,
             'ismessaging' => $CFG->messaging,
+            'dataride' => $CFG->branch >= 500 ? "data-bs-ride" : "data-ride",
+            "dataslide" => $CFG->branch >= 500 ? "data-bs-slide" : "data-slide",
+            'datatoggle' => $CFG->branch >= 500 ? "data-bs-toggle" : "data-toggle",
+            'datacontent' => $CFG->branch >= 500 ? "data-bs-content" : "data-content",
+            'datahtml' => $CFG->branch >= 500 ? "data-bs-html" : "data-html",
         ];
 
         if (format_designer_has_pro()) {
@@ -700,7 +710,7 @@ class renderer extends \core_courseformat\output\section_renderer {
                         $section = course_get_format($course)->get_section($sectionno);
                         if ($section->visible) {
                             $sectionname = get_section_name($course, $section);
-                            $sectionurl = new moodle_url('/course/view.php', ['id' => $course->id, 'section' => $sectionno]);
+                            $sectionurl = course_get_url($section->course, $section->section, ['navigation' => true]);
                             $sectiontooltiplink = html_writer::link($sectionurl,
                                     get_string('strsection', 'format_designer') . ": ". $sectionname);
                             $realtiveactivities = isset($course->calsectionprogress) &&
@@ -884,7 +894,8 @@ class renderer extends \core_courseformat\output\section_renderer {
     public function render_section_data(section_info $section, stdClass $course, $onsectionpage,
         $sectionheader = false, $sectionreturn = 0, $sectioncontent = false) {
         global $CFG;
-        $sectionurl = new \moodle_url('/course/view.php', ['id' => $course->id, 'section' => $section->section]);
+        $sectionurl = course_get_url($section->course, $section->section, ['navigation' => true]);;
+
         if (format_designer_has_pro() && !$section->uservisible && $section->availableinfo
                 && !empty($section->sectioncardredirect)) {
             $sectionurl = $section->sectioncardredirect;
@@ -1015,6 +1026,8 @@ class renderer extends \core_courseformat\output\section_renderer {
             'maskimage' => (isset($section->sectiondesignermaskimage) && $section->sectiondesignermaskimage) ? true : false,
             'flowsizeclass' => (isset($course->flowsize) && $course->coursetype == DESIGNER_TYPE_FLOW &&
             !$this->page->user_is_editing()) ? $this->get_flow_size($course) : '',
+            'datatarget' => ($CFG->branch >= 500) ? 'data-bs-target' : 'data-target',
+            'datatoggle' => ($CFG->branch >= 500) ? 'data-bs-toggle' : 'data-toggle',
         ];
         $zerotohero = $course->sectionzeroactivities;
         if ($zerotohero == DESIGNER_HERO_ZERO_HIDE && $section->section == 0 && !$this->page->user_is_editing()) {
@@ -1025,10 +1038,13 @@ class renderer extends \core_courseformat\output\section_renderer {
             $mods = [];
             $cmids = $modinfo->sections[$section->section] ?? [];
 
+            $displayunavailableactivities = isset($course->displayunavailableactivities) ?
+                $course->displayunavailableactivities : false;
+
             foreach ($cmids as $cmid) {
                 $thismod = $modinfo->cms[$cmid];
                 if (!$thismod->get_course_module_record()->deletioninprogress) {
-                    if (!$thismod->is_visible_on_course_page() && !$course->displayunavailableactivities) {
+                    if (!$thismod->is_visible_on_course_page() && !$displayunavailableactivities) {
                         continue;
                     }
                     if (format_designer_has_pro() && isset($course->activitydisplaymode)
@@ -1175,8 +1191,8 @@ class renderer extends \core_courseformat\output\section_renderer {
         // (AFTER any icons). Otherwise it was displayed before.
         $cmtext = '';
         $videotime = $mod->modname == 'videotime';
-        $videoinstance = null;
         $isvideotimelabel = false;
+        $videoinstance = null;
         $useactivityimagestatus = false;
         $useactivityimage = '';
         if (format_designer_has_pro()) {
@@ -1320,6 +1336,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             'duration_formatted' => $durationformatted,
             'enableactivityimage' => $enableactivityimage ?? false,
             'hascmbulk' => class_exists('core_courseformat\output\local\content\bulkedittoggler') ? true : false,
+            'haspro' => format_designer_has_pro(),
         ];
         if (format_designer_has_pro()) {
             require_once($CFG->dirroot. "/local/designer/lib.php");
@@ -1356,7 +1373,7 @@ class renderer extends \core_courseformat\output\section_renderer {
      */
     public function get_activity_elementclasses($mod) {
 
-        $option  = \format_designer\options::get_option($mod->id, 'activityelements');
+        $option = \format_designer\options::get_option($mod->id, 'activityelements');
         if ($option) {
             $classes = [
                 0 => 'content-hide', 1 => 'content-show', 2 => 'content-show-hover',
@@ -1365,7 +1382,7 @@ class renderer extends \core_courseformat\output\section_renderer {
 
             $elementclasses = array_map(function($v) use ($classes) {
                 return (isset($classes[$v])) ? $classes[$v] : $v;
-            }, $option);
+            }, (array) $option);
             return $elementclasses;
         }
         return [];

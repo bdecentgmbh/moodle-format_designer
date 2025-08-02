@@ -92,7 +92,7 @@ class header extends \core_courseformat\output\local\content\section\header {
 
         if (!$format->show_editor() && $coursedisplay == COURSE_DISPLAY_MULTIPAGE && empty($data->issinglesection)) {
             if ($section->uservisible) {
-                $data->url = course_get_url($course, $section->section);
+                $data->url = course_get_url($course, $section->section, ['navigation' => true]);
             }
         }
         $data->name = get_section_name($course, $section);

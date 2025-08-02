@@ -67,7 +67,12 @@ class section extends \core_courseformat\output\local\content\section {
         }
 
         $renderer = $this->format->get_renderer($PAGE);
-        $sectionnum = $format->get_sectionnum();
+
+        if (method_exists($format, 'get_sectionnum')) {
+            $sectionnum = $format->get_sectionnum();
+        } else {
+            $sectionnum = $format->get_section_number();
+        }
 
         if ($data->iscoursedisplaymultipage && !$sectionnum) {
             $pagesection = optional_param('section', -1, PARAM_INT);

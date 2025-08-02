@@ -194,7 +194,6 @@ $ADMIN->add('formatsettings', new admin_category('format_designer', get_string('
 
 $ADMIN->add('format_designer', $settings);
 
-
 $settings = null;
 
 if (format_designer_has_pro()) {

@@ -244,18 +244,21 @@ class format_designer extends \core_courseformat\base {
      */
     public function get_view_url($section, $options = []) {
         global $CFG;
+
         $course = $this->get_course();
         $url = new moodle_url('/course/view.php', ['id' => $course->id]);
-
         $sr = null;
+
         if (array_key_exists('sr', $options)) {
             $sr = $options['sr'];
         }
+
         if (is_object($section)) {
             $sectionno = $section->section;
         } else {
             $sectionno = $section;
         }
+
         if ($sectionno !== null) {
             if ($sr !== null) {
                 if ($sr) {
@@ -267,6 +270,7 @@ class format_designer extends \core_courseformat\base {
             } else {
                 $usercoursedisplay = $course->coursedisplay;
             }
+
             if ($sectionno != 0 && $usercoursedisplay == COURSE_DISPLAY_MULTIPAGE) {
                 $url->param('section', $sectionno);
             } else {
@@ -309,6 +313,9 @@ class format_designer extends \core_courseformat\base {
      * @return void
      */
     public function page_set_course(moodle_page $page) {
+        global $CFG;
+
+        static $design = null;
         $course = $this->get_course();
         if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
             $page->add_body_class('format-designer-single-section');
@@ -318,9 +325,12 @@ class format_designer extends \core_courseformat\base {
             $classes = \local_designer\info::create()->generate_body_classes($course, $this);
             $page->add_body_class($classes);
 
-            // Include the designer pro styles.
-            $styleurl = \local_designer\courseoptions::create($course)->designer_include_style();
-            $page->requires->css($styleurl);
+            if ($design === null) {
+                // Include the designer pro styles.
+                $styleurl = \local_designer\courseoptions::create($course)->designer_include_style();
+                $page->requires->css($styleurl);
+                $design = true;
+            }
         }
     }
     /**
@@ -1090,7 +1100,7 @@ class format_designer extends \core_courseformat\base {
         $sectionoptions = [
             'sectiontype' => [
                 'type' => PARAM_ALPHANUMEXT,
-                'label' => '',
+                'label' => new lang_string('sectiontype', 'format_designer'),
                 'element_type' => 'hidden',
                 'default' => get_config('format_designer', 'sectiontype'),
             ],
@@ -1106,7 +1116,7 @@ class format_designer extends \core_courseformat\base {
             'type' => PARAM_TEXT,
             'element_type' => 'header',
             'default' => get_string('sectionlayouts', 'format_designer'),
-            'label' => '',
+            'label' => new lang_string('sectionlayouts', 'format_designer'),
         ];
 
         $course = course_get_format($PAGE->course)->get_course();
@@ -1121,7 +1131,7 @@ class format_designer extends \core_courseformat\base {
             foreach ($lists as $name => $options) {
                 $name = $name.'width';
                 $availablewidth = array_slice($width, 0, $options['size']);
-                $widthdefaultvalue = isset($design->$name) ? $width[$design->$name] : '';
+                $widthdefaultvalue = get_config('format_designer', $name);
                 $sectionoptions[$name] = [
                     'default' => (isset($design->$name) ||
                     (isset($course->coursetype) && $course->coursetype != DESIGNER_TYPE_NORMAL))
@@ -2174,7 +2184,7 @@ function format_designer_course_has_videotime($course) {
  * @param stdClass $context The context of the course
  */
 function format_designer_extend_navigation_course($navigation, $course, $context) {
-    global $DB, $PAGE, $COURSE;
+    global $DB, $PAGE, $COURSE, $CFG;
     if ($course->format != 'designer') {
         return;
     }

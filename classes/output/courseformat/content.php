@@ -66,7 +66,12 @@ class content extends content_base {
             'sectionreturn' => null,
         ];
 
-        $singlesectionnum = $format->get_sectionnum();
+        if (method_exists($format, 'get_sectionnum')) {
+            $singlesectionnum = $format->get_sectionnum();
+        } else {
+            $singlesectionnum = $format->get_section_number();
+        }
+
         $singlesectionnumhandled = false;
         if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && optional_param('section', -1, PARAM_INT) >= 0) {
             $singlesectionnumhandled = true;
@@ -144,13 +149,17 @@ class content extends content_base {
 
             $sectiondata = $section->export_for_template($output);
             $checksectionvisible = ($course->coursedisplay != COURSE_DISPLAY_MULTIPAGE);
+
+            $displayunavailableactivities = isset($course->displayunavailableactivities) ?
+                $course->displayunavailableactivities : false;
+
             if (!$format->is_section_visible($thissection)) {
-                if (!format_designer_has_pro() || !isset($course->displayunavailableactivities)
+                if (!format_designer_has_pro() || !$displayunavailableactivities
                     || $course->coursedisplay != COURSE_DISPLAY_MULTIPAGE) {
                     continue;
                 }
 
-                if (!$course->displayunavailableactivities) {
+                if (!$displayunavailableactivities) {
                     continue;
                 }
                 $sectiondata->header->title = get_section_name($course, $sectiondata->num);
@@ -174,9 +183,16 @@ class content extends content_base {
      * @param course_modinfo $modinfo the current course modinfo object
      * @return section_info[] an array of section_info to display
      */
-    private function get_sections_to_display(course_modinfo $modinfo): array {
+    protected function get_sections_to_display(course_modinfo $modinfo): array {
         global $CFG;
-        $singlesection = $this->format->get_sectionnum();
+        $format = $this->format;
+
+        if (method_exists($format, 'get_sectionnum')) {
+            $singlesection = $format->get_sectionnum();
+        } else {
+            $singlesection = $format->get_section_number();
+        }
+
         $course = $this->format->get_course();
         if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && optional_param('section', -1, PARAM_INT) >= 0) {
             $singlesection = empty($singlesection) ? 0 : $singlesection;

@@ -22,7 +22,9 @@
     Example context (json):
     {
         "sectiondesigntextcolor": "color: #fff",
-        "sectionheaderstyle": "min-height:100px;"
+        "sectionheaderstyle": "min-height:100px;",
+        "datatarget": "data-target",
+        "datatoggle": "data-toggle"
     }
 }}
 
@@ -52,8 +54,8 @@ data-target="{{#sectioncardcontentdirect}}_blank{{/sectioncardcontentdirect}}" d
 
 <div class="course-section-header section-header-content {{#sectioncollapse}}{{^sectionshow}}collapsed{{/sectionshow}}{{/sectioncollapse}} {{coursetype.classes}} {{#flowsizeclass}} {{flowsizeclass}} {{/flowsizeclass}}"
     id="section-head-{{section.section}}"
-    {{#sectioncollapse}} data-toggle="collapse" {{/sectioncollapse}}
-    data-target="#section-content-{{section.section}}"
+    {{#sectioncollapse}} {{datatoggle}}="collapse" {{/sectioncollapse}}
+    {{datatarget}}="#section-content-{{section.section}}"
     aria-expanded="false"
     aria-controls="section-head-{{section.section}}"
     role="contentinfo"
@@ -75,7 +77,7 @@ data-target="{{#sectioncardcontentdirect}}_blank{{/sectioncardcontentdirect}}" d
             </div>
         {{/sectiondesignheader}}
         {{#sectioncollapse}}
-        <a data-toggle="collapse" href="#section-content-{{section.section}}">
+        <a {{datatoggle}}="collapse" href="#section-content-{{section.section}}">
             <span class="section-collapse-icon" style="{{{sectiondesigntextcolor}}}"></span>
         </a>
         {{/sectioncollapse}}
