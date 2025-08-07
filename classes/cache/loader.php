@@ -27,7 +27,10 @@ namespace format_designer\cache;
 defined('MOODLE_INTERNAL') || die();
 
 if (version_compare($CFG->version, '2024100700', '<')) {
-    require_once($CFG->dirroot.'/cache/classes/loaders.php');
+    $loader = $CFG->dirroot . '/cache/classes/loaders.php';
+    if (file_exists($loader)) {
+        require_once($loader);
+    }
 }
 
 /**
