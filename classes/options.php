@@ -263,16 +263,23 @@ class options {
     }
 
     /**
-     * Get timemanagement tools due date for the module.
+     * Get tool timetable due date for the module.
      *
      * @param cm_info $cm
      * @return int|bool Mod due date if available otherwiser returns false.
      */
     public static function timetool_duedate($cm) {
-        global $USER;
-        if (format_designer_timemanagement_installed() && function_exists('ltool_timemanagement_get_mod_user_info')) {
-            $data = ltool_timemanagement_get_mod_user_info($cm, $USER->id);
-            return $data['duedate'] ?? false;
+        global $USER, $DB;
+        if (format_designer_timetable_installed()) {
+            $record = $DB->get_record('tool_timetable_modules', ['cmid' => $cm->id ?? 0]);
+            if ($record) {
+                $timemanagement = new \tool_timetable\time_management($cm->course);
+                $userenrolments = $timemanagement->get_course_user_enrollment($USER->id, $cm->course);
+                $timestarted = $userenrolments[0]['timestart'] ?? 0;
+                $timeended = $userenrolments[0]['timeend'] ?? 0;
+                $moduledates = $timemanagement->calculate_coursemodule_managedates($record, $timestarted, $timeended);
+                return $moduledates['duedate'] ?? false;
+            }
         }
         return false;
     }

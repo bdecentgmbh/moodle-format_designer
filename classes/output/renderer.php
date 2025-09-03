@@ -504,11 +504,16 @@ class renderer extends \core_courseformat\output\section_renderer {
             ];
         }
 
-        // Find the course due date. only if the timemanagement installed.
-        if (format_designer_timemanagement_installed() && function_exists('ltool_timemanagement_cal_course_duedate')) {
-            $coursedatesinfo = $DB->get_record('ltool_timemanagement_course', ['course' => $course->id]);
-            if ($courseduedate && $coursedatesinfo) {
-                $data['courseduedate'] = ltool_timemanagement_cal_course_duedate($coursedatesinfo, $enrolstartdate);
+        // Find the course due date. only if the timetable installed.
+        if (format_designer_timetable_installed()) {
+            if ($courseduedate && ($timecourse = $DB->get_record('tool_timetable_course', ['course' => $course->id]))) {
+                $timemanagement = new \tool_timetable\time_management($timecourse->course);
+                // Get user enrolment info in course.
+                $usercourseenrollinfo = $timemanagement->get_course_user_enrollment($USER->id);
+                $startdate = $usercourseenrollinfo[0]['timestart'] ?? 0;
+                $enddate = $usercourseenrollinfo[0]['timeend'] ?? 0;
+                $coursedue = $timemanagement->calculate_course_duedate($startdate, $enddate, $USER->id);
+                $data['courseduedate'] = $coursedue ?? false;
             }
         }
 

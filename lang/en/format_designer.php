@@ -460,7 +460,7 @@ $string['timeagomonth'] = 'month';
 $string['timeagosecond'] = 'second';
 $string['timeagoweek'] = 'week';
 $string['timeagoyear'] = 'year';
-$string['timemanagementmissing'] = 'Learning Tools Pro required for this feature. <a href="https://bdecent.de/product/learning-tools-pro/">Learn more</a>.';
+$string['timemanagementmissing'] = 'Tools timetable required for this feature.';
 $string['title'] = "Title";
 $string['todaydue'] = '{$a->due} due today';
 $string['trimmed'] = 'Trimmed';

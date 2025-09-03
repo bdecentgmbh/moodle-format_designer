@@ -824,7 +824,7 @@ class format_designer extends \core_courseformat\base {
                 ];
             }
 
-            if (format_designer_timemanagement_installed()) {
+            if (format_designer_timetable_installed()) {
                 $courseformatoptionsedit['courseduedateinfo'] = [
                     'element_type' => 'hidden',
                 ];
@@ -2053,21 +2053,24 @@ function format_designer_coursemodule_edit_post_actions($data, $course) {
 }
 
 /**
- * Find the time management tool installed and enabled in the learningtools.
+ * Find the timetable tool installed.
  *
- * @return bool result of the time management plugin availability.
+ * @return bool result of the timetable plugin availability.
  */
-function format_designer_timemanagement_installed() {
-    global $DB, $CFG;
-    $tools = \core_plugin_manager::instance()->get_subplugins_of_plugin('local_learningtools');
-    if (in_array('ltool_timemanagement', array_keys($tools))) {
-        $status = $DB->get_field('local_learningtools_products', 'status', ['shortname' => 'timemanagement']);
-        if ($status) {
-            require_once($CFG->dirroot.'/local/learningtools/ltool/timemanagement/lib.php');
+function format_designer_timetable_installed() {
+    global $CFG;
+        static $result;
+
+        if ($result == null) {
+            if (array_key_exists('timetable', \core_component::get_plugin_list('tool'))) {
+                require_once($CFG->dirroot.'/admin/tool/timetable/classes/time_management.php');
+                $result = true;
+            } else {
+                $result = false;
+            }
         }
-        return ($status) ? true : false;
-    }
-    return false;
+
+    return $result;
 }
 
 
