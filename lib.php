@@ -257,6 +257,7 @@ class format_designer extends \core_courseformat\base {
             $sectionno = $section->section;
         } else {
             $sectionno = $section;
+            $section = $this->get_section($sectionno);
         }
 
         if ($sectionno !== null) {
@@ -271,8 +272,10 @@ class format_designer extends \core_courseformat\base {
                 $usercoursedisplay = $course->coursedisplay;
             }
 
-            if ($sectionno != 0 && $usercoursedisplay == COURSE_DISPLAY_MULTIPAGE) {
+            if ($usercoursedisplay == COURSE_DISPLAY_MULTIPAGE) {
                 $url->param('section', $sectionno);
+                $url->param('sectionid', $section->id);
+                $url->param('sesskey', sesskey());
             } else {
                 $url->set_anchor('section-'.$sectionno);
             }

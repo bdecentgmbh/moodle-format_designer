@@ -77,6 +77,11 @@ class content extends content_base {
             $singlesectionnumhandled = true;
         }
 
+        if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && $this->format->get_sectionid()) {
+            // In ajax, we always want to return the section being viewed.
+            $singlesectionnumhandled = true;
+        }
+
         // The single section format has extra navigation.
         if ($singlesectionnumhandled) {
             $singlesectionnum = empty($singlesectionnum) ? 0 : $singlesectionnum;
@@ -192,9 +197,13 @@ class content extends content_base {
         } else {
             $singlesection = $format->get_section_number();
         }
+        if ((!is_numeric($singlesection))) {
+            $singlesection = $this->format->get_sectionid();
+        }
+
 
         $course = $this->format->get_course();
-        if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && optional_param('section', -1, PARAM_INT) >= 0) {
+        if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && (optional_param('section', -1, PARAM_INT) >= 0) || $this->format->get_sectionid()) {
             $singlesection = empty($singlesection) ? 0 : $singlesection;
             $sections = [
                 $modinfo->get_section_info($singlesection),
