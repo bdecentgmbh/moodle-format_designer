@@ -141,7 +141,7 @@ trait loader_common_methods {
     }
 }
 
-if (version_compare($CFG->version, '2024100700', '<')) {
+if (!class_exists('\core_cache\application_cache')) {
     require_once($CFG->dirroot.'/cache/classes/loaders.php');
     /**
      * Custom cache loader to handle the smart menus and items deletion for older Moodle versions.
