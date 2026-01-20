@@ -27,6 +27,7 @@
 // phpcs:disable moodle.Files.LangFilesOrdering.IncorrectOrder
 
 $string['addsections'] = 'Add designer sections';
+$string['cachedef_designeroptions'] = 'Designer Options Cache';
 $string['currentsection'] = 'This designer section';
 $string['dateformat'] = 'Date format';
 $string['dateformat_help'] = 'Date format for completion info (e.g. Complete by x date)';
