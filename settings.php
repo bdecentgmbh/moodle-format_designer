@@ -82,7 +82,7 @@ if ($ADMIN->fulltree) {
     $name = 'format_designer/heroactivity';
     $title = get_string('showastab', 'format_designer');
     $desc = '';
-    $default = ['value' => '', 'fix' => 0];
+    $default = ['value' => 0, 'fix' => 0];
     $tabs = [
         0 => get_string('disabled', 'format_designer'),
         1 => get_string('everywhere', 'format_designer'),
