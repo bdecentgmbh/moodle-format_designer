@@ -40,7 +40,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class header extends \core_courseformat\output\local\content\section\header {
-
     /**
      * Export this data so it can be used as the context for a mustache template.
      *
@@ -64,14 +63,19 @@ class header extends \core_courseformat\output\local\content\section\header {
         if ($coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
             $data->headerdisplaymultipage = true;
             $data->title = $output->section_title($section, $course);
-            if (format_designer_has_pro() && !$section->uservisible && $section->availableinfo
-                && !empty($section->sectioncardredirect)) {
+            if (
+                \format_designer\helper::has_pro() && !$section->uservisible && $section->availableinfo
+                && !empty($section->sectioncardredirect)
+            ) {
                 $target = '_self';
                 if ($section->sectioncardtab) {
                     $target = '_blank';
                 }
-                $data->title = \html_writer::link($section->sectioncardredirect, get_section_name($course, $section),
-                    ['target' => $target]);
+                $data->title = \html_writer::link(
+                    $section->sectioncardredirect,
+                    get_section_name($course, $section),
+                    ['target' => $target]
+                );
             }
         }
 
@@ -101,8 +105,10 @@ class header extends \core_courseformat\output\local\content\section\header {
         $bodyclasses = explode(" ", $PAGE->bodyclasses);
 
         $sectionreturn = $format->get_sectionnum();
-        if ((!$sectionreturn || !in_array('format-designer-single-section', $bodyclasses))
-            && class_exists('core_courseformat\output\local\content\bulkedittoggler')) {
+        if (
+            (!$sectionreturn || !in_array('format-designer-single-section', $bodyclasses))
+            && class_exists('core_courseformat\output\local\content\bulkedittoggler')
+        ) {
             $data->sectionbulk = true;
         }
 
@@ -110,5 +116,4 @@ class header extends \core_courseformat\output\local\content\section\header {
         $data->headinglevel = ($section->is_delegated() && is_null($format->get_sectionid())) ? 4 : 3;
         return $data;
     }
-
 }

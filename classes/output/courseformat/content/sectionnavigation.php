@@ -74,8 +74,7 @@ class sectionnavigation extends \core_courseformat\output\local\content\sectionn
                     $data->previoushidden = true;
                 }
                 $data->previousname = get_section_name($course, $sections[$back]);
-                //$data->previousurl = course_get_url($course, $back, ['navigation' => true]);
-                $data->previousurl =  new \moodle_url("/course/section.php", ['id' => $sections[$back]->id]);
+                $data->previousurl = new \moodle_url("/course/section.php", ['id' => $sections[$back]->id]);
                 $data->hasprevious = true;
             }
             $back--;
@@ -83,7 +82,7 @@ class sectionnavigation extends \core_courseformat\output\local\content\sectionn
 
         $forward = $this->sectionno + 1;
         $numsections = course_get_format($course)->get_last_section_number();
-        while ($forward <= $numsections and empty($data->nexturl)) {
+        while ($forward <= $numsections && empty($data->nexturl)) {
             if ($canviewhidden || $sections[$forward]->uservisible) {
                 if (!$sections[$forward]->visible) {
                     $data->nexthidden = true;

@@ -53,11 +53,11 @@ data-target="{{#sectioncardcontentdirect}}_blank{{/sectioncardcontentdirect}}" d
 </div>
 
 <div class="course-section-header section-header-content {{#sectioncollapse}}{{^sectionshow}}collapsed{{/sectionshow}}{{/sectioncollapse}} {{coursetype.classes}} {{#flowsizeclass}} {{flowsizeclass}} {{/flowsizeclass}}"
-    id="section-head-{{section.section}}"
+    id="section-head-{{num}}"
     {{#sectioncollapse}} {{datatoggle}}="collapse" {{/sectioncollapse}}
-    {{datatarget}}="#section-content-{{section.section}}"
+    {{datatarget}}="#section-content-{{num}}"
     aria-expanded="false"
-    aria-controls="section-head-{{section.section}}"
+    aria-controls="section-head-{{num}}"
     role="contentinfo"
     style="{{sectionheaderstyle}}"
     data-for="section_title"
@@ -77,7 +77,7 @@ data-target="{{#sectioncardcontentdirect}}_blank{{/sectioncardcontentdirect}}" d
             </div>
         {{/sectiondesignheader}}
         {{#sectioncollapse}}
-        <a {{datatoggle}}="collapse" href="#section-content-{{section.section}}">
+        <a {{datatoggle}}="collapse" href="#section-content-{{num}}">
             <span class="section-collapse-icon" style="{{{sectiondesigntextcolor}}}"></span>
         </a>
         {{/sectioncollapse}}
@@ -90,11 +90,11 @@ data-target="{{#sectioncardcontentdirect}}_blank{{/sectioncardcontentdirect}}" d
         {{/bgoverlay}}
 
         {{#flowcourse}}
-            {{#section.categorisetitle}}
+            {{#sectioncategorisetitle}}
             <div class="categorise-section-block">
-                <span class="badge" style="color:{{section.categorisetextcolor}}; background-color:{{section.categorisebackcolor}};">{{section.categorisetitle}}</span>
+                <span class="badge" style="color:{{sectioncategorisetextcolor}}; background-color:{{sectioncategorisebackcolor}};">{{sectioncategorisetitle}}</span>
             </div>
-            {{/section.categorisetitle}}
+            {{/sectioncategorisetitle}}
         {{/flowcourse}}
 
         {{! Section name header }}
@@ -121,11 +121,11 @@ data-target="{{#sectioncardcontentdirect}}_blank{{/sectioncardcontentdirect}}" d
         </div>
         {{^hidesectiontitle}}
         {{^flowcourse}}
-            {{#section.categorisetitle}}
+            {{#sectioncategorisetitle}}
             <div class="categorise-section-block">
-                <span class="badge" style="color:{{section.categorisetextcolor}}; background-color:{{section.categorisebackcolor}};">{{section.categorisetitle}}</span>
+                <span class="badge" style="color:{{sectioncategorisetextcolor}}; background-color:{{sectioncategorisebackcolor}};">{{sectioncategorisetitle}}</span>
             </div>
-            {{/section.categorisetitle}}
+            {{/sectioncategorisetitle}}
         {{/flowcourse}}
          {{/hidesectiontitle}}
 
@@ -245,8 +245,8 @@ data-target="{{#sectioncardcontentdirect}}_blank{{/sectioncardcontentdirect}}" d
     {{^iscoursedisplaymultipage}}
         {{^sitehome}}course-content-item-content {{/sitehome}}
     {{/iscoursedisplaymultipage}} {{coursetype.content.classes}}"
-    id="section-content-{{section.section}}"
-    aria-labelledby="section-head-{{section.section}}"
+    id="section-content-{{num}}"
+    aria-labelledby="section-head-{{num}}"
     {{#sectionaccordion}}
     data-parent="#section-course-accordion"
     {{/sectionaccordion}}

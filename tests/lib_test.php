@@ -37,14 +37,13 @@ require_once($CFG->dirroot . '/course/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class lib_test extends \advanced_testcase {
-
     /**
      * Test setup.
      */
     public function setUp(): void {
         global $CFG;
-        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_course.php');
-        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_activity.php');
+        require_once($CFG->dirroot . '/completion/criteria/completion_criteria_course.php');
+        require_once($CFG->dirroot . '/completion/criteria/completion_criteria_activity.php');
         parent::setUp();
 
         $this->setAdminUser();
@@ -63,8 +62,10 @@ final class lib_test extends \advanced_testcase {
         // Generate a course with 5 sections.
         $generator = $this->getDataGenerator();
         $numsections = 5;
-        $course = $generator->create_course(['numsections' => $numsections, 'format' => 'designer'],
-            ['createsections' => true]);
+        $course = $generator->create_course(
+            ['numsections' => $numsections, 'format' => 'designer'],
+            ['createsections' => true]
+        );
 
         // Get section names for course.
         $coursesections = $DB->get_records('course_sections', ['course' => $course->id]);
@@ -89,8 +90,10 @@ final class lib_test extends \advanced_testcase {
         // Generate a course with 5 sections.
         $generator = $this->getDataGenerator();
         $numsections = 5;
-        $course = $generator->create_course(['numsections' => $numsections, 'format' => 'designer'],
-            ['createsections' => true]);
+        $course = $generator->create_course(
+            ['numsections' => $numsections, 'format' => 'designer'],
+            ['createsections' => true]
+        );
 
         // Get section names for course.
         $coursesections = $DB->get_records('course_sections', ['course' => $course->id]);
@@ -123,8 +126,10 @@ final class lib_test extends \advanced_testcase {
         // Generate a course with 5 sections.
         $generator = $this->getDataGenerator();
         $numsections = 5;
-        $course = $generator->create_course(['numsections' => $numsections, 'format' => 'designer'],
-            ['createsections' => true]);
+        $course = $generator->create_course(
+            ['numsections' => $numsections, 'format' => 'designer'],
+            ['createsections' => true]
+        );
 
         // Get section names for course.
         $coursesections = $DB->get_records('course_sections', ['course' => $course->id]);
@@ -154,8 +159,10 @@ final class lib_test extends \advanced_testcase {
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
-        $course = $this->getDataGenerator()->create_course(['numsections' => 5, 'format' => 'designer'],
-            ['createsections' => true]);
+        $course = $this->getDataGenerator()->create_course(
+            ['numsections' => 5, 'format' => 'designer'],
+            ['createsections' => true]
+        );
         $section = $DB->get_record('course_sections', ['course' => $course->id, 'section' => 2]);
 
         // Call webservice without necessary permissions.
@@ -163,8 +170,10 @@ final class lib_test extends \advanced_testcase {
             \core_external::update_inplace_editable('format_designer', 'sectionname', $section->id, 'New section name');
             $this->fail('Exception expected');
         } catch (\moodle_exception $e) {
-            $this->assertEquals('Course or activity not accessible. (Not enrolled)',
-                    $e->getMessage());
+            $this->assertEquals(
+                'Course or activity not accessible. (Not enrolled)',
+                $e->getMessage()
+            );
         }
 
         // Change to teacher and make sure that section name can be updated using web service update_inplace_editable().
@@ -191,8 +200,10 @@ final class lib_test extends \advanced_testcase {
 
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
-        $course = $this->getDataGenerator()->create_course(['numsections' => 5, 'format' => 'designer'],
-            ['createsections' => true]);
+        $course = $this->getDataGenerator()->create_course(
+            ['numsections' => 5, 'format' => 'designer'],
+            ['createsections' => true]
+        );
         $teacherrole = $DB->get_record('role', ['shortname' => 'editingteacher']);
         $this->getDataGenerator()->enrol_user($user->id, $course->id, $teacherrole->id);
         $this->setUser($user);
@@ -255,30 +266,30 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * Test the module content trim character.
-     * @covers ::format_designer_modcontent_trim_char
+     * @covers ::\format_designer\helper::modcontent_trim_char
      * @return void
      */
-    public function test_format_designer_modcontent_trim_char(): void {
+    public function test_modcontent_trim_char(): void {
 
         $str1 = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.
         Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
         when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
-        $resstr1 = format_designer_modcontent_trim_char($str1, 30);
+        $resstr1 = \format_designer\helper::modcontent_trim_char($str1, 30);
         $this->assertEquals(23, str_word_count($resstr1));
 
         $str2 = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.";
-        $resstr2 = format_designer_modcontent_trim_char($str2, 30);
+        $resstr2 = \format_designer\helper::modcontent_trim_char($str2, 30);
         $this->assertEquals(str_word_count($str2), str_word_count($resstr2));
     }
 
     /**
      * Test desginer format date method.
-     * @covers ::format_designer_format_date
+     * @covers ::\format_designer\helper::format_date
      * @return void
      */
-    public function test_format_designer_format_date(): void {
+    public function test_format_date(): void {
         $timestamp = 1642861536;
-        $dateformat = format_designer_format_date($timestamp);
+        $dateformat = \format_designer\helper::format_date($timestamp);
         $this->assertEquals("Jan 22", $dateformat);
     }
 
@@ -384,7 +395,5 @@ final class lib_test extends \advanced_testcase {
         $this->assertEquals(2, $result['count']);
         $this->assertEquals(1, $result['completed']);
         $this->assertEquals(50, $result['percent']);
-
     }
 }
-

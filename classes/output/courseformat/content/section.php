@@ -36,7 +36,6 @@ use context_course;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class section extends \core_courseformat\output\local\content\section {
-
     /**
      * Add the section format attributes to the data structure.
      *
@@ -84,7 +83,9 @@ class section extends \core_courseformat\output\local\content\section {
             }
         } else {
             $formatdata = (array) $renderer->render_section_data(
-                $this->section, $this->format->get_course(), $sectionnum
+                $this->section,
+                $this->format->get_course(),
+                $sectionnum
             );
         }
         $data = (object) array_merge((array) $data, $formatdata);
@@ -118,11 +119,15 @@ class section extends \core_courseformat\output\local\content\section {
 
         $singlesection = $this->format->get_sectionnum();
         if (!$this->isstealth) {
-            $data->cmcontrols = $output->course_section_add_cm_control(
-                $course,
-                $this->section->section,
-                $singlesection
-            );
+            if (method_exists($output, 'section_add_cm_controls')) {
+                $data->cmcontrols = $output->section_add_cm_controls($this->format, $this->section);
+            } else {
+                $data->cmcontrols = $output->course_section_add_cm_control(
+                    $course,
+                    $this->section->section,
+                    $singlesection
+                );
+            }
         }
         return true;
     }

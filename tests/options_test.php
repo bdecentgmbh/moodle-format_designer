@@ -39,7 +39,6 @@ require_once($CFG->dirroot . '/course/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class options_test extends \advanced_testcase {
-
     /**
      * @var object
      */
@@ -118,8 +117,7 @@ final class options_test extends \advanced_testcase {
         $module = $this->getDataGenerator()->create_module('page', [
             'course' => $this->course, 'section' => 1, 'name' => 'Test page', 'content' => 'Test the module',
             'completion' => 1,
-            ]
-        );
+            ]);
 
         $user1 = $this->getDataGenerator()->create_user(['email' => 'test@designer.com', 'username' => 'designer1']);
         $this->getDataGenerator()->enrol_user($user1->id, $this->course->id);
@@ -155,14 +153,12 @@ final class options_test extends \advanced_testcase {
         $module = $this->getDataGenerator()->create_module('page', [
             'course' => $this->course, 'section' => 1, 'name' => 'Test page', 'content' => 'Test the module',
             'completion' => 1,
-            ]
-        );
+            ]);
 
         $module2 = $this->getDataGenerator()->create_module('page', [
             'course' => $this->course, 'section' => 1, 'name' => 'Test page2 ', 'content' => 'Test the module',
             'completion' => 1,
-            ]
-        );
+            ]);
 
         $user1 = $this->getDataGenerator()->create_user(['email' => 'test@designer.com', 'username' => 'designer1']);
         $this->getDataGenerator()->enrol_user($user1->id, $this->course->id);
@@ -205,5 +201,4 @@ final class options_test extends \advanced_testcase {
         $iscompleted = \format_designer\options::is_section_completed($section, $this->course, $modinfo, true);
         $this->assertTrue($iscompleted);
     }
-
 }

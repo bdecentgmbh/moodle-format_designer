@@ -31,7 +31,7 @@ Feature: Activities can be check hero activity in designer format
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     And I open the activity chooser
-    And I click on "Add a new Forum" "link" in the "Add an activity or resource" "dialogue"
+    And I select "Forum" activity from the activity chooser
     And I reload the page
     And I expand all fieldsets
     And I set the field "Forum name" to "My forum name"
@@ -39,7 +39,7 @@ Feature: Activities can be check hero activity in designer format
     And I set the field "Order" to "1"
     And I press "Save and return to course"
     And I open the activity chooser
-    And I click on "Add a new Forum" "link" in the "Add an activity or resource" "dialogue"
+    And I select "Forum" activity from the activity chooser
     And I reload the page
     And I expand all fieldsets
     And I set the field "Forum name" to "My forum name1"

@@ -239,7 +239,7 @@
     height: 100%;
 }
 .format-designer .course-content .single-section-layout ul.designer.course-type-normal li.section.main .section-header-content {
-    height: 100%;
+    /* height: 100%; */
     padding: 15px;
     margin-bottom: 15px;
     display: flex;
@@ -247,7 +247,7 @@
 }
 .format-designer .course-content .single-section-layout ul.designer.course-type-normal li.section.main
 .section-header-content .moodle-actionmenu {
-    margin-top: auto;
+    margin-top: 0;
 }
 .format-designer .course-content .single-section-layout:not(.section-page-layout) ul.designer.course-type-normal
 li.section.main .section-content-wrapper {
@@ -588,6 +588,9 @@ body.format-designer.editing ul.designer .section .circles-layout .activity .edi
     left: 0;
     z-index: -1;
 }
+.format-designer .course-content ul.designer li.section.main ul.section .videotime.bg-color-overlay .bg-overlay {
+    z-index: 0;
+}
 .format-designer .course-content ul.designer li.section.main.bg-color-overlay.section-design-whole .img-block .bg-overlay,
 .format-designer .course-content ul.designer li.section.main.section-design-whole .bg-color-overlay .img-block .bg-overlay,
 .format-designer .course-content ul.designer li.section.main.bg-color-overlay.section-design-header .img-block .bg-overlay,
@@ -665,6 +668,7 @@ span.section-collapse-icon {
 .format-designer.editing .course-content .designer li.section .section-header-content span.section-collapse-icon,
 .format-designer.editing .course-content ul.designer li.section .section-header-content .section-head-text {
     float: left;
+    margin-bottom: 10px;
 }
 .format-designer .course-content .designer li.section .section-header-content
 span.section-collapse-icon:before,
@@ -933,11 +937,17 @@ span.section-collapse-icon:before {
 }
 .format-designer .designer .section.img-text.card-layout .activity .activity-block .activityinstance {
     padding-right: 0;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 }
 .format-designer .designer .section.img-text .activity .activityinstance .img-block {
     border-radius: 5px;
     padding: 15px;
+}
+.format-designer .designer .section.img-text .activity .activityinstance .activitytitle .img-block {
+    padding: 5px;
+}
+.format-designer .designer .section.img-text.card-layout .activity .activityinstance .img-block {
+    padding: 10px;
 }
 .format-designer .designer .section.img-text .activity .activityinstance .img-element.content-show .img-block {
     visibility: visible;
@@ -1299,6 +1309,7 @@ span.section-collapse-icon:before {
     border: 0;
     display: flex;
     position: relative;
+    z-index: 0;
 }
 .format-designer.editing .designer .section .content .section li.activity .activity-block.designer:hover {
     background: none;

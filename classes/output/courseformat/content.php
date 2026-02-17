@@ -35,7 +35,6 @@ use course_modinfo;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class content extends content_base {
-
     /**
      * @var bool Topic format has add section after each topic.
      *
@@ -138,8 +137,12 @@ class content extends content_base {
             // The course/view.php check the section existence but the output can be called
             // from other parts so we need to check it.
             if (!$thissection) {
-                throw new \moodle_exception('unknowncoursesection', 'error', course_get_url($course),
-                    format_string($course->fullname));
+                throw new \moodle_exception(
+                    'unknowncoursesection',
+                    'error',
+                    course_get_url($course),
+                    format_string($course->fullname)
+                );
             }
 
             $section = new $this->sectionclass($format, $thissection);
@@ -159,8 +162,10 @@ class content extends content_base {
                 $course->displayunavailableactivities : false;
 
             if (!$format->is_section_visible($thissection)) {
-                if (!format_designer_has_pro() || !$displayunavailableactivities
-                    || $course->coursedisplay != COURSE_DISPLAY_MULTIPAGE) {
+                if (
+                    !\format_designer\helper::has_pro() || !$displayunavailableactivities
+                    || $course->coursedisplay != COURSE_DISPLAY_MULTIPAGE
+                ) {
                     continue;
                 }
 
@@ -201,9 +206,11 @@ class content extends content_base {
             $singlesection = $this->format->get_sectionid();
         }
 
-
         $course = $this->format->get_course();
-        if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && (optional_param('section', -1, PARAM_INT) >= 0) || $this->format->get_sectionid()) {
+        if (
+            $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE &&
+            (optional_param('section', -1, PARAM_INT) >= 0) || $this->format->get_sectionid()
+        ) {
             $singlesection = empty($singlesection) ? 0 : $singlesection;
             $sections = [
                 $modinfo->get_section_info($singlesection),
@@ -212,5 +219,4 @@ class content extends content_base {
         }
         return $modinfo->get_listed_section_info_all();
     }
-
 }

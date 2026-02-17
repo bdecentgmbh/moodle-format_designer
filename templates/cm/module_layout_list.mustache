@@ -102,9 +102,11 @@
                                 {{/modcontent}}
 
                                 {{#hasname}}
-                                        {{$ core_courseformat/local/content/cm/badges }}
-                                            {{> core_courseformat/local/content/cm/badges }}
-                                        {{/ core_courseformat/local/content/cm/badges }}
+                                    {{#cmformat}}
+                                    {{$ core_courseformat/local/content/cm/badges }}
+                                        {{> core_courseformat/local/content/cm/badges }}
+                                    {{/ core_courseformat/local/content/cm/badges }}
+                                    {{/cmformat}}
                                 {{/hasname}}
 
                             </div>

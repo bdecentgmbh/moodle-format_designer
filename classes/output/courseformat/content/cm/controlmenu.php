@@ -36,7 +36,6 @@ use action_menu_link;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class controlmenu extends controlmenu_base {
-
     /**
      * Generate the aciton menu element.
      *
@@ -58,11 +57,6 @@ class controlmenu extends controlmenu_base {
             $controls = $this->cm_control_items();
         }
 
-        if (empty($controls) || (isset($mod->get_course()->coursedisplay) &&
-            $mod->get_course()->coursedisplay == COURSE_DISPLAY_MULTIPAGE)) {
-            return null;
-        }
-
         // Convert control array into an action_menu.
         $menu = new action_menu();
         $menu->set_kebab_trigger(get_string('edit'));
@@ -82,7 +76,6 @@ class controlmenu extends controlmenu_base {
         }
 
         $this->menu = $menu;
-
         return $menu;
     }
 }

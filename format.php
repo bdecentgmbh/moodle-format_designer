@@ -24,8 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->libdir.'/filelib.php');
-require_once($CFG->libdir.'/completionlib.php');
+require_once($CFG->libdir . '/filelib.php');
+require_once($CFG->libdir . '/completionlib.php');
 
 // Horrible backwards compatible parameter aliasing.
 if ($topic = optional_param('topic', 0, PARAM_INT)) {
@@ -65,8 +65,7 @@ $ispopupactivities = isset($course->popupactivities) && $course->popupactivities
 // Include course format js module.
 $PAGE->requires->js('/course/format/designer/format.js');
 
-if ($ispopupactivities && !$PAGE->user_is_editing() && format_designer_popup_installed()) {
-
+if ($ispopupactivities && !$PAGE->user_is_editing() && \format_designer\helper::popup_installed()) {
     if (optional_param('sectionid', 0, PARAM_INT)) {
         $displaysection = optional_param('sectionid', 0, PARAM_INT);
     }

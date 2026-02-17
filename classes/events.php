@@ -33,7 +33,6 @@ require_once($CFG->dirroot . "/course/format/designer/lib.php");
  * Designer format event observer.
  */
 class events {
-
     /**
      * After new section created, section format options are not added to the DB.
      * Observe the section creation and add global format options to section in dB.
@@ -67,8 +66,10 @@ class events {
                 $sectiondata[$name] = get_config('format_designer', $name);
             }
         }
-        if (!defined('NO_OUTPUT_BUFFERING') || (defined('NO_OUTPUT_BUFFERING') && !NO_OUTPUT_BUFFERING)
-            && (!defined('AJAX_SCRIPT') || AJAX_SCRIPT == '0')) {
+        if (
+            !defined('NO_OUTPUT_BUFFERING') || (defined('NO_OUTPUT_BUFFERING') && !NO_OUTPUT_BUFFERING)
+            && (!defined('AJAX_SCRIPT') || AJAX_SCRIPT == '0')
+        ) {
             $format->update_section_format_options($sectiondata);
         }
     }
@@ -83,7 +84,7 @@ class events {
         global $DB;
         $courseid = $event->courseid;
         $DB->delete_records('format_designer_options', ['courseid' => $courseid]);
-        $cache = format_designer_get_cache_object();
+        $cache = \format_designer\helper::get_cache_object();
         $cache->delete_prerequisites_courses();
         self::course_cache_updated($courseid);
     }
@@ -105,9 +106,40 @@ class events {
      * @return bool
      */
     public static function course_updated($event) {
+        global $DB;
         $courseid = $event->courseid;
-        if (course_get_format($courseid)->get_course()->format !== 'designer') {
+        $format = course_get_format($courseid);
+        if ($format->get_course()->format !== 'designer') {
             return true;
+        }
+
+        // Change the coursedisplay to the show all sections per page when the course type is flow or kanban mode.
+        $course = $format->get_course();
+        if (
+            isset($course->coursetype) && ($course->coursetype == DESIGNER_TYPE_FLOW ||
+            $course->coursetype == DESIGNER_TYPE_KANBAN)
+        ) {
+            $existrecord = $DB->get_record('course_format_options', ['courseid' => $course->id,
+                            'name' => 'coursetype', 'format' => 'designer', ]);
+            if ($existrecord) {
+                $existrecord->value = $course->coursetype;
+                $DB->update_record('course_format_options', $existrecord);
+            }
+        }
+
+        if (isset($course->coursetype) && ($course->coursetype == DESIGNER_TYPE_FLOW)) {
+            $comparevalue = $DB->sql_compare_text('value');
+            $sql = "SELECT id, courseid, sectionid, name, value FROM {course_format_options}
+                WHERE courseid = :courseid AND name = :name AND format = :format AND $comparevalue = :comparevalue";
+            $existrecords = $DB->get_recordset_sql($sql, ['courseid' => $course->id,
+                'name' => 'sectionbackgroundtype', 'format' => 'designer', 'comparevalue' => 'whole']);
+            if ($existrecords) {
+                foreach ($existrecords as $existrecord) {
+                    $existrecord->value = 'header';
+                    $DB->update_record('course_format_options', $existrecord);
+                }
+                $existrecords->close();
+            }
         }
         self::course_cache_updated($courseid);
     }
@@ -215,7 +247,7 @@ class events {
      * @return void
      */
     public static function course_cache_updated($courseid) {
-        $cache = format_designer_get_cache_object();
+        $cache = \format_designer\helper::get_cache_object();
         $cache->delete_vaild_section_completed_cache($courseid);
         $cache->delete_user_section_completed_cache($courseid);
         $cache->delete_course_progress_uncompletion_criteria($courseid);
@@ -231,8 +263,8 @@ class events {
      * @param mixed $userid
      * @return void
      */
-    public static function course_user_cache_updated($courseid , $userid) {
-        $cache = format_designer_get_cache_object();
+    public static function course_user_cache_updated($courseid, $userid) {
+        $cache = \format_designer\helper::get_cache_object();
         $cache->delete_vaild_section_completed_cache($courseid);
         $cache->delete_user_section_completed_cache($courseid);
         $cache->delete_course_progress_uncompletion_criteria($courseid, $userid);
@@ -258,7 +290,7 @@ class events {
 
         $cm = $DB->get_record("course_modules", ['id' => $cmid]);
         // Clear cache.
-        $cache = format_designer_get_cache_object();
+        $cache = \format_designer\helper::get_cache_object();
         $cache->delete_vaild_section_completed_cache($courseid);
         $cache->delete_user_section_completed_cache($courseid);
         $cache->delete_course_progress_uncompletion_criteria($courseid);
@@ -280,7 +312,7 @@ class events {
             return true;
         }
         // Clear cache.
-        $cache = format_designer_get_cache_object();
+        $cache = \format_designer\helper::get_cache_object();
         $cache->delete_vaild_section_completed_cache($courseid, $sectionid);
         $cache->delete_user_section_completed_cache($courseid, $sectionid);
         $cache->delete_due_overdue_activities_count($courseid);

@@ -26,7 +26,6 @@
  * Format designer features backup.
  */
 class backup_format_designer_plugin extends backup_format_plugin {
-
     /**
      * Define module plugin structure.
      */
@@ -36,8 +35,10 @@ class backup_format_designer_plugin extends backup_format_plugin {
             'courseid', 'cmid', 'name', 'value', 'timecreated', 'timemodified',
         ]);
 
-        $designer->set_source_table('format_designer_options',
-            ['cmid' => backup::VAR_MODID, 'courseid' => backup::VAR_COURSEID]);
+        $designer->set_source_table(
+            'format_designer_options',
+            ['cmid' => backup::VAR_MODID, 'courseid' => backup::VAR_COURSEID]
+        );
 
         $files = format_designer\options::get_file_areas('module');
         if ($files) {
