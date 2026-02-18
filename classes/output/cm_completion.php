@@ -62,6 +62,15 @@ class cm_completion implements renderable, templatable {
      */
     private static $trackedusers = [];
 
+    /**
+     * @var stdClass|null Instance-level cache for completion data.
+     */
+    private $completiondatacache = null;
+
+    /**
+     * @var string|null Instance-level cache for color class.
+     */
+    private $colorclasscache = null;
 
     /**
      * Constructor.
@@ -124,11 +133,15 @@ class cm_completion implements renderable, templatable {
 
     /**
      * Get completion info for this cm.
+     * Results are cached at the instance level.
      *
      * @return stdClass
      */
     final public function get_completion_data(): stdClass {
-        return $this->get_completion_info()->get_data($this->cm, true);
+        if ($this->completiondatacache === null) {
+            $this->completiondatacache = $this->get_completion_info()->get_data($this->cm, true);
+        }
+        return $this->completiondatacache;
     }
 
     /**
@@ -370,10 +383,25 @@ class cm_completion implements renderable, templatable {
 
     /**
      * Get Bootstrap color class for this cm completion status.
+     * Result is cached at the instance level since it's called both from render_course_module()
+     * and from export_for_template().
      *
      * @return string
      */
     final public function get_color_class(): string {
+        if ($this->colorclasscache !== null) {
+            return $this->colorclasscache;
+        }
+        $this->colorclasscache = $this->compute_color_class();
+        return $this->colorclasscache;
+    }
+
+    /**
+     * Compute Bootstrap color class for this cm completion status.
+     *
+     * @return string
+     */
+    private function compute_color_class(): string {
         if ($this->is_editing() || !$this->is_tracked_user()) {
             if ($this->is_restricted()) {
                 return 'restricted';
@@ -444,30 +472,39 @@ class cm_completion implements renderable, templatable {
             $withavailability = !empty($CFG->enableavailability) && info::completion_value_used($course, $this->cm->id);
         }
 
+        $isediting = $this->is_editing();
+        $istrackeduser = $this->is_tracked_user();
+        $completionmode = $this->get_completion_mode();
+        $completionstate = $this->get_completion_state();
+        $completionfail = $this->get_completion_fail();
+        $colorclass = $this->get_color_class();
+        $ismanual = $completionmode == COMPLETION_TRACKING_MANUAL;
+
         $data = [
             'cmid' => $this->cm->id,
             'activityname' => $this->cm->name,
             'withavailability' => $withavailability,
-            'istrackeduser' => $this->is_tracked_user(),
-            'isediting' => $this->is_editing(),
-            'ispreview' => $this->is_editing() || !$this->is_tracked_user(),
+            'istrackeduser' => $istrackeduser,
+            'isediting' => $isediting,
+            'ispreview' => $isediting || !$istrackeduser,
             'isoverridden' => $this->is_overridden(),
-            'overrideuser' => $this->get_override_user(),
+            'overrideuser' => $this->is_overridden() ? $this->get_override_user() : null,
             'isoverdue' => $this->is_overdue(),
-            'overdueby' => $this->get_overdue_by(),
+            'overdueby' => $this->is_overdue() ? $this->get_overdue_by() : '',
             'duetoday' => $this->is_due_today(),
-            'colorclass' => $this->get_color_class(),
-            'badgeprimaryclass' => ($this->get_color_class() == 'notstarted') ? 'badge-primary' : '',
-            'completioncheckbox' => $this->get_completion_checkbox(),
+            'colorclass' => $colorclass,
+            'badgeprimaryclass' => ($colorclass == 'notstarted') ? 'badge-primary' : '',
+            'completioncheckbox' => $ismanual ? $this->get_completion_checkbox() : [],
             'completionexpected' => ($this->get_completion_expected()) ? true : false,
-            'completiontrackingmanual' => $this->get_completion_mode() == COMPLETION_TRACKING_MANUAL,
-            'completiontrackingautomatic' => $this->get_completion_mode() == COMPLETION_TRACKING_AUTOMATIC,
-            'completionincomplete' => $this->get_completion_state() == COMPLETION_INCOMPLETE &&
-            $this->get_completion_fail() == false,
-            'completioncomplete' => $this->get_completion_state() == COMPLETION_COMPLETE,
-            'completionincompletepass' => $this->get_completion_state() == COMPLETION_COMPLETE_PASS,
-            'completionincompletefail' => $this->get_completion_fail(),
+            'completiontrackingmanual' => $ismanual,
+            'completiontrackingautomatic' => $completionmode == COMPLETION_TRACKING_AUTOMATIC,
+            'completionincomplete' => $completionstate == COMPLETION_INCOMPLETE &&
+            $completionfail == false,
+            'completioncomplete' => $completionstate == COMPLETION_COMPLETE,
+            'completionincompletepass' => $completionstate == COMPLETION_COMPLETE_PASS,
+            'completionincompletefail' => $completionfail,
         ];
+
         if ($completiondate = $this->get_completion_date()) {
             $data['completiondate'] = \format_designer\helper::format_date($completiondate);
         }

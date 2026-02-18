@@ -48,12 +48,26 @@ class options {
      */
     public static $optionspercmid = [];
 
-    /**
+/**
      * Cache for bulk loaded course ids.
      *
      * @var array
      */
     public static $bulkloaded = [];
+
+    /**
+     * Static cache for timetool module records per course (bulk-loaded).
+     *
+     * @var array
+     */
+    private static $timetoolcache = [];
+
+    /**
+     * Static cache for timetool time management + enrolment data per course.
+     *
+     * @var array
+     */
+    private static $timetoolcoursecache = [];
 
     /**
      * Find the given string is JSON format or not.
@@ -355,13 +369,41 @@ class options {
     public static function timetool_duedate($cm) {
         global $USER, $DB;
         if (\format_designer\helper::timetable_installed()) {
-            $record = $DB->get_record('tool_timetable_modules', ['cmid' => $cm->id ?? 0]);
-            if ($record) {
-                $timemanagement = new \tool_timetable\time_management($cm->course);
-                $userenrolments = $timemanagement->get_course_user_enrollment($USER->id, $cm->course);
-                $timestarted = $userenrolments[0]['timestart'] ?? 0;
-                $timeended = $userenrolments[0]['timeend'] ?? 0;
-                $moduledates = $timemanagement->calculate_coursemodule_managedates($record, $timestarted, $timeended);
+            $courseid = $cm->course;
+            $cmid = $cm->id ?? 0;
+
+            // Bulk-load ALL timetable module records for this course in ONE query (on first access).
+            if (!array_key_exists($courseid, self::$timetoolcache)) {
+                self::$timetoolcache[$courseid] = [];
+                $modinfo = get_fast_modinfo($courseid);
+                $cmids = array_keys($modinfo->get_cms());
+                if (!empty($cmids)) {
+                    [$insql, $params] = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED, 'cmid');
+                    $records = $DB->get_records_select('tool_timetable_modules', "cmid $insql", $params);
+                    foreach ($records as $record) {
+                        self::$timetoolcache[$courseid][$record->cmid] = $record;
+                    }
+                }
+            }
+
+            if (isset(self::$timetoolcache[$courseid][$cmid])) {
+                $record = self::$timetoolcache[$courseid][$cmid];
+
+                // Cache time_management instance and enrolment data per course (avoids repeated queries).
+                if (!isset(self::$timetoolcoursecache[$courseid])) {
+                    $timemanagement = new \tool_timetable\time_management($courseid);
+                    $userenrolments = $timemanagement->get_course_user_enrollment($USER->id, $courseid);
+                    self::$timetoolcoursecache[$courseid] = [
+                        'timemanagement' => $timemanagement,
+                        'timestarted' => $userenrolments[0]['timestart'] ?? 0,
+                        'timeended' => $userenrolments[0]['timeend'] ?? 0,
+                    ];
+                }
+
+                $cached = self::$timetoolcoursecache[$courseid];
+                $moduledates = $cached['timemanagement']->calculate_coursemodule_managedates(
+                    $record, $cached['timestarted'], $cached['timeended']
+                );
                 return $moduledates['duedate'] ?? false;
             }
         }
