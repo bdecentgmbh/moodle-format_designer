@@ -3084,6 +3084,10 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 .section-background-style.sectiondesign-header {
     top: 0;
     left: 0;
+    z-index: -2;
+}
+.format-designer.editing .course-content ul.designer .section.main .section-header-content.flow-stack
+.section-background-color {
     z-index: -1;
 }
 .format-designer .course-content ul.course-type-flow.designer .section.main + .section.main

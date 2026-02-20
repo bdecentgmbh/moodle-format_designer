@@ -48,7 +48,7 @@ class options {
      */
     public static $optionspercmid = [];
 
-/**
+    /**
      * Cache for bulk loaded course ids.
      *
      * @var array
@@ -402,7 +402,9 @@ class options {
 
                 $cached = self::$timetoolcoursecache[$courseid];
                 $moduledates = $cached['timemanagement']->calculate_coursemodule_managedates(
-                    $record, $cached['timestarted'], $cached['timeended']
+                    $record,
+                    $cached['timestarted'],
+                    $cached['timeended']
                 );
                 return $moduledates['duedate'] ?? false;
             }
