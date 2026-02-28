@@ -2278,7 +2278,7 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 
 /*Course Integrate time management*/
 
-.format-designer .course-info-block {
+.format-designer .single-section-layout .course-info-block {
     margin: 15px 0;
     clear: both;
 }
@@ -2289,24 +2289,24 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 .format-designer.path-course-view .completionprogress {
     margin-bottom: 15px;
 }
-.format-designer .course-info-block > div {
+.format-designer .single-section-layout .course-info-block > div {
     width: 17%;
     display: inline-block;
     vertical-align: top;
     margin-right: 15px;
     margin-bottom: 15px;
 }
-.format-designer .course-info-block .carousel {
+.format-designer .single-section-layout .course-info-block .carousel {
     margin-right: 0;
     float: right;
 }
-.format-designer .course-info-block .carousel .carousel-item .contact-element {
+.format-designer .single-section-layout .course-info-block .carousel .carousel-item .contact-element {
     margin-right: 15px;
 }
-.format-designer .course-info-block .carousel .carousel-item .contact-element:last-child {
+.format-designer .single-section-layout .course-info-block .carousel .carousel-item .contact-element:last-child {
     margin-right: 0;
 }
-.format-designer .course-info-block .carousel .carousel-control {
+.format-designer .single-section-layout .course-info-block .carousel .carousel-control {
     width: 30px;
     height: 30px;
     line-height: 30px;
@@ -2316,22 +2316,22 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     display: none;
     top: 45%;
 }
-.format-designer .course-info-block .carousel .carousel-control.carousel-control-prev {
+.format-designer .single-section-layout .course-info-block .carousel .carousel-control.carousel-control-prev {
     left: -30px;
 }
-.format-designer .course-info-block .carousel:hover .carousel-control {
+.format-designer .single-section-layout .course-info-block .carousel:hover .carousel-control {
     display: block;
 }
-.format-designer .course-info-block .carousel .carousel-control span {
+.format-designer .single-section-layout .course-info-block .carousel .carousel-control span {
     display: none;
 }
-.format-designer .course-info-block .carousel .carousel-control:before {
+.format-designer .single-section-layout .course-info-block .carousel .carousel-control:before {
     content: '\f104';
     font-family: var(--fa-style-family, "Font Awesome 6 Free", fontawesome);
     font-weight: var(--fa-style, 900);
     color: #fff;
 }
-.format-designer .course-info-block .carousel .carousel-control-next:before {
+.format-designer .single-section-layout .course-info-block .carousel .carousel-control-next:before {
     content: '\f105';
 }
 .format-designer .course-info-block .carousel .contact-element .contact-block .img-block {
@@ -2372,21 +2372,21 @@ body.format-designer.editing .designer .section .content .section.card-layout li
 .format-designer .course-info-block .carousel .contact-element .contact-block .info-block .header-button-group a.btn {
     padding-left: 0;
 }
-.format-designer .course-info-block > div h6 {
+.format-designer .single-section-layout .course-info-block > div h6 {
     font-size: 14px;
     color: #999;
 }
-.format-designer .course-info-block > div h3 {
+.format-designer .single-section-layout .course-info-block > div h3 {
     font-size: 24px;
     font-weight: 500;
 }
-.format-designer .course-info-block > div.progress-block {
+.format-designer .single-section-layout .course-info-block > div.progress-block {
     width: auto;
     display: block;
     margin-right: 30px;
     clear: both;
 }
-.format-designer .course-info-block > div.progress-block > .progress {
+.format-designer .single-section-layout .course-info-block > div.progress-block > .progress {
     max-width: 50%;
     display: flex;
     border: 0;
@@ -2394,87 +2394,87 @@ body.format-designer.editing .designer .section .content .section.card-layout li
     padding-right: 0;
     margin-bottom: 10px;
 }
-.format-designer .course-info-block > div.progress-block > .progress .progress-bar {
+.format-designer .single-section-layout .course-info-block > div.progress-block > .progress .progress-bar {
     background: #28a745;
     height: 100%;
 }
-.format-designer .course-info-block > div.progress-block > .progress .progress-bar.bg-remain-block {
+.format-designer .single-section-layout .course-info-block > div.progress-block > .progress .progress-bar.bg-remain-block {
     background: #e9ecef;
 }
-.format-designer .course-info-block > div.progress-block > div {
+.format-designer .single-section-layout .course-info-block > div.progress-block > div {
     display: inline-block;
     border-right: 1px solid #eee;
     padding-right: 10px;
     margin-right: 10px;
 }
-.format-designer .course-info-block > div.progress-block > div:last-child {
+.format-designer .single-section-layout .course-info-block > div.progress-block > div:last-child {
     border: 0;
 }
-.format-designer .course-info-block > div.progress-block > div p {
+.format-designer .single-section-layout .course-info-block > div.progress-block > div p {
     font-size: 14px;
     font-weight: 500;
     margin-bottom: 0;
 }
-.format-designer .course-info-block > div.progress-block .activity-completed-block p {
+.format-designer .single-section-layout .course-info-block > div.progress-block .activity-completed-block p {
     color: #000;
 }
-.format-designer .course-info-block > div.progress-block .activity-due-block p {
+.format-designer .single-section-layout .course-info-block > div.progress-block .activity-due-block p {
     color: #fd7e14;
 }
-.format-designer .course-info-block > div.progress-block .activity-overdue-block p {
+.format-designer .single-section-layout .course-info-block > div.progress-block .activity-overdue-block p {
     color: #dc3545;
 }
 
 @media (min-width: 1551px) {
-    .format-designer .course-info-block > div {
+    .format-designer .single-section-layout .course-info-block > div {
         width: 19%;
     }
-    .format-designer .course-info-block .carousel {
+    .format-designer .single-section-layout .course-info-block .carousel {
         width: 38%;
     }
 }
 
 @media (min-width: 1200px) and (max-width: 1550px) {
-    .format-designer .course-info-block > div {
+    .format-designer .single-section-layout .course-info-block > div {
         width: 20%;
     }
-    .format-designer .course-info-block .carousel {
+    .format-designer .single-section-layout .course-info-block .carousel {
         width: 34%;
     }
 }
 
 @media (min-width: 992px) and (max-width: 1199px) {
-    .format-designer .course-info-block > div {
+    .format-designer .single-section-layout .course-info-block > div {
         width: 19%;
     }
-    .format-designer .course-info-block .carousel {
+    .format-designer .single-section-layout .course-info-block .carousel {
         width: 35%;
     }
 }
 
 @media (min-width: 768px) and (max-width: 991px) {
-    .format-designer .course-info-block > div {
+    .format-designer .single-section-layout .course-info-block > div {
         width: 45%;
     }
-    .format-designer .course-info-block > div:nth-child(2n) {
+    .format-designer .single-section-layout .course-info-block > div:nth-child(2n) {
         width: 51%;
         margin-right: 0;
     }
-    .format-designer .course-info-block .carousel {
+    .format-designer .single-section-layout .course-info-block .carousel {
         float: none;
     }
 }
 
 @media (max-width: 767px) {
-    .format-designer .course-info-block > div {
+    .format-designer .single-section-layout .course-info-block > div {
         width: 100%;
         margin-right: 0;
         margin-bottom: 30px;
     }
-    .format-designer .course-info-block .carousel {
+    .format-designer .single-section-layout .course-info-block .carousel {
         float: none;
     }
-    .format-designer .course-info-block > div.progress-block > .progress {
+    .format-designer .single-section-layout .course-info-block > div.progress-block > .progress {
         max-width: none;
     }
 }
