@@ -35,14 +35,13 @@ use context_module;
 use coding_exception;
 use moodle_exception;
 use completion_info;
-require_once($CFG->libdir.'/externallib.php');
-require_once($CFG->dirroot.'/course/format/lib.php');
+require_once($CFG->libdir . '/externallib.php');
+require_once($CFG->dirroot . '/course/format/lib.php');
 
 /**
  * Set section options web service function.
  */
 trait set_section_options {
-
     /**
      * Describes the structure of parameters for the function.
      *
@@ -124,8 +123,10 @@ trait set_section_options {
     public static function get_module($id, $sectionid, $sectionreturn = null) {
         global $PAGE, $OUTPUT;
         // Validate and normalize parameters.
-        $params = self::validate_parameters(self::get_module_parameters(),
-            ['id' => $id, 'sectionid' => $sectionid, 'sectionreturn' => $sectionreturn]);
+        $params = self::validate_parameters(
+            self::get_module_parameters(),
+            ['id' => $id, 'sectionid' => $sectionid, 'sectionreturn' => $sectionreturn]
+        );
         $id = $params['id'];
         $sectionreturn = $params['sectionreturn'];
 
@@ -141,7 +142,7 @@ trait set_section_options {
         $PAGE->set_other_editing_capability($contextarray);
 
         // Validate access to the course (note, this is html for the course view page, we don't validate access to the module).
-        list($course, $cm) = get_course_and_cm_from_cmid($id);
+        [$course, $cm] = get_course_and_cm_from_cmid($id);
         self::validate_context(context_course::instance($course->id));
         $renderer = $PAGE->get_renderer('format_designer');
 
@@ -152,15 +153,15 @@ trait set_section_options {
         $cmlistdata = $renderer->render_course_module($cm, $sectionreturn, [], $section);
 
         $templatename = 'format_designer/cm/module_layout_' . $sectiontype;
-        $prolayouts = format_designer_get_pro_layouts();
+        $prolayouts = \format_designer\helper::get_pro_layouts();
         if (in_array($sectiontype, $prolayouts)) {
-            if (format_designer_has_pro()) {
+            if (\format_designer\helper::has_pro()) {
                 $templatename = 'layouts_' . $sectiontype . '/cm/module_layout_' . $sectiontype;
             }
         }
         $liclass = $sectiontype;
-        $liclass .= ' '.$sectiontype.'-layout';
-        $liclass .= ' '.$cmlistdata['modclasses'];
+        $liclass .= ' ' . $sectiontype . '-layout';
+        $liclass .= ' ' . $cmlistdata['modclasses'];
         $liclass .= (isset($cmlistdata['isrestricted']) && $cmlistdata['isrestricted']) ? ' restricted' : '';
         $html = \html_writer::start_tag('li', ['class' => $liclass, 'id' => $cmlistdata['id']]);
         $html .= $OUTPUT->render_from_template($templatename, $cmlistdata);
@@ -171,7 +172,6 @@ trait set_section_options {
     /**
      * Return structure for get_module()
      *
-     * @since Moodle 3.3
      * @return external_description
      */
     public static function get_module_returns() {
@@ -215,8 +215,10 @@ trait set_section_options {
         $context = context_course::instance($courseid);
         $PAGE->set_context($context);
         // Validate and normalize parameters.
-        $params = self::validate_parameters(self::section_refresh_parameters(),
-            ['courseid' => $courseid, 'sectionid' => $sectionid, 'sectionreturn' => $sectionreturn]);
+        $params = self::validate_parameters(
+            self::section_refresh_parameters(),
+            ['courseid' => $courseid, 'sectionid' => $sectionid, 'sectionreturn' => $sectionreturn]
+        );
         $courseid = $params['courseid'];
         $sectionid = $params['sectionid'];
         $sectionreturn = $params['sectionreturn'];
@@ -263,11 +265,13 @@ trait set_section_options {
     public static function get_videotime_instace($cmid) {
         global $CFG, $PAGE;
         $data = [];
-        if (file_exists($CFG->dirroot. "/mod/videotime/lib.php")) {
-            require_once($CFG->dirroot. "/mod/videotime/classes/videotime_instance.php");
-            require_once($CFG->dirroot. "/mod/videotime/lib.php");
-            $params = self::validate_parameters(self::get_videotime_instace_parameters(),
-                ['cmid' => $cmid]);
+        if (file_exists($CFG->dirroot . "/mod/videotime/lib.php")) {
+            require_once($CFG->dirroot . "/mod/videotime/classes/videotime_instance.php");
+            require_once($CFG->dirroot . "/mod/videotime/lib.php");
+            $params = self::validate_parameters(
+                self::get_videotime_instace_parameters(),
+                ['cmid' => $cmid]
+            );
             $cmid = $params['cmid'];
             $cm = get_coursemodule_from_id('videotime', $cmid, 0, false, MUST_EXIST);
             $context = context_course::instance($cm->course);
@@ -301,7 +305,6 @@ trait set_section_options {
             }
         }
         return json_encode($data);
-
     }
 
     /**
@@ -310,7 +313,4 @@ trait set_section_options {
     public static function get_videotime_instace_returns() {
         return new external_value(PARAM_RAW, 'Additional data for javascript (JSON-encoded string)');
     }
-
-
-
 }

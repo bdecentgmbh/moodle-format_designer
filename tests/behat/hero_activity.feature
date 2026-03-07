@@ -30,15 +30,17 @@ Feature: Activities can be check hero activity in designer format
   Scenario: Check the hero activity to see everywhere
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I press "Add an activity or resource"
-    And I click on "Add a new Forum" "link" in the "Add an activity or resource" "dialogue"
+    And I open the activity chooser
+    And I select "Forum" activity from the activity chooser
+    And I reload the page
     And I expand all fieldsets
     And I set the field "Forum name" to "My forum name"
     And I set the field "Show as tab" to "Everywhere"
     And I set the field "Order" to "1"
     And I press "Save and return to course"
-    And I press "Add an activity or resource"
-    And I click on "Add a new Forum" "link" in the "Add an activity or resource" "dialogue"
+    And I open the activity chooser
+    And I select "Forum" activity from the activity chooser
+    And I reload the page
     And I expand all fieldsets
     And I set the field "Forum name" to "My forum name1"
     And I set the field "Show as tab" to "Only on course main page"

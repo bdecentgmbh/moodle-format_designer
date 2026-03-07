@@ -25,9 +25,9 @@
 
 require_once(__DIR__ . '/../../../../../lib/behat/behat_base.php');
 
-use Behat\Gherkin\Node\TableNode as TableNode,
-Behat\Mink\Exception\DriverException as DriverException,
-Behat\Mink\Exception\ExpectationException as ExpectationException;
+use Behat\Gherkin\Node\TableNode,
+Behat\Mink\Exception\DriverException,
+Behat\Mink\Exception\ExpectationException;
 
 /**
  * Designer course format steps definitions.
@@ -38,7 +38,6 @@ Behat\Mink\Exception\ExpectationException as ExpectationException;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_format_designer extends behat_base {
-
     /**
      * Go to editing section layout for specified section number and layout type.
      * You need to be in the course page and on editing mode.
@@ -66,12 +65,13 @@ class behat_format_designer extends behat_base {
             $xpath .= "/descendant::div[contains(@id, 'section-designer-action')]/descendant::
                 div[contains(@class, 'dropdown-menu')]";
             // Click on layout link.
-            $this->execute('behat_general::i_click_on_in_the',
-            [$strlayout, "link", $this->escape($xpath), "xpath_element"]
+            $this->execute(
+                'behat_general::i_click_on_in_the',
+                [$strlayout, "link", $this->escape($xpath), "xpath_element"]
             );
         } else {
             $this->execute('behat_course::i_open_section_edit_menu', [$sectionnumber]);
-            $actionmenu = "Section Layout > ". get_string($layouttype, 'format_designer');
+            $actionmenu = "Section Layout > " . get_string($layouttype, 'format_designer');
             $this->execute('behat_action_menu::i_choose_in_the_open_action_menu', [$actionmenu]);
             $this->execute('behat_general::reload', []);
         }
@@ -184,7 +184,7 @@ class behat_format_designer extends behat_base {
     public function i_check_the_section_layout($sectionnumber, $layouttype) {
         $layoutclass = "$layouttype-layout";
         $xpath = "//li[@id='section-" . $sectionnumber . "']";
-        $xpath .= "/descendant::ul[contains(@class, 'designer-section-content') and contains(@class, '".$layoutclass."')]";
+        $xpath .= "/descendant::ul[contains(@class, 'designer-section-content') and contains(@class, '" . $layoutclass . "')]";
         $exception = new ExpectationException('Section "' . $sectionnumber . '" was not change the layout "'
         . $layouttype . '"', $this->getSession());
         $this->find('xpath', $xpath, $exception);
@@ -201,8 +201,10 @@ class behat_format_designer extends behat_base {
     public function i_check_the_activity_element($activityidendifier, $element) {
         $xpath = $this->get_activity_idendifier_slug($activityidendifier);
         $xpath .= $element;
-        $exception = new ExpectationException('Module "'. $activityidendifier.'" was does not correct completion ',
-            $this->getSession());
+        $exception = new ExpectationException(
+            'Module "' . $activityidendifier . '" was does not correct completion ',
+            $this->getSession()
+        );
         $this->find('xpath', $xpath, $exception);
     }
 
@@ -231,7 +233,7 @@ class behat_format_designer extends behat_base {
     public function i_click_on_section_header($sectionnum) {
         $xpath = "//li[@id='section-" . $sectionnum . "']";
         $xpath .= "/descendant::div[contains(@class, 'section-header-content')]";
-        $exception = new ExpectationException('Click for section"'. $sectionnum .'" header was not found', $this->getSession());
+        $exception = new ExpectationException('Click for section"' . $sectionnum . '" header was not found', $this->getSession());
         $menu = $this->find('xpath', $xpath, $exception);
         $menu->click();
     }
@@ -277,9 +279,11 @@ class behat_format_designer extends behat_base {
         $durationinfo = behat_context_helper::escape($duration);
         $completioninfo .= str_replace("'", "", $durationinfo);
         $xpath .= "/descendant::div[contains(@class, 'completion-info')]/descendant::
-        span[contains(., '".$completioninfo."')]";
-        $exception = new ExpectationException('Completion info for "' . $activityidendifier . '" was not found',
-            $this->getSession());
+        span[contains(., '" . $completioninfo . "')]";
+        $exception = new ExpectationException(
+            'Completion info for "' . $activityidendifier . '" was not found',
+            $this->getSession()
+        );
         $this->find('xpath', $xpath, $exception);
     }
 
@@ -311,9 +315,11 @@ class behat_format_designer extends behat_base {
             throw new Exception('The specified activity with idnumber "' . $activityidendifier . '" does not exist');
         }
         $moduleid = "module-" . $cm->id;
-        $xpath = "//li[@id='".$moduleid."']";
-        $exception = new ExpectationException('Activity idendifier "' . $activityidendifier . '" was not found',
-            $this->getSession());
+        $xpath = "//li[@id='" . $moduleid . "']";
+        $exception = new ExpectationException(
+            'Activity idendifier "' . $activityidendifier . '" was not found',
+            $this->getSession()
+        );
         $this->find('xpath', $xpath, $exception);
         return $xpath;
     }
@@ -340,8 +346,33 @@ class behat_format_designer extends behat_base {
      */
     public function i_check_the_designer_section_general_section() {
         global $CFG;
-        $this->execute('behat_forms::the_field_matches_value', ["Section name" , ""]);
+        $this->execute('behat_forms::the_field_matches_value', ["Section name", ""]);
         $this->execute('behat_general::assert_page_contains_text', ["General"]);
     }
 
+    /**
+     * Select an activity from the activity chooser, handling differences between Moodle versions.
+     *
+     * In Moodle 5.1+, after clicking the activity link, an additional "Add selected activity" button
+     * must be clicked to confirm the selection.
+     *
+     * @Given /^I select "(?P<activity>(?:[^"]|\\")*)" activity from the activity chooser$/
+     * @param string $activity The activity name (e.g., "Forum", "Assignment")
+     */
+    public function i_select_activity_from_the_activity_chooser(string $activity): void {
+        global $CFG;
+
+        $this->execute('behat_general::i_click_on_in_the', [
+            "Add a new $activity", "link",
+            "Add an activity or resource", "dialogue",
+        ]);
+
+        // Moodle 5.1+ requires an additional confirmation button click.
+        if ($CFG->branch >= 501) {
+            $this->execute('behat_general::i_click_on_in_the', [
+                "Add selected activity", "button",
+                "Add an activity or resource", "dialogue",
+            ]);
+        }
+    }
 }

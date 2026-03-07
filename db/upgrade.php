@@ -51,7 +51,6 @@ function xmldb_format_designer_upgrade($oldversion) {
     // Put any upgrade step following this.
 
     if ($oldversion < 2022020301) {
-
         $table = new xmldb_table('format_designer_options');
 
         // Adding fields to table designer options.
@@ -67,8 +66,8 @@ function xmldb_format_designer_upgrade($oldversion) {
         // Conditionally launch create table for designer activity customfields.
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
-            if (format_designer_has_pro()) {
-                local_designer_update_prodata();
+            if (\format_designer\helper::has_pro()) {
+                \local_designer\helper::update_prodata();
             }
         }
 
@@ -78,7 +77,7 @@ function xmldb_format_designer_upgrade($oldversion) {
     if ($oldversion < 2023040601) {
         // Create start date.
         $fields = ['enrolmentstartdate', 'enrolmentenddate', 'coursecompletiondate', 'courseduedate'];
-        list($insql, $inparams) = $DB->get_in_or_equal($fields, SQL_PARAMS_NAMED, 'time');
+        [$insql, $inparams] = $DB->get_in_or_equal($fields, SQL_PARAMS_NAMED, 'time');
         $sql = "SELECT * FROM {course_format_options} cf WHERE cf.name $insql";
         $timerecords = $DB->get_records_sql($sql, $inparams);
 

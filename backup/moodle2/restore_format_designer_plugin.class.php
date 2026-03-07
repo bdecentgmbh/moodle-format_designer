@@ -26,7 +26,6 @@
  * Specialised restore for Designer course format.
  */
 class restore_format_designer_plugin extends restore_format_plugin {
-
     /** @var int */
     protected $originalnumsections = 0;
 
@@ -53,11 +52,14 @@ class restore_format_designer_plugin extends restore_format_plugin {
         // Since this method is executed before the restore we can do some pre-checks here.
         // In case of merging backup into existing course find the current number of sections.
         $target = $this->step->get_task()->get_target();
-        if (($target == backup::TARGET_CURRENT_ADDING || $target == backup::TARGET_EXISTING_ADDING) &&
-                $this->need_restore_numsections()) {
+        if (
+            ($target == backup::TARGET_CURRENT_ADDING || $target == backup::TARGET_EXISTING_ADDING) &&
+                $this->need_restore_numsections()
+        ) {
             $maxsection = $DB->get_field_sql(
                 'SELECT max(section) FROM {course_sections} WHERE course = ?',
-                [$this->step->get_task()->get_courseid()]);
+                [$this->step->get_task()->get_courseid()]
+            );
             $this->originalnumsections = (int)$maxsection;
         }
 
@@ -101,7 +103,6 @@ class restore_format_designer_plugin extends restore_format_plugin {
      * @return void
      */
     public function process_dummy_course() {
-
     }
 
     /**
@@ -110,7 +111,6 @@ class restore_format_designer_plugin extends restore_format_plugin {
      * @return void
      */
     public function process_dummy_section() {
-
     }
 
     /**
@@ -145,8 +145,10 @@ class restore_format_designer_plugin extends restore_format_plugin {
             if ($this->step->get_task()->get_setting_value($key . '_included')) {
                 $sectionnum = (int)$section->title;
                 if ($sectionnum > $numsections && $sectionnum > $this->originalnumsections) {
-                    $DB->execute("UPDATE {course_sections} SET visible = 0 WHERE course = ? AND section = ?",
-                        [$this->step->get_task()->get_courseid(), $sectionnum]);
+                    $DB->execute(
+                        "UPDATE {course_sections} SET visible = 0 WHERE course = ? AND section = ?",
+                        [$this->step->get_task()->get_courseid(), $sectionnum]
+                    );
                 }
             }
         }
@@ -177,13 +179,23 @@ class restore_format_designer_plugin extends restore_format_plugin {
             }
 
             // Restore the courseheaderbgimage.
-            $this->add_related_files('local_designer', 'courseheaderbgimage', null, null,
-                $this->step->get_task()->get_old_courseid());
+            $this->add_related_files(
+                'local_designer',
+                'courseheaderbgimage',
+                null,
+                null,
+                $this->step->get_task()->get_old_courseid()
+            );
             // Restore the coursebgimage.
             $this->add_related_files('local_designer', 'coursebgimage', null, null, $this->step->get_task()->get_old_courseid());
             // Restore the additionalcontent.
-            $this->add_related_files('local_designer', 'additionalcontent', null, null,
-                $this->step->get_task()->get_old_courseid());
+            $this->add_related_files(
+                'local_designer',
+                'additionalcontent',
+                null,
+                null,
+                $this->step->get_task()->get_old_courseid()
+            );
             // Restore the prerequisiteinfo.
             $this->add_related_files('local_designer', 'prerequisiteinfo', null, null, $this->step->get_task()->get_old_courseid());
         }
