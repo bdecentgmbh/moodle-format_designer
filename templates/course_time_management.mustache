@@ -25,7 +25,8 @@
         "userdate": true,
         "datatoggle": "data-toggle",
         "datacontent": "data-content",
-        "datahtml": "data-html"
+        "datahtml": "data-html",
+        "datatrigger": "data-trigger"
     }
 }}
 <div class="course-info-block">
@@ -145,11 +146,11 @@
         <div class="progress">
             <div class="progress-bar success" role="progressbar" style="width: {{courseprogress.percent}}%" aria-valuenow="{{courseprogress.percent}}"
                 aria-valuemin="0" aria-valuemax="100" {{datatoggle}}="popover" {{datacontent}}="{{courseprogress.completioncriteriahtml}}"
-                data-animation="true" data-placement="bottom" {{datahtml}}="true">
+                data-animation="true" data-placement="bottom" {{datahtml}}="true" {{datatrigger}}="focus" tabindex="0">
             </div>
             <div class="progress-bar bg-remain-block" role="progressbar" style="width: {{courseprogress.remain}}%" aria-valuenow="{{courseprogress.remain}}"
                 aria-valuemin="0" aria-valuemax="100" {{datatoggle}}="popover" {{datacontent}}="{{courseprogress.uncompletioncriteriahtml}}"
-                data-animation="true" data-placement="bottom" {{datahtml}}="true">
+                data-animation="true" data-placement="bottom" {{datahtml}}="true" {{datatrigger}}="focus" tabindex="0">
             </div>
         </div>
 

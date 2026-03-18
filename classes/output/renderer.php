@@ -482,6 +482,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             'datatoggle' => $CFG->branch >= 500 ? "data-bs-toggle" : "data-toggle",
             'datacontent' => $CFG->branch >= 500 ? "data-bs-content" : "data-content",
             'datahtml' => $CFG->branch >= 500 ? "data-bs-html" : "data-html",
+            'datatrigger' => $CFG->branch >= 500 ? "data-bs-trigger" : "data-trigger",
         ];
 
         if (\format_designer\helper::has_pro()) {
