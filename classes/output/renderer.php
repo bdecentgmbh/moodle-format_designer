@@ -1396,7 +1396,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             if (!empty($cmtextcontent)) {
                 if ($cmtextlength == DESIGNER_MOD_TEXT_TRIMM) {
                     $trimlenght = get_config('format_designer', 'modtrimlength');
-                    if (str_word_count($cmtextcontent) >= 23) {
+                    if (str_word_count($cmtextcontent) > $trimlenght) {
                         $modcontenthtml = '';
                         $modcontenthtml .= html_writer::start_tag('div', ['class' => 'trim-summary']);
                         $modcontenthtml .= \format_designer\helper::modcontent_trim_char($cmtextcontent, $trimlenght);
