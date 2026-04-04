@@ -24,12 +24,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot. '/course/format/lib.php');
+require_once($CFG->dirroot . '/course/format/lib.php');
 require_once($CFG->dirroot . '/user/profile/lib.php');
 
 use core\output\inplace_editable;
 
-if (format_designer_has_pro()) {
+if (\format_designer\helper::has_pro()) {
     require_once($CFG->dirroot . '/local/designer/classes/courseoptions.php');
 }
 
@@ -98,7 +98,6 @@ define('DESIGNER_PROGRESS_CRITERIA', 'criteria');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format_designer extends \core_courseformat\base {
-
     /**
      * Hide the course index bar in course pages only.
      */
@@ -108,6 +107,13 @@ class format_designer extends \core_courseformat\base {
      * Hide the course index bar everywhere.
      */
     const HIDE_EVERYWHERE = 2;
+
+    /**
+     * Cache for section options.
+     *
+     * @var array
+     */
+    private static $sectionoptionscache = [];
 
     /**
      * Returns true if this course format uses sections.
@@ -177,8 +183,11 @@ class format_designer extends \core_courseformat\base {
     public function get_section_name($section) {
         $section = $this->get_section($section);
         if ((string)$section->name !== '') {
-            return format_string($section->name, true,
-                ['context' => context_course::instance($this->courseid)]);
+            return format_string(
+                $section->name,
+                true,
+                ['context' => context_course::instance($this->courseid)]
+            );
         } else {
             return $this->get_default_section_name($section);
         }
@@ -244,18 +253,22 @@ class format_designer extends \core_courseformat\base {
      */
     public function get_view_url($section, $options = []) {
         global $CFG;
+
         $course = $this->get_course();
         $url = new moodle_url('/course/view.php', ['id' => $course->id]);
-
         $sr = null;
+
         if (array_key_exists('sr', $options)) {
             $sr = $options['sr'];
         }
+
         if (is_object($section)) {
             $sectionno = $section->section;
         } else {
             $sectionno = $section;
+            $section = $this->get_section($sectionno);
         }
+
         if ($sectionno !== null) {
             if ($sr !== null) {
                 if ($sr) {
@@ -267,13 +280,13 @@ class format_designer extends \core_courseformat\base {
             } else {
                 $usercoursedisplay = $course->coursedisplay;
             }
-            if ($sectionno != 0 && $usercoursedisplay == COURSE_DISPLAY_MULTIPAGE) {
+
+            if ($usercoursedisplay == COURSE_DISPLAY_MULTIPAGE) {
                 $url->param('section', $sectionno);
+                $url->param('sectionid', $section->id);
+                $url->param('sesskey', sesskey());
             } else {
-                if (empty($CFG->linkcoursesections) && !empty($options['navigation'])) {
-                    return null;
-                }
-                $url->set_anchor('section-'.$sectionno);
+                $url->set_anchor('section-' . $sectionno);
             }
         }
         return $url;
@@ -300,7 +313,7 @@ class format_designer extends \core_courseformat\base {
      * @return string
      */
     public function course_header() {
-        if (format_designer_has_pro() && class_exists('\local_designer\courseheader')) {
+        if (\format_designer\helper::has_pro() && class_exists('\local_designer\courseheader')) {
             return local_designer\courseheader::get_header_instance($this);
         }
     }
@@ -312,14 +325,24 @@ class format_designer extends \core_courseformat\base {
      * @return void
      */
     public function page_set_course(moodle_page $page) {
+        global $CFG;
+
+        static $design = null;
         $course = $this->get_course();
         if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
             $page->add_body_class('format-designer-single-section');
         }
-        if (format_designer_has_pro()) {
+        if (\format_designer\helper::has_pro()) {
             // Fetch classes from pro designer and attach them to the body.
             $classes = \local_designer\info::create()->generate_body_classes($course, $this);
             $page->add_body_class($classes);
+
+            if ($design === null) {
+                // Include the designer pro styles.
+                $styleurl = \local_designer\courseoptions::create($course)->designer_include_style();
+                $page->requires->css($styleurl);
+                $design = true;
+            }
         }
     }
     /**
@@ -334,8 +357,10 @@ class format_designer extends \core_courseformat\base {
         // If section is specified in course/view.php, make sure it is expanded in navigation.
         if ($navigation->includesectionnum === false) {
             $selectedsection = optional_param('section', null, PARAM_INT);
-            if ($selectedsection !== null && (!defined('AJAX_SCRIPT') || AJAX_SCRIPT == '0') &&
-                    $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)) {
+            if (
+                $selectedsection !== null && (!defined('AJAX_SCRIPT') || AJAX_SCRIPT == '0') &&
+                    $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
+            ) {
                 $navigation->includesectionnum = $selectedsection;
             }
         }
@@ -424,7 +449,7 @@ class format_designer extends \core_courseformat\base {
                 if (isset($design->$name)) {
                     $courseformatoptions[$name]['default'] = $design->$name;
                 }
-                $adv = $name.'_adv';
+                $adv = $name . '_adv';
                 if (isset($design->$adv) && $design->$adv) {
                     $courseformatoptions[$name]['adv'] = true;
                 }
@@ -519,7 +544,7 @@ class format_designer extends \core_courseformat\base {
             ];
 
             // Include course header config.
-            if (format_designer_has_pro()) {
+            if (\format_designer\helper::has_pro()) {
                 $courseoptions = new local_designer\courseoptions($PAGE->course);
                 if (method_exists($courseoptions, 'course_format_options_list')) {
                     $courseformatoptions += $courseoptions->course_format_options_list();
@@ -539,7 +564,7 @@ class format_designer extends \core_courseformat\base {
             ];
 
             // Include course header config.
-            if (format_designer_has_pro()) {
+            if (\format_designer\helper::has_pro()) {
                 $courseformatoptions += (new local_designer\courseoptions($PAGE->course))->course_header_options_format_list();
             }
             $courseformatoptions += [
@@ -563,7 +588,7 @@ class format_designer extends \core_courseformat\base {
                 ],
             ];
 
-            if (format_designer_has_pro() != 1 ) {
+            if (\format_designer\helper::has_pro() != 1) {
                 $userprofilefields = profile_get_user_fields_with_data(0);
                 if (!empty($userprofilefields)) {
                     foreach ($userprofilefields as $field) {
@@ -598,10 +623,9 @@ class format_designer extends \core_courseformat\base {
                 'type' => PARAM_INT,
             ];
         }
-        if (format_designer_has_pro()) {
-            require_once($CFG->dirroot."/local/designer/lib.php");
-            if (function_exists('local_designer_course_format_options_list')) {
-                $courseformatoptions += local_designer_course_format_options_list();
+        if (\format_designer\helper::has_pro()) {
+            if (class_exists('\local_designer\helper') && method_exists('\local_designer\helper', 'course_format_options_list')) {
+                $courseformatoptions += \local_designer\helper::course_format_options_list();
             }
 
             $courseformatoptions += (new local_designer\courseoptions($PAGE->course))->course_background_options_format_list();
@@ -612,7 +636,7 @@ class format_designer extends \core_courseformat\base {
                 'hiddensections' => [
                     'label' => new lang_string('hiddensections'),
                     'help' => 'hiddensections',
-                    'help_component' => 'moodle',
+                    'help_component' => 'format_designer',
                     'element_type' => 'select',
                     'element_attributes' => [
                         [
@@ -632,7 +656,7 @@ class format_designer extends \core_courseformat\base {
                     ],
                     'help' => 'coursedisplay',
                     'help_component' => 'moodle',
-                    'disabledif' => [['coursetype', 'eq', DESIGNER_TYPE_KANBAN]],
+                    'disabledif' => [['coursetype', 'eq', DESIGNER_TYPE_KANBAN], ['coursetype', 'eq', DESIGNER_TYPE_FLOW]],
                 ],
 
                 'accordion' => [
@@ -768,7 +792,7 @@ class format_designer extends \core_courseformat\base {
                     'help_component' => 'format_designer',
                 ],
             ];
-            if (format_designer_has_pro()) {
+            if (\format_designer\helper::has_pro()) {
                 $courseoptions = new local_designer\courseoptions($PAGE->course);
                 if (method_exists($courseoptions, 'course_format_options_editlist')) {
                     $courseformatoptionsedit += $courseoptions->course_format_options_editlist();
@@ -777,7 +801,7 @@ class format_designer extends \core_courseformat\base {
                     $courseformatoptionsedit += $courseoptions->course_header_options_editlist();
                 }
             }
-            if (format_designer_popup_installed()) {
+            if (\format_designer\helper::popup_installed()) {
                 $courseformatoptionsedit['popupactivities'] = [
                     'label' => new lang_string('popupactivities', 'format_designer'),
                     'element_type' => 'select',
@@ -813,7 +837,7 @@ class format_designer extends \core_courseformat\base {
                 ];
             }
 
-            if (format_designer_timemanagement_installed()) {
+            if (\format_designer\helper::timetable_installed()) {
                 $courseformatoptionsedit['courseduedateinfo'] = [
                     'element_type' => 'hidden',
                 ];
@@ -876,10 +900,12 @@ class format_designer extends \core_courseformat\base {
                 'help_component' => 'format_designer',
             ];
 
-            if (format_designer_has_pro()) {
-                require_once($CFG->dirroot."/local/designer/lib.php");
-                if (function_exists('local_designer_course_format_options_editlist')) {
-                    $courseformatoptionsedit += local_designer_course_format_options_editlist();
+            if (\format_designer\helper::has_pro()) {
+                if (
+                    class_exists('\local_designer\helper') &&
+                    method_exists('\local_designer\helper', 'course_format_options_editlist')
+                ) {
+                    $courseformatoptionsedit += \local_designer\helper::course_format_options_editlist();
                 }
                 // Course background format options.
                 $courseformatoptionsedit += (new local_designer\courseoptions($PAGE->course))->course_background_options_editlist();
@@ -927,7 +953,7 @@ class format_designer extends \core_courseformat\base {
         global $COURSE, $PAGE, $CFG;
 
         $elements = parent::create_edit_form_elements($mform, $forsection);
-        if (format_designer_has_pro()) {
+        if (\format_designer\helper::has_pro()) {
             // Update the pro fields course values strucuture, Prepare files.
             local_designer\options::load_course_prepare_file($COURSE, $mform);
         }
@@ -945,13 +971,11 @@ class format_designer extends \core_courseformat\base {
             }
             array_unshift($elements, $element);
         }
-
         if ($forsection) {
             $options = $this->section_format_options(true);
         } else {
             $options = $this->designer_course_format_options(true);
         }
-
         $design = \format_designer\options::get_default_options();
         foreach ($options as $optionname => $option) {
             if (isset($option['disabledif'])) {
@@ -973,8 +997,7 @@ class format_designer extends \core_courseformat\base {
             if (isset($option['adv'])) {
                 $mform->setAdvanced($optionname);
             }
-
-            if ($optionname == 'coursestaff' && isset($design->coursestaff)) {
+            if (($option['element_type'] == 'autocomplete') && isset($design->{$optionname})) {
                 $select = $mform->getElement($optionname);
                 $select->setSelected($design->{$optionname});
             }
@@ -1020,7 +1043,7 @@ class format_designer extends \core_courseformat\base {
      */
     public function editsection_form($action, $customdata = []) {
         global $CFG;
-        require_once($CFG->dirroot. '/course/format/designer/editsection_form.php');
+        require_once($CFG->dirroot . '/course/format/designer/editsection_form.php');
         if (!array_key_exists('course', $customdata)) {
             $customdata['course'] = $this->get_course();
         }
@@ -1054,25 +1077,39 @@ class format_designer extends \core_courseformat\base {
      */
     public function section_format_options($foreditform = false) {
         global $PAGE, $COURSE;
+
         $sectionid = optional_param('id', 0, PARAM_INT);
         if ($sectionid && $PAGE->pagetype == 'course-editsection') {
             $sectionbackdraftid = 0;
             $sectioncompletionbackdraftid = 0;
             $coursecontext = \context_course::instance($COURSE->id);
             $format = course_get_format($COURSE);
-            file_prepare_draft_area($sectionbackdraftid, $coursecontext->id, 'format_designer',
-                    'sectiondesignbackground', $sectionid, ['accepted_types' => 'images',
+            file_prepare_draft_area(
+                $sectionbackdraftid,
+                $coursecontext->id,
+                'format_designer',
+                'sectiondesignbackground',
+                $sectionid,
+                ['accepted_types' => 'images',
                     'maxfiles' => 1,
                     ],
-                );
-            file_prepare_draft_area($sectioncompletionbackdraftid, $coursecontext->id, 'format_designer',
-                    'sectiondesigncompletionbackground', $sectionid, ['accepted_types' => 'images',
+            );
+            file_prepare_draft_area(
+                $sectioncompletionbackdraftid,
+                $coursecontext->id,
+                'format_designer',
+                'sectiondesigncompletionbackground',
+                $sectionid,
+                ['accepted_types' => 'images',
                     'maxfiles' => 1,
                 ],
             );
             $format->set_section_option($sectionid, 'sectiondesignerbackgroundimage', $sectionbackdraftid);
-            $format->set_section_option($sectionid, 'sectiondesignercompletionbg',
-                $sectioncompletionbackdraftid);
+            $format->set_section_option(
+                $sectionid,
+                'sectiondesignercompletionbg',
+                $sectioncompletionbackdraftid
+            );
         }
         return self::section_format_options_list($foreditform);
     }
@@ -1085,11 +1122,28 @@ class format_designer extends \core_courseformat\base {
      */
     public static function section_format_options_list($foreditform) {
         global $CFG, $PAGE;
+
+        // Static cache to prevent repeated calls - CRITICAL OPTIMIZATION.
+        static $cachedoptions = null;
+
+        // Create cache key based on edit form context.
+        $cachekey = $foreditform ? 'edit' : 'view';
+
+        // Return cached result if already loaded for this context.
+        if ($cachedoptions !== null && isset($cachedoptions[$cachekey])) {
+            return $cachedoptions[$cachekey];
+        }
+
+        // Initialize cache array if first call.
+        if ($cachedoptions === null) {
+            $cachedoptions = [];
+        }
+
         $design = \format_designer\options::get_default_options();
         $sectionoptions = [
             'sectiontype' => [
                 'type' => PARAM_ALPHANUMEXT,
-                'label' => '',
+                'label' => new lang_string('sectiontype', 'format_designer'),
                 'element_type' => 'hidden',
                 'default' => get_config('format_designer', 'sectiontype'),
             ],
@@ -1105,7 +1159,7 @@ class format_designer extends \core_courseformat\base {
             'type' => PARAM_TEXT,
             'element_type' => 'header',
             'default' => get_string('sectionlayouts', 'format_designer'),
-            'label' => '',
+            'label' => new lang_string('sectionlayouts', 'format_designer'),
         ];
 
         $course = course_get_format($PAGE->course)->get_course();
@@ -1118,9 +1172,9 @@ class format_designer extends \core_courseformat\base {
             ];
 
             foreach ($lists as $name => $options) {
-                $name = $name.'width';
+                $name = $name . 'width';
                 $availablewidth = array_slice($width, 0, $options['size']);
-                $widthdefaultvalue = isset($design->$name) ? $width[$design->$name] : '';
+                $widthdefaultvalue = get_config('format_designer', $name);
                 $sectionoptions[$name] = [
                     'default' => (isset($design->$name) ||
                     (isset($course->coursetype) && $course->coursetype != DESIGNER_TYPE_NORMAL))
@@ -1134,7 +1188,7 @@ class format_designer extends \core_courseformat\base {
                     'help' => $name,
                     'help_component' => 'format_designer',
                 ];
-                $adv = $name.'_adv';
+                $adv = $name . '_adv';
                 if (isset($design->$adv) && $design->$adv) {
                     $sectionoptions[$name]['adv'] = true;
                 }
@@ -1144,15 +1198,19 @@ class format_designer extends \core_courseformat\base {
                 'type' => PARAM_TEXT,
                 'element_type' => 'text',
                 'label' => get_string('sectionestimatetime', 'format_designer'),
+                'default' => get_config('format_designer', 'sectionestimatetime'),
             ];
         }
 
         // Include pro feature options for section.
-        if (format_designer_has_pro()) {
-            require_once($CFG->dirroot."/local/designer/lib.php");
-            $prosectionoptions = local_designer_get_pro_section_options($foreditform);
-            $sectionoptions = array_merge($sectionoptions, $prosectionoptions);
+        if (\format_designer\helper::has_pro()) {
+            if (class_exists('\local_designer\helper')) {
+                $prosectionoptions = \local_designer\helper::get_pro_section_options($foreditform);
+                $sectionoptions = array_merge($sectionoptions, $prosectionoptions);
+            }
         }
+
+        $cachedoptions[$cachekey] = $sectionoptions;
         return $sectionoptions;
     }
 
@@ -1194,19 +1252,36 @@ class format_designer extends \core_courseformat\base {
                 }
 
                 if (in_array($option, array_keys($fileareasections))) {
-                    $files = $fs->get_area_files($coursecontext->id, $fileareasections[$option]['component'],
-                    $fileareasections[$option]['filearea'], $oldsection->id, 'itemid, filepath, filename', false);
+                    $files = $fs->get_area_files(
+                        $coursecontext->id,
+                        $fileareasections[$option]['component'],
+                        $fileareasections[$option]['filearea'],
+                        $oldsection->id,
+                        'itemid, filepath, filename',
+                        false
+                    );
                     $file = current($files);
                     if ($file) {
-                        $userdraft = [
-                            'contextid' => $coursecontext->id,
-                            'component' => $fileareasections[$option]['component'],
-                            'filearea' => $fileareasections[$option]['filearea'],
-                            'itemid' => $sectioninfo->id,
-                            'filepath' => '/',
-                            'filename' => $file->get_filename(),
-                        ];
-                        $fs->create_file_from_storedfile($userdraft, $file);
+                        // Check if the file already exists to avoid duplicate pathnamehash errors.
+                        $existingfile = $fs->file_exists(
+                            $coursecontext->id,
+                            $fileareasections[$option]['component'],
+                            $fileareasections[$option]['filearea'],
+                            $sectioninfo->id,
+                            '/',
+                            $file->get_filename()
+                        );
+                        if (!$existingfile) {
+                            $userdraft = [
+                                'contextid' => $coursecontext->id,
+                                'component' => $fileareasections[$option]['component'],
+                                'filearea' => $fileareasections[$option]['filearea'],
+                                'itemid' => $sectioninfo->id,
+                                'filepath' => '/',
+                                'filename' => $file->get_filename(),
+                            ];
+                            $fs->create_file_from_storedfile($userdraft, $file);
+                        }
                     }
                 }
             }
@@ -1214,18 +1289,35 @@ class format_designer extends \core_courseformat\base {
 
         // Prepare the section summary.
         $files = $fs->get_area_files(
-            $coursecontext->id, 'course', 'section', $oldsection->id, 'itemid, filepath, filename', false);
+            $coursecontext->id,
+            'course',
+            'section',
+            $oldsection->id,
+            'itemid, filepath, filename',
+            false
+        );
         $file = current($files);
         if ($file) {
-            $userdraft = [
-                'contextid' => $coursecontext->id,
-                'component' => 'course',
-                'filearea' => 'section',
-                'itemid' => $sectioninfo->id,
-                'filepath' => '/',
-                'filename' => $file->get_filename(),
-            ];
-            $fs->create_file_from_storedfile($userdraft, $file);
+            // Check if the file already exists to avoid duplicate pathnamehash errors.
+            $existingfile = $fs->file_exists(
+                $coursecontext->id,
+                'course',
+                'section',
+                $sectioninfo->id,
+                '/',
+                $file->get_filename()
+            );
+            if (!$existingfile) {
+                $userdraft = [
+                    'contextid' => $coursecontext->id,
+                    'component' => 'course',
+                    'filearea' => 'section',
+                    'itemid' => $sectioninfo->id,
+                    'filepath' => '/',
+                    'filename' => $file->get_filename(),
+                ];
+                $fs->create_file_from_storedfile($userdraft, $file);
+            }
         }
         return $sectioninfo;
     }
@@ -1246,7 +1338,7 @@ class format_designer extends \core_courseformat\base {
         if (empty($data['sectionlayoutheader'])) {
             $data['sectionlayoutheader'] = get_string('sectionlayouts', 'format_designer');
         }
-        if (format_designer_has_pro()) {
+        if (\format_designer\helper::has_pro()) {
             local_designer\options::update_section_format_options($data);
         }
         return $this->update_format_options($data, $data['id']);
@@ -1288,17 +1380,25 @@ class format_designer extends \core_courseformat\base {
             expand_value($defaultoptions, $defaultoptions, $option, $key);
             $cached[$key] = ($sectionid === 0 || !empty($option['cache']));
         }
-        $records = $DB->get_records('course_format_options',
-                ['courseid' => $this->courseid,
+        $records = $DB->get_records(
+            'course_format_options',
+            ['courseid' => $this->courseid,
                       'format' => $this->format,
                       'sectionid' => $sectionid,
-                ], '', 'name,id,value');
+            ],
+            '',
+            'name,id,value'
+        );
         $changed = $needrebuild = false;
         foreach ($defaultoptions as $key => $value) {
             if (isset($records[$key])) {
                 if (array_key_exists($key, $data) && $records[$key]->value != $data[$key]) {
-                    $DB->set_field('course_format_options', 'value',
-                            $data[$key], ['id' => $records[$key]->id]);
+                    $DB->set_field(
+                        'course_format_options',
+                        'value',
+                        $data[$key],
+                        ['id' => $records[$key]->id]
+                    );
                     $changed = true;
                     $needrebuild = $needrebuild || $cached[$key];
                 }
@@ -1371,21 +1471,22 @@ class format_designer extends \core_courseformat\base {
                 if ($key == 'coursecompletiondateinfo') {
                     $data[$key] = get_string('completiontrackingmissing', 'format_designer');
                 }
-                if ($key == 'popupactivities' && !format_designer_popup_installed()) {
+                if ($key == 'popupactivities' && !\format_designer\helper::popup_installed()) {
                     $data[$key] = false;
                 }
             }
 
-            if (isset($oldcourse['coursetype'])
+            if (
+                isset($oldcourse['coursetype'])
                 && $oldcourse['coursetype'] != DESIGNER_TYPE_KANBAN
                 && isset($data['coursetype'])
-                && $data['coursetype'] == DESIGNER_TYPE_KANBAN) {
+                && $data['coursetype'] == DESIGNER_TYPE_KANBAN
+            ) {
                     $this->setup_kanban_layouts($oldcourse);
             }
             if (isset($data['coursetype']) && $data['coursetype'] == DESIGNER_TYPE_KANBAN) {
                 $data['coursedisplay'] = 0;
             }
-
         } else {
             if (isset($data['coursetype']) && $data['coursetype'] == DESIGNER_TYPE_KANBAN) {
                 $this->setup_kanban_layouts($data);
@@ -1402,7 +1503,7 @@ class format_designer extends \core_courseformat\base {
         }
 
         // Time management implode the array to string.
-        if (isset($data['timemanagement']) && is_array($data['timemanagement']) ) {
+        if (isset($data['timemanagement']) && is_array($data['timemanagement'])) {
             $data['timemanagement'] = implode(',', $data['timemanagement']);
         }
 
@@ -1428,8 +1529,10 @@ class format_designer extends \core_courseformat\base {
             );
         }
 
+        $data = (object) $data;
+
         // Update the designer pro options, before update.
-        if (format_designer_has_pro()) {
+        if (\format_designer\helper::has_pro()) {
             local_designer\options::update_course_format_options($data, $this->courseid);
         }
         theme_reset_all_caches();
@@ -1444,16 +1547,24 @@ class format_designer extends \core_courseformat\base {
      */
     public function setup_kanban_layouts($course) {
         global $DB;
-        $sections = $DB->get_records('course_sections', ['course' => $course['id']]);
-        foreach ($sections as $section) {
-            if ($section->section == 0) {
-                continue;
-            }
+        $sectionrs = $DB->get_recordset_sql(
+            <<<'EOT'
+            SELECT
+                id
+            FROM {course_sections}
+            WHERE
+                section <> 0
+                AND course = ?
+            EOT,
+            [ $course['id'] ]
+        );
+        foreach ($sectionrs as $section) {
             $this->set_section_option($section->id, 'sectiontype', 'cards');
             $this->set_section_option($section->id, 'layoutmobilecolumn', '1');
             $this->set_section_option($section->id, 'layouttabletcolumn', '1');
             $this->set_section_option($section->id, 'layoutdesktopcolumn', '1');
         }
+        $sectionrs->close();
     }
 
     /**
@@ -1478,12 +1589,19 @@ class format_designer extends \core_courseformat\base {
      * @param null|lang_string|string $editlabel
      * @return inplace_editable
      */
-    public function inplace_editable_render_section_name($section, $linkifneeded = true,
-            $editable = null, $edithint = null, $editlabel = null) {
+    public function inplace_editable_render_section_name(
+        $section,
+        $linkifneeded = true,
+        $editable = null,
+        $edithint = null,
+        $editlabel = null
+    ) {
         global $USER;
         if ($editable === null) {
-            $editable = !empty($USER->editing) && has_capability('moodle/course:update',
-                    context_course::instance($section->course));
+            $editable = !empty($USER->editing) && has_capability(
+                'moodle/course:update',
+                context_course::instance($section->course)
+            );
         }
         if (empty($edithint)) {
             $edithint = new lang_string('editsectionname', 'format_designer');
@@ -1493,11 +1611,11 @@ class format_designer extends \core_courseformat\base {
             $editlabel = new lang_string('newsectionname', 'format_designer', $title);
         }
         $style = '';
-        if (format_designer_has_pro()) {
-            if (isset($section->sectiondesignertextcolor)) {
-                if ($section->sectiondesignertextcolor) {
-                    $style = "color: $section->sectiondesignertextcolor" . ";";
-                }
+        if (\format_designer\helper::has_pro()) {
+            $format = course_get_format($section->course);
+            $sectiontextcolor = $format->get_section_option($section->id, 'sectiondesignertextcolor') ?? null;
+            if ($sectiontextcolor) {
+                $style = "color: $sectiontextcolor" . ";";
             }
         }
         $displayvalue = $title = get_section_name($section->course, $section);
@@ -1514,8 +1632,16 @@ class format_designer extends \core_courseformat\base {
             // there is no other way callback can know where we display the section name.
             $itemtype = 'sectionnamenl';
         }
-        return new \core\output\inplace_editable('format_' . $this->format, $itemtype, $section->id, $editable,
-            $displayvalue, $section->name, $edithint, $editlabel);
+        return new \core\output\inplace_editable(
+            'format_' . $this->format,
+            $itemtype,
+            $section->id,
+            $editable,
+            $displayvalue,
+            $section->name,
+            $edithint,
+            $editlabel
+        );
     }
 
     /**
@@ -1604,13 +1730,56 @@ class format_designer extends \core_courseformat\base {
         if ($existingoption = $DB->get_record('course_format_options', $common)) {
             $existingoption->value = $value;
             $DB->update_record('course_format_options', $existingoption);
-            return $existingoption->id;
+            $optionid = $existingoption->id;
         } else {
             $option = (object)$common;
             $option->value = $value;
-            return $DB->insert_record('course_format_options', $option);
+            $optionid = $DB->insert_record('course_format_options', $option);
         }
+
+        // Update cache.
+        if (!isset(self::$sectionoptionscache[$sectionid])) {
+            self::$sectionoptionscache[$sectionid] = [];
+        }
+        self::$sectionoptionscache[$sectionid][$name] = $value;
+
+        return $optionid;
     }
+
+    /**
+     * Cache all section options for the course at once.
+     *
+     * @return void
+     */
+    private function preload_section_options(): void {
+        global $DB;
+
+        // Only load once per course.
+        if (isset(self::$sectionoptionscache['_loaded_' . $this->courseid])) {
+            return;
+        }
+
+        // Load all section options for this course in one query.
+        $sql = "SELECT id, sectionid, name, value
+                FROM {course_format_options}
+                WHERE courseid = :courseid
+                AND format = 'designer'
+                AND sectionid > 0
+                ORDER BY sectionid, name";
+
+        $records = $DB->get_records_sql($sql, ['courseid' => $this->courseid]);
+
+        foreach ($records as $record) {
+            if (!isset(self::$sectionoptionscache[$record->sectionid])) {
+                self::$sectionoptionscache[$record->sectionid] = [];
+            }
+            self::$sectionoptionscache[$record->sectionid][$record->name] = $record->value;
+        }
+
+        // Mark as loaded for this course.
+        self::$sectionoptionscache['_loaded_' . $this->courseid] = true;
+    }
+
 
     /**
      * Get section option.
@@ -1621,14 +1790,11 @@ class format_designer extends \core_courseformat\base {
      * @throws dml_exception
      */
     public function get_section_option(int $sectionid, string $name): ?string {
-        global $DB;
+        // Preload all section options if not already loaded.
+        $this->preload_section_options();
 
-        return $DB->get_field('course_format_options', 'value', [
-            'courseid' => $this->courseid,
-            'format' => 'designer',
-            'sectionid' => $sectionid,
-            'name' => $name,
-        ]) ?: null;
+        // Return from cache.
+        return self::$sectionoptionscache[$sectionid][$name] ?? null;
     }
 
     /**
@@ -1657,12 +1823,11 @@ class format_designer extends \core_courseformat\base {
      * @return array Options
      */
     public function get_section_options(int $sectionid): array {
-        global $DB;
-        return $DB->get_records_menu('course_format_options', [
-            'courseid' => $this->courseid,
-            'format' => 'designer',
-            'sectionid' => $sectionid,
-        ], '', 'name, value');
+        // Preload all section options if not already loaded.
+        $this->preload_section_options();
+
+        // Return from cache.
+        return self::$sectionoptionscache[$sectionid] ?? [];
     }
 
     /**
@@ -1685,7 +1850,7 @@ class format_designer extends \core_courseformat\base {
             $course->timemanagement = is_string($timemanagement) ? explode(',', $timemanagement) : $timemanagement;
         }
 
-        if ($PAGE->pagetype == 'course-edit' && format_designer_has_pro()) {
+        if ($PAGE->pagetype == 'course-edit' && \format_designer\helper::has_pro()) {
             // Update the pro fields course values strucuture, Prepare files.
             local_designer\options::update_structure_get_course($course);
         }
@@ -1707,127 +1872,10 @@ function format_designer_inplace_editable($itemtype, $itemid, $newvalue) {
     if ($itemtype === 'sectionname' || $itemtype === 'sectionnamenl') {
         $section = $DB->get_record_sql(
             'SELECT s.* FROM {course_sections} s JOIN {course} c ON s.course = c.id WHERE s.id = ? AND c.format = ?',
-            [$itemid, 'designer'], MUST_EXIST);
+            [$itemid, 'designer'],
+            MUST_EXIST
+        );
         return course_get_format($section->course)->inplace_editable_update_section_name($section, $itemtype, $newvalue);
-    }
-}
-
-/**
- * Format date based on format defined in settings.
- *
- * @param int $timestamp
- * @return string
- * @throws coding_exception
- * @throws dml_exception
- */
-function format_designer_format_date(int $timestamp) {
-    if ($format = get_config('format_designer', 'dateformat')) {
-        $component = strpos($format, 'strf') === 0 ? '' : 'format_designer';
-    } else {
-        $format = 'usstandarddate';
-        $component = 'format_designer';
-    }
-
-    return userdate($timestamp, get_string($format, $component));
-}
-
-/**
- * Cut the Course content.
- *
- * @param string $str String to trim.
- * @param int $n
- * @return string
- */
-function format_designer_modcontent_trim_char($str, $n = 25) {
-    if (str_word_count($str) < $n) {
-        return $str;
-    }
-    $arrstr = explode(" ", $str);
-    $slicearr = array_slice($arrstr, 0, $n);
-    $strarr = implode(" ", $slicearr);
-    $strarr .= '...';
-    return $strarr;
-}
-
-/**
- * Check if Designer Pro is installed.
- *
- * @return bool
- */
-function format_designer_has_pro() {
-    global $CFG;
-    static $result;
-
-    if ($result == null) {
-        if (array_key_exists('designer', core_component::get_plugin_list('local'))) {
-            require_once($CFG->dirroot.'/local/designer/lib.php');
-            $result = true;
-        } else {
-            $result = false;
-        }
-    }
-
-    return $result;
-}
-
-/**
- * Get the designer format custom layouts.
- * @return array list of available module pro layouts.
- */
-function format_designer_get_pro_layouts() {
-    $layouts = array_keys(core_component::get_plugin_list('layouts'));
-    return $layouts;
-}
-
-/**
- * Get the designer format custom layouts
- * @return array
- */
-function format_designer_get_all_layouts() {
-    $layouts = [
-        'default' => get_string('link', 'format_designer'),
-        'list' => get_string('list', 'format_designer'),
-        'cards' => get_string('cards', 'format_designer'),
-    ];
-    $prolayouts = array_keys(core_component::get_plugin_list('layouts'));
-    $prolayouts = (array) get_strings($prolayouts, 'format_designer');
-    return array_merge($layouts, $prolayouts);
-}
-
-/**
- * Get section background image url.
- *
- * @param \section_info $section section info class instance.
- * @param stdclass $course Course record object.
- * @param course_modinfo $modinfo Course module info class instance.
- * @return string Section background image URL.
- */
-function format_designer_get_section_background_image($section, $course, $modinfo) {
-    if (!empty($section->sectiondesignerbackgroundimage)) {
-        $coursecontext = \context_course::instance($course->id);
-        $itemid = $section->id;
-        $filearea = 'sectiondesignbackground';
-        $realtiveactivities = isset($course->calsectionprogress) &&
-        ($course->calsectionprogress == DESIGNER_PROGRESS_RELEVANTACTIVITIES) ? true : false;
-        if (\format_designer\options::is_section_completed($section, $course, $modinfo, true, $realtiveactivities)
-            && (isset($section->sectiondesignerusecompletionbg) && $section->sectiondesignerusecompletionbg)) {
-            $filearea = 'sectiondesigncompletionbackground';
-        }
-        $files = get_file_storage()->get_area_files(
-            $coursecontext->id, 'format_designer', $filearea,
-            $itemid, 'itemid, filepath, filename', false);
-        if (empty($files)) {
-            return '';
-        }
-        $file = current($files);
-        $fileurl = moodle_url::make_pluginfile_url(
-            $file->get_contextid(),
-            $file->get_component(),
-            $file->get_filearea(),
-            $file->get_itemid(),
-            $file->get_filepath(),
-            $file->get_filename(), false);
-        return $fileurl->out(false);
     }
 }
 
@@ -1860,19 +1908,6 @@ function format_designer_pluginfile($course, $cm, $context, $filearea, $args, $f
         return false;
     }
     send_stored_file($file, 0, 0, 0, $options);
-}
-
-/**
- * Include the pro settings
- *
- * @param admin_settingspage $settings Admin format settings.
- * @return void
- */
-function format_designer_include_prosettings($settings) {
-    global $CFG, $DB;
-    if (format_designer_has_pro() && file_exists($CFG->dirroot.'/local/designer_pro/setting.php')) {
-        require_once($CFG->dirroot.'/local/designer_pro/setting.php');
-    }
 }
 
 /**
@@ -1913,27 +1948,27 @@ function format_designer_coursemodule_standard_elements($formwrapper, $mform) {
         $mform->addElement('html', get_string('activityelementsdisplay', 'format_designer'));
         foreach ($elements as $element => $defalut) {
             // Module background image repeat.
-            $name = 'designer_activityelements['.$element.']';
-            $title = get_string('activity:'.$element, 'format_designer');
+            $name = 'designer_activityelements[' . $element . ']';
+            $title = get_string('activity:' . $element, 'format_designer');
             $mform->addElement('select', $name, $title, $choice);
             $mform->setType($name, PARAM_INT);
             $mform->setDefault($name, $defalut);
             if (isset($design->activityelements[$element])) {
                 $mform->setDefault($name, $design->activityelements[$element]);
             }
-            $adv = 'activityelements_'.$element.'_adv';
+            $adv = 'activityelements_' . $element . '_adv';
             if (isset($designadv->$adv) && $designadv->$adv) {
                 $mform->setAdvanced($name);
             }
         }
 
         // Include the pro additional module fields.
-        if (format_designer_has_pro()) {
+        if (\format_designer\helper::has_pro()) {
             local_designer_coursemodule_standard_element($formwrapper, $mform);
         }
 
         // Secondary menu.
-        $mform->addElement('html',  get_string('secondarymenu', 'format_designer'));
+        $mform->addElement('html', get_string('secondarymenu', 'format_designer'));
         $types = [
             'activitytitle' => get_string('stractivitytitle', 'format_designer'),
             'activitytype' => get_string('stractivitytype', 'format_designer'),
@@ -1953,8 +1988,11 @@ function format_designer_coursemodule_standard_elements($formwrapper, $mform) {
         $mform->hideIf('designer_secondarycustomtitle', 'designer_secondarytype', 'eq', 'activitytitle');
         $mform->hideIf('designer_secondarycustomtitle', 'designer_secondarytype', 'eq', 'activitytype');
 
-        $mform->addElement('advcheckbox', 'designer_customtitleusecourseindex',
-            get_string('customnameincourseindex', 'format_designer'));
+        $mform->addElement(
+            'advcheckbox',
+            'designer_customtitleusecourseindex',
+            get_string('customnameincourseindex', 'format_designer')
+        );
         $mform->setType('designer_customtitleusecourseindex', PARAM_INT);
         if (isset($design->customtitleusecourseindex)) {
             $mform->setDefault('designer_customtitleusecourseindex', $design->customtitleusecourseindex);
@@ -1962,8 +2000,11 @@ function format_designer_coursemodule_standard_elements($formwrapper, $mform) {
         $mform->hideIf('designer_customtitleusecourseindex', 'designer_secondarytype', 'eq', 'activitytitle');
         $mform->hideIf('designer_customtitleusecourseindex', 'designer_secondarytype', 'eq', 'activitytype');
 
-        $mform->addElement('advcheckbox', 'designer_customtitleuseactivityitem',
-            get_string('customnameinactivityitem', 'format_designer'));
+        $mform->addElement(
+            'advcheckbox',
+            'designer_customtitleuseactivityitem',
+            get_string('customnameinactivityitem', 'format_designer')
+        );
         $mform->setType('designer_customtitleuseactivityitem', PARAM_INT);
         if (isset($design->customtitleuseactivityitem)) {
             $mform->setDefault('designer_customtitleuseactivityitem', $design->customtitleuseactivityitem);
@@ -2033,123 +2074,6 @@ function format_designer_coursemodule_edit_post_actions($data, $course) {
     return $data;
 }
 
-/**
- * Find the time management tool installed and enabled in the learningtools.
- *
- * @return bool result of the time management plugin availability.
- */
-function format_designer_timemanagement_installed() {
-    global $DB, $CFG;
-    $tools = \core_plugin_manager::instance()->get_subplugins_of_plugin('local_learningtools');
-    if (in_array('ltool_timemanagement', array_keys($tools))) {
-        $status = $DB->get_field('local_learningtools_products', 'status', ['shortname' => 'timemanagement']);
-        if ($status) {
-            require_once($CFG->dirroot.'/local/learningtools/ltool/timemanagement/lib.php');
-        }
-        return ($status) ? true : false;
-    }
-    return false;
-}
-
-
-/**
- * Fix the edit settings dropdown menu. due to the Moodle CI, can't able to add it to the styles.css
- *
- * @param moodle_page $page
- * @return void
- */
-function format_designer_editsetting_style($page) {
-    if ($page->user_is_editing()) {
-        // Fixed the overlapping issue by make this css rule as important. Moodle CI doesn't allow important.
-        $style = '.format-designer .course-content ul.designer .kanban-board-activities li.section:first-child .right .dropdown
-         .dropdown-menu .dropdown-subpanel .dropdown-menu {';
-        $style .= 'left: 100% !important;';
-        $style .= '}';
-        echo html_writer::tag('style', $style, []);
-    }
-}
-
-/**
- * Get modules layout class Moodle CI not allowed to add li in mustache.
- *
- * @param object $format
- * @param section_info $section
- * @return string|null
- */
-function format_designer_get_module_layoutclass($format, $section) {
-    $sectiontype = $format->get_section_option($section->id, 'sectiontype') ?: get_config('format_designer', 'sectiontype');
-
-    if ($sectiontype == 'list') {
-        $sectionlayoutclass = " position-relative ";
-    } else if ($sectiontype == 'cards') {
-        $sectionlayoutclass = ' card ';
-    }
-
-    if ($format->get_course()->coursetype == DESIGNER_TYPE_FLOW) {
-        $sectionlayoutclass = 'card';
-        $sectiontype = 'cards';
-    }
-
-    $prolayouts = format_designer_get_pro_layouts();
-    if (in_array($sectiontype, $prolayouts)) {
-        if (format_designer_has_pro()) {
-            if ($sectiontype == 'circles') {
-                $sectionlayoutclass = ' circle-layout card ';
-            } else if ($sectiontype == 'horizontal_circles') {
-                $sectionlayoutclass = ' horizontal_circles circle-layout card ';
-            }
-        }
-    }
-
-    return $sectionlayoutclass ?? '';
-}
-
-/**
- * Find the plugin format_popup installed.
- *
- * @return bool
- */
-function format_designer_popup_installed() {
-    $pluginman = \core_plugin_manager::instance();
-    $plugininfo = $pluginman->get_plugin_info('format_popups');
-    return !empty($plugininfo) ? true : false;
-}
-
-/**
- * Check course has heroactivity condition or not.
- * @param object $course
- * @return bool
- */
-function format_designer_course_has_heroactivity($course) {
-    global $DB, $PAGE;
-    $iscourseheroactivity = ($course->sectionzeroactivities &&
-        $course->heroactivity == DESIGNER_HERO_ACTIVITY_EVERYWHERE) ? true : false;
-    $sql = "SELECT fd.value FROM {format_designer_options} fd
-        WHERE fd.courseid = :courseid AND fd.name = :optionname AND fd.value = :optionvalue AND fd.cmid != :currentcm";
-    $iscoursemodheroactivity = $DB->record_exists_sql($sql, ['optionname' => 'heroactivity',
-        'optionvalue' => 1, 'courseid' => $course->id, 'currentcm' => $PAGE->cm->id, ]
-    );
-    return ($iscourseheroactivity || $iscoursemodheroactivity) ? true : false;
-}
-
-/**
- * Check the video time plugin in designer course format selected courses.
- *
- * @param object $course
- * @return bool.
- */
-function format_designer_course_has_videotime($course) {
-    global $DB;
-    $pluginman = \core_plugin_manager::instance();
-    $plugininfo = $pluginman->get_plugin_info('mod_videotime');
-    if (!empty($plugininfo)) {
-        $videotime = $DB->get_record("modules", ['name' => 'videotime']);
-        if ($DB->record_exists('course_modules', ['course' => $course->id, 'module' => $videotime->id])) {
-            return true;
-        }
-    }
-    return false;
-}
 
 /**
  * This function extends the navigation with the hero activities items
@@ -2159,7 +2083,7 @@ function format_designer_course_has_videotime($course) {
  * @param stdClass $context The context of the course
  */
 function format_designer_extend_navigation_course($navigation, $course, $context) {
-    global $DB, $PAGE, $COURSE;
+    global $DB, $PAGE, $COURSE, $CFG;
     if ($course->format != 'designer') {
         return;
     }
@@ -2168,52 +2092,40 @@ function format_designer_extend_navigation_course($navigation, $course, $context
 
     // Include the designer section js.
     $ispopupactivities = isset($course->popupactivities) && $course->popupactivities;
-    $isvideotime = format_designer_course_has_videotime($course);
+    $isvideotime = \format_designer\helper::course_has_videotime($course);
     $jsparams = [
         'courseid' => $course->id,
         'contextid' => $context->id,
         'popupactivities' => $ispopupactivities,
         'isvideotime' => $isvideotime,
-        'issubpanel' => format_designer_is_support_subpanel(),
+        'issubpanel' => \format_designer\helper::is_support_subpanel(),
         'sectionreturn' => optional_param('section', 0, PARAM_INT),
     ];
     $PAGE->requires->js_call_amd('format_designer/designer_section', 'init', $jsparams);
 
-    if (format_designer_has_pro()) {
-        // Include the designer pro styles.
-        $styleurl = \local_designer\courseoptions::create($course)->designer_include_style();
-        $PAGE->requires->css($styleurl);
-    }
-
     $isaddsecondary = ($navigation->children->count() <= 1 && $PAGE->context->contextlevel == CONTEXT_MODULE) &&
-        (format_designer_course_has_heroactivity($course) || $course->secondarymenutocourse);
+    (\format_designer\helper::course_has_heroactivity($course) || $course->secondarymenutocourse);
     $currentmodname = isset($PAGE->cm->modname) ? get_string('modulename', $PAGE->cm->modname) : '';
     $curentmodurl = isset($PAGE->cm->id) ? new moodle_url("/mod/{$PAGE->cm->modname}/view.php", ['id' => $PAGE->cm->id]) : '';
     $secondarycontent = html_writer::start_div('secondary-navigation d-print-none');
     $secondarycontent .= html_writer::start_tag('nav', ['class' => 'moremenu navigation observed']);
     $secondarycontent .= html_writer::start_tag('ul', ['id' => 'moremenu-63f8473d27694-nav-tabs',
-        'class' => 'nav more-nav nav-tabs', 'role' => 'menubar', ]
-    );
-        $secondarycontent .= html_writer::start_tag('li', ['data-key' => 'modulepage', 'class' => 'nav-item', 'role' => 'none',
-            'data-forceintomoremenu' => 'false', ]
-        );
-        $secondarycontent .= html_writer::link($curentmodurl, $currentmodname, ['role' => 'menuitem',
-            'class' => 'nav-link active active_tree_node', 'aria-current' => 'true', ]
-        );
-        $secondarycontent .= html_writer::end_tag('li');
+    'class' => 'nav more-nav nav-tabs', 'role' => 'menubar', ]);
+    $secondarycontent .= html_writer::start_tag('li', ['data-key' => 'modulepage', 'class' => 'nav-item', 'role' => 'none',
+    'data-forceintomoremenu' => 'false', ]);
+    $secondarycontent .= html_writer::link($curentmodurl, $currentmodname, ['role' => 'menuitem',
+    'class' => 'nav-link active active_tree_node', 'aria-current' => 'true', ]);
+    $secondarycontent .= html_writer::end_tag('li');
         $secondarycontent .= html_writer::start_tag('li', ['role' => 'none',
-            'class' => 'nav-item dropdown dropdownmoremenu d-none', 'data-region' => 'morebutton', ]
-        );
+        'class' => 'nav-item dropdown dropdownmoremenu d-none', 'data-region' => 'morebutton', ]);
             $secondarycontent .= html_writer::link('#', get_string('moremenu'), ['class' => 'dropdown-toggle nav-link',
-                'id' => 'moremenu-dropdown-63f8639161cce', 'role' => 'menuitem', 'data-toggle' => 'dropdown',
-                'aria-haspopup' => 'true', 'aria-expanded' => 'false', 'tabindex' => -1, ]
-            );
-            $secondarycontent .= html_writer::start_tag('ul', ['class' => 'dropdown-menu dropdown-menu-left',
-                'data-region' => 'moredropdown', 'aria-labelledby' => 'moremenu-dropdown-63f8639161cce', 'role' => 'menu', ]
-            );
-            $secondarycontent .= html_writer::end_tag('ul');
-        $secondarycontent .= html_writer::end_tag('li');
-    $secondarycontent .= html_writer::end_tag('ul');
+            'id' => 'moremenu-dropdown-63f8639161cce', 'role' => 'menuitem', 'data-toggle' => 'dropdown',
+                'aria-haspopup' => 'true', 'aria-expanded' => 'false', 'tabindex' => -1, ]);
+                $secondarycontent .= html_writer::start_tag('ul', ['class' => 'dropdown-menu dropdown-menu-left',
+                'data-region' => 'moredropdown', 'aria-labelledby' => 'moremenu-dropdown-63f8639161cce', 'role' => 'menu', ]);
+                $secondarycontent .= html_writer::end_tag('ul');
+                $secondarycontent .= html_writer::end_tag('li');
+                $secondarycontent .= html_writer::end_tag('ul');
     $secondarycontent .= html_writer::end_tag('nav');
     $secondarycontent .= html_writer::end_div('');
 
@@ -2223,23 +2135,34 @@ function format_designer_extend_navigation_course($navigation, $course, $context
     $modbacktomain = '';
     if ($course->secondarymenutocourse) {
         $secondarymenutocoursecontent .= html_writer::start_tag("li", ["data-key" => 'designercoursehome',
-        "class" => "nav-item", "role" => "none", "data-forceintomoremenu" => "true", ]
+        "class" => "nav-item", "role" => "none", "data-forceintomoremenu" => "true", ]);
+        $secondarymenutocoursecontent .= html_writer::link(
+            new moodle_url('/course/view.php', ['id' => $course->id]),
+            get_string('strsecondarymenucourse', 'format_designer'),
+            ['role' => 'menuitem',
+            'class' => 'designercoursehome',
+            "tabindex" => "-1" ]
         );
-        $secondarymenutocoursecontent .= html_writer::link(new moodle_url('/course/view.php', ['id' => $course->id]),
-        get_string('strsecondarymenucourse', 'format_designer'), ['role' => 'menuitem',
-            'class' => 'designercoursehome', "tabindex" => "-1" ]);
         $secondarymenutocoursecontent .= html_writer::end_tag("li");
 
-        if (format_designer_has_pro() && $course->prerequisitesbackmain
-            && $maincourse = local_designer_is_prerequisites_maincourse($course)) {
+        if (
+            \format_designer\helper::has_pro() && $course->prerequisitesbackmain
+            && $maincourse = \local_designer\helper::is_prerequisites_maincourse($course)
+        ) {
             $modbacktomain .= html_writer::start_tag("li", ["data-key" => 'backtomaincourse',
             "class" => "nav-item", "role" => "none", "data-forceintomoremenu" => "false", ]);
-            $modbacktomain .= html_writer::link(new moodle_url('/course/view.php', ['id' => $maincourse->id]),
-            get_string('backtomaincourse', 'format_designer'), ['role' => 'menuitem',
-                'class' => 'backmain-course', "tabindex" => "-1", ]);
+            $modbacktomain .= html_writer::link(
+                new moodle_url('/course/view.php', ['id' => $maincourse->id]),
+                get_string('backtomaincourse', 'format_designer'),
+                ['role' => 'menuitem',
+                'class' => 'backmain-course',
+                "tabindex" => "-1",
+                ]
+            );
             $modbacktomain .= html_writer::end_tag("li");
         }
     }
+
     $sql = "SELECT fd.* FROM
             {format_designer_options} fd
             JOIN {course_modules} cm ON fd.cmid = cm.id
@@ -2258,20 +2181,33 @@ function format_designer_extend_navigation_course($navigation, $course, $context
 
     $neg = [];
     $pos = [];
-    $reports = format_designer_section_zero_tomake_hero($reports, $course);
+    $reports = \format_designer\helper::section_zero_tomake_hero($reports, $course);
+
+    $modinfo = get_fast_modinfo($course);
+    $cmcache = [];
 
     if ($reports) {
         foreach ($reports as $report) {
+            $cmid = $report['cmid'];
+            // Get CM from modinfo (cached, no DB query).
+            try {
+                $cm = $modinfo->get_cm($cmid);
+                $cmcache[$cmid] = $cm;
+            } catch (Exception $e) {
+                // CM not found or not accessible.
+                continue;
+            }
+
             if ($report['heroactivitypos'] < 0) {
                 $neg[] = $report;
             } else {
                 $pos[] = $report;
             }
         }
-        usort($neg, function($a, $b) {
+        usort($neg, function ($a, $b) {
             return $b['heroactivitypos'] - $a['heroactivitypos'];
         });
-        usort($pos, function($a, $b) {
+        usort($pos, function ($a, $b) {
             return $a['heroactivitypos'] - $b['heroactivitypos'];
         });
     }
@@ -2280,29 +2216,27 @@ function format_designer_extend_navigation_course($navigation, $course, $context
     $modulecontent = false;
     $ishidecurrentcmid = false;
     $heroactivityduplicate = get_config("format_designer", "avoidduplicate_heromodentry") == 1 ? true : false;
-
+    $contextlevel = $PAGE->context->contextlevel;
+    $modinfo = get_fast_modinfo($course);
     if ($reports) {
         $reports = array_merge($neg, $pos);
-
         foreach ($reports as $report) {
             if ($report['heroactivity']) {
-                $cm = get_coursemodule_from_id('', $report['cmid']);
+                $cm = $modinfo->get_cm($report['cmid']);
                 $modurl = new moodle_url("/mod/$cm->modname/view.php", ['id' => $cm->id]);
                 $nodepos = $report['heroactivitypos'];
                 $cmtitle = $format->get_cm_secondary_title($cm);
-                if ($PAGE->context->contextlevel == CONTEXT_MODULE) {
+                if ($contextlevel == CONTEXT_MODULE) {
                     if ($report['heroactivity'] == DESIGNER_HERO_ACTIVITY_EVERYWHERE) {
                         if ($cm->id == $PAGE->cm->id && $heroactivityduplicate) {
                             $ishidecurrentcmid = true;
                         }
                         $content .= html_writer::start_tag("li", ["data-key" => $cm->id, "class" => "nav-item",
-                            "role" => "none", "data-forceintomoremenu" => "true", ]
-                        );
-                        $linkclass = "designer-hero-activity position_$nodepos dropdown-item";
-                        $content .= html_writer::link($modurl, $cmtitle, ['role' => 'menuitem', 'class' => $linkclass,
-                            "tabindex" => "-1", "data-mod" => $cm->name, "data-cm" => $cm->id, ]
-                        );
-                        $content .= html_writer::end_tag("li");
+                            "role" => "none", "data-forceintomoremenu" => "true", ]);
+                            $linkclass = "designer-hero-activity position_$nodepos dropdown-item";
+                            $content .= html_writer::link($modurl, $cmtitle, ['role' => 'menuitem', 'class' => $linkclass,
+                            "tabindex" => "-1", "data-mod" => $cm->name, "data-cm" => $cm->id, ]);
+                            $content .= html_writer::end_tag("li");
                         $modulecontent = true;
                     }
                 } else {
@@ -2318,7 +2252,7 @@ function format_designer_extend_navigation_course($navigation, $course, $context
     $designerpro = 0;
     $prerequisitebnewtab = 0;
     $courseprerequisitepos = 0;
-    if (format_designer_has_pro()) {
+    if (\format_designer\helper::has_pro()) {
         $course = course_get_format($course->id)->get_course();
         $prerequisitebnewtab = $course->prerequisitesnewtab;
         $courseprerequisitepos = ($course->courseprerequisitepos > 0) ? $course->courseprerequisitepos : 0;
@@ -2327,6 +2261,7 @@ function format_designer_extend_navigation_course($navigation, $course, $context
 
     $currentmodclass = ($PAGE->context->contextlevel == CONTEXT_MODULE) ? "nav.moremenu li[data-key=\"{$PAGE->cm->id}\"]" : "";
     $currentcmid = ($PAGE->context->contextlevel == CONTEXT_MODULE) ? $PAGE->cm->id : 0;
+
     $PAGE->requires->js_amd_inline("
         require(['jquery', 'core/moremenu'], function($, MenuMore) {
             $(document).ready(function() {
@@ -2480,7 +2415,6 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                         parent.setAttribute('data-forceintomoremenu', 'false');
                         secondarynav.insertBefore(parent, secondarynav.children[0]);
                 }
-
                 // Insert the prerequisite course link to secondary nav.
                 if ($designerpro) {
                     var backmaincourse = document.querySelectorAll('.backmain-course')[0];
@@ -2491,8 +2425,8 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                         parent.setAttribute('data-forceintomoremenu', 'false');
                         secondarynav.insertBefore(parent, secondarynav.children[0]);
                     }
+                    window.dispatchEvent(new Event('resize')); // Dispatch the resize event to create more menu.
                 }
-                MenuMore(secondarynav);
                 return true;
             });
         });
@@ -2500,91 +2434,18 @@ function format_designer_extend_navigation_course($navigation, $course, $context
 }
 
 /**
- * Set the section zero to hero activties.
- * @param array $reports
- * @param object $course
- * @return array reports
- */
-function format_designer_section_zero_tomake_hero($reports, $course) {
-    global $PAGE, $DB;
-    $course = course_get_format($course->id)->get_course();
-    if ($course->sectionzeroactivities) {
-        $modinfo = get_fast_modinfo($course);
-        if (isset($modinfo->sections[0])) {
-            foreach ($modinfo->sections[0] as $modnumber) {
-                if ($DB->record_exists('course_modules', ['deletioninprogress' => 0, 'id' => $modnumber])) {
-                    if (isset($reports[$modnumber]) && !$reports[$modnumber]['heroactivity']) {
-                        $reports[$modnumber]['heroactivity'] = ($course->heroactivity == DESIGNER_HERO_ACTIVITY_COURSEPAGE
-                            && isset($PAGE->cm->id)) ? 0 : ($course->heroactivity == true);
-                        $reports[$modnumber]['heroactivitypos'] = $course->heroactivitypos;
-                    } else if (!isset($reports[$modnumber])) {
-                        $reports[$modnumber]['heroactivity'] = ($course->heroactivity == DESIGNER_HERO_ACTIVITY_COURSEPAGE
-                            && isset($PAGE->cm->id)) ? 0 : ($course->heroactivity == true);
-                        $reports[$modnumber]['heroactivitypos'] = $course->heroactivitypos;
-                        $reports[$modnumber]['cmid'] = $modnumber;
-                    }
-                }
-            }
-        }
-    }
-    return $reports;
-}
-
-/**
- * Get course type.
- * @return array coursetypes.
- */
-function format_designer_get_coursetypes() {
-    $coursetypes = [
-        0 => get_string('normal'),
-        DESIGNER_TYPE_KANBAN => get_string('kanbanboard', 'format_designer'),
-        DESIGNER_TYPE_COLLAPSIBLE => get_string('collapsiblesections', 'format_designer'),
-        DESIGNER_TYPE_FLOW => get_string('type_flow', 'format_designer'),
-    ];
-    return $coursetypes;
-}
-
-/**
- * Update the custom or other selected values.
+ * Fix the edit settings dropdown menu. due to the Moodle CI, can't able to add it to the styles.css
  *
- * @param [object] $data
- * @param [string] $name
- * @param [string] $custom
- * @param [string] $csselement
+ * @param moodle_page $page
  * @return void
  */
-function format_designer_fill_custom_values($data, $name, $custom, $csselement) {
-    if ((isset($data->{$name}) && $data->{$name})) {
-        if ($data->{$name} == 'custom') {
-            $value = $data->{$custom};
-        } else {
-            $value = $data->{$name};
-        }
-        if ($csselement) {
-            return sprintf("$csselement: %s;", $value);
-        } else {
-            return $value;
-        }
+function format_designer_editsetting_style($page) {
+    if ($page->user_is_editing()) {
+        // Fixed the overlapping issue by make this css rule as important. Moodle CI doesn't allow important.
+        $style = '.format-designer .course-content ul.designer .kanban-board-activities li.section:first-child .right .dropdown
+         .dropdown-menu .dropdown-subpanel .dropdown-menu {';
+        $style .= 'left: 100% !important;';
+        $style .= '}';
+        echo html_writer::tag('style', $style, []);
     }
-    return "";
-}
-
-/**
- * Check the subpanel class exit or not.
- *
- * @return boolean
- */
-function format_designer_is_support_subpanel() {
-    if (class_exists('\core\output\local\action_menu\subpanel')) {
-        return true;
-    }
-    return false;
-}
-
-/**
- * Summary of format_designer_get_cache_object
- * @return cache_application|cache_session|cache_store|core_cache\application_cache|core_cache\session_cache|core_cache\store
- */
-function format_designer_get_cache_object() {
-    return cache::make('format_designer', 'designeroptions');
 }

@@ -37,7 +37,6 @@ use stdClass;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class title extends \core_courseformat\output\local\content\cm\title {
-
     /**
      * Return the title template data to be used inside the inplace editable.
      *
@@ -50,7 +49,7 @@ class title extends \core_courseformat\output\local\content\cm\title {
         $courseoutput = $this->format->get_renderer($PAGE);
 
         $mod = $this->mod;
-
+        ;
         $data = (object)[
             'url' => ($mod->modname == 'videotime') ? new moodle_url('/mod/videotime/view.php', ['id' => $mod->id]) : $mod->url,
             'instancename' => ($mod->modname == 'videotime') ? $mod->name : $mod->get_formatted_name(),
@@ -61,21 +60,30 @@ class title extends \core_courseformat\output\local\content\cm\title {
         if ($useactivityitemcustom) {
             $data->designercmname = $this->format->get_cm_secondary_title($mod);
         }
+        // Use cached options to avoid DB query per module.
+        if (\format_designer\helper::has_pro()) {
+            $options = \format_designer\options::get_options($mod->id);
+            $useactivityitemcustom = $options->customtitleuseactivityitem ?? false;
+            if ($useactivityitemcustom) {
+                $data->designercmname = $this->format->get_cm_secondary_title($mod);
+            }
+        }
 
         // File type after name, for alphabetic lists (screen reader).
-        if (strpos(
-            \core_text::strtolower($data->instancename),
-            \core_text::strtolower($mod->modfullname)
-        ) === false) {
+        if (
+            strpos(
+                \core_text::strtolower($data->instancename),
+                \core_text::strtolower($mod->modfullname)
+            ) === false
+        ) {
             $data->altname = get_accesshide(' ' . $mod->modfullname);
         }
 
         // Get on-click attribute value if specified and decode the onclick - it
         // has already been encoded for display (puke).
         $data->onclick = htmlspecialchars_decode($mod->onclick, ENT_QUOTES);
-        if (format_designer_has_pro()) {
-            require_once($CFG->dirroot. "/local/designer/lib.php");
-            if ($textcolor = \format_designer\options::get_option($mod->id, 'textcolor')) {
+        if (\format_designer\helper::has_pro()) {
+            if ($textcolor = $options->textcolor ?? null) {
                 $data->moduletextcolor = "color: $textcolor" . ";";
             }
         }
@@ -85,5 +93,4 @@ class title extends \core_courseformat\output\local\content\cm\title {
             $data
         );
     }
-
 }

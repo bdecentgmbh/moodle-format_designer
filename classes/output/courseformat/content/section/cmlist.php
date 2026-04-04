@@ -35,7 +35,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cmlist extends \core_courseformat\output\local\content\section\cmlist {
-
     /**
      * Export this data so it can be used as the context for a mustache template.
      *
@@ -112,9 +111,9 @@ class cmlist extends \core_courseformat\output\local\content\section\cmlist {
             $sectiontype = 'cards';
         }
         $templatename = 'format_designer/layout/section_layout_' . $sectiontype;
-        $prolayouts = format_designer_get_pro_layouts();
+        $prolayouts = \format_designer\helper::get_pro_layouts();
         if (in_array($sectiontype, $prolayouts)) {
-            if (format_designer_has_pro()) {
+            if (\format_designer\helper::has_pro()) {
                 $templatename = 'layouts_' . $sectiontype . '/layout/section_layout_' . $sectiontype;
             }
         }

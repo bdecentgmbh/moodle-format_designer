@@ -24,10 +24,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->libdir.'/formslib.php');
-require_once($CFG->libdir.'/filelib.php');
-require_once($CFG->libdir.'/completionlib.php');
-require_once($CFG->libdir.'/gradelib.php');
+require_once($CFG->libdir . '/formslib.php');
+require_once($CFG->libdir . '/filelib.php');
+require_once($CFG->libdir . '/completionlib.php');
+require_once($CFG->libdir . '/gradelib.php');
 
 /**
  * Default form for editing course section
@@ -35,7 +35,6 @@ require_once($CFG->libdir.'/gradelib.php');
  * Course format plugins may specify different editing form to use
  */
 class editsection_form extends moodleform {
-
     /**
      * Definition of the form
      */
@@ -77,15 +76,19 @@ class editsection_form extends moodleform {
 
         // Check the moodle 4.3 higher.
         if (!empty($CFG->enableavailability)) {
-
-            $mform->addElement('header', 'availabilityconditions',
-                get_string('restrictaccess', 'availability'));
+            $mform->addElement(
+                'header',
+                'availabilityconditions',
+                get_string('restrictaccess', 'availability')
+            );
             $mform->setExpanded('availabilityconditions', false);
 
             // Availability field. This is just a textarea; the user interface
             // interaction is all implemented in JavaScript. The field is named
             // availabilityconditionsjson for consistency with moodleform_mod.
-            $mform->addElement('textarea', 'availabilityconditionsjson',
+            $mform->addElement(
+                'textarea',
+                'availabilityconditionsjson',
                 get_string('accessrestrictions', 'availability'),
                 ['class' => 'd-none']
             );
@@ -111,8 +114,11 @@ class editsection_form extends moodleform {
         $course = $this->_customdata['course'];
 
         if (!empty($CFG->enableavailability)) {
-            \core_availability\frontend::include_all_javascript($course, null,
-                    $this->_customdata['cs']);
+            \core_availability\frontend::include_all_javascript(
+                $course,
+                null,
+                $this->_customdata['cs']
+            );
         }
 
         $this->add_action_buttons();
@@ -132,12 +138,21 @@ class editsection_form extends moodleform {
 
         $course = $this->_customdata['course'];
         $editoroptions = $this->_customdata['editoroptions'];
-        $defaultvalues = file_prepare_standard_editor($defaultvalues, 'summary', $editoroptions,
-        $editoroptions['context'], 'course', 'section', $defaultvalues->id);
+        $defaultvalues = file_prepare_standard_editor(
+            $defaultvalues,
+            'summary',
+            $editoroptions,
+            $editoroptions['context'],
+            'course',
+            'section',
+            $defaultvalues->id
+        );
 
-        if (format_designer_has_pro() && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
-            $defaultvalues = \local_designer\options::prepare_sectioncardcta_editor_files($defaultvalues,
-                $this->_customdata['course']);
+        if (\format_designer\helper::has_pro() && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
+            $defaultvalues = \local_designer\options::prepare_sectioncardcta_editor_files(
+                $defaultvalues,
+                $this->_customdata['course']
+            );
         }
         parent::set_data($defaultvalues);
     }
@@ -156,8 +171,15 @@ class editsection_form extends moodleform {
             if ($data->name === false) {
                 $data->name = '';
             }
-            $data = file_postupdate_standard_editor($data, 'summary', $editoroptions,
-                    $editoroptions['context'], 'course', 'section', $data->id);
+            $data = file_postupdate_standard_editor(
+                $data,
+                'summary',
+                $editoroptions,
+                $editoroptions['context'],
+                'course',
+                'section',
+                $data->id
+            );
             $course = $this->_customdata['course'];
             foreach (course_get_format($course)->section_format_options() as $option => $unused) {
                 // Fix issue with unset checkboxes not being returned at all.
