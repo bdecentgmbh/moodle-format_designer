@@ -31,7 +31,10 @@ global $CFG;
 require_once(__DIR__ . '/loader_trait.php');
 
 if (!class_exists('\core_cache\application_cache')) {
-    require_once($CFG->dirroot . '/cache/classes/loaders.php');
+    $loader = $CFG->dirroot . '/cache/classes/loaders.php';
+    if (file_exists($loader)) {
+        require_once($loader);
+    }
     /**
      * Custom cache loader to handle the smart menus and items deletion for older Moodle versions.
      */
