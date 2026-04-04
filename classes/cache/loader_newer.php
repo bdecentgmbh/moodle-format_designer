@@ -15,32 +15,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Privacy Subsystem implementation for Designer course format.
+ * Format Designer - Custom cache loader for newer Moodle versions.
  *
- * @package   format_designer
- * @copyright 2021 bdecent gmbh <https://bdecent.de>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    format_designer
+ * @copyright  2023 bdecent GmbH <https://bdecent.de>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace format_designer\privacy;
+namespace format_designer\cache;
 
-use core_privacy\local\metadata\null_provider;
+defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/loader_trait.php');
 
 /**
- * Privacy Subsystem for Designer course format implementing null_provider.
+ * Custom cache loader for newer Moodle versions that use the core_cache namespace.
  *
  * @package   format_designer
- * @copyright 2021 bdecent gmbh <https://bdecent.de>
+ * @copyright 2023 bdecent gmbh <https://bdecent.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements null_provider {
-    /**
-     * Get the language string identifier with the component's language
-     * file to explain why this plugin stores no data.
-     *
-     * @return  string
-     */
-    public static function get_reason(): string {
-        return 'privacy:metadata';
-    }
+class loader_newer extends \core_cache\application_cache {
+    use loader_trait;
 }

@@ -48,8 +48,12 @@
 
         <div class="card card-list {{colorclass}}" data-action="go-to-url" data-url="{{cmurl}}">
             <div class="card-body {{#enableactivityimage}}bg-overlay{{/enableactivityimage}}">
+            {{#haspro}}
+                {{#modulebackgroundstyle}}
                 <div class="activity-background-style" style="{{#modulebackgroundstyle}} {{modulebackgroundstyle}} {{/modulebackgroundstyle}}">
                 </div>
+                {{/modulebackgroundstyle}}
+            {{/haspro}}
 
                 {{#modbackoverlaycolor}}
                 <div class="bg-overlay" style="{{modbackoverlaycolor}}"></div>
