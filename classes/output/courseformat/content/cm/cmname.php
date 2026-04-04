@@ -37,7 +37,6 @@ use stdClass;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cmname extends \core_courseformat\output\local\content\cm\cmname {
-
     /**
      * Export this data so it can be used as the context for a mustache template.
      *
@@ -46,6 +45,9 @@ class cmname extends \core_courseformat\output\local\content\cm\cmname {
      */
     public function export_for_template(\renderer_base $output): array {
         global $DB;
+        static $sectiontypecache = [];
+        static $defaultsectiontype = null;
+
         $format = $this->format;
         $mod = $this->mod;
         $displayoptions = $this->displayoptions;
@@ -71,7 +73,8 @@ class cmname extends \core_courseformat\output\local\content\cm\cmname {
         }
 
         $useactivityimage = '';
-        if (format_designer_has_pro()) {
+        if (\format_designer\helper::has_pro()) {
+            // Use cached options to avoid DB query per module.
             if ($mod->modname == 'videotime') {
                 if ($videorecord = $DB->get_record('videotime', ['id' => $mod->instance])) {
                     if (isset($videorecord->label_mode) && $videorecord->label_mode == 2) {
@@ -80,7 +83,15 @@ class cmname extends \core_courseformat\output\local\content\cm\cmname {
                 }
             }
         }
-        $sectiontype = $format->get_section_option($mod->section, 'sectiontype') ?: get_config('format_designer', 'sectiontype');
+
+        // Cache section type to avoid repeated get_section_option and get_config calls.
+        if (!isset($sectiontypecache[$mod->section])) {
+            if ($defaultsectiontype === null) {
+                $defaultsectiontype = get_config('format_designer', 'sectiontype');
+            }
+            $sectiontypecache[$mod->section] = $format->get_section_option($mod->section, 'sectiontype') ?: $defaultsectiontype;
+        }
+        $sectiontype = $sectiontypecache[$mod->section];
         $removecenter = ($sectiontype == 'default') ? true : false;
         $data = (object)[
             'url' => ($mod->modname == 'videotime') ? new moodle_url('/mod/videotime/view.php', ['id' => $mod->id]) : $mod->url,
@@ -98,10 +109,12 @@ class cmname extends \core_courseformat\output\local\content\cm\cmname {
         ];
 
         // File type after name, for alphabetic lists (screen reader).
-        if (strpos(
-            \core_text::strtolower($data->instancename),
-            \core_text::strtolower($mod->modfullname)
-        ) === false) {
+        if (
+            strpos(
+                \core_text::strtolower($data->instancename),
+                \core_text::strtolower($mod->modfullname)
+            ) === false
+        ) {
             $data->altname = get_accesshide(' ' . $mod->modfullname);
         }
 

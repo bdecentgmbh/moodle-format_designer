@@ -28,144 +28,22 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
-/**
- * Common cache methods trait to avoid duplication.
- */
-trait loader_common_methods {
-
-    /**
-     * Delete the cached menus or menu items for all of its users.
-     *
-     * Fetch the cache store, generate the keys with menu or item id and keyword of user cache.
-     * Get the list of cached files by their filename, filenames are stored in the format of "menuid/itemid_u_ userid".
-     * Generate the key with menu/item id and the keyword of "_u" to get list of all users cache file for this menu/item.
-     *
-     * Delete all the files using delete_many method.
-     *
-     * @param int $courseid Course id.
-     * @param int $sectionid Section id.
-     * @return void
-     */
-    public function delete_vaild_section_completed_cache($courseid, $sectionid = 0) {
-        $store = $this->get_store();
-        $prefix = "v_s_c_c_{$courseid}";
-        if ($sectionid) {
-            $prefix .= "_s_{$sectionid}";
-        }
-        if ($list = $store->find_by_prefix($prefix)) {
-            $keys = array_map(function($key) {
-                $key = current(explode('-', $key));
-                return $key;
-            }, $list);
-            $this->delete_many($keys);
-        }
-    }
-
-    /**
-     * Delete user section completed cache.
-     * @param mixed $courseid
-     * @param mixed $sectionid
-     * @param mixed $userid
-     * @return void
-     */
-    public function delete_user_section_completed_cache($courseid, $sectionid = 0, $userid = 0) {
-        $prefix = "s_c_c_{$courseid}";
-        $this->delete_prefix_cache($prefix);
-    }
-
-    /**
-     * Delete due overdue activities count.
-     * @param mixed $courseid
-     * @param mixed $userid
-     * @return void
-     */
-    public function delete_due_overdue_activities_count($courseid, $userid = 0) {
-        $prefix = "d_o_a_c_c{$courseid}";
-        if ($userid) {
-            $prefix .= "_u{$userid}";
-        }
-        $this->delete_prefix_cache($prefix);
-    }
-
-    /**
-     * Delete course progress uncompletion criteria.
-     * @param mixed $courseid
-     * @param mixed $userid
-     * @return void
-     */
-    public function delete_course_progress_uncompletion_criteria($courseid, $userid = 0) {
-        $prefix = "u_c_c_s{$courseid}";
-        if ($userid) {
-            $prefix .= "_u{$userid}";
-        }
-        $this->delete_prefix_cache($prefix);
-    }
-
-    /**
-     * Delete_criteria_progress.
-     * @param mixed $courseid
-     * @param mixed $userid
-     * @return void
-     */
-    public function delete_criteria_progress($courseid, $userid = 0) {
-        $prefix = "c_p_c{$courseid}";
-        if ($userid) {
-            $prefix .= "_u_{$userid}";
-        }
-        $this->delete_prefix_cache($prefix);
-    }
-
-    /**
-     * Delete_prerequisites_courses.
-     * @return void
-     */
-    public function delete_prerequisites_courses() {
-        $prefix = "data_prereq_main_c";
-        $this->delete_prefix_cache($prefix);
-    }
-
-    /**
-     * Delete the cache files by the prefix.
-     * @param mixed $prefix
-     * @return void
-     */
-    public function delete_prefix_cache($prefix) {
-        $store = $this->get_store();
-        if ($list = $store->find_by_prefix($prefix)) {
-            $keys = array_map(function($key) {
-                $key = current(explode('-', $key));
-                return $key;
-            }, $list);
-            $this->delete_many($keys);
-        }
-    }
-}
+require_once(__DIR__ . '/loader_trait.php');
 
 if (!class_exists('\core_cache\application_cache')) {
-    require_once($CFG->dirroot.'/cache/classes/loaders.php');
+    $loader = $CFG->dirroot . '/cache/classes/loaders.php';
+    if (file_exists($loader)) {
+        require_once($loader);
+    }
     /**
      * Custom cache loader to handle the smart menus and items deletion for older Moodle versions.
      */
     class loader extends \cache_application {
-        use loader_common_methods;
+        use loader_trait;
     }
 } else {
-
-    /**
-     * Format Designer - Custom cache loader newer class.
-     *
-     * @package   format_designer
-     * @copyright 2021 bdecent gmbh <https://bdecent.de>
-     * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-     */
-
-    /**
-     * Custom cache loader for newer Moodle versions that use the core_cache namespace.
-     */
-    class loader_newer extends \core_cache\application_cache {
-        use loader_common_methods;
-    }
-
+    // For newer Moodle versions, use the loader_newer class and alias it.
+    require_once(__DIR__ . '/loader_newer.php');
     // Use class_alias to create the loader class with the correct parent.
     class_alias('format_designer\cache\loader_newer', 'format_designer\cache\loader');
 }

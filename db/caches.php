@@ -24,11 +24,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$definitions = array(
-    'designeroptions' => array(
+$definitions = [
+    'designeroptions' => [
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
         'simpledata' => false,
         'overrideclass' => '\format_designer\cache\loader',
-    ),
-);
+    ],
+];

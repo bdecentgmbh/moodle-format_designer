@@ -38,7 +38,7 @@
         <div class="activitytitle media {{textclasses}} modtype_{{modname}} position-relative align-self-start">
             {{^useactivityimage}}
             <div class="img-element {{elementstate.icon}}">
-                <div class="img-block activityiconcontainer {{purpose}} courseicon align-self-start mr-3" >
+                <div class="img-block activityiconcontainer {{purpose}} courseicon align-self-start me-3" >
                     <img src="{{{icon}}}" class="activityicon " alt="{{{modname}}} icon">
                 </div>
             </div>
@@ -50,7 +50,7 @@
                     </p>
                 </div>
 
-                <div class="activityname cmname-block {{elementstate.title}}" >
+                <div class="activityname cmname-block {{elementstate.title}}" style="{{#moduletextcolor}} {{moduletextcolor}} {{/moduletextcolor}}">
                     {{#activityname}}
                         {{$ core/inplace_editable }}
                             {{> core/inplace_editable }}

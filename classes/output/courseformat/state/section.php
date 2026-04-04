@@ -27,7 +27,6 @@ use stdClass;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class section extends \core_courseformat\output\local\state\section {
-
     /**
      * Export this data so it can be used as state object in the course editor.
      *
@@ -53,7 +52,7 @@ class section extends \core_courseformat\output\local\state\section {
                 $indexcollapsed = true;
             }
         }
-        $sectionurlinfo = course_get_url($course, $section->section, ['navigation' => false]);
+        $sectionurlinfo = course_get_url($section->course, $section->section, ['navigation' => true]);
         $sectionurl = '';
         if ($sectionurlinfo instanceof moodle_url) {
             $sectionurl = $sectionurlinfo->out(false);
