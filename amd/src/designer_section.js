@@ -21,9 +21,9 @@
  * @copyright  2021 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- define(['jquery', 'core/fragment', 'core/templates', 'core/loadingicon', 'core/ajax',
-    'core_course/actions', 'core_message/toggle_contact_button', 'theme_boost/popover', 'core/notification',],
- function($, Fragment, Templates, Loadingicon, Ajax, Actions, Contact, Notification) {
+define(['jquery', 'core/fragment', 'core/templates', 'core/loadingicon', 'core/ajax',
+    'core_course/actions', 'core_message/toggle_contact_button', 'core/notification'],
+   function($, Fragment, Templates, Loadingicon, Ajax, Actions, Contact, Notification) {
 
     var SELECTOR = {
         ACTIVITYLI: 'li.activity',
@@ -85,8 +85,23 @@
             });
         });
 
-        $('.progress .progress-bar[data-toggle="popover"]').popover();
 
+        // Moodle 5.0 compatibility.
+        if (document.querySelector('.progress .progress-bar[data-bs-toggle="popover"]') !== null) {
+            var popoverelem = document.querySelectorAll('.progress .progress-bar[data-bs-toggle="popover"]');
+            this.initPopover(popoverelem);
+        } else if ((document.querySelector('.progress .progress-bar[data-toggle="popover"]') !== null)) {
+            var popoverelem = document.querySelectorAll('.progress .progress-bar[data-toggle="popover"]');
+            this.initPopover(popoverelem);
+        }
+    };
+
+    DesignerSection.prototype.initPopover = function(popoverelem) {
+        require(['theme_boost/bootstrap/popover'], function(Popover) {
+            popoverelem.forEach((popoverTriggerEl) => {
+                new Popover(popoverTriggerEl);
+            });
+        });
     };
 
     /**
@@ -116,13 +131,20 @@
     DesignerSection.prototype.modules = null;
 
     DesignerSection.prototype.redirectToModule = function(event) {
+
         let nodeName = event.target.nodeName;
         let preventionNodes = ['a', 'button', 'form'];
         let iscircle = event.target.closest('li.activity').classList.contains('circle-layout');
         let isDescription = event.target.classList.contains('mod-description-action');
         let isPadlock = event.target.classList.contains('fa-lock');
         let ispopupModule = event.target.closest('li.activity').classList.contains('popmodule');
-        let isModHasURL = event.target.closest('li.activity div[data-action="go-to-url"]').getAttribute('data-url');
+
+        if (nodeName in preventionNodes) {
+            var isModHasURL = event.target.closest('li.activity div[data-action="go-to-url"]').getAttribute('data-url');
+        } else {
+            var isModHasURL = '';
+        }
+
         let isCompletionButton = event.target.closest('button[data-action="toggle-manual-completion"]');
         let isonClickevent = event.target.getAttribute('onclick');
         if ((nodeName in preventionNodes)
@@ -184,8 +206,12 @@
                     content.classList.add('show');
                 }
                 if (document.getElementById('section-course-accordion') !== null) {
-                    document.getElementById('section-head-0').classList.add('collapsed');
-                    document.getElementById('section-content-0').classList.remove('show');
+                    if (document.getElementById('section-head-0') !== null) {
+                        document.getElementById('section-head-0').classList.add('collapsed');
+                    }
+                    if (document.getElementById('section-content-0') !== null) {
+                        document.getElementById('section-content-0').classList.remove('show');
+                    }
                 }
                 section.scrollIntoView();
             }

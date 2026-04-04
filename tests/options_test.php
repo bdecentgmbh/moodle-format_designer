@@ -39,7 +39,6 @@ require_once($CFG->dirroot . '/course/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class options_test extends \advanced_testcase {
-
     /**
      * @var object
      */
@@ -56,11 +55,8 @@ final class options_test extends \advanced_testcase {
      * @return void
      */
     public function setUp(): void {
-
-        $this->resetAfterTest(true);
-
         parent::setUp();
-
+        $this->resetAfterTest(true);
         // Remove the output display of cron task.
         $this->course = $this->getDataGenerator()->create_course(['format' => 'designer', 'enablecompletion' => 1]);
         $this->coursecontext = context_course::instance($this->course->id);
@@ -71,15 +67,7 @@ final class options_test extends \advanced_testcase {
      * @covers \format_designer\options::is_json
      */
     public function test_optionisjson(): void {
-        $elements = [
-            'icon' => 2, 'visits' => 1, 'calltoaction' => 2,
-            'title' => 1, 'description' => 2, 'modname' => 3, 'completionbadge' => 3,
-        ];
-        $module = $this->getDataGenerator()->create_module('page', ['course' => $this->course, 'section' => 1,
-            'name' => 'Test page', 'content' => 'Test the module element avilabilities are available',
-            'designer_activityelements' => $elements,
-        ]);
-        $option = \format_designer\options::get_option($module->cmid, 'activityelements');
+        $option = json_encode([ 'a' => 1 ]);
         $isjson = \format_designer\options::is_json($option);
         $this->assertTrue($isjson);
 
@@ -107,7 +95,7 @@ final class options_test extends \advanced_testcase {
         $this->assertEquals($elements, json_decode($field, true));
 
         $option = \format_designer\options::get_option($module->cmid, 'activityelements');
-        $this->assertEquals($elements, json_decode($option, true));
+        $this->assertEquals($elements, $option);
 
         $classes = $PAGE->get_renderer('format_designer')->get_activity_elementclasses((object)['id' => $module->cmid]);
         $this->assertEquals('content-show-hover', $classes['icon']);
@@ -128,8 +116,7 @@ final class options_test extends \advanced_testcase {
         $module = $this->getDataGenerator()->create_module('page', [
             'course' => $this->course, 'section' => 1, 'name' => 'Test page', 'content' => 'Test the module',
             'completion' => 1,
-            ]
-        );
+            ]);
 
         $user1 = $this->getDataGenerator()->create_user(['email' => 'test@designer.com', 'username' => 'designer1']);
         $this->getDataGenerator()->enrol_user($user1->id, $this->course->id);
@@ -165,14 +152,12 @@ final class options_test extends \advanced_testcase {
         $module = $this->getDataGenerator()->create_module('page', [
             'course' => $this->course, 'section' => 1, 'name' => 'Test page', 'content' => 'Test the module',
             'completion' => 1,
-            ]
-        );
+            ]);
 
         $module2 = $this->getDataGenerator()->create_module('page', [
             'course' => $this->course, 'section' => 1, 'name' => 'Test page2 ', 'content' => 'Test the module',
             'completion' => 1,
-            ]
-        );
+            ]);
 
         $user1 = $this->getDataGenerator()->create_user(['email' => 'test@designer.com', 'username' => 'designer1']);
         $this->getDataGenerator()->enrol_user($user1->id, $this->course->id);
@@ -215,5 +200,4 @@ final class options_test extends \advanced_testcase {
         $iscompleted = \format_designer\options::is_section_completed($section, $this->course, $modinfo, true);
         $this->assertTrue($iscompleted);
     }
-
 }

@@ -15,32 +15,29 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Privacy Subsystem implementation for Designer course format.
+ * Format Designer - Renderer class.
  *
- * @package   format_designer
- * @copyright 2021 bdecent gmbh <https://bdecent.de>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    format_designer
+ * @copyright  2023 bdecent GmbH <https://bdecent.de>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace format_designer\privacy;
-
-use core_privacy\local\metadata\null_provider;
 
 /**
- * Privacy Subsystem for Designer course format implementing null_provider.
+ * Renderer class for format designer.
  *
- * @package   format_designer
- * @copyright 2021 bdecent gmbh <https://bdecent.de>
+ * @copyright 2023 bdecent GmbH <https://bdecent.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements null_provider {
+class renderer {
     /**
-     * Get the language string identifier with the component's language
-     * file to explain why this plugin stores no data.
+     * Render the course index drawer.
      *
-     * @return  string
+     * @param course_format $format the course format
+     * @return string|null the course index HTML or null
      */
-    public static function get_reason(): string {
-        return 'privacy:metadata';
+    public function course_index_drawer(course_format $format): ?string {
+        // Clarified the purpose of this function.
+        // This function draws the course index for the given format.
+        return null; // Placeholder return value.
     }
 }

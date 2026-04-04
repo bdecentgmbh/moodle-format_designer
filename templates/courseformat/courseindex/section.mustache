@@ -57,7 +57,7 @@
 }}
 <div
     class="courseindex-section {{#current}}current{{/current}}"
-    id="{{uniqid}}-course-index-section-{{id}}"
+    id="course-index-section-{{id}}"
     data-for="section"
     data-id="{{id}}"
     data-number="{{number}}"
@@ -77,13 +77,13 @@
             aria-controls="courseindexcollapse{{number}}"
             tabindex="-1"
         >
-            <span class="collapsed-icon icon-no-margin mr-1"
+            <span class="collapsed-icon icon-no-margin me-1"
                 title="{{#str}} expand, core {{/str}}">
                 <span class="dir-rtl-hide">{{#pix}} t/collapsedchevron, core {{/pix}}</span>
                 <span class="dir-ltr-hide">{{#pix}} t/collapsedchevron_rtl, core {{/pix}}</span>
                 <span class="sr-only">{{#str}} expand, core {{/str}}</span>
             </span>
-            <span class="expanded-icon icon-no-margin mr-1"
+            <span class="expanded-icon icon-no-margin me-1"
                 title="{{#str}} collapse, core {{/str}}">
                 {{#pix}} t/expandedchevron, core {{/pix}}
                 <span class="sr-only">{{#str}} collapse, core {{/str}}</span>
@@ -116,7 +116,7 @@
                 {{#hascmrestrictions}}restrictions{{/hascmrestrictions}}
                 {{^accessvisible}}dimmed{{/accessvisible}}
                 {{#url}} d-flex {{/url}} {{^url}} d-flex-noedit {{/url}}"
-                    id="{{uniqid}}-course-index-cm-{{id}}"
+                    id="course-index-cm-{{id}}"
                     data-for="cm"
                     data-id="{{id}}"
                 >
@@ -128,6 +128,6 @@
 </div>
 {{#js}}
 require(['core_courseformat/local/courseindex/section'], function(component) {
-    component.init('{{uniqid}}-course-index-section-{{id}}');
+    component.init('course-index-section-{{id}}');
 });
 {{/js}}

@@ -36,7 +36,6 @@ use action_menu_link;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class controlmenu extends controlmenu_base {
-
     /**
      * Generate the aciton menu element.
      *
@@ -45,18 +44,17 @@ class controlmenu extends controlmenu_base {
      * @return aciton_menu the activity action menu
      */
     public function get_action_menu(\renderer_base $output): ?action_menu {
-
+        global $CFG;
         if (!empty($this->menu)) {
             return $this->menu;
         }
 
         $mod = $this->mod;
 
-        $controls = $this->cm_control_items();
-
-        if (empty($controls) || (isset($mod->get_course()->coursedisplay) &&
-            $mod->get_course()->coursedisplay == COURSE_DISPLAY_MULTIPAGE)) {
-            return null;
+        if ($CFG->branch >= 500) {
+            $controls = $this->get_cm_control_items();
+        } else {
+            $controls = $this->cm_control_items();
         }
 
         // Convert control array into an action_menu.
@@ -78,7 +76,6 @@ class controlmenu extends controlmenu_base {
         }
 
         $this->menu = $menu;
-
         return $menu;
     }
 }

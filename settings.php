@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-require_once($CFG->dirroot.'/course/format/designer/lib.php');
+require_once($CFG->dirroot . '/course/format/designer/lib.php');
 
 if ($ADMIN->fulltree) {
     $settingspage = new theme_boost_admin_settingspage_tabs('formatsettingdesigner', get_string('configtitle', 'format_designer'));
@@ -32,10 +32,12 @@ if ($ADMIN->fulltree) {
     $settings = new admin_settingpage('format_designer_general', get_string('general', 'format_designer'));
 
     $settings->add(
-        new admin_setting_configselect('format_designer/dateformat',
-        new lang_string('dateformat', 'format_designer'),
-        new lang_string('dateformat_help', 'format_designer'),
-        'monthandday', [
+        new admin_setting_configselect(
+            'format_designer/dateformat',
+            new lang_string('dateformat', 'format_designer'),
+            new lang_string('dateformat_help', 'format_designer'),
+            'monthandday',
+            [
             'usstandarddate' => userdate(time(), get_string('usstandarddate', 'format_designer')),
             'monthandday' => userdate(time(), get_string('monthandday', 'format_designer')),
             'strftimedate' => userdate(time(), get_string('strftimedate')),
@@ -50,14 +52,17 @@ if ($ADMIN->fulltree) {
             'strftimemonthyear' => userdate(time(), get_string('strftimemonthyear')),
             'strftimerecent' => userdate(time(), get_string('strftimerecent')),
             'strftimerecentfull' => userdate(time(), get_string('strftimerecentfull')),
-        ]
-    ));
+            ]
+        )
+    );
 
     $settings->add(
-        new admin_setting_configtext('format_designer/flowanimationduration',
-        new lang_string('flowanimationduration', 'format_designer'),
-        new lang_string('flowanimationduration_help', 'format_designer'),
-        '0.5', PARAM_FLOAT
+        new admin_setting_configtext(
+            'format_designer/flowanimationduration',
+            new lang_string('flowanimationduration', 'format_designer'),
+            new lang_string('flowanimationduration_help', 'format_designer'),
+            '0.5',
+            PARAM_FLOAT
         )
     );
 
@@ -123,7 +128,7 @@ if ($ADMIN->fulltree) {
     $title = get_string('strsectionlayout', 'format_designer');
     $description = get_string('section_layout_desc', 'format_designer');
     $layouts = [];
-    $setting = new admin_setting_configselect($name , $title, $description, 'default', format_designer_get_all_layouts());
+    $setting = new admin_setting_configselect($name, $title, $description, 'default', \format_designer\helper::get_all_layouts());
     $sectionpage->add($setting);
 
 
@@ -143,8 +148,12 @@ if ($ADMIN->fulltree) {
 
     // Activity description trim length.
     $setting = new admin_setting_configtext(
-        'format_designer/modtrimlength', get_string('modtrimlength', 'format_designer'),
-        get_string('modtrimlength_desc', 'format_designer'), 23, PARAM_INT);
+        'format_designer/modtrimlength',
+        get_string('modtrimlength', 'format_designer'),
+        get_string('modtrimlength_desc', 'format_designer'),
+        23,
+        PARAM_INT
+    );
     $activitypage->add($setting);
 
 
@@ -169,17 +178,19 @@ if ($ADMIN->fulltree) {
     ];
 
     foreach ($elements as $element => $defaultvalue) {
-        $name = 'format_designer/activityelements_'.$element;
-        $title = get_string('activity:'.$element, 'format_designer');
+        $name = 'format_designer/activityelements_' . $element;
+        $title = get_string('activity:' . $element, 'format_designer');
         $desc = '';
         $default = ['value' => $defaultvalue, 'fix' => 0];
         $setting = new admin_setting_configselect_with_advanced($name, $title, $desc, $default, $choice);
         $activitypage->add($setting);
     }
 
-    if (format_designer_has_pro()
-         && file_exists($CFG->dirroot.'/local/designer/setting.php')) {
-        require_once($CFG->dirroot.'/local/designer/setting.php');
+    if (
+        \format_designer\helper::has_pro()
+         && file_exists($CFG->dirroot . '/local/designer/setting.php')
+    ) {
+        require_once($CFG->dirroot . '/local/designer/setting.php');
     } else {
         $settingspage->add($sectionpage);
         $settingspage->add($activitypage);
@@ -194,12 +205,13 @@ $ADMIN->add('formatsettings', new admin_category('format_designer', get_string('
 
 $ADMIN->add('format_designer', $settings);
 
-
 $settings = null;
 
-if (format_designer_has_pro()) {
+if (\format_designer\helper::has_pro()) {
     // Tell core we already added the settings structure.
-    $ADMIN->add('format_designer', new admin_externalpage('managepurposes', get_string('managepurposes', 'format_designer'),
-    new moodle_url('/local/designer/purposes.php')));
+    $ADMIN->add('format_designer', new admin_externalpage(
+        'managepurposes',
+        get_string('managepurposes', 'format_designer'),
+        new moodle_url('/local/designer/purposes.php')
+    ));
 }
-
