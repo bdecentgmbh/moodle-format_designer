@@ -1529,6 +1529,8 @@ class format_designer extends \core_courseformat\base {
             );
         }
 
+        $data = (object) $data;
+
         // Update the designer pro options, before update.
         if (\format_designer\helper::has_pro()) {
             local_designer\options::update_course_format_options($data, $this->courseid);

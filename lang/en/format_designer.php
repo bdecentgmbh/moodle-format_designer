@@ -70,6 +70,7 @@ $string['belowcourseprogress'] = "Below course progress";
 $string['boxed'] = 'Boxed';
 $string['bypurpose'] = "By purpose";
 $string['bytype'] = "By type";
+$string['cachedef_designeroptions'] = 'Designer Options Cache';
 $string['calcourseprogress'] = "Calculation of course progress";
 $string['calcourseprogress_help'] = "<b> Completion criteria: </b> progress shall include all criteria that are conditions for course completion.<br><b> Relevant activities: </b> progress shall include only activities that are conditions for course completion.<br><b> All activities: </b> progress shall include all activities that have completion tracking configured.<br><b> Sections: </b> progress shall be based upon sections, not activities.<br>";
 $string['calltoactioncontinue'] = 'Review {$a} <i class="fa fa-angle-double-right"></i>';
