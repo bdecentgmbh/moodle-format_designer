@@ -410,22 +410,25 @@ class renderer extends \core_courseformat\output\section_renderer {
     public static function get_course_completion_indicator($course) {
         global $USER;
 
-        $courseprogress = self::criteria_progress($course, $USER->id);
-        $progress = isset($courseprogress['percent']) ? $courseprogress['percent'] : 0;
         $context = context_course::instance($course->id);
+        $completion = new \completion_info($course);
         $status = "";
         $class = "";
-        if ($progress) {
-            if (round($progress) == 100) {
-                $status = get_string('strcompleted', 'format_designer');
-                $class = "completed";
-            } else if (round($progress) > 0) {
+
+        // Check actual course completion first. This correctly handles conditions.
+        if ($completion->is_enabled() && $completion->is_course_complete($USER->id)) {
+            $status = get_string('strcompleted', 'format_designer');
+            $class = "completed";
+        } else {
+            $courseprogress = self::criteria_progress($course, $USER->id);
+            $progress = isset($courseprogress['percent']) ? $courseprogress['percent'] : 0;
+            if ($progress > 0) {
                 $status = get_string('strinprogress', 'format_designer');
                 $class = "inprogress";
+            } else if (is_enrolled($context, $USER->id)) {
+                $status = get_string('strenrolled', 'format_designer');
+                $class = "enrolled";
             }
-        } else if (is_enrolled($context, $USER->id)) {
-            $status = get_string('strenrolled', 'format_designer');
-            $class = "enrolled";
         }
         return [$status, $class];
     }
