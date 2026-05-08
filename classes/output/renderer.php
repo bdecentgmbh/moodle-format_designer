@@ -416,13 +416,16 @@ class renderer extends \core_courseformat\output\section_renderer {
         $class = "";
 
         // Check actual course completion first. This correctly handles conditions.
-        if ($completion->is_enabled() && $completion->is_course_complete($USER->id)) {
+        if ($course->calcourseprogress == DESIGNER_PROGRESS_CRITERIA && $completion->is_enabled() && $completion->is_course_complete($USER->id)) {
             $status = get_string('strcompleted', 'format_designer');
             $class = "completed";
         } else {
             $courseprogress = self::criteria_progress($course, $USER->id);
             $progress = isset($courseprogress['percent']) ? $courseprogress['percent'] : 0;
-            if ($progress > 0) {
+            if ($progress == 100) {
+                $status = get_string('strcompleted', 'format_designer');
+                $class = "completed";
+            } else if ($progress > 0) {
                 $status = get_string('strinprogress', 'format_designer');
                 $class = "inprogress";
             } else if (is_enrolled($context, $USER->id)) {

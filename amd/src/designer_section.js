@@ -39,7 +39,6 @@ define(['jquery', 'core/fragment', 'core/templates', 'core/loadingicon', 'core/a
         }
     });
 
-
     /**
      * Control designer format action
      * @param {int} courseId
