@@ -39,7 +39,6 @@ define(['jquery', 'core/fragment', 'core/templates', 'core/loadingicon', 'core/a
         }
     });
 
-
     /**
      * Control designer format action
      * @param {int} courseId
@@ -131,7 +130,6 @@ define(['jquery', 'core/fragment', 'core/templates', 'core/loadingicon', 'core/a
     DesignerSection.prototype.modules = null;
 
     DesignerSection.prototype.redirectToModule = function(event) {
-
         let nodeName = event.target.nodeName;
         let preventionNodes = ['a', 'button', 'form'];
         let iscircle = event.target.closest('li.activity').classList.contains('circle-layout');
@@ -139,11 +137,7 @@ define(['jquery', 'core/fragment', 'core/templates', 'core/loadingicon', 'core/a
         let isPadlock = event.target.classList.contains('fa-lock');
         let ispopupModule = event.target.closest('li.activity').classList.contains('popmodule');
 
-        if (nodeName in preventionNodes) {
-            var isModHasURL = event.target.closest('li.activity div[data-action="go-to-url"]').getAttribute('data-url');
-        } else {
-            var isModHasURL = '';
-        }
+        var isModHasURL = event.target.closest('li.activity div[data-action="go-to-url"]').getAttribute('data-url');
 
         let isCompletionButton = event.target.closest('button[data-action="toggle-manual-completion"]');
         let isonClickevent = event.target.getAttribute('onclick');
