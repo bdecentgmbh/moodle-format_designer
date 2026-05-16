@@ -1409,7 +1409,7 @@ span.section-collapse-icon:before {
     width: auto;
     padding: 0;
 }
-.format-designer .designer .section .content .section li.activity.label .activityinstance {
+.format-designer .designer .section .content .section:not(.circles-layout) li.activity.label .activityinstance {
     display: none;
 }
 .format-designer .designer .section .content .section li.activity.label .activity-block.designer .contentwithoutlink {
