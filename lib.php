@@ -1378,6 +1378,13 @@ class format_designer extends \core_courseformat\base {
         if (empty($data['sectionlayoutheader'])) {
             $data['sectionlayoutheader'] = get_string('sectionlayouts', 'format_designer');
         }
+        // Header elements take their displayed title from the stored option value,
+        // so seed it (mirrors sectionlayoutheader above). Only when the repository
+        // addon is present, since the option only exists then; validate_format_options
+        // drops it otherwise.
+        if (class_exists(\dashaddon_repository\embedder::class) && empty($data['dashwidgetheader'])) {
+            $data['dashwidgetheader'] = get_string('dashwidgetheader', 'format_designer');
+        }
         if (\format_designer\helper::has_pro()) {
             local_designer\options::update_section_format_options($data);
         }
