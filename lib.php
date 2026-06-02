@@ -1202,6 +1202,46 @@ class format_designer extends \core_courseformat\base {
             ];
         }
 
+        // Dash widget embed — render a Dash Content Repository preset below this
+        // section. Presented in its own settings section and only when the
+        // repository addon is installed; depends on dashaddon_repository (not on
+        // filter_dash), which owns the block-less render path.
+        if (class_exists(\dashaddon_repository\embedder::class)) {
+            $dashpresets = \dashaddon_repository\embedder::list_presets();
+            $canmanagedash = has_capability('dashaddon/repository:manage', \context_system::instance());
+            // Show the section when there is something to pick, or so a manager can
+            // jump to the repository to enable presets.
+            if (!empty($dashpresets) || $canmanagedash) {
+                $sectionoptions['dashwidgetheader'] = [
+                    'type' => PARAM_TEXT,
+                    'element_type' => 'header',
+                    'default' => get_string('dashwidgetheader', 'format_designer'),
+                    'label' => new lang_string('dashwidgetheader', 'format_designer'),
+                ];
+                $sectionoptions['dashwidget'] = [
+                    'type' => PARAM_ALPHANUMEXT,
+                    'label' => new lang_string('dashwidget', 'format_designer'),
+                    'element_type' => 'select',
+                    'element_attributes' => [['' => get_string('none')] + $dashpresets],
+                    'default' => '',
+                    'help' => 'dashwidget',
+                    'help_component' => 'format_designer',
+                ];
+                if ($canmanagedash) {
+                    $sectionoptions['dashwidgetmanage'] = [
+                        'element_type' => 'static',
+                        'label' => '',
+                        'element_attributes' => [
+                            html_writer::link(
+                                new moodle_url('/local/dash/addon/repository/index.php'),
+                                get_string('dashwidgetmanage', 'format_designer')
+                            ),
+                        ],
+                    ];
+                }
+            }
+        }
+
         // Include pro feature options for section.
         if (\format_designer\helper::has_pro()) {
             if (class_exists('\local_designer\helper')) {

@@ -90,6 +90,20 @@ class section extends \core_courseformat\output\local\content\section {
         }
         $data = (object) array_merge((array) $data, $formatdata);
 
+        // Embedded Dash widget: render the repository preset selected for this
+        // section (the 'dashwidget' option) below the section summary. Delegated
+        // to dashaddon_repository's embedder, which owns block-less rendering.
+        if (class_exists(\dashaddon_repository\embedder::class)) {
+            $options = $format->get_format_options($section);
+            $shortname = $options['dashwidget'] ?? '';
+            if ($shortname !== '') {
+                $data->dashwidgethtml = \dashaddon_repository\embedder::render(
+                    $shortname,
+                    context_course::instance($format->get_course()->id)
+                );
+            }
+        }
+
         return true;
     }
 
