@@ -1003,6 +1003,23 @@ class format_designer extends \core_courseformat\base {
             }
         }
 
+        // The Dash widget embed only renders on a regular section. Delegated
+        // sections (subsections) are rendered through a different path where it
+        // would not appear, so drop the option from their edit form.
+        if ($forsection) {
+            $editsectionid = optional_param('id', 0, PARAM_INT);
+            if ($editsectionid) {
+                $editsectioninfo = get_fast_modinfo($this->get_course())->get_section_info_by_id($editsectionid, IGNORE_MISSING);
+                if ($editsectioninfo && $editsectioninfo->is_delegated()) {
+                    foreach (['dashwidgetheader', 'dashwidget', 'dashwidgetmanage'] as $dashelement) {
+                        if ($mform->elementExists($dashelement)) {
+                            $mform->removeElement($dashelement);
+                        }
+                    }
+                }
+            }
+        }
+
         if ($forsection) {
             $PAGE->requires->js_init_code('
                 require(["core/config"], function(CFG) {
