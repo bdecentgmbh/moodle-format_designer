@@ -1224,7 +1224,14 @@ class format_designer extends \core_courseformat\base {
         // repository addon is installed; depends on dashaddon_repository (not on
         // filter_dash), which owns the block-less render path.
         if (class_exists(\dashaddon_repository\embedder::class)) {
-            $dashpresets = \dashaddon_repository\embedder::list_presets();
+            global $PAGE;
+            // Author-time role gating: only offer presets the current user may
+            // embed in this course. Fall back to all embeddable presets when no
+            // course context is available (e.g. backup/restore option lookup).
+            $coursecontext = (!empty($PAGE->context) && $PAGE->context->get_course_context(false))
+                ? $PAGE->context->get_course_context(false)
+                : null;
+            $dashpresets = \dashaddon_repository\embedder::list_presets($coursecontext);
             $canmanagedash = has_capability('dashaddon/repository:manage', \context_system::instance());
             // Show the section when there is something to pick, or so a manager can
             // jump to the repository to enable presets.
