@@ -116,5 +116,29 @@ function xmldb_format_designer_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024073000, 'format', 'designer');
     }
 
+    if ($oldversion < 2026052800) {
+        // The new "plain" section layout (identical to core custom sections) becomes the
+        // factory default. Only adopt it on sites that never explicitly chose a global
+        // section layout, so existing admin choices (including the old "default"/Text links
+        // layout) are preserved. Per-course and per-section stored values are left untouched.
+        if (get_config('format_designer', 'sectiontype') === false) {
+            set_config('sectiontype', 'plain', 'format_designer');
+        }
+        upgrade_plugin_savepoint(true, 2026052800, 'format', 'designer');
+    }
+
+    if ($oldversion < 2026052900) {
+        // The single "sectionlayouts" feature was split into "sectionactivitylayout" (the
+        // per-section activity layout) and "coursesectionlayout" (columns/width). Carry the
+        // previous toggle value over to both new keys so existing administrator choices are kept.
+        $previous = get_config('format_designer', 'feature_sectionlayouts');
+        if ($previous !== false) {
+            set_config('feature_sectionactivitylayout', $previous, 'format_designer');
+            set_config('feature_coursesectionlayout', $previous, 'format_designer');
+            unset_config('feature_sectionlayouts', 'format_designer');
+        }
+        upgrade_plugin_savepoint(true, 2026052900, 'format', 'designer');
+    }
+
     return true;
 }

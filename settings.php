@@ -29,6 +29,46 @@ require_once($CFG->dirroot . '/course/format/designer/lib.php');
 if ($ADMIN->fulltree) {
     $settingspage = new theme_boost_admin_settingspage_tabs('formatsettingdesigner', get_string('configtitle', 'format_designer'));
 
+    // Manage features: one on/off toggle per major designer feature.
+    $featurespage = new admin_settingpage('format_designer_features', get_string('managefeatures', 'format_designer'));
+    $featurespage->add(new admin_setting_heading(
+        'format_designer/managefeaturesintro',
+        '',
+        get_string('managefeatures_desc', 'format_designer')
+    ));
+
+    $featuregroups = [
+        \format_designer\features::GROUP_COURSE => get_string('feature_group_course', 'format_designer'),
+        \format_designer\features::GROUP_SECTION => get_string('feature_group_section', 'format_designer'),
+        \format_designer\features::GROUP_ACTIVITY => get_string('feature_group_activity', 'format_designer'),
+        \format_designer\features::GROUP_HEADER => get_string('feature_group_header', 'format_designer'),
+    ];
+    $allfeatures = \format_designer\features::get_features();
+    foreach ($featuregroups as $groupkey => $grouplabel) {
+        $groupfeatures = array_filter($allfeatures, function($def) use ($groupkey) {
+            return ($def['group'] ?? '') === $groupkey;
+        });
+        // Hide pro features that are not available.
+        if (!\format_designer\helper::has_pro()) {
+            $groupfeatures = array_filter($groupfeatures, function($def) {
+                return empty($def['pro']);
+            });
+        }
+        if (empty($groupfeatures)) {
+            continue;
+        }
+        $featurespage->add(new admin_setting_heading('format_designer/featuregroup_' . $groupkey, $grouplabel, ''));
+        foreach ($groupfeatures as $key => $def) {
+            $featurespage->add(new admin_setting_configcheckbox(
+                'format_designer/feature_' . $key,
+                get_string($def['name'], 'format_designer'),
+                get_string($def['description'], 'format_designer'),
+                1
+            ));
+        }
+    }
+    $settingspage->add($featurespage);
+
     $settings = new admin_settingpage('format_designer_general', get_string('general', 'format_designer'));
 
     $settings->add(
@@ -67,50 +107,52 @@ if ($ADMIN->fulltree) {
     );
 
     // Hero activity.
-    $name = 'format_designer_hero';
-    $heading = get_string('heroactivity', 'format_designer');
-    $information = '';
-    $setting = new admin_setting_heading($name, $heading, $information);
-    $settings->add($setting);
+    if (\format_designer\helper::feature_enabled('heroactivity')) {
+        $name = 'format_designer_hero';
+        $heading = get_string('heroactivity', 'format_designer');
+        $information = '';
+        $setting = new admin_setting_heading($name, $heading, $information);
+        $settings->add($setting);
 
-    $name = 'format_designer/sectionzeroactivities';
-    $title = get_string('sectionzeroactivities', 'format_designer');
-    $description = '';
-    $options = [
-        0 => get_string('disabled', 'format_designer'),
-        1 => get_string('makeherohide', 'format_designer'),
-        2 => get_string('makeherovisible', 'format_designer'),
-    ];
-    $setting = new admin_setting_configselect($name, $title, $description, 0, $options);
-    $settings->add($setting);
+        $name = 'format_designer/sectionzeroactivities';
+        $title = get_string('sectionzeroactivities', 'format_designer');
+        $description = '';
+        $options = [
+            0 => get_string('disabled', 'format_designer'),
+            1 => get_string('makeherohide', 'format_designer'),
+            2 => get_string('makeherovisible', 'format_designer'),
+        ];
+        $setting = new admin_setting_configselect($name, $title, $description, 0, $options);
+        $settings->add($setting);
 
-    $name = 'format_designer/heroactivity';
-    $title = get_string('showastab', 'format_designer');
-    $desc = '';
-    $default = ['value' => 0, 'fix' => 0];
-    $tabs = [
-        0 => get_string('disabled', 'format_designer'),
-        1 => get_string('everywhere', 'format_designer'),
-        2 => get_string('onlycoursepage', 'format_designer'),
-    ];
-    $setting = new admin_setting_configselect_with_advanced($name, $title, $desc, $default, $tabs);
-    $settings->add($setting);
+        $name = 'format_designer/heroactivity';
+        $title = get_string('showastab', 'format_designer');
+        $desc = '';
+        $default = ['value' => 0, 'fix' => 0];
+        $tabs = [
+            0 => get_string('disabled', 'format_designer'),
+            1 => get_string('everywhere', 'format_designer'),
+            2 => get_string('onlycoursepage', 'format_designer'),
+        ];
+        $setting = new admin_setting_configselect_with_advanced($name, $title, $desc, $default, $tabs);
+        $settings->add($setting);
 
-    $name = 'format_designer/heroactivitypos';
-    $title = get_string('order');
-    $desc = '';
-    $default = ['value' => 1, 'fix' => 0];
-    $posrange = array_combine(range(-10, 10), range(-10, 10));
-    unset($posrange[0]);
-    $setting = new admin_setting_configselect_with_advanced($name, $title, $desc, $default, $posrange);
-    $settings->add($setting);
+        $name = 'format_designer/heroactivitypos';
+        $title = get_string('order');
+        $desc = '';
+        $default = ['value' => 1, 'fix' => 0];
+        $posrange = array_combine(range(-10, 10), range(-10, 10));
+        unset($posrange[0]);
+        $setting = new admin_setting_configselect_with_advanced($name, $title, $desc, $default, $posrange);
+        $settings->add($setting);
 
-    // Avoid duplicate entries.
-    $name = 'format_designer/avoidduplicate_heromodentry';
-    $title = get_string('stravoidduplicateentry', 'format_designer');
-    $desc = '';
-    $setting = new admin_setting_configcheckbox_with_advanced($name, $title, $desc, ['value' => 0]);
-    $settings->add($setting);
+        // Avoid duplicate entries.
+        $name = 'format_designer/avoidduplicate_heromodentry';
+        $title = get_string('stravoidduplicateentry', 'format_designer');
+        $desc = '';
+        $setting = new admin_setting_configcheckbox_with_advanced($name, $title, $desc, ['value' => 0]);
+        $settings->add($setting);
+    }
     $settingspage->add($settings);
 
     $sectionpage = new admin_settingpage('format_designer_section', get_string('sectionsettings', 'format_designer'));
@@ -124,66 +166,68 @@ if ($ADMIN->fulltree) {
 
 
     // Section layout - Global setting - DES-866.
-    $name = 'format_designer/sectiontype';
-    $title = get_string('strsectionlayout', 'format_designer');
-    $description = get_string('section_layout_desc', 'format_designer');
-    $layouts = [];
-    $setting = new admin_setting_configselect($name, $title, $description, 'default', \format_designer\helper::get_all_layouts());
-    $sectionpage->add($setting);
+    if (\format_designer\helper::feature_enabled('sectionactivitylayout')) {
+        $name = 'format_designer/sectiontype';
+        $title = get_string('strsectionlayout', 'format_designer');
+        $description = get_string('section_layout_desc', 'format_designer');
+        $setting = new admin_setting_configselect(
+            $name, $title, $description, 'plain', \format_designer\helper::get_all_layouts());
+        $sectionpage->add($setting);
+    }
 
 
     $activitypage = new admin_settingpage('format_designer_activity', get_string('stractivity', 'format_designer'));
 
-    // Activity description length.
-    $name = 'format_designer/activitydesclength';
-    $title = get_string('activitydesclength', 'format_designer');
-    $desc = get_string('activitydesclength_desc', 'format_designer');
-    $options = [
-        0 => get_string('trimmed', 'format_designer'),
-        1 => get_string('donottrim', 'format_designer'),
-    ];
-    $default = 0;
-    $setting = new admin_setting_configselect($name, $title, $desc, $default, $options);
-    $activitypage->add($setting);
-
-    // Activity description trim length.
-    $setting = new admin_setting_configtext(
-        'format_designer/modtrimlength',
-        get_string('modtrimlength', 'format_designer'),
-        get_string('modtrimlength_desc', 'format_designer'),
-        23,
-        PARAM_INT
-    );
-    $activitypage->add($setting);
-
-
-    // Activity elements list to manage the visibility - Activity page continue.
-    $elements = [
-        'icon' => 1,
-        'visits' => 4,
-        'calltoaction' => 4,
-        'title' => 1,
-        'description' => 1,
-        'modname' => 4,
-        'completionbadge' => 1,
-    ];
-
-
-    $choice = [
-        1 => get_string('show'),
-        0 => get_string('hide'),
-        2 => get_string('showonhover', 'format_designer'),
-        3 => get_string('hideonhover', 'format_designer'),
-        4 => get_string('remove'),
-    ];
-
-    foreach ($elements as $element => $defaultvalue) {
-        $name = 'format_designer/activityelements_' . $element;
-        $title = get_string('activity:' . $element, 'format_designer');
-        $desc = '';
-        $default = ['value' => $defaultvalue, 'fix' => 0];
-        $setting = new admin_setting_configselect_with_advanced($name, $title, $desc, $default, $choice);
+    if (\format_designer\helper::feature_enabled('activityelements')) {
+        // Activity description length.
+        $name = 'format_designer/activitydesclength';
+        $title = get_string('activitydesclength', 'format_designer');
+        $desc = get_string('activitydesclength_desc', 'format_designer');
+        $options = [
+            0 => get_string('trimmed', 'format_designer'),
+            1 => get_string('donottrim', 'format_designer'),
+        ];
+        $default = 0;
+        $setting = new admin_setting_configselect($name, $title, $desc, $default, $options);
         $activitypage->add($setting);
+
+        // Activity description trim length.
+        $setting = new admin_setting_configtext(
+            'format_designer/modtrimlength',
+            get_string('modtrimlength', 'format_designer'),
+            get_string('modtrimlength_desc', 'format_designer'),
+            23,
+            PARAM_INT
+        );
+        $activitypage->add($setting);
+
+        // Activity elements list to manage the visibility - Activity page continue.
+        $elements = [
+            'icon' => 1,
+            'visits' => 4,
+            'calltoaction' => 4,
+            'title' => 1,
+            'description' => 1,
+            'modname' => 4,
+            'completionbadge' => 1,
+        ];
+
+        $choice = [
+            1 => get_string('show'),
+            0 => get_string('hide'),
+            2 => get_string('showonhover', 'format_designer'),
+            3 => get_string('hideonhover', 'format_designer'),
+            4 => get_string('remove'),
+        ];
+
+        foreach ($elements as $element => $defaultvalue) {
+            $name = 'format_designer/activityelements_' . $element;
+            $title = get_string('activity:' . $element, 'format_designer');
+            $desc = '';
+            $default = ['value' => $defaultvalue, 'fix' => 0];
+            $setting = new admin_setting_configselect_with_advanced($name, $title, $desc, $default, $choice);
+            $activitypage->add($setting);
+        }
     }
 
     if (
@@ -207,7 +251,7 @@ $ADMIN->add('format_designer', $settings);
 
 $settings = null;
 
-if (\format_designer\helper::has_pro()) {
+if (\format_designer\helper::has_pro() && \format_designer\helper::feature_enabled('purposes')) {
     // Tell core we already added the settings structure.
     $ADMIN->add('format_designer', new admin_externalpage(
         'managepurposes',

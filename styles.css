@@ -15,16 +15,19 @@
 }
 
 @media (min-width: 1200px) {
-    .pagelayout-course.format-designer #page-wrapper #page.drawers .main-inner {
+    /* Only take over the full page width when the course section layout feature is enabled
+       (body.format-designer-fullwidth). Otherwise keep the theme's boxed/centered width so a
+       default Designer course matches the standard custom sections format. */
+    .pagelayout-course.format-designer.format-designer-fullwidth #page-wrapper #page.drawers .main-inner {
         max-width: none;
     }
 }
 
 @media (min-width: 768px) {
     .pagelayout-standard.format-designer #page.drawers .main-inner,
-    body.limitedwidth.format-designer #page.drawers .main-inner,
+    body.limitedwidth.format-designer.format-designer-fullwidth #page.drawers .main-inner,
     .pagelayout-standard.format-designer #page.drawers .footer-popover,
-    body.limitedwidth.format-designer #page.drawers .footer-popover {
+    body.limitedwidth.format-designer.format-designer-fullwidth #page.drawers .footer-popover {
         max-width: none;
     }
     .format-designer.path-admin.path-admin-roles:not(.format-site) .header-maxwidth,

@@ -114,7 +114,7 @@ class renderer extends \core_courseformat\output\section_renderer {
         $data->issectionpageclass = $singlesection || ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE)
             ? 'section-page-layout' : '';
 
-        if (!\format_designer\helper::has_pro()) {
+        if (!\format_designer\helper::has_pro() && \format_designer\helper::feature_enabled('courseheader')) {
             $data->headermetadata = $this->course_header_metadata_details($course);
         }
 
@@ -1083,7 +1083,16 @@ class renderer extends \core_courseformat\output\section_renderer {
 
         $sectionlayoutclass = 'link-layout';
         $sectiontype = $format->get_section_option($section->id, 'sectiontype') ?: get_config('format_designer', 'sectiontype');
-        if ($sectiontype == 'list') {
+
+        // When the section activity layout feature is disabled, force the plain (core
+        // custom-sections) layout regardless of any stored layout value.
+        if (!\format_designer\helper::feature_enabled('sectionactivitylayout')) {
+            $sectiontype = 'plain';
+        }
+
+        if ($sectiontype == 'plain') {
+            $sectionlayoutclass = '';
+        } else if ($sectiontype == 'list') {
             $sectionlayoutclass = "list-layout";
         } else if ($sectiontype == 'cards') {
             $sectionlayoutclass = 'card-layout';
@@ -1238,7 +1247,8 @@ class renderer extends \core_courseformat\output\section_renderer {
             $templatecontext['sectionsingle'] = true;
         }
 
-        if (\format_designer\helper::has_pro() && $showprerequisites) {
+        if (\format_designer\helper::has_pro() && $showprerequisites
+                && \format_designer\helper::feature_enabled('prerequisites')) {
             require_once($CFG->dirroot . "/local/designer/lib.php");
             if (
                 $course->displaycourseprerequisites == DESIGNER_PREREQUISITES_ABOVECOURSE &&

@@ -342,6 +342,54 @@ class helper {
     }
 
     /**
+     * Check whether a major designer feature is enabled.
+     *
+     * A feature is disabled when its admin toggle (format_designer/feature_<key>) is
+     * explicitly off, when it is a pro-only feature and pro is not installed, or when
+     * its required dependency component is not installed. Unknown keys and unset
+     * toggles are treated as enabled for backward compatibility — existing sites behave
+     * exactly as before with no administrator action required.
+     *
+     * @param string $key Feature key as defined in \format_designer\features::get_features().
+     * @return bool
+     */
+    public static function feature_enabled(string $key): bool {
+        static $cache = [];
+
+        if (array_key_exists($key, $cache)) {
+            return $cache[$key];
+        }
+
+        $features = features::get_features();
+
+        // Unknown feature key: treat as enabled (backward compatibility).
+        if (!isset($features[$key])) {
+            return $cache[$key] = true;
+        }
+
+        $def = $features[$key];
+
+        // Pro-only feature requires pro to be installed.
+        if (!empty($def['pro']) && !self::has_pro()) {
+            return $cache[$key] = false;
+        }
+
+        // Required dependency component must be installed.
+        if (!empty($def['depends'])) {
+            if ($def['depends'] === 'format_popups' && !self::popup_installed()) {
+                return $cache[$key] = false;
+            }
+            if ($def['depends'] === 'tool_timetable' && !self::timetable_installed()) {
+                return $cache[$key] = false;
+            }
+        }
+
+        // Read the admin toggle; unset (=== false) means enabled by default.
+        $val = get_config('format_designer', 'feature_' . $key);
+        return $cache[$key] = ($val === false) ? true : (bool) $val;
+    }
+
+    /**
      * Get the designer format custom layouts.
      *
      * @return array list of available module pro layouts.
@@ -357,6 +405,7 @@ class helper {
      */
     public static function get_all_layouts(): array {
         $layouts = [
+            'plain' => get_string('plain', 'format_designer'),
             'default' => get_string('link', 'format_designer'),
             'list' => get_string('list', 'format_designer'),
             'cards' => get_string('cards', 'format_designer'),
@@ -426,8 +475,15 @@ class helper {
 
         $sectiontype = self::$sectionlayoutcache[$section->id];
 
+        // When the section activity layout feature is disabled, every section renders with the
+        // plain (core custom-sections) layout regardless of any stored layout value.
+        if (!self::feature_enabled('sectionactivitylayout')) {
+            $sectiontype = 'plain';
+        }
+
         $sectionlayoutclass = '';
 
+        // The 'plain' layout (core custom-sections) intentionally adds no wrapper class.
         if ($sectiontype == 'list') {
             $sectionlayoutclass = " position-relative ";
         } else if ($sectiontype == 'cards') {
@@ -472,6 +528,10 @@ class helper {
      */
     public static function course_has_heroactivity($course): bool {
         global $DB, $PAGE;
+        // Single chokepoint: when the hero activity feature is disabled it never applies.
+        if (!self::feature_enabled('heroactivity')) {
+            return false;
+        }
         $iscourseheroactivity = ($course->sectionzeroactivities &&
             $course->heroactivity == DESIGNER_HERO_ACTIVITY_EVERYWHERE) ? true : false;
         $sql = "SELECT fd.value FROM {format_designer_options} fd
