@@ -1,6 +1,15 @@
 name: Moodle Plugin CI
 
-on: [push, pull_request]
+# Pushes only build the long lived branches. Feature branches are covered by the
+# pull_request trigger instead, so they run CI once a pull request is open rather
+# than on every push.
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - 'MOODLE_*_DEV'
+  pull_request:
 
 jobs:
   test:
