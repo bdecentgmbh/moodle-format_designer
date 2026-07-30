@@ -58,6 +58,14 @@ class events {
         // Course_section_cache_updated.
         self::course_section_cache_updated($courseid, $sectionid);
 
+        if (self::is_restoring_sections()) {
+            // A restore is creating this section and the backup file carries its format options.
+            // Seeding the site defaults here would make core skip the restored values, because
+            // restore_section_structure_step::process_course_format_options() never overwrites an
+            // option that already exists for the section. See DES-950.
+            return true;
+        }
+
         $format = course_get_format($courseid);
         $options = $format->section_format_options();
         $sectiondata = ['id' => $sectionid];
@@ -72,6 +80,20 @@ class events {
         ) {
             $format->update_section_format_options($sectiondata);
         }
+    }
+
+    /**
+     * Is a course restore currently creating the course sections?
+     *
+     * The restore plugin class is only loaded while a backup file is being restored, so when it is
+     * not in memory there is definitely no restore going on. Autoloading is disabled on purpose,
+     * the class lives in backup/moodle2 and is not autoloadable.
+     *
+     * @return bool
+     */
+    protected static function is_restoring_sections(): bool {
+        return class_exists('restore_format_designer_plugin', false)
+            && \restore_format_designer_plugin::is_restoring_sections();
     }
 
     /**
