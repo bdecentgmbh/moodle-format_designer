@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/course/format/designer/lib.php');
  * @covers \format_designer\events::course_section_created
  */
 final class duplicate_course_test extends \advanced_testcase {
-
     /**
      * Backup a course and restore it into a brand new course, the same way
      * core_course_duplicate_course does.
