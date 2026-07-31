@@ -45,12 +45,12 @@ if ($ADMIN->fulltree) {
     ];
     $allfeatures = \format_designer\features::get_features();
     foreach ($featuregroups as $groupkey => $grouplabel) {
-        $groupfeatures = array_filter($allfeatures, function($def) use ($groupkey) {
+        $groupfeatures = array_filter($allfeatures, function ($def) use ($groupkey) {
             return ($def['group'] ?? '') === $groupkey;
         });
         // Hide pro features that are not available.
         if (!\format_designer\helper::has_pro()) {
-            $groupfeatures = array_filter($groupfeatures, function($def) {
+            $groupfeatures = array_filter($groupfeatures, function ($def) {
                 return empty($def['pro']);
             });
         }
@@ -171,7 +171,12 @@ if ($ADMIN->fulltree) {
         $title = get_string('strsectionlayout', 'format_designer');
         $description = get_string('section_layout_desc', 'format_designer');
         $setting = new admin_setting_configselect(
-            $name, $title, $description, 'plain', \format_designer\helper::get_all_layouts());
+            $name,
+            $title,
+            $description,
+            'plain',
+            \format_designer\helper::get_all_layouts()
+        );
         $sectionpage->add($setting);
     }
 

@@ -1247,8 +1247,10 @@ class renderer extends \core_courseformat\output\section_renderer {
             $templatecontext['sectionsingle'] = true;
         }
 
-        if (\format_designer\helper::has_pro() && $showprerequisites
-                && \format_designer\helper::feature_enabled('prerequisites')) {
+        if (
+            \format_designer\helper::has_pro() && $showprerequisites
+                && \format_designer\helper::feature_enabled('prerequisites')
+        ) {
             require_once($CFG->dirroot . "/local/designer/lib.php");
             if (
                 $course->displaycourseprerequisites == DESIGNER_PREREQUISITES_ABOVECOURSE &&

@@ -313,8 +313,10 @@ class format_designer extends \core_courseformat\base {
      * @return string
      */
     public function course_header() {
-        if (\format_designer\helper::has_pro() && class_exists('\local_designer\courseheader')
-                && \format_designer\helper::feature_enabled('courseheader')) {
+        if (
+            \format_designer\helper::has_pro() && class_exists('\local_designer\courseheader')
+                && \format_designer\helper::feature_enabled('courseheader')
+        ) {
             return local_designer\courseheader::get_header_instance($this);
         }
     }
@@ -449,7 +451,17 @@ class format_designer extends \core_courseformat\base {
                 ];
             }
 
-            $courseformatoptions = array_merge_recursive($courseformatoptions, $courseformatoptionsedit);
+            // Decorate the options that are still on the edit form, never resurrect one that
+            // the safety net in course_format_options_list() dropped: a bare 'element_type'
+            // with no label is what core's create_edit_form_elements() trips over.
+            // array_merge() rather than array_merge_recursive() so that overriding a scalar
+            // like element_type replaces it instead of turning it into an array of both values.
+            foreach ($courseformatoptionsedit as $name => $editdef) {
+                if (isset($courseformatoptions[$name]) && is_array($courseformatoptions[$name])) {
+                    $courseformatoptions[$name] = array_merge($courseformatoptions[$name], $editdef);
+                }
+            }
+
             // Set designer default options to course config.
             $design = \format_designer\options::get_default_options();
             foreach ($courseformatoptions as $name => $value) {
@@ -579,6 +591,10 @@ class format_designer extends \core_courseformat\base {
                     'default' => get_string('completiontrackingmissing', 'format_designer'),
                     'type' => PARAM_TEXT,
                     'label' => new lang_string('coursecompletiondate', 'format_designer'),
+                    // Declared here so the edit-form safety net below keeps it: this option is
+                    // informational and designer_course_format_options() decides whether it shows
+                    // as static text or is hidden, which happens after that safety net has run.
+                    'element_type' => 'static',
                 ],
                 'timemanagement' => [
                     'default' => '',

@@ -247,8 +247,10 @@ class controlmenu extends controlmenu_base {
             ];
 
             $hassectiontypes = true;
-            if ($course->coursetype == DESIGNER_TYPE_FLOW
-                    || !\format_designer\helper::feature_enabled('sectionactivitylayout')) {
+            if (
+                $course->coursetype == DESIGNER_TYPE_FLOW
+                    || !\format_designer\helper::feature_enabled('sectionactivitylayout')
+            ) {
                 $hassectiontypes = false;
             }
 

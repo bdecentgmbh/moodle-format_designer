@@ -33,7 +33,6 @@ namespace format_designer;
  * Registry of the designer course format major features.
  */
 class features {
-
     /** Feature group: course-wide behaviour. */
     const GROUP_COURSE = 'course';
 
@@ -200,9 +199,11 @@ class features {
         ];
 
         // Let Designer Pro contribute its own feature definitions.
-        if (helper::has_pro()
+        if (
+            helper::has_pro()
                 && class_exists('\local_designer\features')
-                && method_exists('\local_designer\features', 'get_features')) {
+                && method_exists('\local_designer\features', 'get_features')
+        ) {
             $features += \local_designer\features::get_features();
         }
 

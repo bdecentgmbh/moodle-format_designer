@@ -354,39 +354,38 @@ class helper {
      * @return bool
      */
     public static function feature_enabled(string $key): bool {
-        static $cache = [];
-
-        if (array_key_exists($key, $cache)) {
-            return $cache[$key];
-        }
-
+        // Deliberately not memoised per key. has_pro() and timetable_installed() already
+        // cache their own answers, get_config() is request cached by core, and the registry
+        // is a plain array, so there is nothing left to save - while a stale cache would
+        // make the answer survive a set_config() within the same request, which breaks
+        // both the settings page and any test that flips a toggle.
         $features = features::get_features();
 
         // Unknown feature key: treat as enabled (backward compatibility).
         if (!isset($features[$key])) {
-            return $cache[$key] = true;
+            return true;
         }
 
         $def = $features[$key];
 
         // Pro-only feature requires pro to be installed.
         if (!empty($def['pro']) && !self::has_pro()) {
-            return $cache[$key] = false;
+            return false;
         }
 
         // Required dependency component must be installed.
         if (!empty($def['depends'])) {
             if ($def['depends'] === 'format_popups' && !self::popup_installed()) {
-                return $cache[$key] = false;
+                return false;
             }
             if ($def['depends'] === 'tool_timetable' && !self::timetable_installed()) {
-                return $cache[$key] = false;
+                return false;
             }
         }
 
         // Read the admin toggle; unset (=== false) means enabled by default.
         $val = get_config('format_designer', 'feature_' . $key);
-        return $cache[$key] = ($val === false) ? true : (bool) $val;
+        return ($val === false) ? true : (bool) $val;
     }
 
     /**
