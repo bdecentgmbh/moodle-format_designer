@@ -29,6 +29,29 @@ class restore_format_designer_plugin extends restore_format_plugin {
     /** @var int */
     protected $originalnumsections = 0;
 
+    /** @var bool True while a restore is creating the course sections. */
+    protected static $restoringsections = false;
+
+    /**
+     * Is a restore currently creating course sections?
+     *
+     * Section format options travel in the backup file as part of the core section structure and
+     * are written by restore_section_structure_step::process_course_format_options(). That method
+     * deliberately never overwrites an option that already exists for the section. Our
+     * course_section_created observer seeds every new section with the site wide defaults, and it
+     * runs the moment the course_sections record is inserted - which is before core reaches the
+     * <course_format_options> children of the same section. The seeded defaults therefore win and
+     * the values from the backup file are silently dropped.
+     *
+     * The observer asks this method so it can stay out of the way while a restore is running and
+     * let the backed up values through. See DES-950.
+     *
+     * @return bool
+     */
+    public static function is_restoring_sections(): bool {
+        return self::$restoringsections;
+    }
+
     /**
      * Checks if backup file was made on Moodle before 3.3 and we should respect the 'numsections'
      * and potential "orphaned" sections in the end of the course.
@@ -79,6 +102,15 @@ class restore_format_designer_plugin extends restore_format_plugin {
      * Section structure path.
      */
     public function define_section_plugin_structure() {
+        // This runs while the section step builds its path elements, so before any section row is
+        // inserted. Flag the restore so the course_section_created observer does not seed the new
+        // section with the site defaults and shadow the options coming from the backup file.
+        // Only do so when the backup was taken from a designer course, because that is the only
+        // case where core restores designer section options - for a backup of any other format
+        // there is nothing to protect and the observer should keep applying the site defaults.
+        $backupinfo = $this->step->get_task()->get_info();
+        self::$restoringsections = (($backupinfo->original_course_format ?? '') === 'designer');
+
         $paths[] = new restore_path_element('dummy_section', $this->get_pathfor('/dummysection'));
         return $paths;
     }
@@ -172,6 +204,9 @@ class restore_format_designer_plugin extends restore_format_plugin {
      * After section restore add the section related files.
      */
     protected function after_restore_section() {
+        // The section rows for this task are in place, the observer may seed defaults again.
+        self::$restoringsections = false;
+
         if (!PHPUNIT_TEST) {
             $files = \format_designer\options::get_file_areas('section');
             foreach ($files as $file => $component) {

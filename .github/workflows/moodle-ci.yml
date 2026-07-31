@@ -8,8 +8,10 @@ on:
       - main
   pull_request:
 
-# One run per branch, whichever event started it, so a superseded run is cancelled rather
-# than left to finish.
+# One run per branch, whichever event started it. github.head_ref is the source branch on a
+# pull_request and empty on a push, so a pull_request run and a push run for the same branch
+# land in the same group and the newer supersedes the older instead of building the same
+# commit twice.
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
