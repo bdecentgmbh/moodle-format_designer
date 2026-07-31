@@ -106,6 +106,9 @@ class cmname extends \core_courseformat\output\local\content\cm\cmname {
             'useactivityimage' => $useactivityimage,
             'activityname' => $this->get_title_data($output),
             'removecenter' => $removecenter,
+            // Structured icon data used by the core cmname/cmicon partials (rendered by the
+            // 'plain' layout). Designer's own cmname templates ignore this and use 'icon'.
+            'activityicon' => $this->get_icon_data($output),
         ];
 
         // File type after name, for alphabetic lists (screen reader).

@@ -313,7 +313,10 @@ class format_designer extends \core_courseformat\base {
      * @return string
      */
     public function course_header() {
-        if (\format_designer\helper::has_pro() && class_exists('\local_designer\courseheader')) {
+        if (
+            \format_designer\helper::has_pro() && class_exists('\local_designer\courseheader')
+                && \format_designer\helper::feature_enabled('courseheader')
+        ) {
             return local_designer\courseheader::get_header_instance($this);
         }
     }
@@ -331,6 +334,12 @@ class format_designer extends \core_courseformat\base {
         $course = $this->get_course();
         if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
             $page->add_body_class('format-designer-single-section');
+        }
+        // Only let Designer take over the full page width when the course section layout feature
+        // is enabled. By default the course keeps the theme's boxed/centered width, matching the
+        // standard custom sections format.
+        if (\format_designer\helper::feature_enabled('coursesectionlayout')) {
+            $page->add_body_class('format-designer-fullwidth');
         }
         if (\format_designer\helper::has_pro()) {
             // Fetch classes from pro designer and attach them to the body.
@@ -442,7 +451,17 @@ class format_designer extends \core_courseformat\base {
                 ];
             }
 
-            $courseformatoptions = array_merge_recursive($courseformatoptions, $courseformatoptionsedit);
+            // Decorate the options that are still on the edit form, never resurrect one that
+            // the safety net in course_format_options_list() dropped: a bare 'element_type'
+            // with no label is what core's create_edit_form_elements() trips over.
+            // array_merge() rather than array_merge_recursive() so that overriding a scalar
+            // like element_type replaces it instead of turning it into an array of both values.
+            foreach ($courseformatoptionsedit as $name => $editdef) {
+                if (isset($courseformatoptions[$name]) && is_array($courseformatoptions[$name])) {
+                    $courseformatoptions[$name] = array_merge($courseformatoptions[$name], $editdef);
+                }
+            }
+
             // Set designer default options to course config.
             $design = \format_designer\options::get_default_options();
             foreach ($courseformatoptions as $name => $value) {
@@ -572,6 +591,10 @@ class format_designer extends \core_courseformat\base {
                     'default' => get_string('completiontrackingmissing', 'format_designer'),
                     'type' => PARAM_TEXT,
                     'label' => new lang_string('coursecompletiondate', 'format_designer'),
+                    // Declared here so the edit-form safety net below keeps it: this option is
+                    // informational and designer_course_format_options() decides whether it shows
+                    // as static text or is hidden, which happens after that safety net has run.
+                    'element_type' => 'static',
                 ],
                 'timemanagement' => [
                     'default' => '',
@@ -585,6 +608,10 @@ class format_designer extends \core_courseformat\base {
                 'coursestaff' => [
                     'default' => $teacher->id,
                     'type' => PARAM_TEXT,
+                ],
+                'coursestafflayout' => [
+                    'default' => 0,
+                    'type' => PARAM_INT,
                 ],
             ];
 
@@ -743,9 +770,7 @@ class format_designer extends \core_courseformat\base {
                     ],
                     'help' => 'showanimation',
                     'help_component' => 'format_designer',
-                    'disabledif' => [
-                        ['coursetype', 'neq', DESIGNER_TYPE_FLOW],
-                    ],
+                    'hideif' => ['coursetype', 'neq', DESIGNER_TYPE_FLOW],
                 ],
                 'flowsize' => [
                     'label' => new lang_string('flowsize', 'format_designer'),
@@ -759,9 +784,7 @@ class format_designer extends \core_courseformat\base {
                     ],
                     'help' => 'flowsize',
                     'help_component' => 'format_designer',
-                    'disabledif' => [
-                        ['coursetype', 'neq', DESIGNER_TYPE_FLOW],
-                    ],
+                    'hideif' => ['coursetype', 'neq', DESIGNER_TYPE_FLOW],
                 ],
                 'courseheader' => [
                     'label' => new lang_string('courseheader', 'format_designer'),
@@ -856,6 +879,18 @@ class format_designer extends \core_courseformat\base {
                 'help' => 'displayheaderroleusers',
                 'help_component' => 'format_designer',
             ];
+            $courseformatoptionsedit['coursestafflayout'] = [
+                'label' => new lang_string('coursestafflayout', 'format_designer'),
+                'element_type' => 'select',
+                'element_attributes' => [
+                    [
+                        0 => new lang_string('coursestafflayout:carousel', 'format_designer'),
+                        1 => new lang_string('coursestafflayout:compact', 'format_designer'),
+                    ],
+                ],
+                'help' => 'coursestafflayout',
+                'help_component' => 'format_designer',
+            ];
 
             $courseformatoptionsedit['courseheroactivityheader'] = [
                 'label' => new lang_string('heroactivity', 'format_designer'),
@@ -898,6 +933,8 @@ class format_designer extends \core_courseformat\base {
                 'element_attributes' => [$posrange],
                 'help' => 'heroactivitypos',
                 'help_component' => 'format_designer',
+                // The order only matters once the activity is shown as a tab.
+                'hideif' => ['heroactivity', 'eq', 0],
             ];
 
             if (\format_designer\helper::has_pro()) {
@@ -912,7 +949,30 @@ class format_designer extends \core_courseformat\base {
                 // Course fields selectors.
                 $courseformatoptionsedit += local_designer\courseoptions::create($PAGE->course)->course_fields_editlist();
             }
+
+            // Remove edit-form fields belonging to disabled features. We only drop the
+            // edit metadata (the field disappears from the course settings form); the base
+            // persisted option definitions above are untouched, so stored values for already
+            // configured courses survive a disable -> re-enable round trip.
+            foreach (\format_designer\features::disabled_option_keys('courseoptions') as $removekey) {
+                unset($courseformatoptionsedit[$removekey]);
+            }
+
             $courseformatoptions = array_merge_recursive($courseformatoptions, $courseformatoptionsedit);
+
+            // Safety net: any option left without an explicit 'element_type' is a base/persisted
+            // option that has no form representation (its edit metadata was never defined or was
+            // removed because its feature is disabled). Core's create_edit_form_elements() would
+            // otherwise default such an option to a 'text' element and call s() on its value -
+            // which fatals for multi-value options (timemanagement, coursestaff, coursefields,
+            // userfields, ...) whose value is an array. Dropping them from the edit-form definition
+            // hides the field; their stored DB values are preserved because update_format_options()
+            // simply leaves untouched any key that is not in the definition.
+            foreach ($courseformatoptions as $optname => $optdef) {
+                if (!is_array($optdef) || !isset($optdef['element_type'])) {
+                    unset($courseformatoptions[$optname]);
+                }
+            }
         }
         return $courseformatoptions;
     }
@@ -988,10 +1048,18 @@ class format_designer extends \core_courseformat\base {
             }
             if (isset($option['hideif'])) {
                 $hideif = $option['hideif'];
-                if (isset($hideif[1])) {
-                    $hide = (isset($hideif[2]))
-                        ? $mform->hideif($optionname, $hideif[0], $hideif[1], $hideif[2])
-                        : $mform->hideif($optionname, $hideif[0], $hideif[1]);
+                // Support both a single condition ['field', 'op', 'value'] and a list of
+                // conditions [['field', 'op', 'value'], ...]. Multiple conditions are OR-combined
+                // by Moodle (the element is hidden if any condition matches).
+                $conditions = isset($hideif[0]) && is_array($hideif[0]) ? $hideif : [$hideif];
+                foreach ($conditions as $cond) {
+                    if (isset($cond[1])) {
+                        if (isset($cond[2])) {
+                            $mform->hideif($optionname, $cond[0], $cond[1], $cond[2]);
+                        } else {
+                            $mform->hideif($optionname, $cond[0], $cond[1]);
+                        }
+                    }
                 }
             }
             if (isset($option['adv'])) {
@@ -1165,32 +1233,39 @@ class format_designer extends \core_courseformat\base {
         $course = course_get_format($PAGE->course)->get_course();
         $settingspage = ($PAGE->course->id == SITEID);
         if ($settingspage || (isset($course->coursetype) && $course->coursetype != DESIGNER_TYPE_FLOW)) {
-            $lists = [
-                'desktop' => ['size' => 5, 'default' => '2'],
-                'tablet' => ['size' => 3, 'default' => 1],
-                'mobile' => ['size' => 2, 'default' => '2'],
-            ];
-
-            foreach ($lists as $name => $options) {
-                $name = $name . 'width';
-                $availablewidth = array_slice($width, 0, $options['size']);
-                $widthdefaultvalue = get_config('format_designer', $name);
-                $sectionoptions[$name] = [
-                    'default' => (isset($design->$name) ||
-                    (isset($course->coursetype) && $course->coursetype != DESIGNER_TYPE_NORMAL))
-                        ? $widthdefaultvalue : $options['default'],
-                    'type' => PARAM_INT,
-                    'label' => new lang_string($name, 'format_designer'),
-                    'element_type' => 'select',
-                    'element_attributes' => [
-                        $availablewidth,
-                    ],
-                    'help' => $name,
-                    'help_component' => 'format_designer',
+            // The per-section width only has any effect when each section is shown on its own page
+            // (course display = "Show one section per page"); when all sections are on a single page
+            // they always span the full width. So only offer the width settings in that case.
+            $showsectionwidth = $settingspage
+                || (isset($course->coursedisplay) && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE);
+            if ($showsectionwidth) {
+                $lists = [
+                    'desktop' => ['size' => 5, 'default' => '2'],
+                    'tablet' => ['size' => 3, 'default' => 1],
+                    'mobile' => ['size' => 2, 'default' => '2'],
                 ];
-                $adv = $name . '_adv';
-                if (isset($design->$adv) && $design->$adv) {
-                    $sectionoptions[$name]['adv'] = true;
+
+                foreach ($lists as $name => $options) {
+                    $name = $name . 'width';
+                    $availablewidth = array_slice($width, 0, $options['size']);
+                    $widthdefaultvalue = get_config('format_designer', $name);
+                    $sectionoptions[$name] = [
+                        'default' => (isset($design->$name) ||
+                        (isset($course->coursetype) && $course->coursetype != DESIGNER_TYPE_NORMAL))
+                            ? $widthdefaultvalue : $options['default'],
+                        'type' => PARAM_INT,
+                        'label' => new lang_string($name, 'format_designer'),
+                        'element_type' => 'select',
+                        'element_attributes' => [
+                            $availablewidth,
+                        ],
+                        'help' => $name,
+                        'help_component' => 'format_designer',
+                    ];
+                    $adv = $name . '_adv';
+                    if (isset($design->$adv) && $design->$adv) {
+                        $sectionoptions[$name]['adv'] = true;
+                    }
                 }
             }
 
@@ -1202,11 +1277,40 @@ class format_designer extends \core_courseformat\base {
             ];
         }
 
+        // Dash widget embed: let a dashaddon_repository preset render below the
+        // section summary. Only offered when filter_dash is installed (it owns the
+        // reusable renderer + preset list) and at least one preset is embeddable.
+        if (class_exists(\filter_dash\widget_renderer::class)) {
+            $presets = \filter_dash\widget_renderer::list_presets();
+            if (!empty($presets)) {
+                $sectionoptions['dashwidget'] = [
+                    'type' => PARAM_ALPHANUMEXT,
+                    'label' => new lang_string('dashwidget', 'format_designer'),
+                    'element_type' => 'select',
+                    'element_attributes' => [['' => get_string('none')] + $presets],
+                    'default' => '',
+                    'help' => 'dashwidget',
+                    'help_component' => 'format_designer',
+                ];
+            }
+        }
+
         // Include pro feature options for section.
         if (\format_designer\helper::has_pro()) {
             if (class_exists('\local_designer\helper')) {
                 $prosectionoptions = \local_designer\helper::get_pro_section_options($foreditform);
                 $sectionoptions = array_merge($sectionoptions, $prosectionoptions);
+            }
+        }
+
+        // When the course section layout feature is disabled, hide the per-section width/column
+        // fields from the section edit form. The keys are kept (only their element_type changes
+        // to 'hidden') so already stored values are never dropped.
+        if (!\format_designer\helper::feature_enabled('coursesectionlayout')) {
+            foreach (['sectionlayoutheader', 'desktopwidth', 'tabletwidth', 'mobilewidth', 'sectionestimatetime'] as $hidekey) {
+                if (isset($sectionoptions[$hidekey])) {
+                    $sectionoptions[$hidekey]['element_type'] = 'hidden';
+                }
             }
         }
 
@@ -1505,6 +1609,19 @@ class format_designer extends \core_courseformat\base {
         // Time management implode the array to string.
         if (isset($data['timemanagement']) && is_array($data['timemanagement'])) {
             $data['timemanagement'] = implode(',', $data['timemanagement']);
+        }
+
+        // An editor hidden by a hideif submits its 'format' and 'itemid' but not its textarea,
+        // so the value arrives as an array with no 'text' key. Post-processing that dereferences
+        // a missing key and the whole course settings save ends on an exception page; letting it
+        // through instead reaches clean_param(), which refuses arrays. The field was not on
+        // screen, so drop it and leave whatever is stored exactly as it is - update_format_options()
+        // ignores any key that is not in the data.
+        if (
+            isset($data['prerequisiteinfo']) && is_array($data['prerequisiteinfo'])
+                && !array_key_exists('text', $data['prerequisiteinfo'])
+        ) {
+            unset($data['prerequisiteinfo'], $data['prerequisiteinfoformat']);
         }
 
         if (isset($data['prerequisiteinfo']) && is_array($data['prerequisiteinfo'])) {
@@ -1850,6 +1967,36 @@ class format_designer extends \core_courseformat\base {
             $course->timemanagement = is_string($timemanagement) ? explode(',', $timemanagement) : $timemanagement;
         }
 
+        // Normalize options owned by disabled features back to their standard Moodle value so
+        // the course renders as if the feature does not exist, regardless of any previously
+        // stored value. Stored DB values are untouched (this only affects the in-memory copy),
+        // so re-enabling a feature restores its prior behaviour.
+        if (!\format_designer\helper::feature_enabled('coursetype')) {
+            $course->coursetype = DESIGNER_TYPE_NORMAL;
+        }
+        if (!\format_designer\helper::feature_enabled('accordion')) {
+            $course->accordion = 0;
+        }
+        if (!\format_designer\helper::feature_enabled('courseindex')) {
+            $course->courseindex = 0;
+        }
+        if (!\format_designer\helper::feature_enabled('activityprogress')) {
+            $course->activityprogress = 0;
+        }
+        if (!\format_designer\helper::feature_enabled('timemanagement')) {
+            $course->timemanagement = [];
+        }
+        if (!\format_designer\helper::feature_enabled('heroactivity')) {
+            $course->sectionzeroactivities = 0;
+            $course->heroactivity = 0;
+        }
+        if (!\format_designer\helper::feature_enabled('secondarynav')) {
+            $course->secondarymenutocourse = 0;
+        }
+        if (!\format_designer\helper::feature_enabled('popupactivities')) {
+            $course->popupactivities = 0;
+        }
+
         if ($PAGE->pagetype == 'course-edit' && \format_designer\helper::has_pro()) {
             // Update the pro fields course values strucuture, Prepare files.
             local_designer\options::update_structure_get_course($course);
@@ -1944,93 +2091,110 @@ function format_designer_coursemodule_standard_elements($formwrapper, $mform) {
             4 => get_string('remove'),
         ];
 
-        $mform->addElement('header', 'moduledesign', get_string('activitydesign', 'format_designer'));
-        $mform->addElement('html', get_string('activityelementsdisplay', 'format_designer'));
-        foreach ($elements as $element => $defalut) {
-            // Module background image repeat.
-            $name = 'designer_activityelements[' . $element . ']';
-            $title = get_string('activity:' . $element, 'format_designer');
-            $mform->addElement('select', $name, $title, $choice);
-            $mform->setType($name, PARAM_INT);
-            $mform->setDefault($name, $defalut);
-            if (isset($design->activityelements[$element])) {
-                $mform->setDefault($name, $design->activityelements[$element]);
-            }
-            $adv = 'activityelements_' . $element . '_adv';
-            if (isset($designadv->$adv) && $designadv->$adv) {
-                $mform->setAdvanced($name);
+        $activityelementson = \format_designer\helper::feature_enabled('activityelements');
+        $secondarynavon = \format_designer\helper::feature_enabled('secondarynav');
+        // Pro only adds module fields when one of its activity features is enabled.
+        $proaddsmodfields = \format_designer\helper::has_pro()
+            && (\format_designer\helper::feature_enabled('purposes')
+                || \format_designer\helper::feature_enabled('activitybackground'));
+        $haspro = \format_designer\helper::has_pro();
+
+        // The "Activity design" header groups the activity elements, pro module fields and
+        // the secondary menu controls; only show it when at least one of those is available.
+        if ($activityelementson || $secondarynavon || $proaddsmodfields) {
+            $mform->addElement('header', 'moduledesign', get_string('activitydesign', 'format_designer'));
+        }
+
+        if ($activityelementson) {
+            foreach ($elements as $element => $defalut) {
+                // Module background image repeat.
+                $name = 'designer_activityelements[' . $element . ']';
+                $title = get_string('activity:' . $element, 'format_designer');
+                $mform->addElement('select', $name, $title, $choice);
+                $mform->setType($name, PARAM_INT);
+                $mform->setDefault($name, $defalut);
+                if (isset($design->activityelements[$element])) {
+                    $mform->setDefault($name, $design->activityelements[$element]);
+                }
+                $adv = 'activityelements_' . $element . '_adv';
+                if (isset($designadv->$adv) && $designadv->$adv) {
+                    $mform->setAdvanced($name);
+                }
             }
         }
 
         // Include the pro additional module fields.
-        if (\format_designer\helper::has_pro()) {
+        if ($haspro) {
             local_designer_coursemodule_standard_element($formwrapper, $mform);
         }
 
         // Secondary menu.
-        $mform->addElement('html', get_string('secondarymenu', 'format_designer'));
-        $types = [
-            'activitytitle' => get_string('stractivitytitle', 'format_designer'),
-            'activitytype' => get_string('stractivitytype', 'format_designer'),
-            'custom' => get_string('strcustom', 'format_designer'),
-        ];
-        $mform->addElement('select', 'designer_secondarytype', get_string('secondarymeu_title', 'format_designer'), $types);
-        $mform->setType('designer_secondarytype', PARAM_TEXT);
-        if (isset($design->secondarytype)) {
-            $mform->setDefault('designer_secondarytype', $design->secondarytype);
-        }
+        if ($secondarynavon) {
+            $types = [
+                'activitytitle' => get_string('stractivitytitle', 'format_designer'),
+                'activitytype' => get_string('stractivitytype', 'format_designer'),
+                'custom' => get_string('strcustom', 'format_designer'),
+            ];
+            $mform->addElement('select', 'designer_secondarytype', get_string('secondarymeu_title', 'format_designer'), $types);
+            $mform->setType('designer_secondarytype', PARAM_TEXT);
+            if (isset($design->secondarytype)) {
+                $mform->setDefault('designer_secondarytype', $design->secondarytype);
+            }
 
-        $mform->addElement('text', 'designer_secondarycustomtitle', get_string('strcustomtitle', 'format_designer'));
-        $mform->setType('designer_secondarycustomtitle', PARAM_TEXT);
-        if (isset($design->secondarycustomtitle)) {
-            $mform->setDefault('designer_secondarycustomtitle', $design->secondarycustomtitle);
-        }
-        $mform->hideIf('designer_secondarycustomtitle', 'designer_secondarytype', 'eq', 'activitytitle');
-        $mform->hideIf('designer_secondarycustomtitle', 'designer_secondarytype', 'eq', 'activitytype');
+            $mform->addElement('text', 'designer_secondarycustomtitle', get_string('strcustomtitle', 'format_designer'));
+            $mform->setType('designer_secondarycustomtitle', PARAM_TEXT);
+            if (isset($design->secondarycustomtitle)) {
+                $mform->setDefault('designer_secondarycustomtitle', $design->secondarycustomtitle);
+            }
+            $mform->hideIf('designer_secondarycustomtitle', 'designer_secondarytype', 'eq', 'activitytitle');
+            $mform->hideIf('designer_secondarycustomtitle', 'designer_secondarytype', 'eq', 'activitytype');
 
-        $mform->addElement(
-            'advcheckbox',
-            'designer_customtitleusecourseindex',
-            get_string('customnameincourseindex', 'format_designer')
-        );
-        $mform->setType('designer_customtitleusecourseindex', PARAM_INT);
-        if (isset($design->customtitleusecourseindex)) {
-            $mform->setDefault('designer_customtitleusecourseindex', $design->customtitleusecourseindex);
-        }
-        $mform->hideIf('designer_customtitleusecourseindex', 'designer_secondarytype', 'eq', 'activitytitle');
-        $mform->hideIf('designer_customtitleusecourseindex', 'designer_secondarytype', 'eq', 'activitytype');
+            $mform->addElement(
+                'advcheckbox',
+                'designer_customtitleusecourseindex',
+                get_string('customnameincourseindex', 'format_designer')
+            );
+            $mform->setType('designer_customtitleusecourseindex', PARAM_INT);
+            if (isset($design->customtitleusecourseindex)) {
+                $mform->setDefault('designer_customtitleusecourseindex', $design->customtitleusecourseindex);
+            }
+            $mform->hideIf('designer_customtitleusecourseindex', 'designer_secondarytype', 'eq', 'activitytitle');
+            $mform->hideIf('designer_customtitleusecourseindex', 'designer_secondarytype', 'eq', 'activitytype');
 
-        $mform->addElement(
-            'advcheckbox',
-            'designer_customtitleuseactivityitem',
-            get_string('customnameinactivityitem', 'format_designer')
-        );
-        $mform->setType('designer_customtitleuseactivityitem', PARAM_INT);
-        if (isset($design->customtitleuseactivityitem)) {
-            $mform->setDefault('designer_customtitleuseactivityitem', $design->customtitleuseactivityitem);
+            $mform->addElement(
+                'advcheckbox',
+                'designer_customtitleuseactivityitem',
+                get_string('customnameinactivityitem', 'format_designer')
+            );
+            $mform->setType('designer_customtitleuseactivityitem', PARAM_INT);
+            if (isset($design->customtitleuseactivityitem)) {
+                $mform->setDefault('designer_customtitleuseactivityitem', $design->customtitleuseactivityitem);
+            }
+            $mform->hideIf('designer_customtitleuseactivityitem', 'designer_secondarytype', 'eq', 'activitytitle');
+            $mform->hideIf('designer_customtitleuseactivityitem', 'designer_secondarytype', 'eq', 'activitytype');
         }
-        $mform->hideIf('designer_customtitleuseactivityitem', 'designer_secondarytype', 'eq', 'activitytitle');
-        $mform->hideIf('designer_customtitleuseactivityitem', 'designer_secondarytype', 'eq', 'activitytype');
 
         // Show tab.
-        $tabs = [
-            0 => get_string('disabled', 'format_designer'),
-            1 => get_string('everywhere', 'format_designer'),
-            2 => get_string('onlycoursepage', 'format_designer'),
-        ];
-        $mform->addElement('header', 'moduleheroactivity', get_string('heroactivity', 'format_designer'));
-        $mform->addElement('select', 'designer_heroactivity', get_string('showastab', 'format_designer'), $tabs);
-        $mform->setType('designer_heroactivity', PARAM_INT);
-        if (isset($design->heroactivity)) {
-            $mform->setDefault('designer_heroactivity', $design->heroactivity);
-        }
-        $posrange = array_combine(range(-10, 10), range(-10, 10));
-        unset($posrange[0]);
-        $mform->addElement('select', 'designer_heroactivitypos', get_string('order'), $posrange);
-        $mform->setType('designer_heroactivitypos', PARAM_INT);
-        $mform->setDefault('designer_heroactivitypos', 0);
-        if (isset($design->heroactivitypos)) {
-            $mform->setDefault('designer_heroactivitypos', $design->heroactivitypos);
+        if (\format_designer\helper::feature_enabled('heroactivity')) {
+            $tabs = [
+                0 => get_string('disabled', 'format_designer'),
+                1 => get_string('everywhere', 'format_designer'),
+                2 => get_string('onlycoursepage', 'format_designer'),
+            ];
+            $mform->addElement('header', 'moduleheroactivity', get_string('heroactivity', 'format_designer'));
+            $mform->addElement('select', 'designer_heroactivity', get_string('showastab', 'format_designer'), $tabs);
+            $mform->setType('designer_heroactivity', PARAM_INT);
+            if (isset($design->heroactivity)) {
+                $mform->setDefault('designer_heroactivity', $design->heroactivity);
+            }
+            $posrange = array_combine(range(-10, 10), range(-10, 10));
+            unset($posrange[0]);
+            $mform->addElement('select', 'designer_heroactivitypos', get_string('order'), $posrange);
+            $mform->setType('designer_heroactivitypos', PARAM_INT);
+            $mform->setDefault('designer_heroactivitypos', 0);
+            if (isset($design->heroactivitypos)) {
+                $mform->setDefault('designer_heroactivitypos', $design->heroactivitypos);
+            }
         }
     }
 }
@@ -2146,7 +2310,8 @@ function format_designer_extend_navigation_course($navigation, $course, $context
         $secondarymenutocoursecontent .= html_writer::end_tag("li");
 
         if (
-            \format_designer\helper::has_pro() && $course->prerequisitesbackmain
+            \format_designer\helper::has_pro() && \format_designer\helper::feature_enabled('prerequisites')
+            && $course->prerequisitesbackmain
             && $maincourse = \local_designer\helper::is_prerequisites_maincourse($course)
         ) {
             $modbacktomain .= html_writer::start_tag("li", ["data-key" => 'backtomaincourse',
