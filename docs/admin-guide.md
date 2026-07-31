@@ -30,10 +30,16 @@ The page is grouped the way the features are used:
 
 | Group | Covers |
 | --- | --- |
-| Course | Course type, accordion, course index |
-| Section | Section activity layout, course section layout |
-| Activity | Hero activity, activity elements, secondary navigation, popup activities |
-| Course header | Course header, activity progress, time management |
+| Course-wide features | Course type, accordion sections, course index control |
+| Section features | Section activity layouts, course section layout |
+| Activity features | Hero activity, activity elements, secondary navigation, popup activities |
+| Course header features | Course header, activity progress, time management |
+
+Every toggle is named **Enable …**, so it reads as the switch it is. That also keeps
+each toggle's name distinct from the setting it governs: a toggle called "Course
+types" would sit uncomfortably close to the "Course type" setting on the same
+page, and anything matching controls by name — your own scripts, an accessibility
+tool, an automated test — could pick the wrong one.
 
 Designer Pro adds its own features to the same page — course background, section
 background, activity background, prerequisites, purposes. They appear only when
