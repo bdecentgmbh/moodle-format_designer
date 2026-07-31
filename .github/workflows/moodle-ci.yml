@@ -1,13 +1,11 @@
 name: Moodle Plugin CI
 
-# Pushes only build the long lived branches. Feature branches are covered by the
-# pull_request trigger instead, so they run CI once a pull request is open rather
-# than on every push.
+# CI runs on pull requests. Pushes build main only - never a feature branch and never
+# dev - so a branch is built once, when there is a pull request to look at.
 on:
   push:
     branches:
       - main
-      - dev
   pull_request:
 
 # One run per branch, whichever event started it. github.head_ref is the source branch on a
