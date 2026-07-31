@@ -1,6 +1,18 @@
 name: Moodle Plugin CI
 
-on: [push, pull_request]
+# CI runs on pull requests. Pushes build main only - never a feature branch and never
+# dev - so a branch is built once, when there is a pull request to look at.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+# One run per branch, whichever event started it, so a superseded run is cancelled rather
+# than left to finish.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -28,32 +40,20 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Moodle 5.2 is the newest supported branch and needs PHP 8.3 or later.
+          # One job per supported Moodle branch, alternating database and covering the
+          # lowest PHP each branch allows, rather than every combination.
           - php: '8.3'
             moodle-branch: 'MOODLE_502_STABLE'
-            database: 'mariadb'
-          - php: '8.3'
-            moodle-branch: 'MOODLE_502_STABLE'
-            database: 'pgsql'
-          - php: '8.3'
-            moodle-branch: 'MOODLE_501_STABLE'
-            database: 'mariadb'
-          - php: '8.3'
-            moodle-branch: 'MOODLE_501_STABLE'
-            database: 'pgsql'
-          - php: '8.3'
-            moodle-branch: 'MOODLE_500_STABLE'
-            database: 'mariadb'
-          - php: '8.3'
-            moodle-branch: 'MOODLE_500_STABLE'
-            database: 'pgsql'
-          # Moodle 4.5 is the oldest supported branch (LTS) and still allows PHP 8.1/8.2.
-          - php: '8.2'
-            moodle-branch: 'MOODLE_405_STABLE'
             database: 'pgsql'
           - php: '8.2'
-            moodle-branch: 'MOODLE_405_STABLE'
+            moodle-branch: 'MOODLE_501_STABLE'
             database: 'mariadb'
+          - php: '8.2'
+            moodle-branch: 'MOODLE_500_STABLE'
+            database: 'mariadb'
+          - php: '8.1'
+            moodle-branch: 'MOODLE_405_STABLE'
+            database: 'pgsql'
 
     steps:
       - name: Check out repository code
