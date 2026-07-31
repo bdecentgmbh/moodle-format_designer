@@ -501,6 +501,7 @@ class format_designer extends \core_courseformat\base {
     public static function course_format_options_list($foreditform = false) {
         global $CFG, $PAGE;
         static $courseformatoptions = false;
+        static $baseoptions = false;
         $teacher = get_archetype_roles('editingteacher');
         $teacher = reset($teacher);
         $courseformatoptionsedit = [];
@@ -656,6 +657,16 @@ class format_designer extends \core_courseformat\base {
             }
 
             $courseformatoptions += (new local_designer\courseoptions($PAGE->course))->course_background_options_format_list();
+        }
+        // The base definitions and the edit-form decorated ones share this static, and the
+        // edit branch below prunes and decorates it in place. Hand the persisted-definition
+        // callers a pristine copy, or the first edit-form call leaks element_type metadata -
+        // and the pruning - into everything that asks for the plain definitions afterwards.
+        if ($baseoptions === false) {
+            $baseoptions = $courseformatoptions;
+        }
+        if (!$foreditform) {
+            return $baseoptions;
         }
 
         if ($foreditform && !isset($courseformatoptions['coursedisplay']['label'])) {
