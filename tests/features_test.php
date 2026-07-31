@@ -325,6 +325,64 @@ final class features_test extends \advanced_testcase {
     }
 
     /**
+     * course_format_options_list() caches its work in a static, and the edit-form branch
+     * decorates and prunes that array in place. The persisted definitions must never come
+     * back decorated, whatever order the two are asked for in - a pruned definition list
+     * silently drops options from update_format_options() and get_format_options().
+     */
+    public function test_edit_form_definitions_do_not_leak_into_the_persisted_ones(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        // Ask for the edit-form definitions first, then the persisted ones.
+        $edit = \format_designer::course_format_options_list(true);
+        $base = \format_designer::course_format_options_list(false);
+
+        $this->assertArrayHasKey('element_type', $edit['coursetype'], 'The edit form needs element_type');
+        $this->assertArrayNotHasKey(
+            'element_type',
+            $base['coursetype'],
+            'The persisted definitions must not carry edit-form metadata'
+        );
+        $this->assertSame(
+            array_keys($base),
+            array_keys(\format_designer::course_format_options_list(false)),
+            'Repeated calls must return the same persisted definitions'
+        );
+    }
+
+    /**
+     * No two settings on the Designer admin page may have a label that contains another's.
+     * Moodle matches form fields by a label substring, so a toggle called "Course types"
+     * shadows the "Course type" setting and silently swallows what an administrator - or a
+     * Behat step - meant to set on the other one.
+     */
+    public function test_feature_toggle_labels_do_not_shadow_option_labels(): void {
+        $this->resetAfterTest();
+
+        $optionlabels = [];
+        foreach (\format_designer::course_format_options_list(true) as $key => $def) {
+            if (isset($def['label'])) {
+                $optionlabels[$key] = trim((string) $def['label']);
+            }
+        }
+
+        foreach (features::get_features() as $key => $def) {
+            $togglelabel = trim(get_string($def['name'], 'format_designer'));
+            foreach ($optionlabels as $optkey => $optlabel) {
+                if ($optlabel === '' || $optlabel === $togglelabel) {
+                    continue;
+                }
+                $this->assertStringNotContainsString(
+                    $optlabel,
+                    $togglelabel,
+                    "Feature toggle '$key' (\"$togglelabel\") shadows the '$optkey' setting (\"$optlabel\")"
+                );
+            }
+        }
+    }
+
+    /**
      * A hidden editor submits its format and itemid but not its textarea, so the value
      * arrives without a 'text' key. Saving the course settings form must survive that
      * instead of dying on a PHP warning deep in file_postupdate_standard_editor(), and it
