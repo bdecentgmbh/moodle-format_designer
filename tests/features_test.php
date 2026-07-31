@@ -248,6 +248,58 @@ final class features_test extends \advanced_testcase {
     }
 
     /**
+     * Body classes for a page in the given course, optionally an activity page.
+     *
+     * @param int $courseid
+     * @param int|null $cmid
+     * @return string
+     */
+    protected function body_classes_for(int $courseid, ?int $cmid = null): string {
+        $page = new \moodle_page();
+        $page->set_course(get_course($courseid));
+        if ($cmid !== null) {
+            $page->set_cm(get_fast_modinfo($courseid)->get_cm($cmid));
+        }
+        $property = new \ReflectionProperty(\moodle_page::class, '_bodyclasses');
+        $property->setAccessible(true);
+        return implode(' ', array_keys($property->getValue($page)));
+    }
+
+    /**
+     * The course section layout feature decides whether Designer takes the full page width,
+     * and it signals that with the format-designer-fullwidth body class. Designer Pro's hero
+     * header stylesheet keys its full-bleed layout off that class, so it has to be present on
+     * course, section and activity pages alike - and absent when the feature is off, otherwise
+     * a boxed course ends up with its content jammed against the left edge.
+     */
+    public function test_fullwidth_body_class_follows_the_feature(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course(
+            ['format' => 'designer', 'numsections' => 2],
+            ['createsections' => true]
+        );
+        $module = $this->getDataGenerator()->create_module('page', ['course' => $course->id, 'section' => 1]);
+
+        set_config('feature_coursesectionlayout', 1, 'format_designer');
+        $this->assertStringContainsString('format-designer-fullwidth', $this->body_classes_for($course->id));
+        $this->assertStringContainsString(
+            'format-designer-fullwidth',
+            $this->body_classes_for($course->id, $module->cmid),
+            'Activity pages need the class too, or the hero header loses its full-bleed layout'
+        );
+
+        set_config('feature_coursesectionlayout', 0, 'format_designer');
+        $this->assertStringNotContainsString('format-designer-fullwidth', $this->body_classes_for($course->id));
+        $this->assertStringNotContainsString(
+            'format-designer-fullwidth',
+            $this->body_classes_for($course->id, $module->cmid),
+            'With the feature off the theme keeps the boxed width on activity pages as well'
+        );
+    }
+
+    /**
      * A course copied while a feature is switched off must still carry that feature's
      * settings, so switching the feature back on after the copy finds them intact.
      * Feature gating only hides edit-form fields; it must never reach the backup.
