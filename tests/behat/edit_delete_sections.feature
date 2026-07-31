@@ -5,7 +5,12 @@ Feature: Sections can be edited and deleted in designer format
   I need to edit and Delete designer
 
   Background:
-    Given the following "users" exist:
+    # This release ships "Default (custom sections)" as the global section layout, which
+    # renders core's activity markup. These scenarios assert Designer's own markup, so pin
+    # the layout they were written against instead of relying on the shipped default.
+    Given the following config values are set as admin:
+      | sectiontype | default | format_designer |
+    And the following "users" exist:
       | username | firstname | lastname | email            |
       | teacher1 | Teacher   | 1        | teacher1@example.com |
     And the following "courses" exist:

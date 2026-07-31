@@ -82,7 +82,9 @@ jobs:
         env:
           DB: ${{ matrix.database }}
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
-          IGNORE_NAMES: 'section.mustache,section_info.mustache,module_layout_cards.mustache,module_layout_default.mustache,module_layout_list.mustache'
+          # The module layout templates render a bare <li>, which the mustache linter reports
+          # as invalid because it validates each template as a standalone document.
+          IGNORE_NAMES: 'section.mustache,section_info.mustache,module_layout_cards.mustache,module_layout_default.mustache,module_layout_list.mustache,module_layout_plain.mustache'
 
       - name: PHP Lint
         if: ${{ always() }}

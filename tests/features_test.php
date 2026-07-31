@@ -158,12 +158,37 @@ final class features_test extends \advanced_testcase {
         $this->assertContains('initialstate', $features['coursetype']['courseoptions']);
         $this->assertContains('initialstate', $features['accordion']['courseoptions']);
 
-        foreach (array_keys($features) as $key) {
+        // Switch on everything that can be switched on. Pro-only features and features that
+        // need another plugin stay off when that plugin is absent - which is the case on a
+        // plain CI Moodle - so their keys are expected in the stripped list and are excluded
+        // from this assertion.
+        $gated = [];
+        foreach ($features as $key => $def) {
             set_config('feature_' . $key, 1, 'format_designer');
+            if (!helper::feature_enabled($key)) {
+                $gated[] = $key;
+            }
         }
-        $this->assertSame([], features::disabled_option_keys('courseoptions'));
-        $this->assertSame([], features::disabled_option_keys('activityoptions'));
-        $this->assertSame([], features::disabled_option_keys('configkeys'));
+
+        foreach (['courseoptions', 'activityoptions', 'configkeys'] as $type) {
+            $expected = [];
+            foreach ($gated as $key) {
+                $expected = array_merge($expected, $features[$key][$type] ?? []);
+            }
+            // A key another, enabled, feature also claims is never stripped.
+            $enabled = [];
+            foreach ($features as $key => $def) {
+                if (!in_array($key, $gated, true)) {
+                    $enabled = array_merge($enabled, $def[$type] ?? []);
+                }
+            }
+            $expected = array_values(array_diff(array_unique($expected), array_unique($enabled)));
+            sort($expected);
+
+            $actual = features::disabled_option_keys($type);
+            sort($actual);
+            $this->assertSame($expected, $actual, "Unexpected stripped $type");
+        }
     }
 
     /**
