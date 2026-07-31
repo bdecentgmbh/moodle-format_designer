@@ -320,6 +320,10 @@ class format_designer extends \core_courseformat\base {
             // Fetch classes from pro designer and attach them to the body.
             $classes = \local_designer\info::create()->generate_body_classes($course, $this);
             $page->add_body_class($classes);
+
+            // Include the designer pro styles.
+            $styleurl = \local_designer\courseoptions::create($course)->designer_include_style();
+            $page->requires->css($styleurl);
         }
     }
     /**
@@ -1441,8 +1445,18 @@ class format_designer extends \core_courseformat\base {
      */
     public function setup_kanban_layouts($course) {
         global $DB;
-        $sections = $DB->get_records('course_sections', ['course' => $course['id']]);
-        foreach ($sections as $section) {
+        $sectionrs = $DB->get_recordset_sql(
+            <<<'EOT'
+            SELECT
+                id
+            FROM {course_sections}
+            WHERE
+                section <> 0
+                AND course = ?
+            EOT,
+            [ $course['id'] ]
+        );
+        foreach ($sectionrs as $section) {
             if ($section->section == 0) {
                 continue;
             }
@@ -1451,6 +1465,7 @@ class format_designer extends \core_courseformat\base {
             $this->set_section_option($section->id, 'layouttabletcolumn', '1');
             $this->set_section_option($section->id, 'layoutdesktopcolumn', '1');
         }
+        $sectionrs->close();
     }
 
     /**
@@ -2139,12 +2154,19 @@ function format_designer_course_has_videotime($course) {
     global $DB;
     $pluginman = \core_plugin_manager::instance();
     $plugininfo = $pluginman->get_plugin_info('mod_videotime');
-    if (!empty($plugininfo)) {
-        $videotime = $DB->get_record("modules", ['name' => 'videotime']);
-        if ($DB->record_exists('course_modules', ['course' => $course->id, 'module' => $videotime->id])) {
-            return true;
-        }
-    }
+    return !empty($plugininfo) && $DB->record_exists_sql(
+        <<<'EOT'
+        SELECT
+            1
+        FROM {modules} m
+        JOIN {course_modules} cm
+            ON cm.module = m.id
+            AND cm.course = ?
+        WHERE
+            m.name = ?
+        EOT,
+        [ $course->id, 'videotime' ]
+    );
     return false;
 }
 
@@ -2176,12 +2198,6 @@ function format_designer_extend_navigation_course($navigation, $course, $context
         'sectionreturn' => optional_param('section', 0, PARAM_INT),
     ];
     $PAGE->requires->js_call_amd('format_designer/designer_section', 'init', $jsparams);
-
-    if (format_designer_has_pro()) {
-        // Include the designer pro styles.
-        $styleurl = \local_designer\courseoptions::create($course)->designer_include_style();
-        $PAGE->requires->css($styleurl);
-    }
 
     $isaddsecondary = ($navigation->children->count() <= 1 && $PAGE->context->contextlevel == CONTEXT_MODULE) &&
         (format_designer_course_has_heroactivity($course) || $course->secondarymenutocourse);

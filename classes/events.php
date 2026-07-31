@@ -128,10 +128,19 @@ class events {
         }
         self::course_user_cache_updated($courseid, $userid);
         // Related the course data cache deleted.
-        $records = $DB->get_records('course_completion_criteria', ['courseinstance' => $courseid]);
-        foreach ($records as $record) {
+        $recordrs = $DB->get_recordset_sql(
+            <<<'EOT'
+            SELECT DISTINCT course
+            FROM {course_completion_criteria}
+            WHERE
+                courseinstance = ?
+            EOT,
+            [ $courseid ]
+        );
+        foreach ($recordrs as $record) {
             self::course_user_cache_updated($record->course, $userid);
         }
+        $recordrs->close();
     }
 
     /**
