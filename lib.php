@@ -1611,6 +1611,19 @@ class format_designer extends \core_courseformat\base {
             $data['timemanagement'] = implode(',', $data['timemanagement']);
         }
 
+        // An editor hidden by a hideif submits its 'format' and 'itemid' but not its textarea,
+        // so the value arrives as an array with no 'text' key. Post-processing that dereferences
+        // a missing key and the whole course settings save ends on an exception page; letting it
+        // through instead reaches clean_param(), which refuses arrays. The field was not on
+        // screen, so drop it and leave whatever is stored exactly as it is - update_format_options()
+        // ignores any key that is not in the data.
+        if (
+            isset($data['prerequisiteinfo']) && is_array($data['prerequisiteinfo'])
+                && !array_key_exists('text', $data['prerequisiteinfo'])
+        ) {
+            unset($data['prerequisiteinfo'], $data['prerequisiteinfoformat']);
+        }
+
         if (isset($data['prerequisiteinfo']) && is_array($data['prerequisiteinfo'])) {
             $editoroptions = ['maxfiles' => -1, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false,
                 'noclean' => true,

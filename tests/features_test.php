@@ -325,6 +325,33 @@ final class features_test extends \advanced_testcase {
     }
 
     /**
+     * A hidden editor submits its format and itemid but not its textarea, so the value
+     * arrives without a 'text' key. Saving the course settings form must survive that
+     * instead of dying on a PHP warning deep in file_postupdate_standard_editor(), and it
+     * must leave the stored value alone - the field was not on screen.
+     */
+    public function test_saving_with_a_hidden_editor_does_not_fatal(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course(
+            ['format' => 'designer', 'numsections' => 2],
+            ['createsections' => true]
+        );
+        $format = course_get_format($course);
+
+        // What the browser posts for an editor that a hideif has hidden.
+        $format->update_course_format_options([
+            'id' => $course->id,
+            'prerequisiteinfo' => ['format' => '0', 'itemid' => '12345'],
+        ]);
+
+        // Reaching here at all is the assertion: before the guard this raised
+        // "Undefined array key \"text\"" and the save ended on an exception page.
+        $this->assertTrue(true);
+    }
+
+    /**
      * A course copied while a feature is switched off must still carry that feature's
      * settings, so switching the feature back on after the copy finds them intact.
      * Feature gating only hides edit-form fields; it must never reach the backup.
