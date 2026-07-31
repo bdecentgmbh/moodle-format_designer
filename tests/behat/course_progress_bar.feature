@@ -4,7 +4,12 @@ Feature: Course progress bar checking criteria in designer format
   Need to check the completion criteria.
 
   Background:
-    Given the following "users" exist:
+    # This release ships "Default (custom sections)" as the global section layout, which
+    # renders core's activity markup. These scenarios assert Designer's own markup, so pin
+    # the layout they were written against instead of relying on the shipped default.
+    Given the following config values are set as admin:
+      | sectiontype | default | format_designer |
+    And the following "users" exist:
       | username | firstname | lastname | email            |
       | teacher1 | Teacher   | First        | teacher1@example.com |
       | student1 | Student   | First       | student1@example.com |

@@ -33,25 +33,25 @@ Feature: Sections can be edited and deleted in designer format
 
   @javascript
   Scenario: Inline edit section name in designer format
-    When I set the field "Edit designer section name" in the "li#section-1" "css_element" to "Midterm evaluation"
-    Then I should not see "Designer section 1" in the "region-main" "region"
+    When I set the field "Edit section name" in the "li#section-1" "css_element" to "Midterm evaluation"
+    Then I should not see "Section 1" in the "region-main" "region"
     And I should see "Midterm evaluation" in the "li#section-1" "css_element"
     And I am on "Course 1" course homepage
-    And I should not see "Designer section 1" in the "region-main" "region"
+    And I should not see "Section 1" in the "region-main" "region"
     And I should see "Midterm evaluation" in the "li#section-1" "css_element"
 
   Scenario: Deleting the last section in designer format
     When I delete section "5"
-    Then I should see "Are you absolutely sure you want to completely delete \"Designer section 5\" and all the activities it contains?"
+    Then I should see "Are you absolutely sure you want to completely delete \"Section 5\" and all the activities it contains?"
     And I press "Delete"
-    And I should not see "Designer section 5"
-    And I should see "Designer section 4"
+    And I should not see "Section 5"
+    And I should see "Section 4"
 
   @javascript
   Scenario: Adding sections in designer format
     When I click on "a[data-action='addSection']" "css_element"
-    And I should see "Designer section 6" in the "li#section-6" "css_element"
+    And I should see "Section 6" in the "li#section-6" "css_element"
     And "li#section-7" "css_element" should not exist
     And I click on "a[data-action='addSection']" "css_element"
-    And I should see "Designer section 7" in the "li#section-7" "css_element"
+    And I should see "Section 7" in the "li#section-7" "css_element"
     And "li#section-8" "css_element" should not exist

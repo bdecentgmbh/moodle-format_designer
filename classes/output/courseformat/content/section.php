@@ -90,6 +90,17 @@ class section extends \core_courseformat\output\local\content\section {
         }
         $data = (object) array_merge((array) $data, $formatdata);
 
+        // Embedded Dash widget: render the selected dashaddon_repository preset
+        // below the section summary. The 'dashwidget' section option is only
+        // present when filter_dash is installed (see section_format_options_list).
+        $shortname = $section->dashwidget ?? '';
+        if ($shortname !== '' && class_exists(\filter_dash\widget_renderer::class)) {
+            $data->dashwidgethtml = \filter_dash\widget_renderer::render(
+                $shortname,
+                context_course::instance($format->get_course()->id)
+            );
+        }
+
         return true;
     }
 

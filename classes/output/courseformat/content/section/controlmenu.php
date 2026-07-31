@@ -109,6 +109,7 @@ class controlmenu extends controlmenu_base {
         if (
             ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && !$sectionnum)
             || $course->coursetype == DESIGNER_TYPE_FLOW
+            || !\format_designer\helper::feature_enabled('sectionactivitylayout')
         ) {
             $hassectiontypes = false;
         }
@@ -121,7 +122,8 @@ class controlmenu extends controlmenu_base {
 
         // Convert control array into an action_menu.
         $menu = new action_menu();
-        $menu->set_menu_trigger(get_string('edit'));
+        // Use the core kebab (three-dots, round backdrop) trigger instead of an "Edit" text link.
+        $menu->set_kebab_trigger(get_string('edit'));
         $menu->attributes['class'] .= ' section-actions';
         foreach ($controls as $key => $value) {
             if ($key == 'sectionlayout') {
@@ -144,12 +146,19 @@ class controlmenu extends controlmenu_base {
 
         $sectiontypes = [];
         if (!\format_designer\helper::is_support_subpanel()) {
+            $currentsectiontype = $this->format->get_section_option($section->id, 'sectiontype')
+                ?: get_config('format_designer', 'sectiontype');
             $sectiontypes = [
+                [
+                    'type' => 'plain',
+                    'name' => get_string('plain', 'format_designer'),
+                    'active' => $currentsectiontype == 'plain',
+                    'url' => new moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $section->section),
+                ],
                 [
                     'type' => 'default',
                     'name' => get_string('link', 'format_designer'),
-                    'active' => empty($this->format->get_section_option($section->id, 'sectiontype'))
-                        || $this->format->get_section_option($section->id, 'sectiontype') == 'default',
+                    'active' => $currentsectiontype == 'default',
                     'url' => new moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $section->section),
                 ],
                 [
@@ -238,7 +247,10 @@ class controlmenu extends controlmenu_base {
             ];
 
             $hassectiontypes = true;
-            if ($course->coursetype == DESIGNER_TYPE_FLOW) {
+            if (
+                $course->coursetype == DESIGNER_TYPE_FLOW
+                    || !\format_designer\helper::feature_enabled('sectionactivitylayout')
+            ) {
                 $hassectiontypes = false;
             }
 
@@ -463,6 +475,7 @@ class controlmenu extends controlmenu_base {
         $choice = new choicelist();
 
         $lists = [
+            'plain' => get_string('plain', 'format_designer'),
             'default' => get_string('link', 'format_designer'),
             'list' => get_string('list', 'format_designer'),
             'cards' => get_string('cards', 'format_designer'),

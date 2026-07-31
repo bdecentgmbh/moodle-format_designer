@@ -100,7 +100,16 @@ class cmlist extends \core_courseformat\output\local\content\section\cmlist {
 
         $sectionlayoutclass = 'link-layout';
         $sectiontype = $this->format->get_section_option($section->id, 'sectiontype') ?: 'default';
-        if ($sectiontype == 'list') {
+
+        // When the section activity layout feature is disabled, force the plain (core
+        // custom-sections) layout regardless of any stored layout value.
+        if (!\format_designer\helper::feature_enabled('sectionactivitylayout')) {
+            $sectiontype = 'plain';
+        }
+
+        if ($sectiontype == 'plain') {
+            $sectionlayoutclass = '';
+        } else if ($sectiontype == 'list') {
             $sectionlayoutclass = "list-layout";
         } else if ($sectiontype == 'cards') {
             $sectionlayoutclass = 'card-layout';
