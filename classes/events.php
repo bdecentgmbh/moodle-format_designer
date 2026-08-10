@@ -34,6 +34,14 @@ require_once($CFG->dirroot . "/course/format/designer/lib.php");
  */
 class events {
     /**
+     * Maintains a flag to indicate that a course restore is in progress.
+     * This is used to prevent the course_section_created observer from overwriting incoming section values with plugin defaults.
+     *
+     * @var bool
+     */
+    public static $restoreinprogress = false;
+
+    /**
      * After new section created, section format options are not added to the DB.
      * Observe the section creation and add global format options to section in dB.
      *
@@ -66,10 +74,7 @@ class events {
                 $sectiondata[$name] = get_config('format_designer', $name);
             }
         }
-        if (
-            !defined('NO_OUTPUT_BUFFERING') || (defined('NO_OUTPUT_BUFFERING') && !NO_OUTPUT_BUFFERING)
-            && (!defined('AJAX_SCRIPT') || AJAX_SCRIPT == '0')
-        ) {
+        if (!self::$restoreinprogress) {
             $format->update_section_format_options($sectiondata);
         }
     }
