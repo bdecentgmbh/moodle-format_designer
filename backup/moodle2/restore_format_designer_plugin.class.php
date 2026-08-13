@@ -49,6 +49,10 @@ class restore_format_designer_plugin extends restore_format_plugin {
     public function define_course_plugin_structure() {
         global $DB;
 
+        // Mark a designer restore as in progress for the duration of this course restore.
+        // This prevents the course_section_created observer from overwriting incoming section values with plugin defaults.
+        \format_designer\events::$restoreinprogress = true;
+
         // Since this method is executed before the restore we can do some pre-checks here.
         // In case of merging backup into existing course find the current number of sections.
         $target = $this->step->get_task()->get_target();
@@ -122,6 +126,10 @@ class restore_format_designer_plugin extends restore_format_plugin {
      */
     public function after_restore_course() {
         global $DB;
+
+        // Restore is finished for this course; re-enable the observer's default-filling behaviour
+        // for any subsequent, genuinely new sections a user creates.
+        \format_designer\events::$restoreinprogress = false;
 
         if (!$this->need_restore_numsections()) {
             // Backup file was made in Moodle 3.3 or later, we don't need to process 'numsecitons'.
