@@ -93,10 +93,17 @@ class section extends \core_courseformat\output\local\content\section {
         // Embedded Dash widget: render the repository preset selected for this
         // section (the 'dashwidget' option) below the section summary. Delegated
         // to dashaddon_repository's embedder, which owns block-less rendering.
+        //
+        // The embedder deliberately applies no allowlist of its own and leaves the
+        // check to whoever exposes preset selection to authors, as filter_dash does.
+        // It matters here: set_section_options() writes any option value straight to
+        // the database with no validation, so the stored shortname is not limited to
+        // what the section form offered, and a preset can lose its embed flag after
+        // it was chosen.
         if (class_exists(\dashaddon_repository\embedder::class)) {
             $options = $format->get_format_options($section);
             $shortname = $options['dashwidget'] ?? '';
-            if ($shortname !== '') {
+            if ($shortname !== '' && \dashaddon_repository\item_registry::is_embeddable($shortname)) {
                 $data->dashwidgethtml = \dashaddon_repository\embedder::render(
                     $shortname,
                     context_course::instance($format->get_course()->id)

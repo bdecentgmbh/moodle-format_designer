@@ -1219,23 +1219,33 @@ class format_designer extends \core_courseformat\base {
             ];
         }
 
+        // Include pro feature options for section.
+        if (\format_designer\helper::has_pro()) {
+            if (class_exists('\local_designer\helper')) {
+                $prosectionoptions = \local_designer\helper::get_pro_section_options($foreditform);
+                $sectionoptions = array_merge($sectionoptions, $prosectionoptions);
+            }
+        }
+
         // Dash widget embed — render a Dash Content Repository preset below this
         // section. Presented in its own settings section and only when the
         // repository addon is installed; depends on dashaddon_repository (not on
         // filter_dash), which owns the block-less render path.
+        //
+        // Added last on purpose: a header element owns every option that follows it
+        // until the next header, so anything appended after this one would be filed
+        // under "Dash widget" on the section form. The pro options above open with
+        // headerless entries that belong to "Section layouts".
         if (class_exists(\dashaddon_repository\embedder::class)) {
-            global $PAGE;
-            // Author-time role gating: only offer presets the current user may
-            // embed in this course. Fall back to all embeddable presets when no
-            // course context is available (e.g. backup/restore option lookup).
-            $coursecontext = (!empty($PAGE->context) && $PAGE->context->get_course_context(false))
-                ? $PAGE->context->get_course_context(false)
-                : null;
-            $dashpresets = \dashaddon_repository\embedder::list_presets($coursecontext);
-            $canmanagedash = has_capability('dashaddon/repository:manage', \context_system::instance());
-            // Show the section when there is something to pick, or so a manager can
-            // jump to the repository to enable presets.
-            if (!empty($dashpresets) || $canmanagedash) {
+            $dashchoices = self::dashwidget_choices($course);
+            // The link is presentational, stores nothing, and only makes sense on the
+            // form, so it is the one element allowed to depend on the current user.
+            $canmanagedash = $foreditform
+                && has_capability('dashaddon/repository:manage', \context_system::instance());
+            // Nothing to pick and nothing already picked: no reason to show the
+            // section at all. Note this asks about site state, never about the
+            // viewer — see dashwidget_choices() for why that distinction matters.
+            if (count($dashchoices) > 1 || $canmanagedash) {
                 $sectionoptions['dashwidgetheader'] = [
                     'type' => PARAM_TEXT,
                     'element_type' => 'header',
@@ -1246,7 +1256,7 @@ class format_designer extends \core_courseformat\base {
                     'type' => PARAM_ALPHANUMEXT,
                     'label' => new lang_string('dashwidget', 'format_designer'),
                     'element_type' => 'select',
-                    'element_attributes' => [['' => get_string('none')] + $dashpresets],
+                    'element_attributes' => [$dashchoices],
                     'default' => '',
                     'help' => 'dashwidget',
                     'help_component' => 'format_designer',
@@ -1266,18 +1276,55 @@ class format_designer extends \core_courseformat\base {
             }
         }
 
-        // Include pro feature options for section.
-        if (\format_designer\helper::has_pro()) {
-            if (class_exists('\local_designer\helper')) {
-                $prosectionoptions = \local_designer\helper::get_pro_section_options($foreditform);
-                $sectionoptions = array_merge($sectionoptions, $prosectionoptions);
-            }
-        }
-
         $cachedoptions[$cachekey] = $sectionoptions;
         return $sectionoptions;
     }
 
+    /**
+     * Choices offered by the per-section Dash widget selector.
+     *
+     * The presets currently enabled for embedding, plus any value already stored on a
+     * section of this course that is no longer among them.
+     *
+     * Both halves matter. The list must not depend on who is asking: an option that
+     * exists only for some users is missing from get_format_options() for everyone
+     * else — so the widget would not render for the students it is meant for — and
+     * duplicate_section() copies only the options defined for the user duplicating.
+     * And an admin disabling a preset must not cost a course its setting:
+     * validate_format_options() discards a select value that is not among the
+     * choices, so a stored value left out here is wiped the next time anyone saves
+     * that section, for any unrelated reason.
+     *
+     * Keeping such a value costs nothing, because it does not grant rendering — the
+     * render path checks is_embeddable() on its own.
+     *
+     * @param stdClass $course course the section belongs to.
+     * @return array shortname => name, including the empty "none" choice.
+     */
+    protected static function dashwidget_choices($course) {
+        global $DB;
+
+        $choices = ['' => get_string('none')] + \dashaddon_repository\embedder::list_presets();
+
+        if (empty($course->id) || $course->id == SITEID) {
+            // Site defaults page: no sections, so nothing can have been stored.
+            return $choices;
+        }
+
+        $stored = $DB->get_fieldset_select(
+            'course_format_options',
+            'DISTINCT value',
+            'courseid = :courseid AND format = :format AND name = :name',
+            ['courseid' => $course->id, 'format' => 'designer', 'name' => 'dashwidget']
+        );
+        foreach ($stored as $shortname) {
+            if ($shortname !== '' && $shortname !== null && !isset($choices[$shortname])) {
+                $choices[$shortname] = get_string('dashwidgetunavailable', 'format_designer', $shortname);
+            }
+        }
+
+        return $choices;
+    }
 
     /**
      * Duplicate a section

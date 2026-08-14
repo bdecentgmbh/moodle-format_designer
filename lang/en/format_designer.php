@@ -216,9 +216,12 @@ $string['currentsection'] = 'This designer section';
 $string['customnameinactivityitem'] = "Use custom name on course/section pages";
 $string['customnameincourseindex'] = "Use custom name in course index";
 $string['dashwidget'] = 'Repository preset';
-$string['dashwidget_help'] = 'Select a Dash Content Repository preset to display below this section. Only presets that have been enabled for embedding are listed.';
+$string['dashwidget_help'] = 'Select a Dash Content Repository preset to display below this section. Only presets that have been enabled for embedding are listed.
+
+A preset that has since had embedding switched off stays selectable here while this course still uses it, so the setting is not lost, but it is not displayed until embedding is enabled for it again.';
 $string['dashwidgetheader'] = 'Dash widget';
 $string['dashwidgetmanage'] = 'Manage repository presets';
+$string['dashwidgetunavailable'] = '{$a} (no longer available for embedding)';
 $string['dateformat'] = 'Date format';
 $string['dateformat_help'] = 'Date format for completion info (e.g. Complete by x date)';
 $string['delete_purpose'] = "Delete purpose";
