@@ -51,6 +51,25 @@ final class lib_test extends \advanced_testcase {
     }
 
     /**
+     * A section layout without a template, e.g. a pro layout after the pro plugin was removed, falls back to
+     * the default layout template instead of crashing the course page.
+     *
+     * @covers \format_designer\output\renderer::is_template_exists
+     */
+    public function test_is_template_exists_falls_back_to_default_layout(): void {
+        global $PAGE;
+        $renderer = $PAGE->get_renderer('format_designer');
+
+        $existing = 'format_designer/layout/section_layout_cards';
+        $this->assertEquals($existing, $renderer->is_template_exists($existing));
+
+        $fallback = $renderer->is_template_exists('layouts_missing/layout/section_layout_missing');
+        $this->assertDebuggingCalled();
+        $this->assertEquals('format_designer/layout/section_layout_default', $fallback);
+        $this->assertStringContainsString('designer-section-content', $renderer->render_from_template($fallback, []));
+    }
+
+    /**
      * Tests for format_designer::get_section_name method with default section names.
      * @covers ::get_section_name
      * @return void
