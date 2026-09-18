@@ -131,6 +131,17 @@ if ($ADMIN->fulltree) {
     $setting = new admin_setting_configselect($name, $title, $description, 'default', \format_designer\helper::get_all_layouts());
     $sectionpage->add($setting);
 
+    // Card width - DES-955: whether the cards of a short row grow to fill it or keep their column width.
+    $name = 'format_designer/cardwidth';
+    $title = get_string('cardwidth', 'format_designer');
+    $description = get_string('cardwidth_desc', 'format_designer');
+    $choices = [
+        'fill' => get_string('cardwidth_fill', 'format_designer'),
+        'column' => get_string('cardwidth_column', 'format_designer'),
+    ];
+    $setting = new admin_setting_configselect($name, $title, $description, 'fill', $choices);
+    $sectionpage->add($setting);
+
 
     $activitypage = new admin_settingpage('format_designer_activity', get_string('stractivity', 'format_designer'));
 
