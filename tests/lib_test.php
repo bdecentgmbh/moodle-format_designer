@@ -75,6 +75,8 @@ final class lib_test extends \advanced_testcase {
      * @covers ::format_designer_settings
      */
     public function test_card_width_setting(): void {
+        global $CFG;
+        require_once($CFG->libdir . '/adminlib.php');
         $this->setAdminUser();
         $page = admin_get_root(true, true)->locate('formatsettingdesigner');
         $setting = $page->settings->cardwidth;
