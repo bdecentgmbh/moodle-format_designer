@@ -332,6 +332,9 @@ class format_designer extends \core_courseformat\base {
         if ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
             $page->add_body_class('format-designer-single-section');
         }
+        if (get_config('format_designer', 'cardwidth') === 'column') {
+            $page->add_body_class('format-designer-cards-keep-width');
+        }
         if (\format_designer\helper::has_pro()) {
             // Fetch classes from pro designer and attach them to the body.
             $classes = \local_designer\info::create()->generate_body_classes($course, $this);

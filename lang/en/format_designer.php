@@ -80,6 +80,10 @@ $string['calltoactionview'] = 'Review {$a} <i class="fa fa-angle-double-right"><
 $string['calsectionprogress'] = "Calculation of section progress";
 $string['calsectionprogress_help'] = "<b> Relevant activities: </b>progress shall include only activities that are conditions for course completion.<br><b> All activities: </b> progress shall include all activities that have completion tracking configured.<br>";
 $string['cards'] = "Cards";
+$string['cardwidth'] = 'Card width';
+$string['cardwidth_column'] = 'Keep the column width';
+$string['cardwidth_desc'] = 'How the Cards and Image cards layouts size the cards of a row that holds fewer activities than the section has columns. "Fill the row" stretches them across the free space. "Keep the column width" leaves the free space empty so every card has the same width.';
+$string['cardwidth_fill'] = 'Fill the row';
 $string['categoriseheader'] = "Section type";
 $string['centerbottom'] = "Center Bottom";
 $string['centercenter'] = "Center Center";
