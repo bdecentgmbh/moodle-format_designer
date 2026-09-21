@@ -284,6 +284,7 @@ $string['hideoncourses'] = 'Hide on course pages';
 $string['hideonhover'] = 'Hide on hover';
 $string['hidesectiontitle'] = "Hide section title";
 $string['horizontal_circles'] = 'Horizontal Circles';
+$string['image_card'] = 'Image cards';
 $string['initial'] = "Initial";
 $string['initialstate'] = 'Initial State';
 $string['kanbanboard'] = 'Kanban Board';
