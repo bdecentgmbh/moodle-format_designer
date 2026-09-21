@@ -51,6 +51,60 @@ final class lib_test extends \advanced_testcase {
     }
 
     /**
+     * A section layout without a template, e.g. a pro layout after the pro plugin was removed, falls back to
+     * the default layout template instead of crashing the course page.
+     *
+     * @covers \format_designer\output\renderer::is_template_exists
+     */
+    public function test_is_template_exists_falls_back_to_default_layout(): void {
+        global $PAGE;
+        $renderer = $PAGE->get_renderer('format_designer');
+
+        $existing = 'format_designer/layout/section_layout_cards';
+        $this->assertEquals($existing, $renderer->is_template_exists($existing));
+
+        $fallback = $renderer->is_template_exists('layouts_missing/layout/section_layout_missing');
+        $this->assertDebuggingCalled();
+        $this->assertEquals('format_designer/layout/section_layout_default', $fallback);
+        $this->assertStringContainsString('designer-section-content', $renderer->render_from_template($fallback, []));
+    }
+
+    /**
+     * The card width setting offers "fill the row" (the default) and "keep the column width".
+     *
+     * @covers ::format_designer_settings
+     */
+    public function test_card_width_setting(): void {
+        global $CFG;
+        require_once($CFG->libdir . '/adminlib.php');
+        $this->setAdminUser();
+        $page = admin_get_root(true, true)->locate('formatsettingdesigner');
+        $setting = $page->settings->cardwidth;
+
+        $this->assertInstanceOf(\admin_setting_configselect::class, $setting);
+        $this->assertEquals(['fill', 'column'], array_keys($setting->choices));
+        $this->assertEquals('fill', $setting->defaultsetting);
+    }
+
+    /**
+     * Course pages get a body class only when cards are set to keep their column width.
+     *
+     * @covers \format_designer::page_set_course
+     */
+    public function test_card_width_body_class(): void {
+        $course = $this->getDataGenerator()->create_course(['format' => 'designer']);
+
+        $page = new \moodle_page();
+        $page->set_course($course);
+        $this->assertStringNotContainsString('format-designer-cards-keep-width', $page->bodyclasses);
+
+        set_config('cardwidth', 'column', 'format_designer');
+        $page = new \moodle_page();
+        $page->set_course($course);
+        $this->assertStringContainsString('format-designer-cards-keep-width', $page->bodyclasses);
+    }
+
+    /**
      * Tests for format_designer::get_section_name method with default section names.
      * @covers ::get_section_name
      * @return void

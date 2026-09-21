@@ -938,7 +938,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             $this->get_mustache()->loadTemplate($templatename);
         } catch (\Exception $exception) {
             debugging('Missing section mustache template: ' . $templatename);
-            $templatename = 'format_designer/section_layout_default';
+            $templatename = 'format_designer/layout/section_layout_default';
         }
         return $templatename;
     }

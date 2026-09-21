@@ -1,6 +1,6 @@
 name: Moodle Plugin CI
 
-on: [push, pull_request]
+on: pull_request
 
 jobs:
   test:
@@ -28,6 +28,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - php: '8.3'
+            moodle-branch: 'MOODLE_502_STABLE'
+            database: 'mariadb'
+          - php: '8.3'
+            moodle-branch: 'MOODLE_502_STABLE'
+            database: 'pgsql'
           - php: '8.3'
             moodle-branch: 'MOODLE_501_STABLE'
             database: 'mariadb'
