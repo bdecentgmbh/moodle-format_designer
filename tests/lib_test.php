@@ -70,6 +70,41 @@ final class lib_test extends \advanced_testcase {
     }
 
     /**
+     * The card width setting offers "fill the row" (the default) and "keep the column width".
+     *
+     * @covers ::format_designer_settings
+     */
+    public function test_card_width_setting(): void {
+        global $CFG;
+        require_once($CFG->libdir . '/adminlib.php');
+        $this->setAdminUser();
+        $page = admin_get_root(true, true)->locate('formatsettingdesigner');
+        $setting = $page->settings->cardwidth;
+
+        $this->assertInstanceOf(\admin_setting_configselect::class, $setting);
+        $this->assertEquals(['fill', 'column'], array_keys($setting->choices));
+        $this->assertEquals('fill', $setting->defaultsetting);
+    }
+
+    /**
+     * Course pages get a body class only when cards are set to keep their column width.
+     *
+     * @covers \format_designer::page_set_course
+     */
+    public function test_card_width_body_class(): void {
+        $course = $this->getDataGenerator()->create_course(['format' => 'designer']);
+
+        $page = new \moodle_page();
+        $page->set_course($course);
+        $this->assertStringNotContainsString('format-designer-cards-keep-width', $page->bodyclasses);
+
+        set_config('cardwidth', 'column', 'format_designer');
+        $page = new \moodle_page();
+        $page->set_course($course);
+        $this->assertStringContainsString('format-designer-cards-keep-width', $page->bodyclasses);
+    }
+
+    /**
      * Tests for format_designer::get_section_name method with default section names.
      * @covers ::get_section_name
      * @return void
