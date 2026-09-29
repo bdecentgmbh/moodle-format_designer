@@ -93,6 +93,7 @@ class cmname extends \core_courseformat\output\local\content\cm\cmname {
         }
         $sectiontype = $sectiontypecache[$mod->section];
         $removecenter = ($sectiontype == 'default') ? true : false;
+        $activitybadgedata = $mod->get_activitybadge($output);
         $data = (object)[
             'url' => ($mod->modname == 'videotime') ? new moodle_url('/mod/videotime/view.php', ['id' => $mod->id]) : $mod->url,
             'instancename' => ($mod->modname == 'videotime') ? $mod->name : $mod->get_formatted_name(),
@@ -106,6 +107,7 @@ class cmname extends \core_courseformat\output\local\content\cm\cmname {
             'useactivityimage' => $useactivityimage,
             'activityname' => $this->get_title_data($output),
             'removecenter' => $removecenter,
+            'activitybadge' => $activitybadgedata ?: null,
         ];
 
         // File type after name, for alphabetic lists (screen reader).
