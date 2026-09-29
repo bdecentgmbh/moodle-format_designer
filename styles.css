@@ -1225,6 +1225,11 @@ span.section-collapse-icon:before {
     position: relative;
     flex: auto;
 }
+/* Card width setting "Keep the column width": the cards of a short row stay at their column width
+   instead of growing (flex: auto above, flex: 1 0 0% from Bootstrap's card-deck) to fill the row. */
+body.format-designer-cards-keep-width .designer .section .content .section.card-layout li.activity {
+    flex-grow: 0;
+}
 .format-designer .designer .section .content .section.card-layout li.activity.subsection .section {
     min-width: auto;
     max-width: none;
