@@ -450,4 +450,54 @@ final class lib_test extends \advanced_testcase {
         $this->assertEquals(1, $result['completed']);
         $this->assertEquals(50, $result['percent']);
     }
+
+    /**
+     * Course index visibility options with whether the section page shows its own navigation.
+     *
+     * @return array
+     */
+    public static function section_navigation_provider(): array {
+        return [
+            'Course index shown' => [0, false],
+            'Course index hidden on course pages' => [\format_designer::HIDE_ON_COURSEPAGE, true],
+            'Course index hidden everywhere' => [\format_designer::HIDE_EVERYWHERE, true],
+        ];
+    }
+
+    /**
+     * A section page shows the previous and next section links when the course index is hidden.
+     *
+     * @dataProvider section_navigation_provider
+     * @covers \format_designer\output\courseformat\content::export_for_template
+     * @param int $courseindex Course index visibility option.
+     * @param bool $navigation Whether the section page shows the section navigation.
+     * @return void
+     */
+    public function test_single_section_navigation(int $courseindex, bool $navigation): void {
+        global $PAGE;
+
+        $this->setAdminUser();
+        $course = $this->getDataGenerator()->create_course([
+            'format' => 'designer', 'numsections' => 3, 'coursedisplay' => COURSE_DISPLAY_MULTIPAGE,
+            'courseindex' => $courseindex,
+        ]);
+        $format = course_get_format($course);
+        $format->set_sectionid(get_fast_modinfo($course)->get_section_info(2)->id);
+
+        $PAGE = new \moodle_page();
+        $PAGE->set_course($course);
+        $PAGE->set_url('/course/section.php', ['id' => $format->get_sectionid()]);
+        $this->assertTrue($PAGE->theme->usescourseindex);
+
+        $outputclass = $format->get_output_classname('content');
+        $data = (new $outputclass($format))->export_for_template($PAGE->get_renderer('format_designer'));
+
+        $this->assertTrue($data->hasnavigation);
+        $this->assertEquals($navigation, !empty($data->sectionnavigation));
+        $this->assertEquals($navigation, !empty($data->sectionselector));
+        if ($navigation) {
+            $this->assertTrue($data->sectionnavigation->hasprevious);
+            $this->assertTrue($data->sectionnavigation->hasnext);
+        }
+    }
 }
