@@ -70,6 +70,19 @@ class options {
     private static $timetoolcoursecache = [];
 
     /**
+     * Forget the static caches, so unit tests that reuse record ids start without stale options.
+     *
+     * @return void
+     */
+    public static function reset_caches(): void {
+        self::$completionactivitiescache = [];
+        self::$optionspercmid = [];
+        self::$bulkloaded = [];
+        self::$timetoolcache = [];
+        self::$timetoolcoursecache = [];
+    }
+
+    /**
      * Find the given string is JSON format or not.
      *
      * @param string $string
