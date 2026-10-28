@@ -486,9 +486,126 @@ class helper {
     }
 
     /**
-     * Check the video time plugin in designer course format selected courses.
+     * Per-request cache of the Video Time records the course page needs, indexed by course id.
      *
-     * @param object $course Course object.
+     * @var array
+     */
+    protected static $videotimerecords = [];
+
+    /**
+     * Preload, once per request and course, the Video Time related records the course page needs.
+     *
+     * Every Video Time activity on the course page used to fetch its own videotime, videotimeplugin_pro and
+     * videotime_vimeo_video record, i.e. three to four queries per activity. On a course with 100+ videos that is
+     * several hundred queries, and the videotime_vimeo_video lookup by link is not indexed, so on sites with a
+     * large Vimeo library each of those is a full table scan (DES-962). Loading the records for the whole course
+     * in three queries removes that cost. Tables that do not exist (plugin or subplugin not installed) yield
+     * empty arrays.
+     *
+     * @param int $courseid Course id.
+     * @return array ['instances' => [instanceid => videotime record],
+     *                'pro' => [instanceid => videotimeplugin_pro record],
+     *                'vimeo' => [link => videotime_vimeo_video record (id, link, duration)]]
+     */
+    public static function preload_videotime_records(int $courseid): array {
+        global $DB;
+
+        if (isset(self::$videotimerecords[$courseid])) {
+            return self::$videotimerecords[$courseid];
+        }
+
+        $records = ['instances' => [], 'pro' => [], 'vimeo' => []];
+        $dbman = $DB->get_manager();
+
+        if ($dbman->table_exists('videotime')) {
+            $records['instances'] = $DB->get_records('videotime', ['course' => $courseid]);
+        }
+
+        if (!empty($records['instances'])) {
+            [$insql, $params] = $DB->get_in_or_equal(array_keys($records['instances']), SQL_PARAMS_NAMED, 'vt');
+
+            if ($dbman->table_exists('videotimeplugin_pro')) {
+                $prorecords = $DB->get_records_select('videotimeplugin_pro', "videotime $insql", $params);
+                foreach ($prorecords as $prorecord) {
+                    $records['pro'][$prorecord->videotime] = $prorecord;
+                }
+            }
+
+            $links = [];
+            foreach ($records['instances'] as $instance) {
+                if (!empty($instance->vimeo_url)) {
+                    $links[$instance->vimeo_url] = true;
+                }
+            }
+            if (!empty($links) && $dbman->table_exists('videotime_vimeo_video')) {
+                [$linksql, $linkparams] = $DB->get_in_or_equal(array_keys($links), SQL_PARAMS_NAMED, 'lnk');
+                $videos = $DB->get_records_select(
+                    'videotime_vimeo_video',
+                    "link $linksql",
+                    $linkparams,
+                    '',
+                    'id, link, duration'
+                );
+                foreach ($videos as $video) {
+                    $records['vimeo'][$video->link] = $video;
+                }
+            }
+        }
+
+        self::$videotimerecords[$courseid] = $records;
+        return $records;
+    }
+
+    /**
+     * Get the videotime record of an activity from the per-request course cache.
+     *
+     * @param int $courseid Course id.
+     * @param int $instanceid Video Time instance id.
+     * @return stdClass|null
+     */
+    public static function get_videotime_instance(int $courseid, int $instanceid): ?stdClass {
+        return self::preload_videotime_records($courseid)['instances'][$instanceid] ?? null;
+    }
+
+    /**
+     * Get the videotimeplugin_pro record of an activity from the per-request course cache.
+     *
+     * @param int $courseid Course id.
+     * @param int $instanceid Video Time instance id.
+     * @return stdClass|null
+     */
+    public static function get_videotime_pro_record(int $courseid, int $instanceid): ?stdClass {
+        return self::preload_videotime_records($courseid)['pro'][$instanceid] ?? null;
+    }
+
+    /**
+     * Get the Vimeo library record (id, link, duration) for a video link from the per-request course cache.
+     *
+     * @param int $courseid Course id.
+     * @param string $link Video URL as stored in the videotime instance.
+     * @return stdClass|null
+     */
+    public static function get_videotime_vimeo_video(int $courseid, string $link): ?stdClass {
+        return self::preload_videotime_records($courseid)['vimeo'][$link] ?? null;
+    }
+
+    /**
+     * Forget the preloaded Video Time records (for tests, or after changing Video Time activities in the request).
+     *
+     * @param int|null $courseid Course id, or null to clear every course.
+     */
+    public static function reset_videotime_records(?int $courseid = null): void {
+        if ($courseid === null) {
+            self::$videotimerecords = [];
+        } else {
+            unset(self::$videotimerecords[$courseid]);
+        }
+    }
+
+    /**
+     * Course has videotime activity.
+     *
+     * @param stdClass $course
      * @return bool
      */
     public static function course_has_videotime($course): bool {

@@ -1322,8 +1322,6 @@ class renderer extends \core_courseformat\output\section_renderer {
         global $DB, $USER, $CFG;
         // Static caches to reduce DB queries - persists across multiple calls within same request.
         static $modvisitscache = [];
-        static $videotimecache = [];
-        static $vimeovideocache = [];
         static $completioncache = []; // Add completion cache.
         static $completionbulkloaded = false; // Track if bulk loaded.
 
@@ -1331,7 +1329,6 @@ class renderer extends \core_courseformat\output\section_renderer {
         if (!$mod->is_visible_on_course_page()) {
             return [];
         }
-        $dbman = $DB->get_manager();
         $modclasses = 'activity ' . $mod->modname . ' modtype_' . $mod->modname . ' ' . $mod->extraclasses;
 
         // Add course type flow animation class.
@@ -1380,8 +1377,9 @@ class renderer extends \core_courseformat\output\section_renderer {
         $options = null;
         if (\format_designer\helper::has_pro()) {
             $options = \local_designer\options::get_options($mod->id);
-            if ($mod->modname == 'videotime' && $dbman->table_exists('videotimeplugin_pro')) {
-                if ($videorecord = $DB->get_record('videotimeplugin_pro', ['videotime' => $mod->instance])) {
+            if ($videotime) {
+                // Video Time records are preloaded for the whole course once per request (DES-962).
+                if ($videorecord = \format_designer\helper::get_videotime_pro_record($course->id, $mod->instance)) {
                     if (isset($videorecord->label_mode) && $videorecord->label_mode == 2) {
                         $useactivityimage = $options->useactivityimage ?? '';
                     } else if ($videorecord->label_mode == 1) {
@@ -1396,8 +1394,8 @@ class renderer extends \core_courseformat\output\section_renderer {
         if (!empty($url) && !$videotime) {
             $cmtext = $mod->get_formatted_content(['overflowdiv' => true, 'noclean' => true]);
             if (isset($videotime) && $videotime) {
-                $videoinstance = $DB->get_record('videotime', ['id' => $mod->instance]);
-                $cmtext = $videoinstance->intro;
+                $videoinstance = \format_designer\helper::get_videotime_instance($course->id, $mod->instance);
+                $cmtext = $videoinstance->intro ?? '';
             }
             $cmtextcontent = format_string($cmtext);
             $cmtextlength = get_config('format_designer', 'activitydesclength');
@@ -1500,23 +1498,15 @@ class renderer extends \core_courseformat\output\section_renderer {
 
         $videotimeduration = '';
         $durationformatted = '';
-        if ($mod->modname == 'videotime') {
+        if ($videotime) {
             if ($videoinstance === null) {
-                // Use cached videotime instance.
-                if (!isset($videotimecache[$mod->instance])) {
-                    $videotimecache[$mod->instance] = $DB->get_record('videotime', ['id' => $mod->instance]);
-                }
-                $videoinstance = $videotimecache[$mod->instance];
+                $videoinstance = \format_designer\helper::get_videotime_instance($course->id, $mod->instance);
             }
-            $dbman = $DB->get_manager();
-            if ($videoinstance && $dbman->table_exists('videotime_vimeo_video')) {
-                // Use cached vimeo video data.
-                if (!isset($vimeovideocache[$videoinstance->vimeo_url])) {
-                    $vimeovideocache[$videoinstance->vimeo_url] =
-                        $DB->get_record('videotime_vimeo_video', ['link' => $videoinstance->vimeo_url]);
-                }
-                if ($vimeovideocache[$videoinstance->vimeo_url]) {
-                    $videotimeduration = $vimeovideocache[$videoinstance->vimeo_url]->duration;
+            if ($videoinstance && !empty($videoinstance->vimeo_url)) {
+                // Duration comes from the Vimeo library record, preloaded for the whole course (DES-962).
+                $video = \format_designer\helper::get_videotime_vimeo_video($course->id, $videoinstance->vimeo_url);
+                if ($video) {
+                    $videotimeduration = $video->duration;
                 }
             }
         }

@@ -44,7 +44,6 @@ class cmname extends \core_courseformat\output\local\content\cm\cmname {
      * @return stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output): array {
-        global $DB;
         static $sectiontypecache = [];
         static $defaultsectiontype = null;
 
@@ -76,7 +75,8 @@ class cmname extends \core_courseformat\output\local\content\cm\cmname {
         if (\format_designer\helper::has_pro()) {
             // Use cached options to avoid DB query per module.
             if ($mod->modname == 'videotime') {
-                if ($videorecord = $DB->get_record('videotime', ['id' => $mod->instance])) {
+                // Video Time records are preloaded for the whole course once per request (DES-962).
+                if ($videorecord = \format_designer\helper::get_videotime_instance($mod->course, $mod->instance)) {
                     if (isset($videorecord->label_mode) && $videorecord->label_mode == 2) {
                         $useactivityimage = \format_designer\options::get_option($mod->id, 'useactivityimage');
                     }
