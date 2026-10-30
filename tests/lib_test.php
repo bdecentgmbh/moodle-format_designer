@@ -501,4 +501,54 @@ final class lib_test extends \advanced_testcase {
             $this->assertTrue($data->sectionnavigation->hasnext);
         }
     }
+
+    /**
+     * Course layouts and URL options with the page the section URL leads to.
+     *
+     * @return array
+     */
+    public static function view_url_provider(): array {
+        return [
+            'One section per page' => [COURSE_DISPLAY_MULTIPAGE, 2, [], 'section', 2],
+            'One section per page, section 0' => [COURSE_DISPLAY_MULTIPAGE, 0, [], 'section', 0],
+            'One section per page, navigation' => [COURSE_DISPLAY_MULTIPAGE, 2, ['navigation' => true], 'section', 2],
+            'One section per page, return to the course page' => [COURSE_DISPLAY_MULTIPAGE, 2, ['sr' => 0], 'course', 2],
+            'All sections on one page' => [COURSE_DISPLAY_SINGLEPAGE, 2, ['navigation' => true], 'course', 2],
+            'All sections on one page, return to a section page' => [COURSE_DISPLAY_SINGLEPAGE, 1, ['sr' => 2], 'section', 2],
+        ];
+    }
+
+    /**
+     * A section with a page of its own links to the section page of core, the course index and the section
+     * navigation link there too. Other sections link to their place on the course page.
+     *
+     * @dataProvider view_url_provider
+     * @covers ::get_view_url
+     * @param int $coursedisplay Course layout.
+     * @param int $sectionnum Number of the section to link to.
+     * @param array $options Options of the URL.
+     * @param string $page Page the URL leads to, section or course.
+     * @param int $pagesection Number of the section on that page.
+     * @return void
+     */
+    public function test_get_view_url(int $coursedisplay, int $sectionnum, array $options, string $page, int $pagesection): void {
+        $course = $this->getDataGenerator()->create_course([
+            'format' => 'designer', 'numsections' => 3, 'coursedisplay' => $coursedisplay,
+        ]);
+        $format = course_get_format($course);
+        $modinfo = get_fast_modinfo($course);
+
+        if ($page == 'section') {
+            $expected = new \moodle_url('/course/section.php', ['id' => $modinfo->get_section_info($pagesection)->id]);
+        } else {
+            $expected = new \moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $pagesection);
+        }
+        $this->assertEquals($expected->out(false), $format->get_view_url($sectionnum, $options)->out(false));
+        $section = $modinfo->get_section_info($sectionnum);
+        $this->assertEquals($expected->out(false), $format->get_view_url($section, $options)->out(false));
+        $this->assertEquals(
+            (new \moodle_url('/course/view.php', ['id' => $course->id]))->out(false),
+            $format->get_view_url(null, $options)->out(false)
+        );
+    }
 }

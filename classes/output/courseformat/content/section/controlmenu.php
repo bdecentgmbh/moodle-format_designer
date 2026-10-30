@@ -217,9 +217,9 @@ class controlmenu extends controlmenu_base {
         $controls = [];
 
         // Only show the view link if we are not already in the section view page.
-        if ($PAGE->pagetype !== 'section-view-' . $course->format) {
+        if ($PAGE->pagetype !== 'course-view-section-' . $course->format) {
             $controls['view'] = [
-                'url'   => new moodle_url('/course/view.php', ['id' => $course->id, 'section' => $section->section]),
+                'url'   => new moodle_url('/course/section.php', ['id' => $section->id]),
                 'icon' => 'i/viewsection',
                 'name' => get_string('view'),
                 'pixattr' => ['class' => ''],
