@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/course/lib.php');
+require_once($CFG->dirroot . '/course/format/designer/lib.php');
 
 /**
  * designer course format related unit tests.
@@ -449,5 +450,148 @@ final class lib_test extends \advanced_testcase {
         $this->assertEquals(2, $result['count']);
         $this->assertEquals(1, $result['completed']);
         $this->assertEquals(50, $result['percent']);
+    }
+
+    /**
+     * Course index visibility options with whether the section page shows its own navigation.
+     *
+     * @return array
+     */
+    public static function section_navigation_provider(): array {
+        return [
+            'Course index shown' => [0, false],
+            'Course index hidden on course pages' => [\format_designer::HIDE_ON_COURSEPAGE, true],
+            'Course index hidden everywhere' => [\format_designer::HIDE_EVERYWHERE, true],
+        ];
+    }
+
+    /**
+     * A section page shows the previous and next section links when the course index is hidden.
+     *
+     * @dataProvider section_navigation_provider
+     * @covers \format_designer\output\courseformat\content::export_for_template
+     * @param int $courseindex Course index visibility option.
+     * @param bool $navigation Whether the section page shows the section navigation.
+     * @return void
+     */
+    public function test_single_section_navigation(int $courseindex, bool $navigation): void {
+        global $PAGE;
+
+        $this->setAdminUser();
+        $course = $this->getDataGenerator()->create_course([
+            'format' => 'designer', 'numsections' => 3, 'coursedisplay' => COURSE_DISPLAY_MULTIPAGE,
+            'courseindex' => $courseindex,
+        ]);
+        $format = course_get_format($course);
+        $format->set_sectionid(get_fast_modinfo($course)->get_section_info(2)->id);
+
+        $PAGE = new \moodle_page();
+        $PAGE->set_course($course);
+        $PAGE->set_url('/course/section.php', ['id' => $format->get_sectionid()]);
+        $this->assertTrue($PAGE->theme->usescourseindex);
+
+        $outputclass = $format->get_output_classname('content');
+        $data = (new $outputclass($format))->export_for_template($PAGE->get_renderer('format_designer'));
+
+        $this->assertTrue($data->hasnavigation);
+        $this->assertEquals($navigation, !empty($data->sectionnavigation));
+        $this->assertEquals($navigation, !empty($data->sectionselector));
+        if ($navigation) {
+            $this->assertTrue($data->sectionnavigation->hasprevious);
+            $this->assertTrue($data->sectionnavigation->hasnext);
+        }
+    }
+
+    /**
+     * Course layouts and URL options with the page the section URL leads to.
+     *
+     * @return array
+     */
+    public static function view_url_provider(): array {
+        return [
+            'One section per page' => [COURSE_DISPLAY_MULTIPAGE, 2, [], 'section', 2],
+            'One section per page, section 0' => [COURSE_DISPLAY_MULTIPAGE, 0, [], 'section', 0],
+            'One section per page, navigation' => [COURSE_DISPLAY_MULTIPAGE, 2, ['navigation' => true], 'section', 2],
+            'One section per page, return to the course page' => [COURSE_DISPLAY_MULTIPAGE, 2, ['sr' => 0], 'course', 2],
+            'All sections on one page' => [COURSE_DISPLAY_SINGLEPAGE, 2, ['navigation' => true], 'course', 2],
+            'All sections on one page, return to a section page' => [COURSE_DISPLAY_SINGLEPAGE, 1, ['sr' => 2], 'section', 2],
+        ];
+    }
+
+    /**
+     * A section with a page of its own links to the section page of core, the course index and the section
+     * navigation link there too. Other sections link to their place on the course page.
+     *
+     * @dataProvider view_url_provider
+     * @covers ::get_view_url
+     * @param int $coursedisplay Course layout.
+     * @param int $sectionnum Number of the section to link to.
+     * @param array $options Options of the URL.
+     * @param string $page Page the URL leads to, section or course.
+     * @param int $pagesection Number of the section on that page.
+     * @return void
+     */
+    public function test_get_view_url(int $coursedisplay, int $sectionnum, array $options, string $page, int $pagesection): void {
+        $course = $this->getDataGenerator()->create_course([
+            'format' => 'designer', 'numsections' => 3, 'coursedisplay' => $coursedisplay,
+        ]);
+        $format = course_get_format($course);
+        $modinfo = get_fast_modinfo($course);
+
+        if ($page == 'section') {
+            $expected = new \moodle_url('/course/section.php', ['id' => $modinfo->get_section_info($pagesection)->id]);
+        } else {
+            $expected = new \moodle_url('/course/view.php', ['id' => $course->id], 'section-' . $pagesection);
+        }
+        $this->assertEquals($expected->out(false), $format->get_view_url($sectionnum, $options)->out(false));
+        $section = $modinfo->get_section_info($sectionnum);
+        $this->assertEquals($expected->out(false), $format->get_view_url($section, $options)->out(false));
+        $this->assertEquals(
+            (new \moodle_url('/course/view.php', ['id' => $course->id]))->out(false),
+            $format->get_view_url(null, $options)->out(false)
+        );
+    }
+
+    /**
+     * Course types with whether the section page leaves the section title to the page heading.
+     *
+     * @return array
+     */
+    public static function section_title_provider(): array {
+        return [
+            'Normal' => [DESIGNER_TYPE_NORMAL, true],
+            'Collapsible' => [DESIGNER_TYPE_COLLAPSIBLE, true],
+            'Flow, the title is on the section card' => [DESIGNER_TYPE_FLOW, false],
+        ];
+    }
+
+    /**
+     * The section page of core has the section name as its heading, the section doesn't repeat it.
+     *
+     * @dataProvider section_title_provider
+     * @covers \format_designer\output\courseformat\content\section\header::export_for_template
+     * @param int $coursetype Course type.
+     * @param bool $inpageheading Whether the section page leaves the title to the page heading.
+     * @return void
+     */
+    public function test_section_title_on_section_page(int $coursetype, bool $inpageheading): void {
+        global $PAGE;
+        $course = $this->getDataGenerator()->create_course([
+            'format' => 'designer', 'numsections' => 2, 'coursedisplay' => COURSE_DISPLAY_MULTIPAGE, 'coursetype' => $coursetype,
+        ]);
+        $format = course_get_format($course);
+        $section = get_fast_modinfo($course)->get_section_info(2);
+        $PAGE = new \moodle_page();
+        $PAGE->set_course($course);
+        $renderer = $PAGE->get_renderer('format_designer');
+        $headerclass = $format->get_output_classname('content\\section\\header');
+
+        $this->assertFalse((new $headerclass($format, $section))->export_for_template($renderer)->titleinpageheading);
+
+        $format->set_sectionid($section->id);
+        $data = (new $headerclass($format, $section))->export_for_template($renderer);
+        $this->assertEquals($inpageheading, $data->titleinpageheading);
+        $other = (new $headerclass($format, get_fast_modinfo($course)->get_section_info(1)))->export_for_template($renderer);
+        $this->assertFalse($other->titleinpageheading);
     }
 }

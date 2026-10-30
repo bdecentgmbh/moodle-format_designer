@@ -60,18 +60,7 @@ $widget = new $outputclass($format);
 
 echo $renderer->render($widget);
 
-$ispopupactivities = isset($course->popupactivities) && $course->popupactivities;
-
-// Include course format js module.
+// Include course format js module. The popups are included with the designer section js, the section page needs them too.
 $PAGE->requires->js('/course/format/designer/format.js');
-
-if ($ispopupactivities && !$PAGE->user_is_editing() && \format_designer\helper::popup_installed()) {
-    if (optional_param('sectionid', 0, PARAM_INT)) {
-        $displaysection = optional_param('sectionid', 0, PARAM_INT);
-    }
-    // Include popups.
-    $PAGE->requires->js_call_amd('format_popups/popups', 'init', [
-        $context->id, $course->id, $displaysection]);
-}
 
 format_designer_editsetting_style($PAGE);
