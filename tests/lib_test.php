@@ -329,11 +329,113 @@ final class lib_test extends \advanced_testcase {
         Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
         when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
         $resstr1 = \format_designer\helper::modcontent_trim_char($str1, 30);
-        $this->assertEquals(23, str_word_count($resstr1));
+        $this->assertCount(30, \format_designer\helper::get_words($resstr1));
+        $this->assertStringEndsWith('the 1500s, when an unknown printer took...', $resstr1);
 
         $str2 = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.";
         $resstr2 = \format_designer\helper::modcontent_trim_char($str2, 30);
-        $this->assertEquals(str_word_count($str2), str_word_count($resstr2));
+        $this->assertEquals($str2, $resstr2);
+    }
+
+    /**
+     * Words counted and kept by the activity description trim.
+     *
+     * @return array
+     */
+    public static function trim_words_provider(): array {
+        $words = function (int $count, string $separator = ' '): string {
+            $numbers = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+            $list = [];
+            for ($i = 0; $i < $count; $i++) {
+                $list[] = $numbers[$i % 10];
+            }
+            return implode($separator, $list);
+        };
+        return [
+            '22 words' => [$words(22), 22, false],
+            '23 words' => [$words(23), 23, false],
+            '24 words' => [$words(24), 24, true],
+            '60 words' => [$words(60), 60, true],
+            '24 words with a non-breaking space entity' => [$words(12) . '&nbsp;' . $words(12), 24, true],
+            '23 words with non-breaking space entities' => [$words(23, '&nbsp; '), 23, false],
+            '24 words with non-breaking space characters' => [$words(24, "\u{00A0}"), 24, true],
+            '24 words over three lines' => [$words(8) . "\n" . $words(8) . "\r\n\t" . $words(8), 24, true],
+            'German words count once' => [str_repeat('Übung für Prüfung ', 7) . 'Größe Ärger', 23, false],
+            'digits are words' => [trim(str_repeat('Step 1 then ', 8)), 24, true],
+        ];
+    }
+
+    /**
+     * The activity description trim counts and cuts the same words.
+     *
+     * @dataProvider trim_words_provider
+     * @covers ::\format_designer\helper::get_words
+     * @covers ::\format_designer\helper::modcontent_trim_char
+     * @param string $text Description text, as returned by format_string().
+     * @param int $count Expected number of words.
+     * @param bool $trimmed Whether a trim length of 23 cuts the text.
+     * @return void
+     */
+    public function test_trim_words(string $text, int $count, bool $trimmed): void {
+        $this->assertCount($count, \format_designer\helper::get_words($text));
+
+        $result = \format_designer\helper::modcontent_trim_char($text, 23);
+        if ($trimmed) {
+            $this->assertStringEndsWith('...', $result);
+            $this->assertCount(23, \format_designer\helper::get_words(substr($result, 0, -3)));
+        } else {
+            $this->assertEquals($text, $result);
+        }
+    }
+
+    /**
+     * The course page trims a description by its real words, also when the editor stored &nbsp; or paragraphs.
+     *
+     * @covers \format_designer\output\renderer::render_course_module
+     * @return void
+     */
+    public function test_render_trimmed_description(): void {
+        global $PAGE;
+
+        $this->setAdminUser();
+        set_config('activitydesclength', DESIGNER_MOD_TEXT_TRIMM, 'format_designer');
+        set_config('modtrimlength', 23, 'format_designer');
+        $words = 'one two three four five six seven eight nine ten one two';
+        $course = $this->getDataGenerator()->create_course(['format' => 'designer']);
+        $rest = 'three four five six seven eight nine ten one two';
+        $short = $this->getDataGenerator()->create_module('page', [
+            'course' => $course, 'showdescription' => 1, 'intro' => "<p>$words</p><p>$rest</p>",
+        ]);
+        $exact = $this->getDataGenerator()->create_module('page', [
+            'course' => $course, 'showdescription' => 1, 'intro' => "<p>$words&nbsp;$rest three</p>",
+        ]);
+        $long = $this->getDataGenerator()->create_module('page', [
+            'course' => $course, 'showdescription' => 1, 'intro' => "<p>$words&nbsp;$words</p>",
+        ]);
+
+        $PAGE = new \moodle_page();
+        $PAGE->set_course($course);
+        $PAGE->set_url(course_get_url($course));
+        $renderer = $PAGE->get_renderer('format_designer');
+        $modinfo = get_fast_modinfo($course);
+        $section = $modinfo->get_section_info(0);
+        $render = fn($module) => $renderer->render_course_module($modinfo->get_cm($module->cmid), 0, [], $section)['modcontent'];
+
+        // 22 words in two paragraphs: shown in full, the last word of the first paragraph stays apart from the next one.
+        $html = $render($short);
+        $this->assertStringNotContainsString('trim-summary', $html);
+        $this->assertStringContainsString('nine ten one two three four five', $html);
+
+        // 23 words with a non-breaking space: shown in full.
+        $this->assertStringNotContainsString('trim-summary', $render($exact));
+
+        // 24 words with a non-breaking space: cut after 23 words.
+        $this->assertStringContainsString("<div class=\"trim-summary\">$words one two three four five six " .
+            'seven eight nine ten one...', $render($long));
+
+        // Rendering cached the format options and the completion info of these ids, which the next tests reuse.
+        \format_designer\options::reset_caches();
+        \format_designer\output\cm_completion::reset_caches();
     }
 
     /**

@@ -63,6 +63,16 @@ class cm_completion implements renderable, templatable {
     private static $trackedusers = [];
 
     /**
+     * Forget the static caches, so unit tests that reuse course ids start without a stale completion info.
+     *
+     * @return void
+     */
+    public static function reset_caches(): void {
+        self::$completioninfos = [];
+        self::$trackedusers = [];
+    }
+
+    /**
      * @var stdClass|null Instance-level cache for completion data.
      */
     private $completiondatacache = null;
