@@ -102,6 +102,10 @@ class header extends \core_courseformat\output\local\content\section\header {
         $data->name = get_section_name($course, $section);
         $data->selecttext = $format->get_format_string('selectsection', $data->name);
 
+        // The section page of core has the section name as its heading already, as in core. Flow shows it on the
+        // section card.
+        $data->titleinpageheading = $format->get_sectionid() == $section->id && $course->coursetype != DESIGNER_TYPE_FLOW;
+
         $bodyclasses = explode(" ", $PAGE->bodyclasses);
 
         $sectionreturn = $format->get_sectionnum();

@@ -551,4 +551,47 @@ final class lib_test extends \advanced_testcase {
             $format->get_view_url(null, $options)->out(false)
         );
     }
+
+    /**
+     * Course types with whether the section page leaves the section title to the page heading.
+     *
+     * @return array
+     */
+    public static function section_title_provider(): array {
+        return [
+            'Normal' => [DESIGNER_TYPE_NORMAL, true],
+            'Collapsible' => [DESIGNER_TYPE_COLLAPSIBLE, true],
+            'Flow, the title is on the section card' => [DESIGNER_TYPE_FLOW, false],
+        ];
+    }
+
+    /**
+     * The section page of core has the section name as its heading, the section doesn't repeat it.
+     *
+     * @dataProvider section_title_provider
+     * @covers \format_designer\output\courseformat\content\section\header::export_for_template
+     * @param int $coursetype Course type.
+     * @param bool $inpageheading Whether the section page leaves the title to the page heading.
+     * @return void
+     */
+    public function test_section_title_on_section_page(int $coursetype, bool $inpageheading): void {
+        global $PAGE;
+        $course = $this->getDataGenerator()->create_course([
+            'format' => 'designer', 'numsections' => 2, 'coursedisplay' => COURSE_DISPLAY_MULTIPAGE, 'coursetype' => $coursetype,
+        ]);
+        $format = course_get_format($course);
+        $section = get_fast_modinfo($course)->get_section_info(2);
+        $PAGE = new \moodle_page();
+        $PAGE->set_course($course);
+        $renderer = $PAGE->get_renderer('format_designer');
+        $headerclass = $format->get_output_classname('content\\section\\header');
+
+        $this->assertFalse((new $headerclass($format, $section))->export_for_template($renderer)->titleinpageheading);
+
+        $format->set_sectionid($section->id);
+        $data = (new $headerclass($format, $section))->export_for_template($renderer);
+        $this->assertEquals($inpageheading, $data->titleinpageheading);
+        $other = (new $headerclass($format, get_fast_modinfo($course)->get_section_info(1)))->export_for_template($renderer);
+        $this->assertFalse($other->titleinpageheading);
+    }
 }

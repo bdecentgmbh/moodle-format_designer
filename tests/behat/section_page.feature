@@ -25,11 +25,14 @@ Feature: Section pages in designer format
   Scenario: Section links and the section navigation lead to the section page
     Given I am on the "Course 1" course page logged in as student1
     And ".secondary-navigation" "css_element" should exist
+    And ".course-content .sectionname" "css_element" should exist
     When I click on "Designer section 2" "link" in the "region-main" "region"
     Then I should see "Designer section 2" in the ".breadcrumb" "css_element"
     And I should see "Page 2" in the "region-main" "region"
     And I should not see "Page 1" in the "region-main" "region"
     And ".secondary-navigation" "css_element" should not exist
+    # The page heading is the section name, the section doesn't repeat it.
+    And ".course-content .sectionname" "css_element" should not exist
     And I click on "Designer section 3" "link" in the ".section-navigation" "css_element"
     And I should see "Designer section 3" in the ".breadcrumb" "css_element"
     And I should see "Page 3" in the "region-main" "region"
