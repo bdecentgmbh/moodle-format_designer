@@ -1801,9 +1801,14 @@ class format_designer extends \core_courseformat\base {
     }
 
     /**
-     * Get course module secondary navigation title.
-     * @param object $cm
-     * @return string title.
+     * Get course module secondary navigation title, formatted for HTML output.
+     *
+     * Custom titles are stored as plain text (PARAM_TEXT). format_string() escapes
+     * them for the course-index and activity templates, which render this value
+     * with unescaped Mustache, and for the hero navigation link body.
+     *
+     * @param object $cm Course module.
+     * @return string Title passed through format_string() in the module context.
      */
     public function get_cm_secondary_title($cm) {
         $secondarytitletype = \format_designer\options::get_option($cm->id, 'secondarytype');
@@ -1816,7 +1821,9 @@ class format_designer extends \core_courseformat\base {
             // Custom title.
             $title = \format_designer\options::get_option($cm->id, 'secondarycustomtitle');
         }
-        return !empty($title) ? $title : $cm->name;
+        $title = !empty($title) ? $title : $cm->name;
+        $modcontext = \context_module::instance($cm->id);
+        return format_string((string) $title, true, ['context' => $modcontext]);
     }
 
     /**
@@ -2264,6 +2271,12 @@ function format_designer_extend_navigation_course($navigation, $course, $context
 
     $currentmodclass = ($PAGE->context->contextlevel == CONTEXT_MODULE) ? "nav.moremenu li[data-key=\"{$PAGE->cm->id}\"]" : "";
     $currentcmid = ($PAGE->context->contextlevel == CONTEXT_MODULE) ? $PAGE->cm->id : 0;
+    // The link HTML is inserted from a script tag. Encode it as a JavaScript string so a
+    // title character that survives HTML escaping cannot terminate the script.
+    $heroactivityhtml = json_encode(
+        $content,
+        JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+    );
 
     $PAGE->requires->js_amd_inline("
         require(['jquery', 'core/moremenu'], function($, MenuMore) {
@@ -2276,7 +2289,7 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                 // Added the hero activities on the module page.
                 if ('$modulecontent') {
                     if (moremenu) {
-                        $(moremenu).append('$content');
+                        $(moremenu).append($heroactivityhtml);
                     }
                 }
 
