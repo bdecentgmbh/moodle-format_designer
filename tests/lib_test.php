@@ -450,4 +450,194 @@ final class lib_test extends \advanced_testcase {
         $this->assertEquals(1, $result['completed']);
         $this->assertEquals(50, $result['percent']);
     }
+
+    /**
+     * Custom activity titles are plain text and must be escaped before templates and navigation use them.
+     *
+     * @covers \format_designer::get_cm_secondary_title
+     * @covers ::format_designer_extend_navigation_course
+     */
+    public function test_custom_activity_title_is_formatted(): void {
+        global $PAGE, $COURSE;
+
+        $course = $this->getDataGenerator()->create_course(['format' => 'designer']);
+        $module = $this->getDataGenerator()->create_module('page', [
+            'course' => $course->id,
+            'name' => 'Week & review',
+        ]);
+        $raw = "Tom's <script>alert(1)</script> \"quoted\"";
+        \format_designer\options::insert_option($module->cmid, $course->id, 'secondarytype', 'custom');
+        \format_designer\options::insert_option($module->cmid, $course->id, 'secondarycustomtitle', $raw);
+        \format_designer\options::insert_option($module->cmid, $course->id, 'customtitleusecourseindex', 1);
+        \format_designer\options::insert_option($module->cmid, $course->id, 'heroactivity', DESIGNER_HERO_ACTIVITY_EVERYWHERE);
+        \format_designer\options::insert_option($module->cmid, $course->id, 'heroactivitypos', 1);
+        \format_designer\options::$optionspercmid = [];
+        \format_designer\options::$bulkloaded = [];
+
+        $PAGE->set_course($course);
+        $modinfo = get_fast_modinfo($course);
+        $cm = $modinfo->get_cm($module->cmid);
+        $format = course_get_format($course);
+        $title = $format->get_cm_secondary_title($cm);
+
+        $expected = format_string($raw, true, ['context' => \context_module::instance($cm->id)]);
+        $this->assertSame($expected, $title);
+        $this->assertStringNotContainsString('<script>', $title);
+        $this->assertStringNotContainsString("'", $title);
+        $this->assertStringNotContainsString('"', $title);
+        $this->assertNotSame($raw, $title);
+
+        $index = $PAGE->get_renderer('core')->render_from_template('format_designer/courseformat/courseindex/cm', [
+            'id' => $cm->id,
+            'url' => (new \moodle_url('/mod/page/view.php', ['id' => $cm->id]))->out(false),
+            'uservisible' => 1,
+            'designercmname' => $title,
+            'name' => 'fallback',
+            'anchor' => 'module-' . $cm->id,
+            'visible' => 1,
+        ]);
+        $this->assertStringContainsString($title, $index);
+        $this->assertStringNotContainsString($raw, $index);
+
+        $activity = $PAGE->get_renderer('core')->render_from_template('format_designer/courseformat/content/cm/title', [
+            'url' => (new \moodle_url('/mod/page/view.php', ['id' => $cm->id]))->out(false),
+            'instancename' => $cm->get_formatted_name(),
+            'uservisible' => true,
+            'designercmname' => $title,
+            'altname' => '',
+            'linkclasses' => '',
+            'onclick' => '',
+        ]);
+        $this->assertStringContainsString($title, $activity);
+        $this->assertStringNotContainsString($raw, $activity);
+
+        // Hero navigation interpolates the link into an inline script. The title must not break that string.
+        $COURSE = $course;
+        $PAGE->set_cm($cm);
+        $navigation = new \navigation_node(['text' => 'Course', 'key' => 'course']);
+        format_designer_extend_navigation_course($navigation, $course, \context_course::instance($course->id));
+
+        $reflection = new \ReflectionObject($PAGE->requires);
+        $property = $reflection->getProperty('amdjscode');
+        $property->setAccessible(true);
+        $jscode = implode("\n", $property->getValue($PAGE->requires));
+        $this->assertStringContainsString('designer-hero-activity', $jscode);
+        $this->assertStringNotContainsString($raw, $jscode);
+        $this->assertStringNotContainsString('<script>', $jscode);
+        $this->assertDoesNotMatchRegularExpression("/\\.append\\('.*<script>/s", $jscode);
+
+        // Activity-name mode must ignore the stored custom markup.
+        \format_designer\options::insert_option($module->cmid, $course->id, 'secondarytype', 'activitytitle');
+        \format_designer\options::$optionspercmid = [];
+        \format_designer\options::$bulkloaded = [];
+        $activityname = $format->get_cm_secondary_title($cm);
+        $this->assertSame(
+            format_string('Week & review', true, ['context' => \context_module::instance($cm->id)]),
+            $activityname
+        );
+        $this->assertStringNotContainsString('<script>', $activityname);
+    }
+
+    /**
+     * Selected textarea profile fields are cleaned before the staff header template renders them.
+     *
+     * @covers \format_designer\helper::get_course_staff_users
+     */
+    public function test_textarea_profile_field_is_formatted(): void {
+        global $DB, $PAGE;
+
+        $course = $this->getDataGenerator()->create_course(['format' => 'designer']);
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->create_custom_profile_field([
+            'datatype' => 'textarea',
+            'shortname' => 'aboutme',
+            'name' => 'About me',
+        ]);
+        $this->getDataGenerator()->create_custom_profile_field([
+            'datatype' => 'text',
+            'shortname' => 'nickname',
+            'name' => 'Nickname',
+        ]);
+        $textarea = $DB->get_record('user_info_field', ['shortname' => 'aboutme'], '*', MUST_EXIST);
+        $text = $DB->get_record('user_info_field', ['shortname' => 'nickname'], '*', MUST_EXIST);
+        $markup = '<script>alert(1)</script><b>Hello</b><img src="x" onerror="alert(1)">' .
+            '<a href="javascript:alert(1)">x</a>';
+        $DB->insert_record('user_info_data', [
+            'userid' => $user->id,
+            'fieldid' => $textarea->id,
+            'data' => $markup,
+            'dataformat' => FORMAT_HTML,
+        ]);
+        $DB->insert_record('user_info_data', [
+            'userid' => $user->id,
+            'fieldid' => $text->id,
+            'data' => '<img src=x onerror=alert(1)>',
+            'dataformat' => FORMAT_MOODLE,
+        ]);
+
+        $course = course_get_format($course)->get_course();
+        $course->coursestaff = '1';
+        $course->profile_field_aboutme = 1;
+        $course->profile_field_nickname = 1;
+
+        $PAGE->set_url('/');
+        $PAGE->set_course($course);
+
+        $helper = new class extends helper {
+            /** @var int[] User ids to return as course staff. */
+            public array $forcestaffids = [];
+
+            /**
+             * Return the test user instead of resolving role assignments.
+             *
+             * @param object $course Course.
+             * @return int[] Staff user ids.
+             */
+            protected function get_staffs_users($course) {
+                if (empty($course->id)) {
+                    return [];
+                }
+                return $this->forcestaffids;
+            }
+        };
+        $helper->forcestaffids = [$user->id];
+        $staffs = $helper->get_course_staff_users($course);
+
+        $this->assertCount(1, $staffs);
+        $values = array_column($staffs[0]->customfield, 'value');
+        $this->assertCount(2, $values);
+
+        $usercontext = \context_user::instance($user->id);
+        $expectedtextarea = format_text($markup, FORMAT_HTML, [
+            'context' => $usercontext,
+            'overflowdiv' => true,
+        ]);
+        $this->assertContains($expectedtextarea, $values);
+        $this->assertStringNotContainsString('<script', $expectedtextarea);
+        $this->assertStringNotContainsString('onerror', $expectedtextarea);
+        $this->assertStringNotContainsString('javascript:', $expectedtextarea);
+        $this->assertStringContainsString('Hello', $expectedtextarea);
+
+        $expectedtext = null;
+        foreach (profile_get_user_fields_with_data($user->id) as $field) {
+            if ($field->field->shortname === 'nickname') {
+                $expectedtext = (string) $field->display_data();
+            }
+        }
+        $this->assertNotNull($expectedtext);
+        $this->assertContains($expectedtext, $values);
+        $this->assertStringNotContainsString('<img', $expectedtext);
+
+        $html = $PAGE->get_renderer('core')->render_from_template('format_designer/course_time_management', [
+            'statuscoursestaffinfo' => true,
+            'coursestaffinfo' => $staffs,
+            'dataride' => 'data-ride',
+        ]);
+        $this->assertStringContainsString('profile-field', $html);
+        $this->assertStringContainsString($expectedtextarea, $html);
+        $this->assertStringContainsString($expectedtext, $html);
+        $this->assertStringNotContainsString('<script>alert(1)</script>', $html);
+        $this->assertStringNotContainsString('<img src=x onerror=alert(1)>', $html);
+        $this->assertStringNotContainsString('javascript:', $html);
+    }
 }

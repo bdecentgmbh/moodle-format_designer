@@ -131,9 +131,10 @@ class helper {
 
             if (self::has_pro() != 1) {
                 $extrafields = profile_get_user_fields_with_data($userid);
+                $fieldcontext = \context_user::instance($userid);
                 foreach ($extrafields as $formfield) {
                     if ($course->{$formfield->inputname}) {
-                        $customfield[]['value'] = $formfield->data;
+                        $customfield[]['value'] = self::format_user_profile_field($formfield, $fieldcontext);
                     }
                 }
             }
@@ -176,7 +177,32 @@ class helper {
         return $staffs;
     }
 
-
+    /**
+     * Format one profile field for the course staff header.
+     *
+     * Textarea values are stored unfiltered, so they are cleaned with format_text()
+     * in the profile owner's user context before the template renders them.
+     * Other field types use display_data(), which applies format_string() or
+     * format_text() for that type.
+     *
+     * @param \profile_field_base $formfield Field with this user's data loaded.
+     * @param \context $context User context of the field owner.
+     * @return string HTML safe to render.
+     */
+    private static function format_user_profile_field($formfield, \context $context): string {
+        $datatype = $formfield->field->datatype ?? '';
+        if ($datatype === 'textarea') {
+            $format = $formfield->dataformat ?? FORMAT_MOODLE;
+            if ($format === '') {
+                $format = FORMAT_MOODLE;
+            }
+            return format_text((string) ($formfield->data ?? ''), (int) $format, [
+                'context' => $context,
+                'overflowdiv' => true,
+            ]);
+        }
+        return (string) $formfield->display_data();
+    }
 
     /**
      * Bulk preload all section background images for a course.
