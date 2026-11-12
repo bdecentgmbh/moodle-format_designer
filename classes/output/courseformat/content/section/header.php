@@ -103,8 +103,9 @@ class header extends \core_courseformat\output\local\content\section\header {
         $data->selecttext = $format->get_format_string('selectsection', $data->name);
 
         // The section page of core has the section name as its heading already, as in core. Flow shows it on the
-        // section card.
-        $data->titleinpageheading = $format->get_sectionid() == $section->id && $course->coursetype != DESIGNER_TYPE_FLOW;
+        // section card. The course header of Designer Pro hides the page heading and shows the course name instead.
+        $data->titleinpageheading = $format->get_sectionid() == $section->id && $course->coursetype != DESIGNER_TYPE_FLOW
+            && !$format->course_header();
 
         $bodyclasses = explode(" ", $PAGE->bodyclasses);
 
