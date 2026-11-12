@@ -23,7 +23,9 @@ namespace format_designer\external;
  * @copyright  2026 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \format_designer\external\external::get_videotime_instace
+ * @runTestsInSeparateProcesses
  */
+#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 final class get_videotime_instace_test extends \advanced_testcase {
     /** @var \stdClass Designer course with the Video Time activity. */
     private $course;
