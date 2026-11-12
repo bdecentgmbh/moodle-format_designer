@@ -118,25 +118,27 @@ class events {
             return true;
         }
 
+        // Read the course type from the format options instead of $format->get_course(). That would load the
+        // course through core get_course(), which returns a copy of $COURSE when it is this course, and the format
+        // instance would keep that record, with the values from before the update, for the rest of the request.
+        $options = $format->get_format_options();
+        $coursetype = $options['coursetype'] ?? null;
+
         // Change the coursedisplay to the show all sections per page when the course type is flow or kanban mode.
-        $course = $format->get_course();
-        if (
-            isset($course->coursetype) && ($course->coursetype == DESIGNER_TYPE_FLOW ||
-            $course->coursetype == DESIGNER_TYPE_KANBAN)
-        ) {
-            $existrecord = $DB->get_record('course_format_options', ['courseid' => $course->id,
+        if ($coursetype == DESIGNER_TYPE_FLOW || $coursetype == DESIGNER_TYPE_KANBAN) {
+            $existrecord = $DB->get_record('course_format_options', ['courseid' => $courseid,
                             'name' => 'coursetype', 'format' => 'designer', ]);
             if ($existrecord) {
-                $existrecord->value = $course->coursetype;
+                $existrecord->value = $coursetype;
                 $DB->update_record('course_format_options', $existrecord);
             }
         }
 
-        if (isset($course->coursetype) && ($course->coursetype == DESIGNER_TYPE_FLOW)) {
+        if ($coursetype == DESIGNER_TYPE_FLOW) {
             $comparevalue = $DB->sql_compare_text('value');
             $sql = "SELECT id, courseid, sectionid, name, value FROM {course_format_options}
                 WHERE courseid = :courseid AND name = :name AND format = :format AND $comparevalue = :comparevalue";
-            $existrecords = $DB->get_recordset_sql($sql, ['courseid' => $course->id,
+            $existrecords = $DB->get_recordset_sql($sql, ['courseid' => $courseid,
                 'name' => 'sectionbackgroundtype', 'format' => 'designer', 'comparevalue' => 'whole']);
             if ($existrecords) {
                 foreach ($existrecords as $existrecord) {
