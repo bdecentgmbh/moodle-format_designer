@@ -421,10 +421,10 @@ final class lib_test extends \advanced_testcase {
         $section = $modinfo->get_section_info(0);
         $render = fn($module) => $renderer->render_course_module($modinfo->get_cm($module->cmid), 0, [], $section)['modcontent'];
 
-        // 22 words in two paragraphs: shown in full, the last word of the first paragraph stays apart from the next one.
+        // 22 words in two paragraphs: shown in full, with its paragraphs.
         $html = $render($short);
         $this->assertStringNotContainsString('trim-summary', $html);
-        $this->assertStringContainsString('nine ten one two three four five', $html);
+        $this->assertStringContainsString("<p>$words</p><p>$rest</p>", $html);
 
         // 23 words with a non-breaking space: shown in full.
         $this->assertStringNotContainsString('trim-summary', $render($exact));
@@ -432,6 +432,63 @@ final class lib_test extends \advanced_testcase {
         // 24 words with a non-breaking space: cut after 23 words.
         $this->assertStringContainsString("<div class=\"trim-summary\">$words one two three four five six " .
             'seven eight nine ten one...', $render($long));
+
+        // Rendering cached the format options and the completion info of these ids, which the next tests reuse.
+        \format_designer\options::reset_caches();
+        \format_designer\output\cm_completion::reset_caches();
+    }
+
+    /**
+     * The course page shows a description with its paragraphs, line breaks and images, only the trimmed teaser is plain text.
+     *
+     * @covers \format_designer\output\renderer::render_course_module
+     * @return void
+     */
+    public function test_render_description_formatting(): void {
+        global $PAGE;
+
+        $this->setAdminUser();
+        $course = $this->getDataGenerator()->create_course(['format' => 'designer']);
+        $image = '<img src="https://example.com/image.png" alt="Example image">';
+        $formatted = $this->getDataGenerator()->create_module('page', [
+            'course' => $course, 'showdescription' => 1,
+            'intro' => "<p>First paragraph with a line<br>break.</p><ul><li>First item</li><li>Second item</li></ul>" .
+                "<p>$image</p>",
+        ]);
+        $imageonly = $this->getDataGenerator()->create_module('page', [
+            'course' => $course, 'showdescription' => 1, 'intro' => "<p>$image</p>",
+        ]);
+
+        $PAGE = new \moodle_page();
+        $PAGE->set_course($course);
+        $PAGE->set_url(course_get_url($course));
+        $renderer = $PAGE->get_renderer('format_designer');
+        $modinfo = get_fast_modinfo($course);
+        $section = $modinfo->get_section_info(0);
+        $render = fn($module) => $renderer->render_course_module($modinfo->get_cm($module->cmid), 0, [], $section)['modcontent'];
+        $assertformatted = function (string $html): void {
+            $this->assertMatchesRegularExpression('~<p>First paragraph with a line<br\s*/?>break\.</p>~', $html);
+            $this->assertStringContainsString('<ul><li>First item</li><li>Second item</li></ul>', $html);
+            $this->assertMatchesRegularExpression('~<img [^>]*src="https://example\.com/image\.png"~', $html);
+        };
+
+        // Do not trim: the description as formatted for the course.
+        set_config('activitydesclength', 1, 'format_designer');
+        $html = $render($formatted);
+        $this->assertStringNotContainsString('trim-summary', $html);
+        $assertformatted($html);
+        $this->assertStringContainsString('src="https://example.com/image.png"', $render($imageonly));
+
+        // Trimmed: a plain text teaser, the description as formatted for the course behind "more".
+        set_config('activitydesclength', DESIGNER_MOD_TEXT_TRIMM, 'format_designer');
+        set_config('modtrimlength', 3, 'format_designer');
+        $html = $render($formatted);
+        $this->assertMatchesRegularExpression('~<div class="trim-summary">First paragraph with\.\.\.<a ~', $html);
+        [, $fullcontent] = explode('<div class="fullcontent-summary summary-hide">', $html, 2);
+        $assertformatted($fullcontent);
+
+        // Trimmed, but without words to cut: the image is shown.
+        $this->assertStringContainsString('src="https://example.com/image.png"', $render($imageonly));
 
         // Rendering cached the format options and the completion info of these ids, which the next tests reuse.
         \format_designer\options::reset_caches();
