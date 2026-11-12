@@ -755,6 +755,7 @@ final class lib_test extends \advanced_testcase {
         }
         $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
         $course = course_get_format($course)->get_course();
+        $PAGE->reset_theme_and_output();
         $PAGE->set_url('/course/view.php', ['id' => $course->id]);
         $PAGE->set_course($course);
 
@@ -824,6 +825,7 @@ final class lib_test extends \advanced_testcase {
         foreach (array_keys($visibility) as $shortname) {
             $course->{'profile_field_' . $shortname} = 1;
         }
+        $PAGE->reset_theme_and_output();
         $PAGE->set_url('/course/view.php', ['id' => $course->id]);
         $PAGE->set_course($course);
 
