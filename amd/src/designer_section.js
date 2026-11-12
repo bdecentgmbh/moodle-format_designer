@@ -46,7 +46,7 @@ define(['jquery', 'core/fragment', 'core/templates', 'core/loadingicon', 'core/a
      * @param {array} popupActivities
      * @param {bool} videoTime
      * @param {bool} issubpanel
-     * @param {int} sectionreturn
+     * @param {int|null} sectionreturn Section of the section page, null on the course page.
      */
     let DesignerSection = function(courseId, contextId, popupActivities, videoTime, issubpanel, sectionreturn) {
         var self = this;
@@ -327,16 +327,12 @@ define(['jquery', 'core/fragment', 'core/templates', 'core/loadingicon', 'core/a
             $.when.apply($, promises)
             .done(function() {
                 if (self.isSubpanel) {
-                    const promise = Fragment.loadFragment(
-                        'core_courseformat',
-                        'section',
-                        self.contextId,
-                        {
-                            id: sectionid,
-                            courseid: self.courseId,
-                            sr: self.sectionReturn,
-                        }
-                    );
+                    const fragmentargs = {id: sectionid, courseid: self.courseId};
+                    // The course page has no section to return to, section 0 is a section page too.
+                    if (self.sectionReturn !== null) {
+                        fragmentargs.sr = self.sectionReturn;
+                    }
+                    const promise = Fragment.loadFragment('core_courseformat', 'section', self.contextId, fragmentargs);
                     promise.then((html, js) => {
                         Templates.replaceNode(sectionitem, html, js);
                     }).catch();
