@@ -62,7 +62,8 @@ class content extends content_base {
             'initialsection' => $initialsection,
             'sections' => $sections,
             'format' => $format->get_format(),
-            'sectionreturn' => 'null',
+            'sectionreturn' => 'null', // Mustache templates don't display NULL, so pass a string value.
+            'pagesectionid' => $format->get_sectionid() ?? 'null', // Pass a string value if NULL.
         ];
 
         if (method_exists($format, 'get_sectionnum')) {
