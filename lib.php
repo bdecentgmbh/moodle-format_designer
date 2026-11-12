@@ -2275,17 +2275,19 @@ function format_designer_extend_navigation_course($navigation, $course, $context
     $currentcmid = ($PAGE->context->contextlevel == CONTEXT_MODULE) ? $PAGE->cm->id : 0;
     // The link HTML is inserted from a script tag. Encode it as a JavaScript string so a
     // title character that survives HTML escaping cannot terminate the script.
-    $heroactivityhtml = json_encode(
-        $content,
-        JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
-    );
+    $jsonflags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
+    $heroactivityhtml = json_encode($content, $jsonflags);
+    // The same applies to the menu HTML built from language strings, which may contain an apostrophe.
+    $secondarycontenthtml = json_encode($secondarycontent, $jsonflags);
+    $secondarymenutocoursehtml = json_encode($secondarymenutocoursecontent, $jsonflags);
+    $modbacktomainhtml = json_encode($modbacktomain, $jsonflags);
 
     $PAGE->requires->js_amd_inline("
         require(['jquery', 'core/moremenu'], function($, MenuMore) {
             $(document).ready(function() {
                 // Added the secondary navigation when menu is empty.
                 if ('$isaddsecondary' && !document.querySelector('.secondary-navigation')) {
-                    $('$secondarycontent').insertAfter('#page-header');
+                    $($secondarycontenthtml).insertAfter('#page-header');
                 }
                 var moremenu = document.querySelector('.secondary-navigation ul.nav-tabs .dropdownmoremenu ul');
                 // Added the hero activities on the module page.
@@ -2297,17 +2299,17 @@ function format_designer_extend_navigation_course($navigation, $course, $context
 
                 // Added the course menu on the module page.
                 var coursehome = document.querySelectorAll('nav.moremenu li[data-key=coursehome]')[0];
-                if ('$secondarymenutocoursecontent' && !coursehome) {
+                if ($secondarymenutocoursehtml && !coursehome) {
                     if (moremenu) {
-                        $(moremenu).append('$secondarymenutocoursecontent');
+                        $(moremenu).append($secondarymenutocoursehtml);
                     }
                 }
 
                 // Added the course menu on the module page.
                 var backtomaincourse = document.querySelectorAll('nav.moremenu li[data-key=backtomaincourse]')[0];
-                if ('$modbacktomain' && !backtomaincourse) {
+                if ($modbacktomainhtml && !backtomaincourse) {
                     if (moremenu) {
-                        $(moremenu).append('$modbacktomain');
+                        $(moremenu).append($modbacktomainhtml);
                     }
                 }
 

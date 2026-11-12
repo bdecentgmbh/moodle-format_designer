@@ -642,4 +642,44 @@ final class lib_test extends \advanced_testcase {
         $this->assertStringNotContainsString('<img src=x onerror=alert(1)>', $html);
         $this->assertStringNotContainsString('javascript:', $html);
     }
+
+    /**
+     * The menu HTML built from language strings is JSON-encoded before it goes into the inline navigation script.
+     *
+     * @covers ::format_designer_extend_navigation_course
+     */
+    public function test_secondary_menu_script_encodes_menu_html(): void {
+        global $PAGE, $COURSE;
+
+        $label = get_string('strsecondarymenucourse', 'format_designer');
+        if (method_exists($this, 'get_mocked_string_manager')) {
+            // Moodle 4.5.1 and later: use a label with an apostrophe, which broke the single-quoted script string.
+            $label = "Course's home";
+            $this->get_mocked_string_manager()->mock_string('strsecondarymenucourse', 'format_designer', $label);
+        }
+
+        $course = $this->getDataGenerator()->create_course(['format' => 'designer', 'secondarymenutocourse' => 1]);
+        $module = $this->getDataGenerator()->create_module('page', ['course' => $course->id]);
+        $cm = get_fast_modinfo($course)->get_cm($module->cmid);
+
+        $COURSE = $course;
+        $PAGE->set_course($course);
+        $PAGE->set_cm($cm);
+        $navigation = new \navigation_node(['text' => 'Course', 'key' => 'course']);
+        format_designer_extend_navigation_course($navigation, $course, \context_course::instance($course->id));
+
+        $property = (new \ReflectionObject($PAGE->requires))->getProperty('amdjscode');
+        $jscode = implode("\n", $property->getValue($PAGE->requires));
+
+        $flags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
+        $this->assertStringContainsString('designercoursehome', $jscode);
+        $this->assertStringContainsString(trim(json_encode($label, $flags), '"'), $jscode);
+        // Encoded markup keeps no tags, so nothing can end a string or the script early.
+        $this->assertStringNotContainsString('<li', $jscode);
+        $this->assertStringNotContainsString('<div', $jscode);
+        $this->assertStringNotContainsString('<a ', $jscode);
+        if (strpos($label, "'") !== false) {
+            $this->assertStringNotContainsString($label, $jscode);
+        }
+    }
 }
