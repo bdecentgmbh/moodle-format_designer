@@ -575,28 +575,28 @@ class renderer extends \core_courseformat\output\section_renderer {
     }
 
     /**
-     * Obtains a list of activities for which completion is enabled on the
-     * @param object $course The list is ordered by the section order of those activities.
-     * @return cm_info[] Array from $cmid => $cm of all activities with completion enabled,
+     * Obtains the list of activities with completion enabled that the user sees on the course page,
+     * ordered by the section order of those activities.
+     *
+     * The list depends on the access of the user, so it is built from the course modinfo of the user,
+     * which core caches per user, and not kept in a course cache shared by all users.
+     *
+     * @param object $course Course record.
+     * @param int $userid User to get the activities for, the current user by default.
+     * @return cm_info[] Array from $cmid => $cm of the activities.
      */
-    public static function get_completion_activities($course) {
-        $cache = \format_designer\helper::get_cache_object();
-        $key = "g_c_a{$course->id}";
-        if (!$cache->get($key)) {
-            $modinfo = get_fast_modinfo($course);
-            $result = [];
-            foreach ($modinfo->get_cms() as $cm) {
-                $sectioninfo = $cm->get_section_info();
-                if (
-                    $cm->completion != COMPLETION_TRACKING_NONE && !$cm->deletioninprogress &&
-                        $cm->is_visible_on_course_page() && $sectioninfo->uservisible
-                ) {
-                    $result[$cm->id] = $cm;
-                }
+    public static function get_completion_activities($course, $userid = 0) {
+        $modinfo = get_fast_modinfo($course, $userid);
+        $result = [];
+        foreach ($modinfo->get_cms() as $cm) {
+            if (
+                $cm->completion != COMPLETION_TRACKING_NONE && !$cm->deletioninprogress &&
+                    $cm->is_visible_on_course_page() && $cm->get_section_info()->uservisible
+            ) {
+                $result[$cm->id] = $cm;
             }
-            $cache->set($key, $result);
         }
-        return $cache->get($key);
+        return $result;
     }
 
     /**
@@ -658,7 +658,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             $uncompletedcriteria = [];
 
             // Get the number of modules that support completion.
-            $modules = self::get_completion_activities($course);
+            $modules = self::get_completion_activities($course, $userid);
             $completionactivities = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY);
             $complteioncourses = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_COURSE);
 

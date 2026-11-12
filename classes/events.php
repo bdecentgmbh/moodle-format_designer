@@ -258,7 +258,6 @@ class events {
         $cache->delete_course_progress_uncompletion_criteria($courseid);
         $cache->delete_due_overdue_activities_count($courseid);
         $cache->delete_criteria_progress($courseid);
-        $cache->delete("g_c_a{$courseid}");
         $cache->delete("g_c_s_ic{$courseid}");
     }
 
@@ -275,7 +274,6 @@ class events {
         $cache->delete_course_progress_uncompletion_criteria($courseid, $userid);
         $cache->delete_due_overdue_activities_count($courseid, $userid);
         $cache->delete_criteria_progress($courseid, $userid);
-        $cache->delete("g_c_a{$courseid}");
         $cache->delete("g_c_s_ic{$courseid}");
     }
 
@@ -302,7 +300,6 @@ class events {
         $cache->delete_due_overdue_activities_count($courseid);
         $cache->delete_criteria_progress($courseid);
         $cache->delete("fdo_cm_j_{$courseid}");
-        $cache->delete("g_c_a{$courseid}");
         $cache->delete("g_c_s_ic{$courseid}");
     }
 
@@ -323,7 +320,6 @@ class events {
         $cache->delete_due_overdue_activities_count($courseid);
         $cache->delete_course_progress_uncompletion_criteria($courseid);
         $cache->delete_criteria_progress($courseid);
-        $cache->delete("g_c_a{$courseid}");
         $cache->delete("g_c_s_ic{$courseid}");
     }
 }
