@@ -127,13 +127,13 @@ class helper {
         foreach ($staffids as $userid) {
             $customfield = [];
             $user = \core_user::get_user($userid);
-            profile_load_data($user);
 
             if (self::has_pro() != 1) {
                 $extrafields = profile_get_user_fields_with_data($userid);
                 $fieldcontext = \context_user::instance($userid);
                 foreach ($extrafields as $formfield) {
-                    if ($course->{$formfield->inputname}) {
+                    // Selected for the course, and visible to the current user by the field's visibility setting.
+                    if (!empty($course->{$formfield->inputname}) && $formfield->show_field_content()) {
                         $customfield[]['value'] = self::format_user_profile_field($formfield, $fieldcontext);
                     }
                 }
@@ -146,10 +146,11 @@ class helper {
             }, $roles);
             $roles = implode(", ", array_column($roles, 'name'));
 
-            // Users data list.
-            $list = clone $user;
+            // Users data list. Only the fields the header uses, not the user record.
+            $list = new stdClass();
             $list->userid = $userid;
-            $list->email = $user->email;
+            // The email address only when the current user may see it, e.g. by the user's email display setting.
+            $list->email = self::get_visible_user_details($user, $course, ['email'])['email'] ?? '';
             $list->fullname = fullname($user);
             // Contact and profile view url.
             $list->profileurl = new \moodle_url('/user/profile.php', ['id' => $userid]);
@@ -175,6 +176,34 @@ class helper {
             $i++;
         }
         return $staffs;
+    }
+
+    /**
+     * Get the details of a user that the current user may see in a course.
+     *
+     * Uses the core rules, which for example show the email address only when the user's
+     * email display setting, the hidden user fields and the viewer's capabilities allow it.
+     *
+     * @param stdClass $user User record.
+     * @param stdClass $course Course the details are shown in.
+     * @param string[] $fields Fields to get, from the core list of user detail fields.
+     * @return array Visible values by field name, always including id and fullname when the user is visible.
+     */
+    public static function get_visible_user_details(stdClass $user, stdClass $course, array $fields): array {
+        global $CFG;
+
+        if (empty($fields)) {
+            // Core returns all fields for an empty list.
+            return [];
+        }
+        if (method_exists(\core\user::class, 'get_user_details')) {
+            // Moodle 5.3 and later, user_get_user_details() is deprecated there.
+            $details = \core\user::get_user_details($user, $course, $fields);
+        } else {
+            require_once($CFG->dirroot . '/user/lib.php');
+            $details = user_get_user_details($user, $course, $fields);
+        }
+        return $details ?? [];
     }
 
     /**

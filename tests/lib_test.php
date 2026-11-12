@@ -720,4 +720,128 @@ final class lib_test extends \advanced_testcase {
         $this->assertStringContainsString($expected, $data['displayvalue']);
         $this->assertStringNotContainsString('<script>', $data['displayvalue']);
     }
+
+    /**
+     * Get the course header staff list as the current user, indexed by user id.
+     *
+     * @param \stdClass $course Course with the designer format options.
+     * @return \stdClass[] Staff data by user id.
+     */
+    protected function get_staff_by_userid(\stdClass $course): array {
+        $staffs = [];
+        foreach (helper::create()->get_course_staff_users($course) as $staff) {
+            $staffs[$staff->userid] = $staff;
+        }
+        return $staffs;
+    }
+
+    /**
+     * The staff header shows an email address only to users who may see it, and never exports the user record.
+     *
+     * @covers \format_designer\helper::get_course_staff_users
+     * @covers \format_designer\helper::get_visible_user_details
+     */
+    public function test_course_staff_email_follows_user_visibility(): void {
+        global $PAGE;
+
+        set_config('hiddenuserfields', '');
+        $course = $this->getDataGenerator()->create_course(['format' => 'designer']);
+        $hidden = $this->getDataGenerator()->create_user(['maildisplay' => \core_user::MAILDISPLAY_HIDE]);
+        $everyone = $this->getDataGenerator()->create_user(['maildisplay' => \core_user::MAILDISPLAY_EVERYONE]);
+        $members = $this->getDataGenerator()->create_user(['maildisplay' => \core_user::MAILDISPLAY_COURSE_MEMBERS_ONLY]);
+        $student = $this->getDataGenerator()->create_user();
+        foreach ([$hidden, $everyone, $members] as $teacher) {
+            $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
+        }
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+        $course = course_get_format($course)->get_course();
+        $PAGE->set_url('/course/view.php', ['id' => $course->id]);
+        $PAGE->set_course($course);
+
+        $this->setUser($student);
+        $staffs = $this->get_staff_by_userid($course);
+        $this->assertCount(3, $staffs);
+        $this->assertSame('', $staffs[$hidden->id]->email);
+        $this->assertSame($everyone->email, $staffs[$everyone->id]->email);
+        $this->assertSame($members->email, $staffs[$members->id]->email);
+        foreach (['password', 'username', 'auth', 'lastip', 'phone1', 'address'] as $field) {
+            $this->assertArrayNotHasKey($field, (array) $staffs[$hidden->id]);
+        }
+
+        // The template leaves out the envelope icon when there is no email address.
+        $html = $PAGE->get_renderer('core')->render_from_template('format_designer/course_time_management', [
+            'statuscoursestaffinfo' => true,
+            'coursestaffinfo' => [$staffs[$hidden->id]],
+            'dataride' => 'data-ride',
+        ]);
+        $this->assertStringNotContainsString('fa-envelope', $html);
+        $this->assertStringNotContainsString($hidden->email, $html);
+
+        // Users always see their own email address.
+        $this->setUser($hidden);
+        $this->assertSame($hidden->email, $this->get_staff_by_userid($course)[$hidden->id]->email);
+
+        // Hidden user fields hide the email address even when the user shows it to everyone.
+        set_config('hiddenuserfields', 'email');
+        $this->setUser($student);
+        $this->assertSame('', $this->get_staff_by_userid($course)[$everyone->id]->email);
+    }
+
+    /**
+     * The staff header shows selected profile fields only when their visibility setting allows it.
+     *
+     * @covers \format_designer\helper::get_course_staff_users
+     */
+    public function test_course_staff_profile_fields_follow_field_visibility(): void {
+        global $CFG, $PAGE;
+        require_once($CFG->dirroot . '/user/profile/lib.php');
+
+        if (helper::has_pro()) {
+            $this->markTestSkipped('Designer Pro builds the staff profile fields itself.');
+        }
+
+        $visibility = [
+            'everyonefield' => PROFILE_VISIBLE_ALL,
+            'privatefield' => PROFILE_VISIBLE_PRIVATE,
+            'nobodyfield' => PROFILE_VISIBLE_NONE,
+        ];
+        $userdata = [];
+        foreach ($visibility as $shortname => $visible) {
+            $this->getDataGenerator()->create_custom_profile_field([
+                'datatype' => 'text',
+                'shortname' => $shortname,
+                'name' => $shortname,
+                'visible' => $visible,
+            ]);
+            $userdata['profile_field_' . $shortname] = 'Value of ' . $shortname;
+        }
+        $course = $this->getDataGenerator()->create_course(['format' => 'designer']);
+        $teacher = $this->getDataGenerator()->create_user($userdata);
+        $student = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+        $course = course_get_format($course)->get_course();
+        foreach (array_keys($visibility) as $shortname) {
+            $course->{'profile_field_' . $shortname} = 1;
+        }
+        $PAGE->set_url('/course/view.php', ['id' => $course->id]);
+        $PAGE->set_course($course);
+
+        $this->setUser($student);
+        $values = array_column($this->get_staff_by_userid($course)[$teacher->id]->customfield, 'value');
+        $this->assertCount(1, $values);
+        $this->assertStringContainsString('Value of everyonefield', $values[0]);
+
+        // The user also sees the private field. A field that is not visible stays hidden even from its owner.
+        $this->setUser($teacher);
+        $values = implode(' ', array_column($this->get_staff_by_userid($course)[$teacher->id]->customfield, 'value'));
+        $this->assertStringContainsString('Value of everyonefield', $values);
+        $this->assertStringContainsString('Value of privatefield', $values);
+        $this->assertStringNotContainsString('Value of nobodyfield', $values);
+
+        // Fields that are not selected for the course are left out.
+        $course->profile_field_everyonefield = 0;
+        $this->setUser($student);
+        $this->assertSame([], $this->get_staff_by_userid($course)[$teacher->id]->customfield);
+    }
 }
