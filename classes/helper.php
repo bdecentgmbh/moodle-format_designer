@@ -309,6 +309,19 @@ class helper {
     }
 
     /**
+     * Split a text into its words.
+     *
+     * Any white space separates two words, including the non-breaking spaces the editor stores as &nbsp;.
+     * Digits and non-ASCII letters belong to the words, unlike in str_word_count().
+     *
+     * @param string $str Text, as returned by format_string().
+     * @return string[] The words.
+     */
+    public static function get_words(string $str): array {
+        return preg_split('/(?:\s|\x{00A0}|&nbsp;|&#160;|&#xa0;)+/iu', $str, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+    }
+
+    /**
      * Cut the Course content.
      *
      * @param string $str String to trim.
@@ -316,14 +329,11 @@ class helper {
      * @return string
      */
     public static function modcontent_trim_char(string $str, int $n = 25): string {
-        if (str_word_count($str) < $n) {
+        $words = self::get_words($str);
+        if (count($words) <= $n) {
             return $str;
         }
-        $arrstr = explode(" ", $str);
-        $slicearr = array_slice($arrstr, 0, $n);
-        $strarr = implode(" ", $slicearr);
-        $strarr .= '...';
-        return $strarr;
+        return implode(' ', array_slice($words, 0, $n)) . '...';
     }
 
     /**

@@ -1399,13 +1399,15 @@ class renderer extends \core_courseformat\output\section_renderer {
                 $videoinstance = $DB->get_record('videotime', ['id' => $mod->instance]);
                 $cmtext = $videoinstance->intro;
             }
-            $cmtextcontent = format_string($cmtext);
+            // Keep the words of two paragraphs or lines apart when format_string() strips the tags.
+            $cmtext = preg_replace('~<br\s*/?>|</(?:p|div|li|h[1-6]|td|th)>~i', '$0 ', $cmtext);
+            $cmtextcontent = trim(format_string($cmtext));
             $cmtextlength = get_config('format_designer', 'activitydesclength');
             $modcontent = '';
             if (!empty($cmtextcontent)) {
                 if ($cmtextlength == DESIGNER_MOD_TEXT_TRIMM) {
                     $trimlenght = get_config('format_designer', 'modtrimlength');
-                    if (str_word_count($cmtextcontent) > $trimlenght) {
+                    if (count(\format_designer\helper::get_words($cmtextcontent)) > $trimlenght) {
                         $modcontenthtml = '';
                         $modcontenthtml .= html_writer::start_tag('div', ['class' => 'trim-summary']);
                         $modcontenthtml .= \format_designer\helper::modcontent_trim_char($cmtextcontent, $trimlenght);
