@@ -1803,9 +1803,11 @@ class format_designer extends \core_courseformat\base {
     /**
      * Get course module secondary navigation title, formatted for HTML output.
      *
-     * Custom titles are stored as plain text (PARAM_TEXT). format_string() escapes
-     * them for the course-index and activity templates, which render this value
-     * with unescaped Mustache, and for the hero navigation link body.
+     * Custom titles are stored as plain text (PARAM_TEXT). format_string() strips
+     * their tags (or cleans them when the site keeps tags) for the course-index and
+     * activity templates, which render this value with unescaped Mustache, and for
+     * the hero navigation link body. Quotes are kept, so callers that place the
+     * value in an attribute or a script must still encode it.
      *
      * @param object $cm Course module.
      * @return string Title passed through format_string() in the module context.

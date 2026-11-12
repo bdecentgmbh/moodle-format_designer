@@ -452,7 +452,7 @@ final class lib_test extends \advanced_testcase {
     }
 
     /**
-     * Custom activity titles are plain text and must be escaped before templates and navigation use them.
+     * Custom activity titles are plain text and must pass through format_string() before templates and navigation use them.
      *
      * @covers \format_designer::get_cm_secondary_title
      * @covers ::format_designer_extend_navigation_course
@@ -483,8 +483,6 @@ final class lib_test extends \advanced_testcase {
         $expected = format_string($raw, true, ['context' => \context_module::instance($cm->id)]);
         $this->assertSame($expected, $title);
         $this->assertStringNotContainsString('<script>', $title);
-        $this->assertStringNotContainsString("'", $title);
-        $this->assertStringNotContainsString('"', $title);
         $this->assertNotSame($raw, $title);
 
         $index = $PAGE->get_renderer('core')->render_from_template('format_designer/courseformat/courseindex/cm', [
@@ -545,6 +543,10 @@ final class lib_test extends \advanced_testcase {
      */
     public function test_textarea_profile_field_is_formatted(): void {
         global $DB, $PAGE;
+
+        if (helper::has_pro()) {
+            $this->markTestSkipped('Designer Pro builds the staff profile fields itself.');
+        }
 
         $course = $this->getDataGenerator()->create_course(['format' => 'designer']);
         $user = $this->getDataGenerator()->create_user();
