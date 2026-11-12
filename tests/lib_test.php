@@ -682,4 +682,42 @@ final class lib_test extends \advanced_testcase {
             $this->assertStringNotContainsString($label, $jscode);
         }
     }
+
+    /**
+     * Video Time activity names go through format_string() like other activity names before the title template prints them.
+     *
+     * @covers \format_designer\output\courseformat\content\cm\title::get_title_displayvalue
+     */
+    public function test_videotime_title_is_formatted(): void {
+        global $PAGE;
+
+        if (!\core_component::get_component_directory('mod_videotime')) {
+            $this->markTestSkipped('mod_videotime is not installed.');
+        }
+
+        $raw = 'Video <script>alert(1)</script> & notes';
+        $course = $this->getDataGenerator()->create_course(['format' => 'designer']);
+        $module = $this->getDataGenerator()->create_module('videotime', [
+            'course' => $course->id,
+            'name' => $raw,
+        ]);
+
+        $PAGE->set_url('/course/view.php', ['id' => $course->id]);
+        $PAGE->set_course($course);
+        $format = course_get_format($course);
+        $modinfo = get_fast_modinfo($course);
+        $cm = $modinfo->get_cm($module->cmid);
+        $title = new \format_designer\output\courseformat\content\cm\title(
+            $format,
+            $modinfo->get_section_info($cm->sectionnum),
+            $cm,
+            [],
+            false
+        );
+        $data = $title->export_for_template($PAGE->get_renderer('core'));
+
+        $expected = format_string($raw, true, ['context' => \context_module::instance($cm->id)]);
+        $this->assertStringContainsString($expected, $data['displayvalue']);
+        $this->assertStringNotContainsString('<script>', $data['displayvalue']);
+    }
 }
