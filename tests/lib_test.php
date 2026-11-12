@@ -501,10 +501,11 @@ final class lib_test extends \advanced_testcase {
     public function test_criteria_progress_skips_hidden_activities(): void {
         [$course, $visible, $hidden, $teacher, $student] = $this->create_course_with_hidden_activity();
         $criterion = new \completion_criteria_activity();
-        $criterion->update_config((object) [
+        $criteriadata = (object) [
             'id' => $course->id,
             'criteria_activity' => [$visible->cmid => 1, $hidden->cmid => 1],
-        ]);
+        ];
+        $criterion->update_config($criteriadata);
 
         $this->setUser($teacher);
         $result = \format_designer\output\renderer::criteria_progress($course, $teacher->id);
