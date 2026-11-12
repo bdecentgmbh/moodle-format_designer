@@ -42,6 +42,7 @@ final class get_videotime_instace_test extends \advanced_testcase {
             $this->markTestSkipped('mod_videotime is not installed.');
         }
         $this->resetAfterTest();
+        $this->setAdminUser();
         $this->course = $this->getDataGenerator()->create_course(['format' => 'designer']);
         $this->videotime = $this->getDataGenerator()->create_module('videotime', ['course' => $this->course->id]);
     }
@@ -95,7 +96,8 @@ final class get_videotime_instace_test extends \advanced_testcase {
         assign_capability('mod/videotime:view', CAP_PROHIBIT, $studentrole, $modcontext->id);
         $this->setUser($student);
 
-        $this->expectException(\required_capability_exception::class);
+        // Without the view capability, core already treats the activity as not available to the user.
+        $this->expectException(\require_login_exception::class);
         external::get_videotime_instace($this->videotime->cmid);
     }
 }
