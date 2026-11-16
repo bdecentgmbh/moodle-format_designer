@@ -87,10 +87,12 @@
                                 <!--Contact User name-->
                                 <div class="title-block">
                                     <a href="{{{profileurl}}}"> <h4>{{{fullname}}}<h4> </a>
+                                    {{#email}}
                                     <span>
                                         <i class="icon fa fa-envelope fa-fw iconsmall" title="{{#str}}mail, format_designer{{/str}} " aria-label="mail"></i>
                                         <span class="user-email"> {{email}}</span>
                                     </span>
+                                    {{/email}}
                                     <span class="user-role">{{role}}</span>
                                     {{#customfield}}
                                         <span class="profile-field"> {{{value}}} </span>
