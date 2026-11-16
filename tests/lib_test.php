@@ -846,4 +846,85 @@ final class lib_test extends \advanced_testcase {
         $this->setUser($student);
         $this->assertSame([], $this->get_staff_by_userid($course)[$teacher->id]->customfield);
     }
+
+    /**
+     * Create a Designer course with a background image on section 1.
+     *
+     * @return array The course and the pluginfile.php arguments of the background.
+     */
+    protected function create_course_with_section_background(): array {
+        $course = $this->getDataGenerator()->create_course(
+            ['format' => 'designer', 'numsections' => 2, 'hiddensections' => 1],
+            ['createsections' => true]
+        );
+        $section = get_fast_modinfo($course)->get_section_info(1);
+        get_file_storage()->create_file_from_string([
+            'contextid' => \context_course::instance($course->id)->id,
+            'component' => 'format_designer',
+            'filearea' => 'sectiondesignbackground',
+            'itemid' => $section->id,
+            'filepath' => '/',
+            'filename' => 'background.png',
+        ], 'image');
+        return [$course, [$section->id, 'background.png']];
+    }
+
+    /**
+     * Enrolled users get the section background.
+     *
+     * @covers ::format_designer_get_section_background_file
+     */
+    public function test_section_background_file_enrolled_user(): void {
+        [$course, $args] = $this->create_course_with_section_background();
+        $context = \context_course::instance($course->id);
+        $this->setUser($this->getDataGenerator()->create_and_enrol($course, 'student'));
+
+        $file = format_designer_get_section_background_file($course, $context, 'sectiondesignbackground', $args);
+        $this->assertInstanceOf(\stored_file::class, $file);
+        $this->assertEquals('background.png', $file->get_filename());
+
+        // Only the section background areas in the course context are served.
+        $this->assertNull(format_designer_get_section_background_file($course, $context, 'other', $args));
+        $systemcontext = \context_system::instance();
+        $this->assertNull(format_designer_get_section_background_file($course, $systemcontext, 'sectiondesignbackground', $args));
+    }
+
+    /**
+     * Users who are not enrolled in the course do not get the section background.
+     *
+     * @covers ::format_designer_get_section_background_file
+     */
+    public function test_section_background_file_user_not_enrolled(): void {
+        [$course, $args] = $this->create_course_with_section_background();
+        $context = \context_course::instance($course->id);
+        // Enrolled in another course only.
+        $othercourse = $this->getDataGenerator()->create_course(['format' => 'designer']);
+        $this->setUser($this->getDataGenerator()->create_and_enrol($othercourse, 'student'));
+
+        // The course login redirects to the enrolment page, which PHPUnit reports as an exception.
+        $this->expectException(\moodle_exception::class);
+        format_designer_get_section_background_file($course, $context, 'sectiondesignbackground', $args);
+    }
+
+    /**
+     * Students do not get the background of a hidden section, teachers do.
+     *
+     * @covers ::format_designer_get_section_background_file
+     */
+    public function test_section_background_file_hidden_section(): void {
+        global $DB;
+        [$course, $args] = $this->create_course_with_section_background();
+        $context = \context_course::instance($course->id);
+        $DB->set_field('course_sections', 'visible', 0, ['id' => $args[0]]);
+        rebuild_course_cache($course->id, true);
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $teacher = $this->getDataGenerator()->create_and_enrol($course, 'editingteacher');
+
+        $this->setUser($student);
+        $this->assertNull(format_designer_get_section_background_file($course, $context, 'sectiondesignbackground', $args));
+
+        $this->setUser($teacher);
+        $file = format_designer_get_section_background_file($course, $context, 'sectiondesignbackground', $args);
+        $this->assertInstanceOf(\stored_file::class, $file);
+    }
 }

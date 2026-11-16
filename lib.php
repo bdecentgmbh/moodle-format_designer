@@ -1905,21 +1905,45 @@ function format_designer_inplace_editable($itemtype, $itemid, $newvalue) {
  * @return bool false if file not found, does not return if found - just send the file
  */
 function format_designer_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
-    require_login();
-    if ($context->contextlevel != CONTEXT_COURSE && $filearea != 'sectiondesignbackground') {
-        return false;
-    }
-
-    $areas = ['sectiondesignbackground', 'sectiondesigncompletionbackground'];
-    if (!in_array($filearea, $areas)) {
-        return false;
-    }
-    $fs = get_file_storage();
-    $file = $fs->get_file($context->id, 'format_designer', $filearea, $args[0], '/', $args[1]);
+    $file = format_designer_get_section_background_file($course, $context, $filearea, $args);
     if (!$file) {
         return false;
     }
     send_stored_file($file, 0, 0, 0, $options);
+}
+
+/**
+ * Find the section background file requested from pluginfile.php, if the current user may see it.
+ *
+ * Section backgrounds are only shown inside the course, so they need the same access as the course,
+ * like the course section summary files. Backgrounds of sections the user does not get to see are refused.
+ *
+ * @param stdClass $course Course of the file context.
+ * @param context $context Context of the file.
+ * @param string $filearea File area.
+ * @param array $args Section id, file path and file name.
+ * @return stored_file|null The file, or null if there is none to send.
+ */
+function format_designer_get_section_background_file($course, $context, $filearea, array $args): ?stored_file {
+    $areas = ['sectiondesignbackground', 'sectiondesigncompletionbackground'];
+    if ($context->contextlevel != CONTEXT_COURSE || !in_array($filearea, $areas)) {
+        return null;
+    }
+    require_course_login($course, true);
+
+    $sectionid = (int) array_shift($args);
+    $section = get_fast_modinfo($course)->get_section_info_by_id($sectionid);
+    if (!$section || !course_get_format($course)->is_section_visible($section)) {
+        return null;
+    }
+
+    $filename = array_pop($args);
+    $filepath = $args ? '/' . implode('/', $args) . '/' : '/';
+    $file = get_file_storage()->get_file($context->id, 'format_designer', $filearea, $sectionid, $filepath, $filename);
+    if (!$file || $file->is_directory()) {
+        return null;
+    }
+    return $file;
 }
 
 /**
