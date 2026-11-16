@@ -1801,9 +1801,16 @@ class format_designer extends \core_courseformat\base {
     }
 
     /**
-     * Get course module secondary navigation title.
-     * @param object $cm
-     * @return string title.
+     * Get course module secondary navigation title, formatted for HTML output.
+     *
+     * Custom titles are stored as plain text (PARAM_TEXT). format_string() strips
+     * their tags (or cleans them when the site keeps tags) for the course-index and
+     * activity templates, which render this value with unescaped Mustache, and for
+     * the hero navigation link body. Quotes are kept, so callers that place the
+     * value in an attribute or a script must still encode it.
+     *
+     * @param object $cm Course module.
+     * @return string Title passed through format_string() in the module context.
      */
     public function get_cm_secondary_title($cm) {
         $secondarytitletype = \format_designer\options::get_option($cm->id, 'secondarytype');
@@ -1816,7 +1823,9 @@ class format_designer extends \core_courseformat\base {
             // Custom title.
             $title = \format_designer\options::get_option($cm->id, 'secondarycustomtitle');
         }
-        return !empty($title) ? $title : $cm->name;
+        $title = !empty($title) ? $title : $cm->name;
+        $modcontext = \context_module::instance($cm->id);
+        return format_string((string) $title, true, ['context' => $modcontext]);
     }
 
     /**
@@ -2264,35 +2273,43 @@ function format_designer_extend_navigation_course($navigation, $course, $context
 
     $currentmodclass = ($PAGE->context->contextlevel == CONTEXT_MODULE) ? "nav.moremenu li[data-key=\"{$PAGE->cm->id}\"]" : "";
     $currentcmid = ($PAGE->context->contextlevel == CONTEXT_MODULE) ? $PAGE->cm->id : 0;
+    // The link HTML is inserted from a script tag. Encode it as a JavaScript string so a
+    // title character that survives HTML escaping cannot terminate the script.
+    $jsonflags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
+    $heroactivityhtml = json_encode($content, $jsonflags);
+    // The same applies to the menu HTML built from language strings, which may contain an apostrophe.
+    $secondarycontenthtml = json_encode($secondarycontent, $jsonflags);
+    $secondarymenutocoursehtml = json_encode($secondarymenutocoursecontent, $jsonflags);
+    $modbacktomainhtml = json_encode($modbacktomain, $jsonflags);
 
     $PAGE->requires->js_amd_inline("
         require(['jquery', 'core/moremenu'], function($, MenuMore) {
             $(document).ready(function() {
                 // Added the secondary navigation when menu is empty.
                 if ('$isaddsecondary' && !document.querySelector('.secondary-navigation')) {
-                    $('$secondarycontent').insertAfter('#page-header');
+                    $($secondarycontenthtml).insertAfter('#page-header');
                 }
                 var moremenu = document.querySelector('.secondary-navigation ul.nav-tabs .dropdownmoremenu ul');
                 // Added the hero activities on the module page.
                 if ('$modulecontent') {
                     if (moremenu) {
-                        $(moremenu).append('$content');
+                        $(moremenu).append($heroactivityhtml);
                     }
                 }
 
                 // Added the course menu on the module page.
                 var coursehome = document.querySelectorAll('nav.moremenu li[data-key=coursehome]')[0];
-                if ('$secondarymenutocoursecontent' && !coursehome) {
+                if ($secondarymenutocoursehtml && !coursehome) {
                     if (moremenu) {
-                        $(moremenu).append('$secondarymenutocoursecontent');
+                        $(moremenu).append($secondarymenutocoursehtml);
                     }
                 }
 
                 // Added the course menu on the module page.
                 var backtomaincourse = document.querySelectorAll('nav.moremenu li[data-key=backtomaincourse]')[0];
-                if ('$modbacktomain' && !backtomaincourse) {
+                if ($modbacktomainhtml && !backtomaincourse) {
                     if (moremenu) {
-                        $(moremenu).append('$modbacktomain');
+                        $(moremenu).append($modbacktomainhtml);
                     }
                 }
 
