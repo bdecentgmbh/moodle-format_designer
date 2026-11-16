@@ -49,6 +49,7 @@ final class get_videotime_instace_test extends \advanced_testcase {
 
     /**
      * An enrolled student gets the settings of the activity.
+     * @covers \format_designer\external\external::get_videotime_instace
      */
     public function test_enrolled_student_gets_instance(): void {
         $student = $this->getDataGenerator()->create_and_enrol($this->course, 'student');
@@ -62,6 +63,7 @@ final class get_videotime_instace_test extends \advanced_testcase {
 
     /**
      * A user who is not enrolled in the course gets nothing.
+     * @covers \format_designer\external\external::get_videotime_instace
      */
     public function test_user_not_enrolled_is_refused(): void {
         // Enrolled in another course only.
@@ -75,6 +77,7 @@ final class get_videotime_instace_test extends \advanced_testcase {
 
     /**
      * An enrolled student gets nothing for a hidden activity.
+     * @covers \format_designer\external\external::get_videotime_instace
      */
     public function test_hidden_activity_is_refused(): void {
         set_coursemodule_visible($this->videotime->cmid, 0);
@@ -87,6 +90,7 @@ final class get_videotime_instace_test extends \advanced_testcase {
 
     /**
      * A student without the view capability on the activity gets nothing.
+     * @covers \format_designer\external\external::get_videotime_instace
      */
     public function test_no_view_capability_is_refused(): void {
         global $DB;
