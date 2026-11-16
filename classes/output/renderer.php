@@ -1321,7 +1321,6 @@ class renderer extends \core_courseformat\output\section_renderer {
     ) {
         global $DB, $USER, $CFG;
         // Static caches to reduce DB queries - persists across multiple calls within same request.
-        static $modvisitscache = [];
         static $videotimecache = [];
         static $vimeovideocache = [];
         static $completioncache = []; // Add completion cache.
@@ -1443,46 +1442,16 @@ class renderer extends \core_courseformat\output\section_renderer {
             }
         }
 
-        // Bulk load ALL visit counts in ONE query on first call.
-        static $visitsbulkloaded = false;
-
-        if (!$visitsbulkloaded) {
-            // Get all course module IDs from modinfo to use IN clause instead of LIKE.
-            $modinfo = get_fast_modinfo($course);
-            $cmids = array_keys($modinfo->get_cms());
-
-            if (!empty($cmids)) {
-                // Use IN clause for much better performance than LIKE on path.
-                [$insql, $params] = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED, 'cmid');
-
-                $params['userid'] = $USER->id;
-                $params['action'] = 'viewed';
-                $params['target'] = 'course_module';
-                // Optional: Only get logs from last 6 months to reduce dataset.
-                $params['timefrom'] = time() - (6 * 30 * 24 * 60 * 60);
-
-                $sql = "SELECT l.contextinstanceid, COUNT(*) as visitcount
-                        FROM {logstore_standard_log} l
-                        WHERE l.userid = :userid
-                        AND l.action = :action
-                        AND l.target = :target
-                        AND l.contextinstanceid $insql
-                        AND l.timecreated >= :timefrom
-                        GROUP BY l.contextinstanceid";
-
-                // Use get_records_sql() since we already filtered by course modules.
-                $visits = $DB->get_records_sql($sql, $params);
-                foreach ($visits as $visit) {
-                    $modvisitscache[$visit->contextinstanceid . '_' . $USER->id] = $visit->visitcount;
-                }
+        // The visit count of the current user, only for activities that show it.
+        $modvisits = false;
+        if ($this->get_cmurl($mod, $options) && $this->shows_visits($mod, $options)) {
+            $visitcounts = $this->get_visit_counts($course);
+            if ($visitcounts !== null) {
+                $modvisits = !empty($visitcounts[$mod->id])
+                    ? get_string('modvisit', 'format_designer', $visitcounts[$mod->id])
+                    : get_string('notvisit', 'format_designer');
             }
-            $visitsbulkloaded = true;
         }
-
-        // Use cached visits count.
-        $cachekey = $mod->id . '_' . $USER->id;
-        $modvisits = !empty($modvisitscache[$cachekey]) ? get_string('modvisit', 'format_designer', $modvisitscache[$cachekey]) :
-            get_string('notvisit', 'format_designer');
 
         $calltoactionhtml = $this->render(new call_to_action($mod));
         $modrestricted = ($mod->availableinfo) ?: false;
@@ -1566,7 +1535,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             'isrestricted' => !empty($mod->availableinfo),
             'modcontent' => isset($modcontent) ? $modcontent : '',
             'modcontentclass' => !empty($modcontent) ? 'ismodcontent' : '',
-            'modvisits' => $this->get_cmurl($mod, $options) ? $modvisits : false,
+            'modvisits' => $modvisits,
             'modiconurl' => $modiconurl,
             'modrestricted' => $modrestricted,
             'elementstate' => $this->get_activity_elementclasses($mod, $options),
@@ -1643,6 +1612,68 @@ class renderer extends \core_courseformat\output\section_renderer {
             return $elementclasses;
         }
         return [];
+    }
+
+    /**
+     * Whether an activity shows its visit count, i.e. its "Visits" element isn't set to Remove.
+     *
+     * @param cm_info $mod
+     * @param object|null $options Cached module options to avoid extra DB query
+     * @return bool
+     */
+    protected function shows_visits(cm_info $mod, $options = null): bool {
+        return ($this->get_activity_elementclasses($mod, $options)['visits'] ?? '') !== 'content-remove';
+    }
+
+    /**
+     * The current user's visit counts for the activities of a course, from the standard log store.
+     *
+     * One query per course and request, over the last 6 months. No counts for guests: they all share one user id,
+     * so the count would be the views of all guests. No counts either when the standard log store is disabled or
+     * no activity of the course shows its visits.
+     *
+     * @param \stdClass $course
+     * @return array|null Number of views by course module id, null when no counts are shown.
+     */
+    protected function get_visit_counts(\stdClass $course): ?array {
+        global $DB, $USER;
+
+        if (!isloggedin() || isguestuser()) {
+            return null;
+        }
+        $cache = \cache::make_from_params(\cache_store::MODE_REQUEST, 'format_designer', 'visitcounts');
+        $key = $course->id . '_' . $USER->id;
+        $cached = $cache->get($key);
+        if ($cached !== false) {
+            return $cached['counts'];
+        }
+
+        $counts = null;
+        $stores = explode(',', (string) get_config('tool_log', 'enabled_stores'));
+        $cms = get_fast_modinfo($course)->get_cms();
+        if (in_array('logstore_standard', $stores) && array_filter($cms, fn($cm) => $this->shows_visits($cm))) {
+            // Filter on the course, not on a list of all its activities, which can exceed the number of query
+            // parameters some databases allow. The user-module index starts with userid and contextlevel.
+            $sql = "SELECT l.contextinstanceid, COUNT(*) AS visitcount
+                      FROM {logstore_standard_log} l
+                     WHERE l.userid = :userid
+                       AND l.contextlevel = :contextlevel
+                       AND l.courseid = :courseid
+                       AND l.action = :action
+                       AND l.target = :target
+                       AND l.timecreated >= :timefrom
+                  GROUP BY l.contextinstanceid";
+            $counts = $DB->get_records_sql_menu($sql, [
+                'userid' => $USER->id,
+                'contextlevel' => CONTEXT_MODULE,
+                'courseid' => $course->id,
+                'action' => 'viewed',
+                'target' => 'course_module',
+                'timefrom' => time() - (6 * 30 * 24 * 60 * 60),
+            ]);
+        }
+        $cache->set($key, ['counts' => $counts]);
+        return $counts;
     }
 
     /**
