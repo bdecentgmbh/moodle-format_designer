@@ -263,7 +263,7 @@ trait set_section_options {
      * @return array $data videotime instance data.
      */
     public static function get_videotime_instace($cmid) {
-        global $CFG, $PAGE;
+        global $CFG;
         $data = [];
         if (file_exists($CFG->dirroot . "/mod/videotime/lib.php")) {
             require_once($CFG->dirroot . "/mod/videotime/classes/videotime_instance.php");
@@ -274,8 +274,11 @@ trait set_section_options {
             );
             $cmid = $params['cmid'];
             $cm = get_coursemodule_from_id('videotime', $cmid, 0, false, MUST_EXIST);
-            $context = context_course::instance($cm->course);
-            $PAGE->set_context($context);
+            // Only users who may view the activity get its settings: this logs the user in to the course
+            // and the activity, so hidden or restricted activities and other courses are refused.
+            $modcontext = context_module::instance($cm->id);
+            self::validate_context($modcontext);
+            require_capability('mod/videotime:view', $modcontext);
             $moduleinstance = \mod_videotime\videotime_instance::instance_by_id($cm->instance);
             $record = $moduleinstance->to_record();
             $data = [
