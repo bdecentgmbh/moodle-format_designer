@@ -927,4 +927,97 @@ final class lib_test extends \advanced_testcase {
         $file = format_designer_get_section_background_file($course, $context, 'sectiondesignbackground', $args);
         $this->assertInstanceOf(\stored_file::class, $file);
     }
+
+    /**
+     * Create a Designer course with a visible and a hidden activity with completion, a teacher and a student.
+     *
+     * @param array $options Course options.
+     * @return array The course, the visible and the hidden activity, the teacher and the student.
+     */
+    protected function create_course_with_hidden_activity(array $options = []): array {
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(['format' => 'designer', 'enablecompletion' => 1] + $options);
+        $completion = ['completion' => COMPLETION_TRACKING_MANUAL];
+        $visible = $generator->create_module('page', ['course' => $course->id, 'name' => 'Visible page'], $completion);
+        $hidden = $generator->create_module('page', ['course' => $course->id, 'name' => 'Hidden page'], $completion);
+        $generator->create_module('page', ['course' => $course->id, 'name' => 'Page without completion']);
+        set_coursemodule_visible($hidden->cmid, 0);
+        $teacher = $generator->create_and_enrol($course, 'editingteacher');
+        $student = $generator->create_and_enrol($course, 'student');
+        return [$course, $visible, $hidden, $teacher, $student];
+    }
+
+    /**
+     * The completion activities are the ones the user sees, whoever asked for them first.
+     *
+     * @covers \format_designer\output\renderer::get_completion_activities
+     */
+    public function test_get_completion_activities_per_user(): void {
+        [$course, $visible, $hidden, $teacher, $student] = $this->create_course_with_hidden_activity();
+
+        $this->setUser($teacher);
+        $activities = \format_designer\output\renderer::get_completion_activities($course);
+        $this->assertEqualsCanonicalizing([$visible->cmid, $hidden->cmid], array_keys($activities));
+
+        $this->setUser($student);
+        $activities = \format_designer\output\renderer::get_completion_activities($course);
+        $this->assertEquals([$visible->cmid], array_keys($activities));
+        $this->assertInstanceOf(\cm_info::class, $activities[$visible->cmid]);
+
+        // The activities of another user follow the access of that user.
+        $this->setUser($teacher);
+        $activities = \format_designer\output\renderer::get_completion_activities($course, $student->id);
+        $this->assertEquals([$visible->cmid], array_keys($activities));
+    }
+
+    /**
+     * The progress of a student does not list activities hidden from the student, even right after a teacher.
+     *
+     * @covers \format_designer\output\renderer::criteria_progress
+     */
+    public function test_criteria_progress_skips_hidden_activities(): void {
+        [$course, $visible, $hidden, $teacher, $student] = $this->create_course_with_hidden_activity();
+        $criterion = new \completion_criteria_activity();
+        $criteriadata = (object) [
+            'id' => $course->id,
+            'criteria_activity' => [$visible->cmid => 1, $hidden->cmid => 1],
+        ];
+        $criterion->update_config($criteriadata);
+
+        $this->setUser($teacher);
+        $result = \format_designer\output\renderer::criteria_progress($course, $teacher->id);
+        $this->assertStringContainsString('Hidden page', $result['uncompletioncriteriahtml']);
+
+        $this->setUser($student);
+        $result = \format_designer\output\renderer::criteria_progress($course, $student->id);
+        $this->assertStringContainsString('Visible page', $result['uncompletioncriteriahtml']);
+        $this->assertStringNotContainsString('Hidden page', $result['uncompletioncriteriahtml']);
+        $this->assertStringNotContainsString('Hidden page', $result['completioncriteriahtml']);
+    }
+
+    /**
+     * With Designer Pro's "all activities" progress, a student's progress only counts the activities the student sees.
+     *
+     * @covers \format_designer\output\renderer::criteria_progress
+     */
+    public function test_criteria_progress_all_activities_counts_visible_activities(): void {
+        global $CFG;
+        if (!\format_designer\helper::has_pro()) {
+            $this->markTestSkipped('Designer Pro is not installed.');
+        }
+        require_once($CFG->dirroot . '/course/format/designer/lib.php');
+        [$course, , , $teacher, $student] = $this->create_course_with_hidden_activity(
+            ['calcourseprogress' => DESIGNER_PROGRESS_ALLACTIVITIES]
+        );
+
+        $this->setUser($teacher);
+        $result = \format_designer\output\renderer::criteria_progress($course, $teacher->id);
+        $this->assertEquals(2, $result['count']);
+
+        $this->setUser($student);
+        $result = \format_designer\output\renderer::criteria_progress($course, $student->id);
+        $this->assertEquals(1, $result['count']);
+        $this->assertStringContainsString('Visible page', $result['uncompletioncriteriahtml']);
+        $this->assertStringNotContainsString('Hidden page', $result['uncompletioncriteriahtml']);
+    }
 }
