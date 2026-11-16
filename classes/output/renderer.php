@@ -1399,13 +1399,17 @@ class renderer extends \core_courseformat\output\section_renderer {
                 $videoinstance = $DB->get_record('videotime', ['id' => $mod->instance]);
                 $cmtext = $videoinstance->intro;
             }
-            $cmtextcontent = format_string($cmtext);
+            // The plain text is only for the word count and the trimmed teaser, the description keeps its paragraphs,
+            // line breaks and images otherwise. Keep the words of two paragraphs or lines apart when format_string()
+            // strips the tags.
+            $cmtextcontent = trim(format_string(preg_replace('~<br\s*/?>|</(?:p|div|li|h[1-6]|td|th)>~i', '$0 ', $cmtext)));
             $cmtextlength = get_config('format_designer', 'activitydesclength');
             $modcontent = '';
-            if (!empty($cmtextcontent)) {
+            // Show a description with text, or with only an image or other media.
+            if ($cmtextcontent !== '' || preg_match('~<(?:img|video|audio|iframe|object|embed|svg|picture)\b~i', $cmtext)) {
                 if ($cmtextlength == DESIGNER_MOD_TEXT_TRIMM) {
                     $trimlenght = get_config('format_designer', 'modtrimlength');
-                    if (str_word_count($cmtextcontent) > $trimlenght) {
+                    if (count(\format_designer\helper::get_words($cmtextcontent)) > $trimlenght) {
                         $modcontenthtml = '';
                         $modcontenthtml .= html_writer::start_tag('div', ['class' => 'trim-summary']);
                         $modcontenthtml .= \format_designer\helper::modcontent_trim_char($cmtextcontent, $trimlenght);
@@ -1416,7 +1420,7 @@ class renderer extends \core_courseformat\output\section_renderer {
                         );
                         $modcontenthtml .= html_writer::end_tag('div');
                         $modcontenthtml .= html_writer::start_tag('div', ['class' => 'fullcontent-summary summary-hide']);
-                        $modcontenthtml .= $cmtextcontent;
+                        $modcontenthtml .= $cmtext;
                         $modcontenthtml .= " " . \html_writer::link(
                             'javascript:void(0)',
                             get_string('less', 'format_designer'),
@@ -1425,10 +1429,10 @@ class renderer extends \core_courseformat\output\section_renderer {
                         $modcontenthtml .= html_writer::end_tag('div');
                         $modcontent = $modcontenthtml;
                     } else {
-                        $modcontent = html_writer::tag('p', $cmtextcontent);
+                        $modcontent = $cmtext;
                     }
                 } else {
-                    $modcontent = html_writer::tag('p', $cmtextcontent);
+                    $modcontent = $cmtext;
                 }
             }
         } else {
