@@ -216,6 +216,9 @@
 </div>
 {{#js}}
 require(['core_courseformat/local/content'], function(component) {
-    component.init('course-format-{{uniqid}}', {}, {{sectionreturn}});
+    component.init(
+        'course-format-{{uniqid}}', {}, {{sectionreturn}},
+        {{#pagesectionid}}{{.}}{{/pagesectionid}}{{^pagesectionid}}null{{/pagesectionid}}
+    );
 });
 {{/js}}
