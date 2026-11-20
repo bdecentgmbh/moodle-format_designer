@@ -331,12 +331,12 @@ class helper {
      *
      * Raise it whenever a function, constant or class shared with Pro changes.
      */
-    const MIN_PRO_VERSION = 2026050201;
+    public const MIN_PRO_VERSION = 2026050201;
 
     /**
      * Release name shown in the "Designer Pro is outdated" notice.
      */
-    const MIN_PRO_RELEASE = '1.8';
+    public const MIN_PRO_RELEASE = '1.8';
 
     /**
      * Check if a usable Designer Pro is installed.
