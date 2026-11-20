@@ -60,13 +60,13 @@ final class helper_test extends \advanced_testcase {
         if (!helper::pro_present()) {
             $this->markTestSkipped('Designer Pro is not installed.');
         }
+        $this->setAdminUser();
         $course = $this->getDataGenerator()->create_course(['format' => 'designer']);
         $topics = $this->getDataGenerator()->create_course(['format' => 'topics']);
         $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
         $message = get_string('prooutdated', 'format_designer', helper::MIN_PRO_RELEASE);
 
         set_config('version', 2025041100, 'local_designer');
-        $this->setAdminUser();
         $this->assertSame([$message], $this->notices_for($course, 'course'));
         $this->assertSame([$message], $this->notices_for(get_site(), 'admin'));
         $this->assertSame([], $this->notices_for($topics, 'course'));
