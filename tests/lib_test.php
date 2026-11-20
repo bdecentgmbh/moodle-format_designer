@@ -1299,6 +1299,44 @@ final class lib_test extends \advanced_testcase {
     }
 
     /**
+     * A criterion for an activity hidden from the student still counts, and is listed without its name (DES-998).
+     *
+     * @covers \format_designer\output\renderer::criteria_progress
+     */
+    public function test_criteria_progress_lists_unavailable_activities(): void {
+        [$course, $visible, $hidden, , $student] = $this->create_course_with_hidden_activity();
+        $criterion = new \completion_criteria_activity();
+        $criteriadata = (object) [
+            'id' => $course->id,
+            'criteria_activity' => [$visible->cmid => 1, $hidden->cmid => 1],
+        ];
+        $criterion->update_config($criteriadata);
+        $unavailable = get_string('criteriaactivitynotavailable', 'format_designer');
+
+        $this->setUser($student);
+        $result = \format_designer\output\renderer::criteria_progress($course, $student->id);
+        $this->assertEquals(2, $result['count']);
+        $this->assertEquals(0, $result['completed']);
+        $this->assertStringContainsString('Visible page', $result['uncompletioncriteriahtml']);
+        $this->assertStringContainsString($unavailable, $result['uncompletioncriteriahtml']);
+        $this->assertStringNotContainsString('Hidden page', $result['uncompletioncriteriahtml']);
+
+        // Completed before it was hidden: it counts as completed, as in course completion.
+        $completion = new \completion_info($course);
+        foreach ($completion->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY) as $activitycriterion) {
+            if ($activitycriterion->moduleinstance == $hidden->cmid) {
+                $completion->get_user_completion($student->id, $activitycriterion)->mark_complete();
+            }
+        }
+        \format_designer\helper::get_cache_object()->purge();
+        $result = \format_designer\output\renderer::criteria_progress($course, $student->id);
+        $this->assertEquals(2, $result['count']);
+        $this->assertEquals(1, $result['completed']);
+        $this->assertStringContainsString($unavailable, $result['completioncriteriahtml']);
+        $this->assertStringNotContainsString($unavailable, $result['uncompletioncriteriahtml']);
+    }
+
+    /**
      * With Designer Pro's "all activities" progress, a student's progress only counts the activities the student sees.
      *
      * @covers \format_designer\output\renderer::criteria_progress
