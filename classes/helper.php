@@ -327,18 +327,52 @@ class helper {
     }
 
     /**
-     * Check if Designer Pro is installed.
+     * Oldest Designer Pro (local_designer) version this format works with: Pro 1.7 R5.
+     *
+     * Raise it whenever a function, constant or class shared with Pro changes.
+     */
+    const MIN_PRO_VERSION = 2026050201;
+
+    /**
+     * Release name shown in the "Designer Pro is outdated" notice.
+     */
+    const MIN_PRO_RELEASE = '1.8';
+
+    /**
+     * Check if a usable Designer Pro is installed.
+     *
+     * Pro only counts as installed when its installed version is at least MIN_PRO_VERSION.
+     * An older Pro (for example while only the format has been updated) is ignored,
+     * so that Designer courses and Site administration keep working until Pro is updated too.
      *
      * @return bool
      */
     public static function has_pro(): bool {
-        static $result;
-        if ($result === null) {
-            // Check if local_designer plugin exists by checking for its helper class.
-            $result = array_key_exists('designer', core_component::get_plugin_list('local'));
-        }
+        return self::pro_present() && !self::pro_outdated();
+    }
 
-        return $result;
+    /**
+     * Check if the Designer Pro code is present, regardless of its version.
+     *
+     * @return bool
+     */
+    public static function pro_present(): bool {
+        return array_key_exists('designer', core_component::get_plugin_list('local'));
+    }
+
+    /**
+     * Check if Designer Pro is present but older than the version this format needs.
+     *
+     * Uses the installed (database) version, so a Pro whose new code isn't upgraded yet also counts as outdated.
+     *
+     * @return bool
+     */
+    public static function pro_outdated(): bool {
+        if (!self::pro_present()) {
+            return false;
+        }
+        $version = get_config('local_designer', 'version');
+        return !$version || (int) $version < self::MIN_PRO_VERSION;
     }
 
     /**
