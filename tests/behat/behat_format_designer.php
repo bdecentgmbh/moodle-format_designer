@@ -141,8 +141,13 @@ class behat_format_designer extends behat_base {
         $tops = $this->evaluate_script('return Array.from(document.querySelectorAll(' . json_encode($selector) . '))' .
             '.filter(e => e.getClientRects().length).map(e => Math.round(e.getBoundingClientRect().top));');
         if (count(array_unique($tops)) > 1) {
-            throw new ExpectationException(sprintf('The %d visible elements are in %d rows (tops %s)',
-                count($tops), count(array_unique($tops)), implode(', ', $tops)), $this->getSession());
+            $message = sprintf(
+                'The %d visible elements are in %d rows (tops %s)',
+                count($tops),
+                count(array_unique($tops)),
+                implode(', ', $tops)
+            );
+            throw new ExpectationException($message, $this->getSession());
         }
     }
 
