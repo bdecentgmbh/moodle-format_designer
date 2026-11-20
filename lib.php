@@ -2479,8 +2479,9 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                         parent.setAttribute('data-forceintomoremenu', 'false');
                         secondarynav.insertBefore(parent, secondarynav.children[0]);
                     }
-                    window.dispatchEvent(new Event('resize')); // Dispatch the resize event to create more menu.
                 }
+                // Let core's more menu recalculate which items fit, now that the items have moved.
+                window.dispatchEvent(new Event('resize'));
                 return true;
             });
         });
