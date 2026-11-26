@@ -368,6 +368,7 @@ $string['privacy:metadata'] = 'The Designer format plugin does not store any per
 $string['profilefieditem'] = '';
 $string['profilefieditem_help'] = "Display the user profile field in the course staff block.";
 $string['progressbar'] = 'Progress bar';
+$string['prooutdated'] = 'Designer Pro is outdated and has been switched off until it is updated. Please update Designer Pro to {$a} or later (Site administration > Plugins > Install plugins).';
 $string['purpose'] = "Purpose";
 $string['purpose_created'] = 'Purpose successfully created';
 $string['purpose_deleted'] = "Purpose successfully deleted";
