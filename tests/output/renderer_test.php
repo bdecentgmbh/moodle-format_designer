@@ -23,7 +23,10 @@ namespace format_designer\output;
  * @copyright  2026 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \format_designer\output\renderer
+ * @covers     \format_designer\output\renderer::render_course_module
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\format_designer\output\renderer::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\renderer::class, 'render_course_module')]
 final class renderer_test extends \advanced_testcase {
     /** @var \stdClass Designer course. */
     protected \stdClass $course;
@@ -58,8 +61,6 @@ final class renderer_test extends \advanced_testcase {
 
     /**
      * A user sees their own views of the last 6 months, not those of other users.
-     *
-     * @covers ::render_course_module
      */
     public function test_visits_of_the_user(): void {
         global $USER;
@@ -76,8 +77,6 @@ final class renderer_test extends \advanced_testcase {
 
     /**
      * An activity without views shows that it wasn't visited yet.
-     *
-     * @covers ::render_course_module
      */
     public function test_not_visited(): void {
         $this->setAdminUser();
@@ -86,8 +85,6 @@ final class renderer_test extends \advanced_testcase {
 
     /**
      * An activity whose visits element is set to Remove shows no count.
-     *
-     * @covers ::render_course_module
      */
     public function test_visits_removed(): void {
         global $USER;
@@ -99,8 +96,6 @@ final class renderer_test extends \advanced_testcase {
 
     /**
      * Guests share one user id, so they get no count, not the views of all guests.
-     *
-     * @covers ::render_course_module
      */
     public function test_visits_guest(): void {
         global $USER;
@@ -112,8 +107,6 @@ final class renderer_test extends \advanced_testcase {
 
     /**
      * Without the standard log store there is nothing to count.
-     *
-     * @covers ::render_course_module
      */
     public function test_visits_log_store_disabled(): void {
         global $USER;

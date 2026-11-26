@@ -23,12 +23,13 @@ namespace format_designer\output\courseformat;
  * @copyright  2026 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \format_designer\output\courseformat\content
+ * @covers     \format_designer\output\courseformat\content::export_for_template
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\format_designer\output\courseformat\content::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\courseformat\content::class, 'export_for_template')]
 final class content_test extends \advanced_testcase {
     /**
      * The content exports the values for the content JavaScript like core: strings instead of NULL.
-     *
-     * @covers ::export_for_template
      */
     public function test_export_for_template_section_return(): void {
         global $PAGE;

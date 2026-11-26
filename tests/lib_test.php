@@ -36,7 +36,59 @@ require_once($CFG->dirroot . '/course/format/designer/lib.php');
  * @package    format_designer
  * @copyright  2015 Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers     \format_designer\output\renderer::is_template_exists
+ * @covers     \format_designer::page_set_course
+ * @covers     \format_designer::get_section_name
+ * @covers     \format_designer::get_default_section_name
+ * @covers     \core_external::update_inplace_editable
+ * @covers     ::format_designer_inplace_editable
+ * @covers     \format_designer\helper::modcontent_trim_char
+ * @covers     \format_designer\helper::get_words
+ * @covers     \format_designer\output\renderer::render_course_module
+ * @covers     \format_designer\helper::format_date
+ * @covers     \format_designer::setup_kanban_layouts
+ * @covers     \format_designer\helper::get_course_staff_users
+ * @covers     \format_designer\output\renderer::criteria_progress
+ * @covers     \format_designer\output\courseformat\content::export_for_template
+ * @covers     \format_designer::get_view_url
+ * @covers     \format_designer\output\courseformat\content\section\header::export_for_template
+ * @covers     \format_designer::get_cm_secondary_title
+ * @covers     ::format_designer_extend_navigation_course
+ * @covers     \format_designer\local\secondarynav
+ * @covers     \format_designer\output\courseformat\content\cm\title::get_title_displayvalue
+ * @covers     \format_designer\helper::get_visible_user_details
+ * @covers     ::format_designer_get_section_background_file
+ * @covers     \format_designer\output\renderer::get_completion_activities
  */
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\renderer::class, 'is_template_exists')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer::class, 'page_set_course')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer::class, 'get_section_name')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer::class, 'get_default_section_name')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\core_external::class, 'update_inplace_editable')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_inplace_editable')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\helper::class, 'modcontent_trim_char')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\helper::class, 'get_words')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\renderer::class, 'render_course_module')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\helper::class, 'format_date')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer::class, 'setup_kanban_layouts')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\helper::class, 'get_course_staff_users')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\renderer::class, 'criteria_progress')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\courseformat\content::class, 'export_for_template')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer::class, 'get_view_url')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(
+    \format_designer\output\courseformat\content\section\header::class,
+    'export_for_template'
+)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer::class, 'get_cm_secondary_title')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_extend_navigation_course')]
+#[\PHPUnit\Framework\Attributes\CoversClass(\format_designer\local\secondarynav::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(
+    \format_designer\output\courseformat\content\cm\title::class,
+    'get_title_displayvalue'
+)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\helper::class, 'get_visible_user_details')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_get_section_background_file')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\renderer::class, 'get_completion_activities')]
 final class lib_test extends \advanced_testcase {
     /**
      * Test setup.
@@ -54,8 +106,6 @@ final class lib_test extends \advanced_testcase {
     /**
      * A section layout without a template, e.g. a pro layout after the pro plugin was removed, falls back to
      * the default layout template instead of crashing the course page.
-     *
-     * @covers \format_designer\output\renderer::is_template_exists
      */
     public function test_is_template_exists_falls_back_to_default_layout(): void {
         global $PAGE;
@@ -72,8 +122,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * The card width setting offers "fill the row" (the default) and "keep the column width".
-     *
-     * @covers ::format_designer_settings
      */
     public function test_card_width_setting(): void {
         global $CFG;
@@ -89,8 +137,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * Course pages get a body class only when cards are set to keep their column width.
-     *
-     * @covers \format_designer::page_set_course
      */
     public function test_card_width_body_class(): void {
         $course = $this->getDataGenerator()->create_course(['format' => 'designer']);
@@ -107,7 +153,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * Tests for format_designer::get_section_name method with default section names.
-     * @covers ::get_section_name
      * @return void
      */
     public function test_get_section_name(): void {
@@ -135,7 +180,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * Tests for format_designer::get_section_name method with modified section names.
-     * @covers ::get_section_name_customised
      * @return void
      */
     public function test_get_section_name_customised(): void {
@@ -171,7 +215,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * Tests for format_designer::get_default_section_name.
-     * @covers ::get_default_section_name
      * @return void
      */
     public function test_get_default_section_name(): void {
@@ -204,7 +247,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * Test web service updating section name.
-     * @covers \core_external::update_inplace_editable
      * @return void
      */
     public function test_update_inplace_editable(): void {
@@ -243,7 +285,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * Test callback updating section name.
-     * @covers ::inplace_editable
      * @return void
      */
     public function test_inplace_editable(): void {
@@ -279,7 +320,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * Test get_default_course_enddate.
-     * @covers ::get_default_course_enddate
      * @return void
      */
     public function test_default_course_enddate(): void {
@@ -317,7 +357,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * Test the module content trim character.
-     * @covers ::\format_designer\helper::modcontent_trim_char
      * @return void
      */
     public function test_modcontent_trim_char(): void {
@@ -366,13 +405,12 @@ final class lib_test extends \advanced_testcase {
      * The activity description trim counts and cuts the same words.
      *
      * @dataProvider trim_words_provider
-     * @covers ::\format_designer\helper::get_words
-     * @covers ::\format_designer\helper::modcontent_trim_char
      * @param string $text Description text, as returned by format_string().
      * @param int $count Expected number of words.
      * @param bool $trimmed Whether a trim length of 23 cuts the text.
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('trim_words_provider')]
     public function test_trim_words(string $text, int $count, bool $trimmed): void {
         $this->assertCount($count, \format_designer\helper::get_words($text));
 
@@ -388,7 +426,6 @@ final class lib_test extends \advanced_testcase {
     /**
      * The course page trims a description by its real words, also when the editor stored &nbsp; or paragraphs.
      *
-     * @covers \format_designer\output\renderer::render_course_module
      * @return void
      */
     public function test_render_trimmed_description(): void {
@@ -438,7 +475,6 @@ final class lib_test extends \advanced_testcase {
     /**
      * The course page shows a description with its paragraphs, line breaks and images, only the trimmed teaser is plain text.
      *
-     * @covers \format_designer\output\renderer::render_course_module
      * @return void
      */
     public function test_render_description_formatting(): void {
@@ -494,7 +530,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * Test desginer format date method.
-     * @covers ::\format_designer\helper::format_date
      * @return void
      */
     public function test_format_date(): void {
@@ -505,7 +540,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * Test the kanban board setup changes the section type.
-     * @covers ::setup_kanban_board
      * @return void
      */
     public function test_kanban_setup(): void {
@@ -536,7 +570,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * Test the Staffs for the course header.
-     * @covers ::format_designer_show_staffs_header
      * @return void
      */
     public function test_format_designer_show_staffs_header(): void {
@@ -554,7 +587,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * Test the Critera progress function.
-     * @covers ::critera_progress
      * @return void
      */
     public function test_critera_progress(): void {
@@ -627,11 +659,11 @@ final class lib_test extends \advanced_testcase {
      * A section page shows the previous and next section links when the course index is hidden.
      *
      * @dataProvider section_navigation_provider
-     * @covers \format_designer\output\courseformat\content::export_for_template
      * @param int $courseindex Course index visibility option.
      * @param bool $navigation Whether the section page shows the section navigation.
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('section_navigation_provider')]
     public function test_single_section_navigation(int $courseindex, bool $navigation): void {
         global $PAGE;
 
@@ -681,7 +713,6 @@ final class lib_test extends \advanced_testcase {
      * navigation link there too. Other sections link to their place on the course page.
      *
      * @dataProvider view_url_provider
-     * @covers ::get_view_url
      * @param int $coursedisplay Course layout.
      * @param int $sectionnum Number of the section to link to.
      * @param array $options Options of the URL.
@@ -689,6 +720,7 @@ final class lib_test extends \advanced_testcase {
      * @param int $pagesection Number of the section on that page.
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('view_url_provider')]
     public function test_get_view_url(int $coursedisplay, int $sectionnum, array $options, string $page, int $pagesection): void {
         $course = $this->getDataGenerator()->create_course([
             'format' => 'designer', 'numsections' => 3, 'coursedisplay' => $coursedisplay,
@@ -727,11 +759,11 @@ final class lib_test extends \advanced_testcase {
      * The section page of core has the section name as its heading, the section doesn't repeat it.
      *
      * @dataProvider section_title_provider
-     * @covers \format_designer\output\courseformat\content\section\header::export_for_template
      * @param int $coursetype Course type.
      * @param bool $inpageheading Whether the section page leaves the title to the page heading.
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('section_title_provider')]
     public function test_section_title_on_section_page(int $coursetype, bool $inpageheading): void {
         global $PAGE;
         $course = $this->getDataGenerator()->create_course([
@@ -755,9 +787,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * Custom activity titles are plain text and must pass through format_string() before templates and navigation use them.
-     *
-     * @covers \format_designer::get_cm_secondary_title
-     * @covers ::format_designer_extend_navigation_course
      */
     public function test_custom_activity_title_is_formatted(): void {
         global $PAGE, $COURSE;
@@ -843,8 +872,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * Selected textarea profile fields are cleaned before the staff header template renders them.
-     *
-     * @covers \format_designer\helper::get_course_staff_users
      */
     public function test_textarea_profile_field_is_formatted(): void {
         global $DB, $PAGE;
@@ -951,8 +978,6 @@ final class lib_test extends \advanced_testcase {
     /**
      * Activity pages get the course link of "Secondary menu to course", and without a secondary navigation of their own one
      * with the activity tab (DES-964). A hero activity's tab replaces the activity tab when duplicates are avoided.
-     *
-     * @covers \format_designer\local\secondarynav
      */
     public function test_secondary_navigation_course_link(): void {
         global $PAGE, $COURSE;
@@ -1001,8 +1026,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * Video Time activity names go through format_string() like other activity names before the title template prints them.
-     *
-     * @covers \format_designer\output\courseformat\content\cm\title::get_title_displayvalue
      */
     public function test_videotime_title_is_formatted(): void {
         global $PAGE;
@@ -1053,9 +1076,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * The staff header shows an email address only to users who may see it, and never exports the user record.
-     *
-     * @covers \format_designer\helper::get_course_staff_users
-     * @covers \format_designer\helper::get_visible_user_details
      */
     public function test_course_staff_email_follows_user_visibility(): void {
         global $PAGE;
@@ -1106,8 +1126,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * The staff header shows selected profile fields only when their visibility setting allows it.
-     *
-     * @covers \format_designer\helper::get_course_staff_users
      */
     public function test_course_staff_profile_fields_follow_field_visibility(): void {
         global $CFG, $PAGE;
@@ -1187,8 +1205,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * Enrolled users get the section background.
-     *
-     * @covers ::format_designer_get_section_background_file
      */
     public function test_section_background_file_enrolled_user(): void {
         [$course, $args] = $this->create_course_with_section_background();
@@ -1207,8 +1223,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * Users who are not enrolled in the course do not get the section background.
-     *
-     * @covers ::format_designer_get_section_background_file
      */
     public function test_section_background_file_user_not_enrolled(): void {
         [$course, $args] = $this->create_course_with_section_background();
@@ -1224,8 +1238,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * Students do not get the background of a hidden section, teachers do.
-     *
-     * @covers ::format_designer_get_section_background_file
      */
     public function test_section_background_file_hidden_section(): void {
         global $DB;
@@ -1265,8 +1277,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * The completion activities are the ones the user sees, whoever asked for them first.
-     *
-     * @covers \format_designer\output\renderer::get_completion_activities
      */
     public function test_get_completion_activities_per_user(): void {
         [$course, $visible, $hidden, $teacher, $student] = $this->create_course_with_hidden_activity();
@@ -1288,8 +1298,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * The progress of a student does not list activities hidden from the student, even right after a teacher.
-     *
-     * @covers \format_designer\output\renderer::criteria_progress
      */
     public function test_criteria_progress_skips_hidden_activities(): void {
         [$course, $visible, $hidden, $teacher, $student] = $this->create_course_with_hidden_activity();
@@ -1313,8 +1321,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * A criterion for an activity hidden from the student still counts, and is listed without its name (DES-998).
-     *
-     * @covers \format_designer\output\renderer::criteria_progress
      */
     public function test_criteria_progress_lists_unavailable_activities(): void {
         [$course, $visible, $hidden, , $student] = $this->create_course_with_hidden_activity();
@@ -1351,8 +1357,6 @@ final class lib_test extends \advanced_testcase {
 
     /**
      * With Designer Pro's "all activities" progress, a student's progress only counts the activities the student sees.
-     *
-     * @covers \format_designer\output\renderer::criteria_progress
      */
     public function test_criteria_progress_all_activities_counts_visible_activities(): void {
         global $CFG;

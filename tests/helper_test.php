@@ -23,7 +23,16 @@ namespace format_designer;
  * @copyright  2026 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \format_designer\helper
+ * @covers     ::format_designer_get_cache_object
+ * @covers     ::format_designer_has_pro
+ * @covers     ::format_designer_get_pro_layouts
+ * @covers     ::format_designer_fill_custom_values
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\format_designer\helper::class)]
+#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_get_cache_object')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_has_pro')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_get_pro_layouts')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_fill_custom_values')]
 final class helper_test extends \advanced_testcase {
     /**
      * Pro only counts as installed when its installed version is at least the minimum version (DES-994).
@@ -98,11 +107,6 @@ final class helper_test extends \advanced_testcase {
 
     /**
      * The functions that Designer 1.7 moved into the helper still exist for Designer Pro 1.6 (DES-994).
-     *
-     * @covers ::format_designer_get_cache_object
-     * @covers ::format_designer_has_pro
-     * @covers ::format_designer_get_pro_layouts
-     * @covers ::format_designer_fill_custom_values
      */
     public function test_pro_16_functions(): void {
         global $CFG;

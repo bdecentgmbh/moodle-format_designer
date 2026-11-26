@@ -28,12 +28,13 @@ require_once($CFG->dirroot . '/course/lib.php');
  * @copyright  2026 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \format_designer\events
+ * @covers     \format_designer\events::course_updated
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\format_designer\events::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\events::class, 'course_updated')]
 final class events_test extends \advanced_testcase {
     /**
      * Updating a course in another format must not leave the old course record in the format cache.
-     *
-     * @covers ::course_updated
      */
     public function test_course_updated_other_format_keeps_updated_course(): void {
         $this->assert_course_updated_keeps_updated_course('topics');
@@ -41,8 +42,6 @@ final class events_test extends \advanced_testcase {
 
     /**
      * Updating a Designer course must not leave the old course record in the format cache.
-     *
-     * @covers ::course_updated
      */
     public function test_course_updated_designer_keeps_updated_course(): void {
         $this->assert_course_updated_keeps_updated_course('designer');
