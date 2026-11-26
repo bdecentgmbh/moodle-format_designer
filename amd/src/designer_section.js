@@ -291,6 +291,10 @@ define(['jquery', 'core/fragment', 'core/templates', 'core/loadingicon', 'core/a
                     Templates.runTemplateJS(js);
                     return true;
                 }).fail(Notification.exception);
+                return true;
+            }).catch(function() {
+                // The user may not view this activity: leave it as rendered.
+                return false;
             });
         }
     };

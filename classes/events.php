@@ -59,7 +59,7 @@ class events {
         $option = get_config('format_designer', 'sectiondesignerbackgroundimage');
         $coursecontext = \context_course::instance($courseid);
 
-        if (course_get_format($courseid)->get_course()->format !== 'designer') {
+        if (course_get_format($courseid)->get_format() !== 'designer') {
             return true;
         }
 
@@ -114,29 +114,31 @@ class events {
         global $DB;
         $courseid = $event->courseid;
         $format = course_get_format($courseid);
-        if ($format->get_course()->format !== 'designer') {
+        if ($format->get_format() !== 'designer') {
             return true;
         }
 
+        // Read the course type from the format options instead of $format->get_course(). That would load the
+        // course through core get_course(), which returns a copy of $COURSE when it is this course, and the format
+        // instance would keep that record, with the values from before the update, for the rest of the request.
+        $options = $format->get_format_options();
+        $coursetype = $options['coursetype'] ?? null;
+
         // Change the coursedisplay to the show all sections per page when the course type is flow or kanban mode.
-        $course = $format->get_course();
-        if (
-            isset($course->coursetype) && ($course->coursetype == DESIGNER_TYPE_FLOW ||
-            $course->coursetype == DESIGNER_TYPE_KANBAN)
-        ) {
-            $existrecord = $DB->get_record('course_format_options', ['courseid' => $course->id,
+        if ($coursetype == DESIGNER_TYPE_FLOW || $coursetype == DESIGNER_TYPE_KANBAN) {
+            $existrecord = $DB->get_record('course_format_options', ['courseid' => $courseid,
                             'name' => 'coursetype', 'format' => 'designer', ]);
             if ($existrecord) {
-                $existrecord->value = $course->coursetype;
+                $existrecord->value = $coursetype;
                 $DB->update_record('course_format_options', $existrecord);
             }
         }
 
-        if (isset($course->coursetype) && ($course->coursetype == DESIGNER_TYPE_FLOW)) {
+        if ($coursetype == DESIGNER_TYPE_FLOW) {
             $comparevalue = $DB->sql_compare_text('value');
             $sql = "SELECT id, courseid, sectionid, name, value FROM {course_format_options}
                 WHERE courseid = :courseid AND name = :name AND format = :format AND $comparevalue = :comparevalue";
-            $existrecords = $DB->get_recordset_sql($sql, ['courseid' => $course->id,
+            $existrecords = $DB->get_recordset_sql($sql, ['courseid' => $courseid,
                 'name' => 'sectionbackgroundtype', 'format' => 'designer', 'comparevalue' => 'whole']);
             if ($existrecords) {
                 foreach ($existrecords as $existrecord) {
@@ -203,7 +205,7 @@ class events {
     public static function course_module_deleted($event) {
         global $DB;
         $courseid = $event->courseid;
-        if (course_get_format($courseid)->get_course()->format !== 'designer') {
+        if (course_get_format($courseid)->get_format() !== 'designer') {
             return true;
         }
         $cmid = $event->objectid;
@@ -258,7 +260,6 @@ class events {
         $cache->delete_course_progress_uncompletion_criteria($courseid);
         $cache->delete_due_overdue_activities_count($courseid);
         $cache->delete_criteria_progress($courseid);
-        $cache->delete("g_c_a{$courseid}");
         $cache->delete("g_c_s_ic{$courseid}");
     }
 
@@ -275,7 +276,6 @@ class events {
         $cache->delete_course_progress_uncompletion_criteria($courseid, $userid);
         $cache->delete_due_overdue_activities_count($courseid, $userid);
         $cache->delete_criteria_progress($courseid, $userid);
-        $cache->delete("g_c_a{$courseid}");
         $cache->delete("g_c_s_ic{$courseid}");
     }
 
@@ -289,7 +289,7 @@ class events {
     public static function course_section_module_cache_updated($courseid, $cmid, $sectionid = 0) {
         global $DB;
 
-        if (course_get_format($courseid)->get_course()->format !== 'designer') {
+        if (course_get_format($courseid)->get_format() !== 'designer') {
             return true;
         }
 
@@ -302,7 +302,6 @@ class events {
         $cache->delete_due_overdue_activities_count($courseid);
         $cache->delete_criteria_progress($courseid);
         $cache->delete("fdo_cm_j_{$courseid}");
-        $cache->delete("g_c_a{$courseid}");
         $cache->delete("g_c_s_ic{$courseid}");
     }
 
@@ -313,7 +312,7 @@ class events {
      * @return bool
      */
     public static function course_section_cache_updated($courseid, $sectionid) {
-        if (course_get_format($courseid)->get_course()->format !== 'designer') {
+        if (course_get_format($courseid)->get_format() !== 'designer') {
             return true;
         }
         // Clear cache.
@@ -323,7 +322,6 @@ class events {
         $cache->delete_due_overdue_activities_count($courseid);
         $cache->delete_course_progress_uncompletion_criteria($courseid);
         $cache->delete_criteria_progress($courseid);
-        $cache->delete("g_c_a{$courseid}");
         $cache->delete("g_c_s_ic{$courseid}");
     }
 }

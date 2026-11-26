@@ -575,28 +575,28 @@ class renderer extends \core_courseformat\output\section_renderer {
     }
 
     /**
-     * Obtains a list of activities for which completion is enabled on the
-     * @param object $course The list is ordered by the section order of those activities.
-     * @return cm_info[] Array from $cmid => $cm of all activities with completion enabled,
+     * Obtains the list of activities with completion enabled that the user sees on the course page,
+     * ordered by the section order of those activities.
+     *
+     * The list depends on the access of the user, so it is built from the course modinfo of the user,
+     * which core caches per user, and not kept in a course cache shared by all users.
+     *
+     * @param object $course Course record.
+     * @param int $userid User to get the activities for, the current user by default.
+     * @return cm_info[] Array from $cmid => $cm of the activities.
      */
-    public static function get_completion_activities($course) {
-        $cache = \format_designer\helper::get_cache_object();
-        $key = "g_c_a{$course->id}";
-        if (!$cache->get($key)) {
-            $modinfo = get_fast_modinfo($course);
-            $result = [];
-            foreach ($modinfo->get_cms() as $cm) {
-                $sectioninfo = $cm->get_section_info();
-                if (
-                    $cm->completion != COMPLETION_TRACKING_NONE && !$cm->deletioninprogress &&
-                        $cm->is_visible_on_course_page() && $sectioninfo->uservisible
-                ) {
-                    $result[$cm->id] = $cm;
-                }
+    public static function get_completion_activities($course, $userid = 0) {
+        $modinfo = get_fast_modinfo($course, $userid);
+        $result = [];
+        foreach ($modinfo->get_cms() as $cm) {
+            if (
+                $cm->completion != COMPLETION_TRACKING_NONE && !$cm->deletioninprogress &&
+                    $cm->is_visible_on_course_page() && $cm->get_section_info()->uservisible
+            ) {
+                $result[$cm->id] = $cm;
             }
-            $cache->set($key, $result);
         }
-        return $cache->get($key);
+        return $result;
     }
 
     /**
@@ -658,7 +658,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             $uncompletedcriteria = [];
 
             // Get the number of modules that support completion.
-            $modules = self::get_completion_activities($course);
+            $modules = self::get_completion_activities($course, $userid);
             $completionactivities = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY);
             $complteioncourses = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_COURSE);
 
@@ -1321,7 +1321,6 @@ class renderer extends \core_courseformat\output\section_renderer {
     ) {
         global $DB, $USER, $CFG;
         // Static caches to reduce DB queries - persists across multiple calls within same request.
-        static $modvisitscache = [];
         static $completioncache = []; // Add completion cache.
         static $completionbulkloaded = false; // Track if bulk loaded.
 
@@ -1397,12 +1396,14 @@ class renderer extends \core_courseformat\output\section_renderer {
                 $videoinstance = \format_designer\helper::get_videotime_instance($course->id, $mod->instance);
                 $cmtext = $videoinstance->intro ?? '';
             }
-            // Keep the words of two paragraphs or lines apart when format_string() strips the tags.
-            $cmtext = preg_replace('~<br\s*/?>|</(?:p|div|li|h[1-6]|td|th)>~i', '$0 ', $cmtext);
-            $cmtextcontent = trim(format_string($cmtext));
+            // The plain text is only for the word count and the trimmed teaser, the description keeps its paragraphs,
+            // line breaks and images otherwise. Keep the words of two paragraphs or lines apart when format_string()
+            // strips the tags.
+            $cmtextcontent = trim(format_string(preg_replace('~<br\s*/?>|</(?:p|div|li|h[1-6]|td|th)>~i', '$0 ', $cmtext)));
             $cmtextlength = get_config('format_designer', 'activitydesclength');
             $modcontent = '';
-            if (!empty($cmtextcontent)) {
+            // Show a description with text, or with only an image or other media.
+            if ($cmtextcontent !== '' || preg_match('~<(?:img|video|audio|iframe|object|embed|svg|picture)\b~i', $cmtext)) {
                 if ($cmtextlength == DESIGNER_MOD_TEXT_TRIMM) {
                     $trimlenght = get_config('format_designer', 'modtrimlength');
                     if (count(\format_designer\helper::get_words($cmtextcontent)) > $trimlenght) {
@@ -1416,7 +1417,7 @@ class renderer extends \core_courseformat\output\section_renderer {
                         );
                         $modcontenthtml .= html_writer::end_tag('div');
                         $modcontenthtml .= html_writer::start_tag('div', ['class' => 'fullcontent-summary summary-hide']);
-                        $modcontenthtml .= $cmtextcontent;
+                        $modcontenthtml .= $cmtext;
                         $modcontenthtml .= " " . \html_writer::link(
                             'javascript:void(0)',
                             get_string('less', 'format_designer'),
@@ -1425,10 +1426,10 @@ class renderer extends \core_courseformat\output\section_renderer {
                         $modcontenthtml .= html_writer::end_tag('div');
                         $modcontent = $modcontenthtml;
                     } else {
-                        $modcontent = html_writer::tag('p', $cmtextcontent);
+                        $modcontent = $cmtext;
                     }
                 } else {
-                    $modcontent = html_writer::tag('p', $cmtextcontent);
+                    $modcontent = $cmtext;
                 }
             }
         } else {
@@ -1439,46 +1440,16 @@ class renderer extends \core_courseformat\output\section_renderer {
             }
         }
 
-        // Bulk load ALL visit counts in ONE query on first call.
-        static $visitsbulkloaded = false;
-
-        if (!$visitsbulkloaded) {
-            // Get all course module IDs from modinfo to use IN clause instead of LIKE.
-            $modinfo = get_fast_modinfo($course);
-            $cmids = array_keys($modinfo->get_cms());
-
-            if (!empty($cmids)) {
-                // Use IN clause for much better performance than LIKE on path.
-                [$insql, $params] = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED, 'cmid');
-
-                $params['userid'] = $USER->id;
-                $params['action'] = 'viewed';
-                $params['target'] = 'course_module';
-                // Optional: Only get logs from last 6 months to reduce dataset.
-                $params['timefrom'] = time() - (6 * 30 * 24 * 60 * 60);
-
-                $sql = "SELECT l.contextinstanceid, COUNT(*) as visitcount
-                        FROM {logstore_standard_log} l
-                        WHERE l.userid = :userid
-                        AND l.action = :action
-                        AND l.target = :target
-                        AND l.contextinstanceid $insql
-                        AND l.timecreated >= :timefrom
-                        GROUP BY l.contextinstanceid";
-
-                // Use get_records_sql() since we already filtered by course modules.
-                $visits = $DB->get_records_sql($sql, $params);
-                foreach ($visits as $visit) {
-                    $modvisitscache[$visit->contextinstanceid . '_' . $USER->id] = $visit->visitcount;
-                }
+        // The visit count of the current user, only for activities that show it.
+        $modvisits = false;
+        if ($this->get_cmurl($mod, $options) && $this->shows_visits($mod, $options)) {
+            $visitcounts = $this->get_visit_counts($course);
+            if ($visitcounts !== null) {
+                $modvisits = !empty($visitcounts[$mod->id])
+                    ? get_string('modvisit', 'format_designer', $visitcounts[$mod->id])
+                    : get_string('notvisit', 'format_designer');
             }
-            $visitsbulkloaded = true;
         }
-
-        // Use cached visits count.
-        $cachekey = $mod->id . '_' . $USER->id;
-        $modvisits = !empty($modvisitscache[$cachekey]) ? get_string('modvisit', 'format_designer', $modvisitscache[$cachekey]) :
-            get_string('notvisit', 'format_designer');
 
         $calltoactionhtml = $this->render(new call_to_action($mod));
         $modrestricted = ($mod->availableinfo) ?: false;
@@ -1554,7 +1525,7 @@ class renderer extends \core_courseformat\output\section_renderer {
             'isrestricted' => !empty($mod->availableinfo),
             'modcontent' => isset($modcontent) ? $modcontent : '',
             'modcontentclass' => !empty($modcontent) ? 'ismodcontent' : '',
-            'modvisits' => $this->get_cmurl($mod, $options) ? $modvisits : false,
+            'modvisits' => $modvisits,
             'modiconurl' => $modiconurl,
             'modrestricted' => $modrestricted,
             'elementstate' => $this->get_activity_elementclasses($mod, $options),
@@ -1631,6 +1602,68 @@ class renderer extends \core_courseformat\output\section_renderer {
             return $elementclasses;
         }
         return [];
+    }
+
+    /**
+     * Whether an activity shows its visit count, i.e. its "Visits" element isn't set to Remove.
+     *
+     * @param cm_info $mod
+     * @param object|null $options Cached module options to avoid extra DB query
+     * @return bool
+     */
+    protected function shows_visits(cm_info $mod, $options = null): bool {
+        return ($this->get_activity_elementclasses($mod, $options)['visits'] ?? '') !== 'content-remove';
+    }
+
+    /**
+     * The current user's visit counts for the activities of a course, from the standard log store.
+     *
+     * One query per course and request, over the last 6 months. No counts for guests: they all share one user id,
+     * so the count would be the views of all guests. No counts either when the standard log store is disabled or
+     * no activity of the course shows its visits.
+     *
+     * @param \stdClass $course
+     * @return array|null Number of views by course module id, null when no counts are shown.
+     */
+    protected function get_visit_counts(\stdClass $course): ?array {
+        global $DB, $USER;
+
+        if (!isloggedin() || isguestuser()) {
+            return null;
+        }
+        $cache = \cache::make_from_params(\cache_store::MODE_REQUEST, 'format_designer', 'visitcounts');
+        $key = $course->id . '_' . $USER->id;
+        $cached = $cache->get($key);
+        if ($cached !== false) {
+            return $cached['counts'];
+        }
+
+        $counts = null;
+        $stores = explode(',', (string) get_config('tool_log', 'enabled_stores'));
+        $cms = get_fast_modinfo($course)->get_cms();
+        if (in_array('logstore_standard', $stores) && array_filter($cms, fn($cm) => $this->shows_visits($cm))) {
+            // Filter on the course, not on a list of all its activities, which can exceed the number of query
+            // parameters some databases allow. The user-module index starts with userid and contextlevel.
+            $sql = "SELECT l.contextinstanceid, COUNT(*) AS visitcount
+                      FROM {logstore_standard_log} l
+                     WHERE l.userid = :userid
+                       AND l.contextlevel = :contextlevel
+                       AND l.courseid = :courseid
+                       AND l.action = :action
+                       AND l.target = :target
+                       AND l.timecreated >= :timefrom
+                  GROUP BY l.contextinstanceid";
+            $counts = $DB->get_records_sql_menu($sql, [
+                'userid' => $USER->id,
+                'contextlevel' => CONTEXT_MODULE,
+                'courseid' => $course->id,
+                'action' => 'viewed',
+                'target' => 'course_module',
+                'timefrom' => time() - (6 * 30 * 24 * 60 * 60),
+            ]);
+        }
+        $cache->set($key, ['counts' => $counts]);
+        return $counts;
     }
 
     /**
