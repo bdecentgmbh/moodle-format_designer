@@ -748,6 +748,16 @@ class renderer extends \core_courseformat\output\section_renderer {
                         } else {
                             $uncompletedcriteria[] = $modtooltiplink;
                         }
+                    } else if ($cmidentifier == 'moduleinstance') {
+                        // A criterion for an activity the user can't see (e.g. hidden from students) still counts, as in
+                        // course completion. List it without its name and link, so that the list matches the count.
+                        $unavailable = get_string('criteriaactivitynotavailable', 'format_designer');
+                        if ($completion->get_user_completion($userid, $activity)->is_complete()) {
+                            $completed += 1;
+                            $completedcriteria[] = $unavailable;
+                        } else {
+                            $uncompletedcriteria[] = $unavailable;
+                        }
                     }
                 }
             }

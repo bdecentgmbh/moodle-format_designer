@@ -207,6 +207,7 @@ $string['coursetype_help'] = 'Kanban board sets as course type, course sections 
 $string['cover'] = "Cover";
 $string['create_purpose'] = 'Create Purpose';
 $string['createprereqgroup'] = "Create prerequisites group";
+$string['criteriaactivitynotavailable'] = 'Activity: not available';
 $string['criteriacompleted'] = '{$a->completed} of {$a->count} criteria completed';
 $string['criteriadate'] = 'Date';
 $string['criteriaduration'] = 'Enrolment duration';
