@@ -259,6 +259,21 @@ li.section.main .section-content-wrapper {
 .format-designer .course-content ul.designer.course-type-normal li.section.main:before {
     border: 0;
 }
+/* The section cards of the course page have the same height in a row: the header, which carries a header background,
+   fills the card, and the arrow goes to its bottom. */
+#page-course-view-designer .course-content .single-section-layout ul.designer.course-type-normal li.section.main
+.section-content-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+#page-course-view-designer .course-content .single-section-layout ul.designer.course-type-normal li.section.main
+.section-content-wrapper .section-header-content {
+    flex-grow: 1;
+}
+#page-course-view-designer .course-content .single-section-layout ul.designer.course-type-normal li.section.main
+.section-content-wrapper .section-header-content .moodle-actionmenu:has(> .goto-section) {
+    margin-top: auto;
+}
 
 /* Section goto link */
 .format-designer .course-content ul.designer:not(.course-type-flow) li.section

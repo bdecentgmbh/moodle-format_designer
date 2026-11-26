@@ -484,4 +484,30 @@ class behat_format_designer extends behat_base {
             ]);
         }
     }
+
+    /**
+     * Checks that the visible elements in the same row have the same height, e.g. the section cards of a course.
+     *
+     * @Then /^the visible "(?P<selector>(?:[^"]|\\")*)" css elements in a row should have the same height$/
+     * @param string $selector CSS selector of the elements.
+     */
+    public function visible_css_elements_in_a_row_should_have_the_same_height(string $selector): void {
+        $this->find('css', $selector);
+        $boxes = $this->evaluate_script('return Array.from(document.querySelectorAll(' . json_encode($selector) . '))' .
+            '.filter(e => e.getClientRects().length).map(e => { const r = e.getBoundingClientRect(); ' .
+            'return [Math.round(r.top), Math.round(r.height)]; });');
+        $rows = [];
+        foreach ($boxes as [$top, $height]) {
+            $rows[$top][] = $height;
+        }
+        if (count($rows) == count($boxes)) {
+            throw new ExpectationException('No two of the ' . count($boxes) . ' elements are in one row', $this->getSession());
+        }
+        foreach ($rows as $top => $heights) {
+            if (max($heights) - min($heights) > 1) {
+                $message = sprintf('The elements of the row at %dpx have the heights %s', $top, implode(', ', $heights));
+                throw new ExpectationException($message, $this->getSession());
+            }
+        }
+    }
 }
