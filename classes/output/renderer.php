@@ -271,7 +271,8 @@ class renderer extends \core_courseformat\output\section_renderer {
         $sectionreturn = $onsectionpage ? $section->section : null;
 
         $coursecontext = context_course::instance($course->id);
-        $numsections = course_get_format($course)->get_last_section_number();
+        $format = course_get_format($course);
+        $numsections = $format->get_last_section_number();
         $isstealth = $section->section > $numsections;
 
         $baseurl = course_get_url($course, $sectionreturn, ['navigation' => true]);
@@ -290,7 +291,10 @@ class renderer extends \core_courseformat\output\section_renderer {
             }
 
             $controls['edit'] = [
-                'url'   => new moodle_url('/course/editsection.php', ['id' => $section->id, 'sr' => $sectionreturn]),
+                'url'   => new moodle_url(
+                    '/course/editsection.php',
+                    ['id' => $section->id] + \format_designer\helper::section_return_params($format, $section, $sectionreturn)
+                ),
                 'icon' => 'i/settings',
                 'name' => $streditsection,
                 'pixattr' => ['class' => ''],
@@ -373,10 +377,9 @@ class renderer extends \core_courseformat\output\section_renderer {
                 }
                 $url = new moodle_url('/course/editsection.php', [
                     'id' => $section->id,
-                    'sr' => $sectionreturn,
                     'delete' => 1,
                     'sesskey' => sesskey(),
-                ]);
+                ] + \format_designer\helper::section_return_params($format, $section, $sectionreturn));
                 $controls['delete'] = [
                     'url' => $url,
                     'icon' => 'i/delete',

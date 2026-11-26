@@ -207,6 +207,28 @@ class helper {
     }
 
     /**
+     * The parameters of a link to core's section edit page that bring the user back to the page they came from.
+     *
+     * Moodle 5.3 deprecates the sr parameter for returnoptions (MDL-86284), and logs a debugging notice when a page gets
+     * it. Before 5.3, sr is only added when there is a section page to return to.
+     *
+     * @param \core_courseformat\base $format Course format.
+     * @param \section_info|\stdClass $section Section the link is for.
+     * @param int|null $sectionreturn Section number of the section page the link is on, null on the course page.
+     * @return array URL parameters.
+     */
+    public static function section_return_params(
+        \core_courseformat\base $format,
+        \section_info|\stdClass $section,
+        ?int $sectionreturn
+    ): array {
+        if (method_exists($format, 'get_return_options')) {
+            return ['returnoptions' => $format->get_return_options($section)];
+        }
+        return is_null($sectionreturn) ? [] : ['sr' => $sectionreturn];
+    }
+
+    /**
      * Get the details of a user that the current user may see in a course.
      *
      * Uses the core rules, which for example show the email address only when the user's

@@ -230,7 +230,10 @@ class controlmenu extends controlmenu_base {
         if (!$isstealth && has_capability('moodle/course:update', $coursecontext, $user)) {
             $streditsection = get_string('editsection', 'format_' . $format->get_format());
             $controls['edit'] = [
-                'url'   => new moodle_url('/course/editsection.php', ['id' => $section->id, 'sr' => $sectionreturn]),
+                'url'   => new moodle_url(
+                    '/course/editsection.php',
+                    ['id' => $section->id] + \format_designer\helper::section_return_params($format, $section, $sectionreturn)
+                ),
                 'icon' => 'i/settings',
                 'name' => $streditsection,
                 'pixattr' => ['class' => ''],
@@ -392,11 +395,7 @@ class controlmenu extends controlmenu_base {
                     'id' => $section->id,
                     'delete' => 1,
                     'sesskey' => sesskey(),
-                ];
-
-                if (!is_null($sectionreturn)) {
-                    $params['sr'] = $sectionreturn;
-                }
+                ] + \format_designer\helper::section_return_params($format, $section, $sectionreturn);
                 $url = new moodle_url(
                     '/course/editsection.php',
                     $params,
