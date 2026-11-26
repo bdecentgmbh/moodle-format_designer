@@ -5,10 +5,13 @@ on: pull_request
 jobs:
   test:
     runs-on: ubuntu-latest
+    # A job marked experimental shows its result without failing the run.
+    continue-on-error: ${{ matrix.experimental }}
 
     services:
       postgres:
-        image: postgres:16
+        # Moodle 5.3 needs PostgreSQL 17 or later; 4.5 to 5.2 run on it too.
+        image: postgres:17
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -24,34 +27,31 @@ jobs:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
 
+    # One job per Moodle version, with the databases alternating.
     strategy:
       fail-fast: false
       matrix:
         include:
+          - php: '8.4'
+            moodle-branch: 'MOODLE_503_STABLE'
+            database: 'pgsql'
+            experimental: true
           - php: '8.3'
             moodle-branch: 'MOODLE_502_STABLE'
             database: 'mariadb'
-          - php: '8.3'
-            moodle-branch: 'MOODLE_502_STABLE'
-            database: 'pgsql'
-          - php: '8.3'
-            moodle-branch: 'MOODLE_501_STABLE'
-            database: 'mariadb'
+            experimental: false
           - php: '8.3'
             moodle-branch: 'MOODLE_501_STABLE'
             database: 'pgsql'
+            experimental: false
           - php: '8.3'
             moodle-branch: 'MOODLE_500_STABLE'
             database: 'mariadb'
-          - php: '8.3'
-            moodle-branch: 'MOODLE_500_STABLE'
-            database: 'pgsql'
+            experimental: false
           - php: '8.2'
             moodle-branch: 'MOODLE_405_STABLE'
             database: 'pgsql'
-          - php: '8.2'
-            moodle-branch: 'MOODLE_405_STABLE'
-            database: 'mariadb'
+            experimental: false
 
     steps:
       - name: Check out repository code
