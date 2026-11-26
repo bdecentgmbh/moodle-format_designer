@@ -32,12 +32,20 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/course/lib.php');
 
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\options::class, 'is_json')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\renderer::class, 'get_activity_elementclasses')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\options::class, 'is_mod_completed')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\options::class, 'is_section_completed')]
 /**
  * designer course format related unit tests.
  *
  * @package    format_designer
  * @copyright  2021 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers     \format_designer\options::is_json
+ * @covers     \format_designer\output\renderer::get_activity_elementclasses
+ * @covers     \format_designer\options::is_mod_completed
+ * @covers     \format_designer\options::is_section_completed
  */
 final class options_test extends \advanced_testcase {
     /**
@@ -67,7 +75,6 @@ final class options_test extends \advanced_testcase {
 
     /**
      * Test isjson method find the string is json or not.
-     * @covers \format_designer\options::is_json
      */
     public function test_optionisjson(): void {
         $option = json_encode([ 'a' => 1 ]);
@@ -81,7 +88,6 @@ final class options_test extends \advanced_testcase {
 
     /**
      * Test module elements visibility settings are added with module form. It updates the data to table.
-     * @covers ::get_activity_elementclasses
      */
     public function test_moduleelements(): void {
         global $DB, $PAGE;
@@ -112,7 +118,6 @@ final class options_test extends \advanced_testcase {
 
     /**
      * Test ismodcompleted method process the user module completion.
-     * @covers \format_designer\options::is_mod_completed
      */
     public function test_modcompletion(): void {
         global $DB;
@@ -148,7 +153,6 @@ final class options_test extends \advanced_testcase {
 
     /**
      * Test section completion find the logged in user status of section.
-     * @covers \format_designer\options::is_section_completed
      */
     public function test_sectioncompletion(): void {
         global $DB;

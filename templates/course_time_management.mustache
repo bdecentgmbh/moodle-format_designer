@@ -99,8 +99,10 @@
                                     {{/customfield}}
                                 </div>
                                 {{#ismessaging}}
+                                {{#hascontactactions}}
                                 <div class="info-block">
                                     <div class="btn-group header-button-group">
+                                        {{#cansendmessage}}
                                         <a id="message-user-button" role="button" data-conversationid="0" data-userid="{{userid}}" class="btn"
                                             href="{{{contacturl}}}">
                                             <span>
@@ -109,6 +111,7 @@
                                             </span>
                                         </a>
                                         <span class="sr-only sr-only-focusable" data-region="jumpto" tabindex="-1"></span>
+                                        {{/cansendmessage}}
                                         {{#showaddtocontacts}}
                                         <a data-currentuserid="{{currentuser}}" data-userid="{{userid}}" data-is-contact="{{iscontact}}" role="button" class="ajax-contact-button btn toggle-contact-button" href="#">
                                             <span>
@@ -122,6 +125,7 @@
                                         {{/showaddtocontacts}}
                                     </div>
                                 </div>
+                                {{/hascontactactions}}
                                 {{/ismessaging}}
                             </div>
                         </div>

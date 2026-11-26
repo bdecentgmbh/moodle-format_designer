@@ -161,12 +161,10 @@ class helper {
             $list->profileimageurl = $userpicture->get_url($PAGE)->out(false);
 
             $list->role = $roles; // List of roles, user assigned to.
-            $list->showaddtocontacts = ($USER->id != $user->id) ? true : false;
-            // Check this staff is in current user contact.
-            $iscontact = \core_message\api::is_contact($USER->id, $user->id);
-            $list->iscontact = $iscontact;
-            $list->contacttitle = $iscontact ? get_string('removefromyourcontacts', 'message') :
-                get_string('addtoyourcontacts', 'message');
+            // Message and contact buttons, as far as the current user can use them.
+            foreach (self::staff_contact_actions($userid) as $key => $value) {
+                $list->$key = $value;
+            }
             // List of custom fields.
             $list->customfield = $customfield;
             // Add active class to the first user for carousel.
@@ -176,6 +174,58 @@ class helper {
             $i++;
         }
         return $staffs;
+    }
+
+    /**
+     * The message and contact buttons of a staff user that the current user can use.
+     *
+     * Moodle only lets users message, or send contact requests to, people they share a course with, unless the site
+     * allows messages to all users. So a user who views the course through guest access or isn't enrolled would get
+     * "Can not contact user" from the buttons. They are left out when they wouldn't work.
+     *
+     * @param int $staffid Staff user id.
+     * @return array cansendmessage, showaddtocontacts, hascontactactions, iscontact and contacttitle.
+     */
+    public static function staff_contact_actions(int $staffid): array {
+        global $USER;
+
+        $isself = $USER->id == $staffid;
+        $iscontact = \core_message\api::is_contact($USER->id, $staffid);
+        $cansendmessage = !$isself && isloggedin() && !isguestuser() &&
+            \core_message\api::can_send_message($staffid, $USER->id);
+        // An existing contact can always be removed.
+        $showaddtocontacts = !$isself && isloggedin() && !isguestuser() &&
+            ($iscontact || \core_message\api::can_create_contact($USER->id, $staffid));
+        return [
+            'cansendmessage' => $cansendmessage,
+            'showaddtocontacts' => $showaddtocontacts,
+            'hascontactactions' => $cansendmessage || $showaddtocontacts,
+            'iscontact' => $iscontact,
+            'contacttitle' => $iscontact ? get_string('removefromyourcontacts', 'message') :
+                get_string('addtoyourcontacts', 'message'),
+        ];
+    }
+
+    /**
+     * The parameters of a link to core's section edit page that bring the user back to the page they came from.
+     *
+     * Moodle 5.3 deprecates the sr parameter for returnoptions (MDL-86284), and logs a debugging notice when a page gets
+     * it. Before 5.3, sr is only added when there is a section page to return to.
+     *
+     * @param \core_courseformat\base $format Course format.
+     * @param \section_info|\stdClass $section Section the link is for.
+     * @param int|null $sectionreturn Section number of the section page the link is on, null on the course page.
+     * @return array URL parameters.
+     */
+    public static function section_return_params(
+        \core_courseformat\base $format,
+        \section_info|\stdClass $section,
+        ?int $sectionreturn
+    ): array {
+        if (method_exists($format, 'get_return_options')) {
+            return ['returnoptions' => $format->get_return_options($section)];
+        }
+        return is_null($sectionreturn) ? [] : ['sr' => $sectionreturn];
     }
 
     /**

@@ -16,6 +16,7 @@
 
 namespace format_designer;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\format_designer\helper::class)]
 /**
  * Tests for the per-request preload of Video Time records used on the course page (DES-962).
  *

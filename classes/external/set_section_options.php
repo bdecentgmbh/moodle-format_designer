@@ -27,15 +27,16 @@ namespace format_designer\external;
 defined('MOODLE_INTERNAL') || die();
 
 use context_course;
-use external_function_parameters;
-use external_single_structure;
-use external_value;
+use core_external\external_description;
+use core_external\external_function_parameters;
+use core_external\external_multiple_structure;
+use core_external\external_single_structure;
+use core_external\external_value;
 use format_designer;
 use context_module;
 use coding_exception;
 use moodle_exception;
 use completion_info;
-require_once($CFG->libdir . '/externallib.php');
 require_once($CFG->dirroot . '/course/format/lib.php');
 
 /**
@@ -51,7 +52,7 @@ trait set_section_options {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
             'sectionid' => new external_value(PARAM_INT, 'Section ID'),
-            'options' => new \external_multiple_structure(new external_single_structure([
+            'options' => new external_multiple_structure(new external_single_structure([
                 'name' => new external_value(PARAM_TEXT, 'Option name to set on section'),
                 'value' => new external_value(PARAM_RAW, 'Value for option'),
             ])),

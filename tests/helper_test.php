@@ -16,6 +16,11 @@
 
 namespace format_designer;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\format_designer\helper::class)]
+#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_get_cache_object')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_has_pro')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_get_pro_layouts')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_fill_custom_values')]
 /**
  * Tests for the Designer helper class.
  *
@@ -23,6 +28,10 @@ namespace format_designer;
  * @copyright  2026 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \format_designer\helper
+ * @covers     ::format_designer_get_cache_object
+ * @covers     ::format_designer_has_pro
+ * @covers     ::format_designer_get_pro_layouts
+ * @covers     ::format_designer_fill_custom_values
  */
 final class helper_test extends \advanced_testcase {
     /**
@@ -98,11 +107,6 @@ final class helper_test extends \advanced_testcase {
 
     /**
      * The functions that Designer 1.7 moved into the helper still exist for Designer Pro 1.6 (DES-994).
-     *
-     * @covers ::format_designer_get_cache_object
-     * @covers ::format_designer_has_pro
-     * @covers ::format_designer_get_pro_layouts
-     * @covers ::format_designer_fill_custom_values
      */
     public function test_pro_16_functions(): void {
         global $CFG;
@@ -115,5 +119,85 @@ final class helper_test extends \advanced_testcase {
         $data = (object) ['bg' => 'custom', 'bgcustom' => '#123456', 'empty' => ''];
         $this->assertSame('background: #123456;', format_designer_fill_custom_values($data, 'bg', 'bgcustom', 'background'));
         $this->assertSame('', format_designer_fill_custom_values($data, 'empty', 'bgcustom', 'background'));
+    }
+
+    /**
+     * The message and contact buttons of a staff user are only offered when they would work (DES-1003).
+     */
+    public function test_staff_contact_actions(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $course = $this->getDataGenerator()->create_course(['format' => 'designer']);
+        $teacher = $this->getDataGenerator()->create_user();
+        $student = $this->getDataGenerator()->create_user();
+        // Logged in, but not enrolled, e.g. through guest access.
+        $visitor = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+
+        $this->setUser($student);
+        $actions = helper::staff_contact_actions($teacher->id);
+        $this->assertTrue($actions['cansendmessage']);
+        $this->assertTrue($actions['showaddtocontacts']);
+        $this->assertTrue($actions['hascontactactions']);
+        $this->assertFalse($actions['iscontact']);
+        $this->assertEquals(get_string('addtoyourcontacts', 'message'), $actions['contacttitle']);
+
+        // Moodle only allows messages and contact requests to people in the same course.
+        $this->setUser($visitor);
+        $actions = helper::staff_contact_actions($teacher->id);
+        $this->assertFalse($actions['cansendmessage']);
+        $this->assertFalse($actions['showaddtocontacts']);
+        $this->assertFalse($actions['hascontactactions']);
+
+        // A contact can be messaged and removed from the contacts.
+        \core_message\api::add_contact($visitor->id, $teacher->id);
+        $actions = helper::staff_contact_actions($teacher->id);
+        $this->assertTrue($actions['cansendmessage']);
+        $this->assertTrue($actions['showaddtocontacts']);
+        $this->assertTrue($actions['iscontact']);
+        $this->assertEquals(get_string('removefromyourcontacts', 'message'), $actions['contacttitle']);
+
+        // With messages to all users allowed, anyone may send a contact request.
+        set_config('messagingallusers', 1);
+        $other = $this->getDataGenerator()->create_user();
+        $this->setUser($other);
+        $this->assertTrue(helper::staff_contact_actions($teacher->id)['showaddtocontacts']);
+
+        // Nothing for the staff user themselves, guests and visitors who aren't logged in.
+        $this->setUser($teacher);
+        $this->assertFalse(helper::staff_contact_actions($teacher->id)['hascontactactions']);
+        $this->setGuestUser();
+        $this->assertFalse(helper::staff_contact_actions($teacher->id)['hascontactactions']);
+        $this->setUser(0);
+        $this->assertFalse(helper::staff_contact_actions($teacher->id)['hascontactactions']);
+    }
+
+    /**
+     * Links to the section edit page bring the user back without the sr parameter that Moodle 5.3 deprecates (DES-967).
+     */
+    public function test_section_return_params(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course(['format' => 'designer', 'numsections' => 2]);
+        $format = course_get_format($course);
+        $section = $format->get_section(2);
+        $hasreturnoptions = method_exists($format, 'get_return_options');
+
+        // On the course page.
+        $params = helper::section_return_params($format, $section, null);
+        if ($hasreturnoptions) {
+            $this->assertEquals(['returnoptions' => ['pagesectionid' => 0]], $params);
+        } else {
+            $this->assertSame([], $params);
+        }
+
+        // On the section page of section 2.
+        $format->set_sectionid($section->id);
+        $params = helper::section_return_params($format, $section, 2);
+        if ($hasreturnoptions) {
+            $this->assertEquals(['returnoptions' => ['pagesectionid' => $section->id, 'sr' => 2]], $params);
+        } else {
+            $this->assertSame(['sr' => 2], $params);
+        }
     }
 }
