@@ -970,6 +970,8 @@ final class lib_test extends \advanced_testcase {
         $cm = get_fast_modinfo($course)->get_cm($module->cmid);
 
         $COURSE = $course;
+        // A page of its own: creating the course can set up the theme of the global page already.
+        $PAGE = new \moodle_page();
         $PAGE->set_course($course);
         $PAGE->set_cm($cm);
         $PAGE->set_url('/mod/page/view.php', ['id' => $cm->id]);
@@ -979,7 +981,10 @@ final class lib_test extends \advanced_testcase {
         $keys = $PAGE->secondarynav->children->get_key_list();
         $this->assertSame(['designercoursehome', 'modulepage'], array_slice($keys, 0, 2));
         $this->assertSame($label, $PAGE->secondarynav->get('designercoursehome')->text);
-        $this->assertTrue($PAGE->secondarynav->get('modulepage')->isactive);
+        $this->assertEquals(
+            new \moodle_url('/mod/page/view.php', ['id' => $cm->id]),
+            $PAGE->secondarynav->get('modulepage')->action
+        );
 
         // The page as a hero activity, with duplicates avoided: its tab instead of the activity tab.
         \format_designer\options::insert_option($cm->id, $course->id, 'heroactivity', DESIGNER_HERO_ACTIVITY_EVERYWHERE);
