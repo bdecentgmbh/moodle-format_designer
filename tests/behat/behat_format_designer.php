@@ -88,7 +88,7 @@ class behat_format_designer extends behat_base {
     public function i_check_heroactivity_position($name, $pos): void {
         $script = "
             return (function() {
-                var val = document.querySelector('.secondary-navigation .moremenu ul li:nth-child($pos) a.nav-link').innerHTML;
+                var val = document.querySelector('.secondary-navigation ul.more-nav > li:nth-child($pos) a').textContent;
                 return val.trim();
             })();
         ";
@@ -109,7 +109,7 @@ class behat_format_designer extends behat_base {
     public function i_check_heroactivity_not_in_the_position($name, $pos): void {
         $script = "
             return (function() {
-                var val = document.querySelector('.secondary-navigation .moremenu ul li:nth-child($pos) a.nav-link').innerHTML;
+                var val = document.querySelector('.secondary-navigation ul.more-nav > li:nth-child($pos) a').textContent;
                 return val.trim();
             })();
         ";

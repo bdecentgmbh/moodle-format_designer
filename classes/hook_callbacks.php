@@ -25,16 +25,29 @@ namespace format_designer;
  */
 class hook_callbacks {
     /**
-     * Tell site admins that Designer Pro needs to be updated, when it is too old for this format.
-     *
-     * Shown on admin pages and in Designer courses, in the page's notification area.
+     * Before the page is output: Designer's items in the secondary navigation, and the notice about an outdated Pro.
      *
      * @param \core\hook\output\before_http_headers $hook
      */
     public static function before_http_headers(\core\hook\output\before_http_headers $hook): void {
         global $CFG, $PAGE;
 
-        if (during_initial_install() || !empty($CFG->upgraderunning) || !is_siteadmin()) {
+        if (during_initial_install() || !empty($CFG->upgraderunning)) {
+            return;
+        }
+        local\secondarynav::extend($PAGE);
+        self::outdated_pro_notice();
+    }
+
+    /**
+     * Tell site admins that Designer Pro needs to be updated, when it is too old for this format.
+     *
+     * Shown on admin pages and in Designer courses, in the page's notification area.
+     */
+    protected static function outdated_pro_notice(): void {
+        global $PAGE;
+
+        if (!is_siteadmin()) {
             return;
         }
         if ($PAGE->pagelayout !== 'admin' && ($PAGE->course->format ?? '') !== 'designer') {
