@@ -1278,6 +1278,50 @@ body.format-designer-cards-keep-width .designer .section .content .section.card-
     margin-bottom: 15px;
     border: 0;
 }
+/* Drop position while an activity is dragged. Core marks it with a border on the activity (drop-up: before it,
+   drop-down: after the last activity), which Designer's border: 0 hides. A line drawn above the activity keeps the
+   layout in place; beside the activity where they are side by side (Cards, Circles). */
+.format-designer .designer li.activity.dropready.drop-up,
+.format-designer .designer li.activity.dropready.drop-down {
+    position: relative;
+}
+.format-designer .designer li.activity.dropready.drop-up::after,
+.format-designer .designer li.activity.dropready.drop-down::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: var(--bs-primary, var(--primary, #0f6cbf));
+    border-radius: 3px;
+    pointer-events: none;
+    z-index: 3;
+}
+.format-designer .designer li.activity.dropready.drop-up::after {
+    top: -2px;
+}
+.format-designer .designer li.activity.dropready.drop-down::after {
+    bottom: -2px;
+}
+.format-designer .designer .section.card-layout li.activity.dropready.drop-up::after,
+.format-designer .designer .section.card-layout li.activity.dropready.drop-down::after,
+.format-designer .designer .section.circles-layout li.activity.dropready.drop-up::after,
+.format-designer .designer .section.circles-layout li.activity.dropready.drop-down::after {
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    height: auto;
+}
+.format-designer .designer .section.card-layout li.activity.dropready.drop-up::after,
+.format-designer .designer .section.circles-layout li.activity.dropready.drop-up::after {
+    left: -2px;
+    right: auto;
+}
+.format-designer .designer .section.card-layout li.activity.dropready.drop-down::after,
+.format-designer .designer .section.circles-layout li.activity.dropready.drop-down::after {
+    left: auto;
+    right: -2px;
+}
 .format-designer .designer .section .content .section li.activity.activity-height .activity-block .card {
     min-height: var(--activity-height);
 }

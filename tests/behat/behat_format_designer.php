@@ -383,6 +383,83 @@ class behat_format_designer extends behat_base {
     }
 
     /**
+     * Starts dragging an activity and moves it over another element, without dropping it.
+     *
+     * Uses the browser's drag and drop events, as a mouse drag would: the course editor then marks the drop position.
+     *
+     * @When /^I drag "(?P<activity>(?:[^"]|\\")*)" activity over "(?P<target>(?:[^"]|\\")*)" "(?P<selectortype>[^"]*)"$/
+     * @param string $activity Name of the activity to drag.
+     * @param string $target Element to drag it over.
+     * @param string $selectortype Selector type of the element.
+     */
+    public function i_drag_activity_over(string $activity, string $target, string $selectortype): void {
+        $source = $this->get_selected_node('activity', $activity);
+        $over = $this->get_selected_node($selectortype, $target);
+        $this->execute_script('(() => {
+            const source = document.evaluate(' . json_encode($source->getXpath()) . ', document, null,
+                XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+            const over = document.evaluate(' . json_encode($over->getXpath()) . ', document, null,
+                XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+            const dataTransfer = new DataTransfer();
+            const fire = (element, type) => element.dispatchEvent(
+                new DragEvent(type, {bubbles: true, cancelable: true, dataTransfer: dataTransfer}));
+            fire(source, "dragstart");
+            fire(over, "dragenter");
+            fire(over, "dragover");
+            window.formatDesignerDrag = {source: source, over: over, dataTransfer: dataTransfer};
+        })();');
+    }
+
+    /**
+     * Checks that the drop position line is shown before or after an activity while an activity is dragged.
+     *
+     * @Then /^the drop position should be shown (?P<position>before|after) "(?P<activity>(?:[^"]|\\")*)" activity$/
+     * @param string $position "before" (core's drop-up) or "after" (core's drop-down, the end of a section).
+     * @param string $activity Name of the activity.
+     */
+    public function drop_position_should_be_shown(string $position, string $activity): void {
+        $node = $this->get_selected_node('activity', $activity);
+        $class = ($position == 'before') ? 'drop-up' : 'drop-down';
+        $line = $this->evaluate_script('return (() => {
+            const activity = document.evaluate(' . json_encode($node->getXpath()) . ', document, null,
+                XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.closest("li.activity");
+            if (!activity.classList.contains(' . json_encode($class) . ')) {
+                return "no " + ' . json_encode($class) . ' + " class";
+            }
+            const style = getComputedStyle(activity, "::after");
+            const width = parseFloat(style.width) || 0;
+            const height = parseFloat(style.height) || 0;
+            if (style.content === "none" || style.display === "none" || style.visibility !== "visible" ||
+                    width < 2 || height < 2 || style.backgroundColor === "rgba(0, 0, 0, 0)") {
+                return "no visible line (" + style.content + ", " + width + "x" + height + ", " + style.backgroundColor + ")";
+            }
+            return "";
+        })();');
+        if ($line !== '') {
+            throw new ExpectationException(
+                "The drop position isn't shown {$position} \"{$activity}\": {$line}",
+                $this->getSession()
+            );
+        }
+    }
+
+    /**
+     * Drops the activity that is being dragged where it is.
+     *
+     * @When /^I drop the dragged activity$/
+     */
+    public function i_drop_the_dragged_activity(): void {
+        $this->execute_script('(() => {
+            const drag = window.formatDesignerDrag;
+            const fire = (element, type) => element.dispatchEvent(
+                new DragEvent(type, {bubbles: true, cancelable: true, dataTransfer: drag.dataTransfer}));
+            fire(drag.over, "drop");
+            fire(drag.source, "dragend");
+        })();');
+        $this->wait_for_pending_js();
+    }
+
+    /**
      * Select an activity from the activity chooser, handling differences between Moodle versions.
      *
      * In Moodle 5.1+, after clicking the activity link, an additional "Add selected activity" button
