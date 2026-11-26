@@ -777,6 +777,7 @@ final class lib_test extends \advanced_testcase {
         \format_designer\options::$optionspercmid = [];
         \format_designer\options::$bulkloaded = [];
 
+        $PAGE->reset_theme_and_output();
         $PAGE->set_course($course);
         $modinfo = get_fast_modinfo($course);
         $cm = $modinfo->get_cm($module->cmid);
@@ -812,20 +813,22 @@ final class lib_test extends \advanced_testcase {
         $this->assertStringContainsString($title, $activity);
         $this->assertStringNotContainsString($raw, $activity);
 
-        // Hero navigation interpolates the link into an inline script. The title must not break that string.
+        // The hero activity tab in the secondary navigation shows the formatted title.
+        $this->setAdminUser();
         $COURSE = $course;
-        $PAGE->set_cm($cm);
-        $navigation = new \navigation_node(['text' => 'Course', 'key' => 'course']);
-        format_designer_extend_navigation_course($navigation, $course, \context_course::instance($course->id));
-
-        $reflection = new \ReflectionObject($PAGE->requires);
-        $property = $reflection->getProperty('amdjscode');
-        $property->setAccessible(true);
-        $jscode = implode("\n", $property->getValue($PAGE->requires));
-        $this->assertStringContainsString('designer-hero-activity', $jscode);
-        $this->assertStringNotContainsString($raw, $jscode);
-        $this->assertStringNotContainsString('<script>', $jscode);
-        $this->assertDoesNotMatchRegularExpression("/\\.append\\('.*<script>/s", $jscode);
+        $PAGE = new \moodle_page();
+        $PAGE->set_course($course);
+        $PAGE->set_url('/course/view.php', ['id' => $course->id]);
+        \format_designer\local\secondarynav::extend($PAGE);
+        $node = $PAGE->secondarynav->get(\format_designer\local\secondarynav::HERO_PREFIX . $cm->id);
+        $this->assertSame($title, $node->text);
+        // As the theme renders the menu.
+        $renderer = $PAGE->get_renderer('core');
+        $moremenu = new \core\navigation\output\more_menu($PAGE->secondarynav, 'nav-tabs');
+        $menu = $renderer->render_from_template('core/moremenu', $moremenu->export_for_template($renderer));
+        $this->assertStringContainsString('designer-hero-activity', $menu);
+        $this->assertStringNotContainsString($raw, $menu);
+        $this->assertStringNotContainsString('<script>', $menu);
 
         // Activity-name mode must ignore the stored custom markup.
         \format_designer\options::insert_option($module->cmid, $course->id, 'secondarytype', 'activitytitle');
@@ -947,16 +950,17 @@ final class lib_test extends \advanced_testcase {
     }
 
     /**
-     * The menu HTML built from language strings is JSON-encoded before it goes into the inline navigation script.
+     * Activity pages get the course link of "Secondary menu to course", and without a secondary navigation of their own one
+     * with the activity tab (DES-964). A hero activity's tab replaces the activity tab when duplicates are avoided.
      *
-     * @covers ::format_designer_extend_navigation_course
+     * @covers \format_designer\local\secondarynav
      */
-    public function test_secondary_menu_script_encodes_menu_html(): void {
+    public function test_secondary_navigation_course_link(): void {
         global $PAGE, $COURSE;
 
         $label = get_string('strsecondarymenucourse', 'format_designer');
         if (method_exists($this, 'get_mocked_string_manager')) {
-            // Moodle 4.5.1 and later: use a label with an apostrophe, which broke the single-quoted script string.
+            // Moodle 4.5.1 and later: a label with an apostrophe, which broke the single-quoted script string before.
             $label = "Course's home";
             $this->get_mocked_string_manager()->mock_string('strsecondarymenucourse', 'format_designer', $label);
         }
@@ -968,22 +972,32 @@ final class lib_test extends \advanced_testcase {
         $COURSE = $course;
         $PAGE->set_course($course);
         $PAGE->set_cm($cm);
-        $navigation = new \navigation_node(['text' => 'Course', 'key' => 'course']);
-        format_designer_extend_navigation_course($navigation, $course, \context_course::instance($course->id));
+        $PAGE->set_url('/mod/page/view.php', ['id' => $cm->id]);
+        \format_designer\local\secondarynav::extend($PAGE);
 
-        $property = (new \ReflectionObject($PAGE->requires))->getProperty('amdjscode');
-        $jscode = implode("\n", $property->getValue($PAGE->requires));
+        // First the course link, then the activity tab, before the activity's own tabs.
+        $keys = $PAGE->secondarynav->children->get_key_list();
+        $this->assertSame(['designercoursehome', 'modulepage'], array_slice($keys, 0, 2));
+        $this->assertSame($label, $PAGE->secondarynav->get('designercoursehome')->text);
+        $this->assertTrue($PAGE->secondarynav->get('modulepage')->isactive);
 
-        $flags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
-        $this->assertStringContainsString('designercoursehome', $jscode);
-        $this->assertStringContainsString(trim(json_encode($label, $flags), '"'), $jscode);
-        // Encoded markup keeps no tags, so nothing can end a string or the script early.
-        $this->assertStringNotContainsString('<li', $jscode);
-        $this->assertStringNotContainsString('<div', $jscode);
-        $this->assertStringNotContainsString('<a ', $jscode);
-        if (strpos($label, "'") !== false) {
-            $this->assertStringNotContainsString($label, $jscode);
-        }
+        // The page as a hero activity, with duplicates avoided: its tab instead of the activity tab.
+        \format_designer\options::insert_option($cm->id, $course->id, 'heroactivity', DESIGNER_HERO_ACTIVITY_EVERYWHERE);
+        \format_designer\options::insert_option($cm->id, $course->id, 'heroactivitypos', 1);
+        \format_designer\options::$optionspercmid = [];
+        \format_designer\options::$bulkloaded = [];
+        set_config('avoidduplicate_heromodentry', 1, 'format_designer');
+        $PAGE = new \moodle_page();
+        $PAGE->set_course($course);
+        $PAGE->set_cm($cm);
+        $PAGE->set_url('/mod/page/view.php', ['id' => $cm->id]);
+        \format_designer\local\secondarynav::extend($PAGE);
+
+        $herokey = \format_designer\local\secondarynav::HERO_PREFIX . $cm->id;
+        $keys = $PAGE->secondarynav->children->get_key_list();
+        $this->assertSame(['designercoursehome', $herokey], array_slice($keys, 0, 2));
+        $this->assertNotContains('modulepage', $keys);
+        $this->assertTrue($PAGE->secondarynav->get($herokey)->isactive);
     }
 
     /**
