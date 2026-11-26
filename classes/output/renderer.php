@@ -114,7 +114,11 @@ class renderer extends \core_courseformat\output\section_renderer {
         $data->issectionpageclass = $singlesection || ($course->coursedisplay == COURSE_DISPLAY_MULTIPAGE)
             ? 'section-page-layout' : '';
 
-        if (!\format_designer\helper::has_pro()) {
+        // The course header of Designer Basic, also with Designer Pro when its header type is "Basic layout".
+        if (
+            !\format_designer\helper::has_pro() ||
+            (isset($course->courseheadertype) && $course->courseheadertype == DESIGNER_COURSE_HEADER_BASIC)
+        ) {
             $data->headermetadata = $this->course_header_metadata_details($course);
         }
 

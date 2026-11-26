@@ -58,6 +58,12 @@ define('DESIGNER_TYPE_COLLAPSIBLE', 2);
 
 define('DESIGNER_TYPE_FLOW', 3);
 
+/**
+ * Course header type of Designer Pro that shows the course header of Designer Basic (the header types None, Hero and
+ * Content are 0, 1 and 2 in Designer Pro).
+ */
+define('DESIGNER_COURSE_HEADER_BASIC', 3);
+
 define('DESIGNER_HERO_ZERO_HIDE', 1);
 
 define('DESIGNER_HERO_ZERO_VISIBLE', 2);
