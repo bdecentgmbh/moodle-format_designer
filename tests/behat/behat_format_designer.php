@@ -152,6 +152,35 @@ class behat_format_designer extends behat_base {
     }
 
     /**
+     * Checks that nothing else is painted over the visible elements, e.g. the items of an open dropdown menu.
+     *
+     * @Then /^the visible "(?P<selector>(?:[^"]|\\")*)" css elements should not be covered by other elements$/
+     * @param string $selector CSS selector of the elements.
+     */
+    public function visible_css_elements_should_not_be_covered(string $selector): void {
+        $this->find('css', $selector);
+        // For each visible element, what the browser shows in its middle when it isn't the element itself.
+        $covered = $this->evaluate_script('return (() => {
+            const elements = Array.from(document.querySelectorAll(' . json_encode($selector) . '))
+                .filter(e => e.getClientRects().length);
+            elements[elements.length - 1].scrollIntoView({block: "center"});
+            return elements.map(element => {
+                const rect = element.getBoundingClientRect();
+                const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                if (!hit || element.contains(hit)) {
+                    return "";
+                }
+                const owner = hit.closest("li.activity, li.section");
+                return element.textContent.trim() + ": " + hit.tagName.toLowerCase() +
+                    (owner ? " in #" + owner.id : "");
+            }).filter(text => text);
+        })();');
+        if ($covered) {
+            throw new ExpectationException('Covered: ' . implode('; ', $covered), $this->getSession());
+        }
+    }
+
+    /**
      * I set the completion.
      *
      * @Given /^I set the designer manual completion$/
