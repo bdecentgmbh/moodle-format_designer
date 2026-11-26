@@ -16,6 +16,8 @@
 
 namespace format_designer\output;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\format_designer\output\renderer::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\renderer::class, 'render_course_module')]
 /**
  * Unit tests for the Designer course renderer.
  *
@@ -25,8 +27,6 @@ namespace format_designer\output;
  * @covers     \format_designer\output\renderer
  * @covers     \format_designer\output\renderer::render_course_module
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(\format_designer\output\renderer::class)]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\renderer::class, 'render_course_module')]
 final class renderer_test extends \advanced_testcase {
     /** @var \stdClass Designer course. */
     protected \stdClass $course;

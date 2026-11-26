@@ -16,6 +16,7 @@
 
 namespace format_designer;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\format_designer\helper::class)]
 /**
  * Tests for the per-request preload of Video Time records used on the course page (DES-962).
  *
@@ -24,7 +25,6 @@ namespace format_designer;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \format_designer\helper
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(\format_designer\helper::class)]
 final class videotime_preload_test extends \advanced_testcase {
     /**
      * The cache is static for the request; tests share the process, so start each one clean.
