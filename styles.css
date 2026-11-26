@@ -1337,6 +1337,12 @@ body.format-designer-cards-keep-width .designer .section .content .section.card-
     left: auto;
     right: -2px;
 }
+/* The cards are stacking contexts, so an open menu of an activity (e.g. its visibility) would be painted below the
+   next activities. The activity with the open menu is raised above them. */
+.format-designer li.activity:has(.dropdown-menu.show) {
+    position: relative;
+    z-index: 2;
+}
 .format-designer .designer .section .content .section li.activity.activity-height .activity-block .card {
     min-height: var(--activity-height);
 }
