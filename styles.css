@@ -3631,3 +3631,126 @@ li.section.main.section-background-color:not(.section-header-image)
 .format-designer .course-content ul.designer li.section.main.bg-color-overlay.section-design-whole .bg-overlay {
     z-index: 0;
 } */
+/* Dark colour mode of Boost (Moodle 5.3, experimental): the fixed light backgrounds, dark text and light borders above
+   follow the colour mode (DES-969). In light mode nothing changes. */
+[data-bs-theme="dark"] .format-designer.path-mod .header-maxwidth,
+[data-bs-theme="dark"] .format-designer.path-admin .header-maxwidth {
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] .format-designer ul.designer .card.card-list.restricted {
+    border-color: var(--bs-border-color);
+}
+[data-bs-theme="dark"] .format-designer .course-content ul.designer li.section .categorise-section-block span.badge {
+    color: var(--bs-body-color);
+}
+[data-bs-theme="dark"] .format-designer .course-content ul.designer li.section .availability-section-block
+.section_availability .availabilityinfo {
+    border-color: var(--bs-border-color);
+}
+[data-bs-theme="dark"] .format-designer .course-content ul.designer li.section .availability-section-block
+.section_availability .availabilityinfo.isrestricted {
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] .format-designer .course-content .single-section-layout:not(.section-page-layout)
+ul.designer.course-type-normal li.section.main .section-content-wrapper {
+    border-color: var(--bs-border-color);
+}
+[data-bs-theme="dark"] .format-designer ul.designer li.activity .activity-block .card .show-on-hover .col a,
+[data-bs-theme="dark"] .format-designer ul.designer li.activity .activity-block .card:hover .show-on-hover .col a {
+    color: var(--bs-body-color);
+}
+[data-bs-theme="dark"] .format-designer ul.designer .togglecompletion.badge-restricted {
+    color: var(--bs-body-color);
+}
+[data-bs-theme="dark"] .format-designer ul.designer .togglecompletion .btn img {
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] .format-designer .designer .section.img-text .activity .restrict-block .info-content-block
+.availabilityinfo.isrestricted {
+    color: var(--bs-body-color);
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] .format-designer .designer .section.img-text.circles-layout .activity:hover .activityinstance
+.img-element.content-show-hover .img-block,
+[data-bs-theme="dark"] .format-designer .designer .section.img-text.circles-layout .activity .activityinstance
+.img-element.content-hide-hover .img-block {
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] .format-designer .designer .section .content .section li.activity .action-html-card a {
+    color: var(--bs-body-color);
+}
+[data-bs-theme="dark"] .format-designer .designer .section.img-text.circles-layout .activity-block .img-block {
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] .format-designer .designer.kanban-board .kanban-board-activities .section.img-text .circle-layout
+.activity-block .activityinstance .img-element .img-block {
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] .format-designer .course-info-block .carousel .contact-element .contact-block .content-block
+.title-block a h4 {
+    color: var(--bs-body-color);
+}
+[data-bs-theme="dark"] .format-designer .single-section-layout .course-info-block > div.progress-block > .progress
+.progress-bar.bg-remain-block {
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] .format-designer .single-section-layout .course-info-block > div.progress-block > div {
+    border-right-color: var(--bs-border-color);
+}
+[data-bs-theme="dark"] .format-designer .single-section-layout .course-info-block > div.progress-block
+.activity-completed-block p {
+    color: var(--bs-body-color);
+}
+[data-bs-theme="dark"] .format-designer .course-content ul.designer.kanban-board li.section.main {
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] .format-designer .course-content ul.designer.kanban-board li.section.main#section-0
+.section-header-content .section-progress-bar .progress {
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] .format-designer .course-content ul.designer.kanban-board .kanban-board-activities li.section
+.section-progress-info .progress-bar .progress {
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] .format-designer .course-content ul.course-type-flow.designer .section.main
+.section-header-content {
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] .format-designer .course-content ul.designer .section.main .section-header-content.flow-stack
+.flow-stack-header {
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] .format-designer .course-content ul.designer .section.main .section-header-content.flow-stack
+.section-background-color {
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] .format-designer .course-content ul.designer li.section .section-header-content.flow-stack
+.section-background-style.sectiondesign-header {
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] .format-designer:not(.editing) .course-content ul.designer.course-type-flow
+li.section.section-background-color.bg-mask .section-header-content.flow-stack .flow-stack-header:before,
+[data-bs-theme="dark"] .format-designer:not(.editing) .course-content ul.designer.course-type-flow
+.section.main.bg-mask:not(.section-background-overlay) .section-header-content.flow-stack .flow-stack-header:before {
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] .format-designer .course-content ul.designer.course-type-flow li.section ul.section.img-text
+li.activity {
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] .format-designer .course-content ul.designer.course-type-flow li.section .section-header-content
+.section-progress-info > div:not(.progress-donut) .progress {
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] .format-designer .course-content ul.designer.course-type-flow li.section .content .section
+li.activity div:not(.activity-background-style) + .mod-indent-outer .completion-html-card .completion-info form button {
+    color: var(--bs-body-color);
+}
+[data-bs-theme="dark"] .format-designer:not(.editing) .course-content ul.designer.course-type-flow
+li.section.section-background-color .section-header-content.flow-stack .section-background-style.sectiondesign-header {
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] .format-designer .course-content ul.designer.course-type-flow li.section .content .section
+li.activity .mod-indent-outer .completion-html-card .completion-info form button.border-badge-notstarted {
+    color: var(--bs-body-color);
+}
