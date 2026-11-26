@@ -370,6 +370,11 @@ class cm_completion implements renderable, templatable {
             'type' => 'hidden', 'name' => 'modulename', 'value' => $this->get_cm_formatted_name(), ]);
         $output .= html_writer::empty_tag('input', [
             'type' => 'hidden', 'name' => 'completionstate', 'value' => $newstate, ]);
+        // Back to the course page, as togglecompletion.php does without backto. Moodle 5.3's togglecompletion.php fails
+        // there, calling get_section_info() on a course module record.
+        $backto = course_get_url($this->cm->get_course(), $this->cm->sectionnum);
+        $output .= html_writer::empty_tag('input', [
+            'type' => 'hidden', 'name' => 'backto', 'value' => $backto->out(false), ]);
         $output .= html_writer::end_tag('div');
 
         $manualcompletiondata = [
