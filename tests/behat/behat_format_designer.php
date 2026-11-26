@@ -120,6 +120,38 @@ class behat_format_designer extends behat_base {
     }
 
     /**
+     * Skips the scenario when the Designer Pro code is present, for behaviour of Designer Basic.
+     *
+     * @Given /^Designer Pro is not installed$/
+     */
+    public function designer_pro_is_not_installed(): void {
+        if (array_key_exists('designer', \core_component::get_plugin_list('local'))) {
+            throw new \Moodle\BehatExtension\Exception\SkippedException('Designer Pro is installed.');
+        }
+    }
+
+    /**
+     * Checks that the visible elements sit in one row, e.g. the items of the secondary navigation.
+     *
+     * @Then /^the visible "(?P<selector>(?:[^"]|\\")*)" css elements should be in one row$/
+     * @param string $selector CSS selector of the elements.
+     */
+    public function visible_css_elements_should_be_in_one_row(string $selector): void {
+        $this->find('css', $selector);
+        $tops = $this->evaluate_script('return Array.from(document.querySelectorAll(' . json_encode($selector) . '))' .
+            '.filter(e => e.getClientRects().length).map(e => Math.round(e.getBoundingClientRect().top));');
+        if (count(array_unique($tops)) > 1) {
+            $message = sprintf(
+                'The %d visible elements are in %d rows (tops %s)',
+                count($tops),
+                count(array_unique($tops)),
+                implode(', ', $tops)
+            );
+            throw new ExpectationException($message, $this->getSession());
+        }
+    }
+
+    /**
      * I set the completion.
      *
      * @Given /^I set the designer manual completion$/
