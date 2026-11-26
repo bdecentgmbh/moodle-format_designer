@@ -5,9 +5,7 @@ Feature: The secondary navigation keeps its More menu in courses with hero activ
   I need the items that don't fit in the secondary navigation to stay in its More menu
 
   Background:
-    # The bug was in Designer Basic. Designer Pro has its own way through the same script.
-    Given Designer Pro is not installed
-    And the following "users" exist:
+    Given the following "users" exist:
       | username | firstname | lastname | email                |
       | teacher1 | Teacher   | 1        | teacher1@example.com |
     And the following "courses" exist:
@@ -28,4 +26,4 @@ Feature: The secondary navigation keeps its More menu in courses with hero activ
     And I change window size to "1200x900"
     When I am on the "Course 1" course page logged in as teacher1
     Then I should see "Page 1" in the ".secondary-navigation" "css_element"
-    And the visible ".secondary-navigation .moremenu .nav-tabs > li" css elements should be in one row
+    And the visible ".secondary-navigation .navigation ul.more-nav > li" css elements should be in one row
