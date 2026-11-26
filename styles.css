@@ -1239,6 +1239,14 @@ span.section-collapse-icon:before {
 body.format-designer-cards-keep-width .designer .section .content .section.card-layout li.activity {
     flex-grow: 0;
 }
+/* Kanban columns are only 400-550px wide, too narrow for the section's column setting, which is meant for a
+   full-width section: one card per row there (as before DES-956 on Moodle 5). More specific than the column widths
+   of Designer Pro. Section 0 above the board keeps its columns. */
+.format-designer .course-content ul.designer.kanban-board .kanban-board-activities li.section .content
+.section.card-layout li.activity {
+    width: 100%;
+    margin-right: 0;
+}
 .format-designer .designer .section .content .section.card-layout li.activity.subsection .section {
     min-width: auto;
     max-width: none;
