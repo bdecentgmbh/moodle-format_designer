@@ -30,6 +30,35 @@ global $CFG;
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . '/course/format/designer/lib.php');
 
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\renderer::class, 'is_template_exists')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer::class, 'page_set_course')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer::class, 'get_section_name')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer::class, 'get_default_section_name')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\core_external::class, 'update_inplace_editable')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_inplace_editable')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\helper::class, 'modcontent_trim_char')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\helper::class, 'get_words')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\renderer::class, 'render_course_module')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\helper::class, 'format_date')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer::class, 'setup_kanban_layouts')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\helper::class, 'get_course_staff_users')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\renderer::class, 'criteria_progress')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\courseformat\content::class, 'export_for_template')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer::class, 'get_view_url')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(
+    \format_designer\output\courseformat\content\section\header::class,
+    'export_for_template'
+)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer::class, 'get_cm_secondary_title')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_extend_navigation_course')]
+#[\PHPUnit\Framework\Attributes\CoversClass(\format_designer\local\secondarynav::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(
+    \format_designer\output\courseformat\content\cm\title::class,
+    'get_title_displayvalue'
+)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\helper::class, 'get_visible_user_details')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_get_section_background_file')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\renderer::class, 'get_completion_activities')]
 /**
  * designer course format related unit tests.
  *
@@ -60,35 +89,6 @@ require_once($CFG->dirroot . '/course/format/designer/lib.php');
  * @covers     ::format_designer_get_section_background_file
  * @covers     \format_designer\output\renderer::get_completion_activities
  */
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\renderer::class, 'is_template_exists')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer::class, 'page_set_course')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer::class, 'get_section_name')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer::class, 'get_default_section_name')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\core_external::class, 'update_inplace_editable')]
-#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_inplace_editable')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\helper::class, 'modcontent_trim_char')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\helper::class, 'get_words')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\renderer::class, 'render_course_module')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\helper::class, 'format_date')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer::class, 'setup_kanban_layouts')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\helper::class, 'get_course_staff_users')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\renderer::class, 'criteria_progress')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\courseformat\content::class, 'export_for_template')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer::class, 'get_view_url')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(
-    \format_designer\output\courseformat\content\section\header::class,
-    'export_for_template'
-)]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer::class, 'get_cm_secondary_title')]
-#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_extend_navigation_course')]
-#[\PHPUnit\Framework\Attributes\CoversClass(\format_designer\local\secondarynav::class)]
-#[\PHPUnit\Framework\Attributes\CoversMethod(
-    \format_designer\output\courseformat\content\cm\title::class,
-    'get_title_displayvalue'
-)]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\helper::class, 'get_visible_user_details')]
-#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_get_section_background_file')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\renderer::class, 'get_completion_activities')]
 final class lib_test extends \advanced_testcase {
     /**
      * Test setup.

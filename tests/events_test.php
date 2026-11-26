@@ -21,6 +21,8 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/course/lib.php');
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\format_designer\events::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\events::class, 'course_updated')]
 /**
  * Unit tests for the Designer event observers.
  *
@@ -30,8 +32,6 @@ require_once($CFG->dirroot . '/course/lib.php');
  * @covers     \format_designer\events
  * @covers     \format_designer\events::course_updated
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(\format_designer\events::class)]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\events::class, 'course_updated')]
 final class events_test extends \advanced_testcase {
     /**
      * Updating a course in another format must not leave the old course record in the format cache.

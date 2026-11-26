@@ -16,6 +16,8 @@
 
 namespace format_designer\output\courseformat;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\format_designer\output\courseformat\content::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\courseformat\content::class, 'export_for_template')]
 /**
  * Unit tests for the Designer course content output.
  *
@@ -25,8 +27,6 @@ namespace format_designer\output\courseformat;
  * @covers     \format_designer\output\courseformat\content
  * @covers     \format_designer\output\courseformat\content::export_for_template
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(\format_designer\output\courseformat\content::class)]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\courseformat\content::class, 'export_for_template')]
 final class content_test extends \advanced_testcase {
     /**
      * The content exports the values for the content JavaScript like core: strings instead of NULL.

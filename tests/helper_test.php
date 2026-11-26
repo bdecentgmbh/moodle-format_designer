@@ -16,6 +16,11 @@
 
 namespace format_designer;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\format_designer\helper::class)]
+#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_get_cache_object')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_has_pro')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_get_pro_layouts')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_fill_custom_values')]
 /**
  * Tests for the Designer helper class.
  *
@@ -28,11 +33,6 @@ namespace format_designer;
  * @covers     ::format_designer_get_pro_layouts
  * @covers     ::format_designer_fill_custom_values
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(\format_designer\helper::class)]
-#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_get_cache_object')]
-#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_has_pro')]
-#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_get_pro_layouts')]
-#[\PHPUnit\Framework\Attributes\CoversFunction('format_designer_fill_custom_values')]
 final class helper_test extends \advanced_testcase {
     /**
      * Pro only counts as installed when its installed version is at least the minimum version (DES-994).

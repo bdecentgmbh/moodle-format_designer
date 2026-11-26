@@ -16,6 +16,8 @@
 
 namespace format_designer\external;
 
+#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\external\external::class, 'get_videotime_instace')]
 /**
  * Tests for the format_designer_get_videotime_instace web service.
  *
@@ -25,8 +27,6 @@ namespace format_designer\external;
  * @runTestsInSeparateProcesses
  * @covers     \format_designer\external\external::get_videotime_instace
  */
-#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\external\external::class, 'get_videotime_instace')]
 final class get_videotime_instace_test extends \advanced_testcase {
     /** @var \stdClass Designer course with the Video Time activity. */
     private $course;

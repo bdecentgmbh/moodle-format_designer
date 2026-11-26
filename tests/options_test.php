@@ -32,6 +32,10 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/course/lib.php');
 
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\options::class, 'is_json')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\renderer::class, 'get_activity_elementclasses')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\options::class, 'is_mod_completed')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\options::class, 'is_section_completed')]
 /**
  * designer course format related unit tests.
  *
@@ -43,10 +47,6 @@ require_once($CFG->dirroot . '/course/lib.php');
  * @covers     \format_designer\options::is_mod_completed
  * @covers     \format_designer\options::is_section_completed
  */
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\options::class, 'is_json')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\output\renderer::class, 'get_activity_elementclasses')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\options::class, 'is_mod_completed')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\format_designer\options::class, 'is_section_completed')]
 final class options_test extends \advanced_testcase {
     /**
      * @var object
