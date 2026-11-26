@@ -200,7 +200,8 @@ class renderer extends \core_courseformat\output\section_renderer {
 
         $controls = [];
         if ($section->section && has_capability('moodle/course:setcurrentsection', $coursecontext)) {
-            if ($course->marker == $section->section) {  // Show the "light globe" on/off.
+            if ($course->marker == $section->section) {
+                // Show the "light globe" on/off.
                 $url->param('marker', 0);
                 $highlightoff = get_string('highlightoff');
                 $controls['highlight'] = [
@@ -297,7 +298,8 @@ class renderer extends \core_courseformat\output\section_renderer {
             $url = clone($baseurl);
             if (!$isstealth) {
                 if (has_capability('moodle/course:sectionvisibility', $coursecontext)) {
-                    if ($section->visible) { // Show the hide/show eye.
+                    if ($section->visible) {
+                        // Show the hide/show eye.
                         $strhidefromothers = get_string('hidefromothers', 'format_' . $course->format);
                         $url->param('hide', $section->section);
                         $controls['visiblity'] = [
@@ -327,7 +329,8 @@ class renderer extends \core_courseformat\output\section_renderer {
                 if (!$onsectionpage) {
                     if (has_capability('moodle/course:movesections', $coursecontext)) {
                         $url = clone($baseurl);
-                        if ($section->section > 1) { // Add a arrow to move section up.
+                        if ($section->section > 1) {
+                            // Add a arrow to move section up.
                             $url->param('section', $section->section);
                             $url->param('move', -1);
                             $strmoveup = get_string('moveup');
@@ -341,7 +344,8 @@ class renderer extends \core_courseformat\output\section_renderer {
                         }
 
                         $url = clone($baseurl);
-                        if ($section->section < $numsections) { // Add a arrow to move section down.
+                        if ($section->section < $numsections) {
+                            // Add a arrow to move section down.
                             $url->param('section', $section->section);
                             $url->param('move', 1);
                             $strmovedown = get_string('movedown');

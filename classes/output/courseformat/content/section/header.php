@@ -31,7 +31,6 @@ use renderable;
 use section_info;
 use stdClass;
 
-
 /**
  * Base class to render a section activity in the activities list.
  *

@@ -24,7 +24,6 @@
 
 namespace format_designer\cache;
 
-
 /**
  * Common cache methods trait to avoid duplication.
  */
