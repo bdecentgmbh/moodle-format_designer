@@ -116,4 +116,56 @@ final class helper_test extends \advanced_testcase {
         $this->assertSame('background: #123456;', format_designer_fill_custom_values($data, 'bg', 'bgcustom', 'background'));
         $this->assertSame('', format_designer_fill_custom_values($data, 'empty', 'bgcustom', 'background'));
     }
+
+    /**
+     * The message and contact buttons of a staff user are only offered when they would work (DES-1003).
+     */
+    public function test_staff_contact_actions(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $course = $this->getDataGenerator()->create_course(['format' => 'designer']);
+        $teacher = $this->getDataGenerator()->create_user();
+        $student = $this->getDataGenerator()->create_user();
+        // Logged in, but not enrolled, e.g. through guest access.
+        $visitor = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+
+        $this->setUser($student);
+        $actions = helper::staff_contact_actions($teacher->id);
+        $this->assertTrue($actions['cansendmessage']);
+        $this->assertTrue($actions['showaddtocontacts']);
+        $this->assertTrue($actions['hascontactactions']);
+        $this->assertFalse($actions['iscontact']);
+        $this->assertEquals(get_string('addtoyourcontacts', 'message'), $actions['contacttitle']);
+
+        // Moodle only allows messages and contact requests to people in the same course.
+        $this->setUser($visitor);
+        $actions = helper::staff_contact_actions($teacher->id);
+        $this->assertFalse($actions['cansendmessage']);
+        $this->assertFalse($actions['showaddtocontacts']);
+        $this->assertFalse($actions['hascontactactions']);
+
+        // A contact can be messaged and removed from the contacts.
+        \core_message\api::add_contact($visitor->id, $teacher->id);
+        $actions = helper::staff_contact_actions($teacher->id);
+        $this->assertTrue($actions['cansendmessage']);
+        $this->assertTrue($actions['showaddtocontacts']);
+        $this->assertTrue($actions['iscontact']);
+        $this->assertEquals(get_string('removefromyourcontacts', 'message'), $actions['contacttitle']);
+
+        // With messages to all users allowed, anyone may send a contact request.
+        set_config('messagingallusers', 1);
+        $other = $this->getDataGenerator()->create_user();
+        $this->setUser($other);
+        $this->assertTrue(helper::staff_contact_actions($teacher->id)['showaddtocontacts']);
+
+        // Nothing for the staff user themselves, guests and visitors who aren't logged in.
+        $this->setUser($teacher);
+        $this->assertFalse(helper::staff_contact_actions($teacher->id)['hascontactactions']);
+        $this->setGuestUser();
+        $this->assertFalse(helper::staff_contact_actions($teacher->id)['hascontactactions']);
+        $this->setUser(0);
+        $this->assertFalse(helper::staff_contact_actions($teacher->id)['hascontactactions']);
+    }
 }
