@@ -1,6 +1,12 @@
 name: Moodle Plugin CI
 
-on: pull_request
+# Pull requests, and main and the stable branches after a merge: the release workflow needs a passed run on the tagged
+# commit. Pushes to other branches are tested through their pull request.
+on:
+  push:
+    branches: [main, 'MOODLE_*_STABLE']
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   test:
