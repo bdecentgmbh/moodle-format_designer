@@ -74,7 +74,10 @@ class section extends \core_courseformat\output\local\content\section {
         }
 
         if ($data->iscoursedisplaymultipage && !$sectionnum) {
-            $pagesection = optional_param('section', -1, PARAM_INT);
+            // Section 0 has a section page too. Old links to the course page pass the section number, the section page
+            // of core sets it.
+            $issectionpage = $PAGE->pagetype == 'course-view-section-' . $format->get_format();
+            $pagesection = $issectionpage ? 0 : optional_param('section', -1, PARAM_INT);
             $sectionnum = empty($sectionnum) && ($pagesection >= 0) ? 0 : false;
             if ($pagesection >= 0) {
                 $formatdata = (array) $renderer->render_section_data($this->section, $this->format->get_course(), $sectionnum);

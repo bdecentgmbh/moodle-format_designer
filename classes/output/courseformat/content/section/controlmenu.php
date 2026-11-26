@@ -217,9 +217,9 @@ class controlmenu extends controlmenu_base {
         $controls = [];
 
         // Only show the view link if we are not already in the section view page.
-        if ($PAGE->pagetype !== 'section-view-' . $course->format) {
+        if ($PAGE->pagetype !== 'course-view-section-' . $course->format) {
             $controls['view'] = [
-                'url'   => new moodle_url('/course/view.php', ['id' => $course->id, 'section' => $section->section]),
+                'url'   => new moodle_url('/course/section.php', ['id' => $section->id]),
                 'icon' => 'i/viewsection',
                 'name' => get_string('view'),
                 'pixattr' => ['class' => ''],
@@ -294,7 +294,8 @@ class controlmenu extends controlmenu_base {
                 if (has_capability('moodle/course:sectionvisibility', $coursecontext, $user)) {
                     $strhidefromothers = get_string('hidefromothers', 'format_' . $course->format);
                     $strshowfromothers = get_string('showfromothers', 'format_' . $course->format);
-                    if ($section->visible) { // Show the hide/show eye.
+                    if ($section->visible) {
+                        // Show the hide/show eye.
                         $url->param('hide', $section->section);
                         $controls['visiblity'] = [
                             'url' => $url,
@@ -349,7 +350,8 @@ class controlmenu extends controlmenu_base {
                     }
                     // Legacy move up and down links for non component-based formats.
                     $url = clone($baseurl);
-                    if ($section->section > 1) { // Add a arrow to move section up.
+                    if ($section->section > 1) {
+                        // Add a arrow to move section up.
                         $url->param('section', $section->section);
                         $url->param('move', -1);
                         $strmoveup = get_string('moveup');
@@ -363,7 +365,8 @@ class controlmenu extends controlmenu_base {
                     }
 
                     $url = clone($baseurl);
-                    if ($section->section < $numsections) { // Add a arrow to move section down.
+                    if ($section->section < $numsections) {
+                        // Add a arrow to move section down.
                         $url->param('section', $section->section);
                         $url->param('move', 1);
                         $strmovedown = get_string('movedown');

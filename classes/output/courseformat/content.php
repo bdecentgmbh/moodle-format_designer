@@ -62,7 +62,8 @@ class content extends content_base {
             'initialsection' => $initialsection,
             'sections' => $sections,
             'format' => $format->get_format(),
-            'sectionreturn' => null,
+            'sectionreturn' => 'null', // Mustache templates don't display NULL, so pass a string value.
+            'pagesectionid' => $format->get_sectionid() ?? 'null', // Pass a string value if NULL.
         ];
 
         if (method_exists($format, 'get_sectionnum')) {
@@ -81,10 +82,11 @@ class content extends content_base {
             $singlesectionnumhandled = true;
         }
 
-        // The single section format has extra navigation.
+        // The single section format has extra navigation, unless the course index is there to navigate. Besides the
+        // theme, the course index visibility option of the course can hide the course index.
         if ($singlesectionnumhandled) {
             $singlesectionnum = empty($singlesectionnum) ? 0 : $singlesectionnum;
-            if (!$PAGE->theme->usescourseindex) {
+            if (!$PAGE->theme->usescourseindex || !$format->uses_course_index()) {
                 $sectionnavigation = new $this->sectionnavigationclass($format, $singlesectionnum);
                 $data->sectionnavigation = $sectionnavigation->export_for_template($output);
 

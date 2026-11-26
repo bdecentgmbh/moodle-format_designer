@@ -21,6 +21,7 @@
  * @copyright  2021 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace format_designer;
 
 use context_course;
@@ -57,6 +58,8 @@ final class options_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
+        \format_designer\options::reset_caches();
+        \format_designer\output\cm_completion::reset_caches();
         // Remove the output display of cron task.
         $this->course = $this->getDataGenerator()->create_course(['format' => 'designer', 'enablecompletion' => 1]);
         $this->coursecontext = context_course::instance($this->course->id);

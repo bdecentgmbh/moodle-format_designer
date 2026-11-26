@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace format_designer\output\courseformat\state;
+
 use stdClass;
 use core_availability\info_module;
 use completion_info;

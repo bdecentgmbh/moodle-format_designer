@@ -127,13 +127,14 @@ class helper {
         foreach ($staffids as $userid) {
             $customfield = [];
             $user = \core_user::get_user($userid);
-            profile_load_data($user);
 
             if (self::has_pro() != 1) {
                 $extrafields = profile_get_user_fields_with_data($userid);
+                $fieldcontext = \context_user::instance($userid);
                 foreach ($extrafields as $formfield) {
-                    if ($course->{$formfield->inputname}) {
-                        $customfield[]['value'] = $formfield->data;
+                    // Selected for the course, and visible to the current user by the field's visibility setting.
+                    if (!empty($course->{$formfield->inputname}) && $formfield->show_field_content()) {
+                        $customfield[]['value'] = self::format_user_profile_field($formfield, $fieldcontext);
                     }
                 }
             }
@@ -145,10 +146,11 @@ class helper {
             }, $roles);
             $roles = implode(", ", array_column($roles, 'name'));
 
-            // Users data list.
-            $list = clone $user;
+            // Users data list. Only the fields the header uses, not the user record.
+            $list = new stdClass();
             $list->userid = $userid;
-            $list->email = $user->email;
+            // The email address only when the current user may see it, e.g. by the user's email display setting.
+            $list->email = self::get_visible_user_details($user, $course, ['email'])['email'] ?? '';
             $list->fullname = fullname($user);
             // Contact and profile view url.
             $list->profileurl = new \moodle_url('/user/profile.php', ['id' => $userid]);
@@ -176,7 +178,60 @@ class helper {
         return $staffs;
     }
 
+    /**
+     * Get the details of a user that the current user may see in a course.
+     *
+     * Uses the core rules, which for example show the email address only when the user's
+     * email display setting, the hidden user fields and the viewer's capabilities allow it.
+     *
+     * @param stdClass $user User record.
+     * @param stdClass $course Course the details are shown in.
+     * @param string[] $fields Fields to get, from the core list of user detail fields.
+     * @return array Visible values by field name, always including id and fullname when the user is visible.
+     */
+    public static function get_visible_user_details(stdClass $user, stdClass $course, array $fields): array {
+        global $CFG;
 
+        if (empty($fields)) {
+            // Core returns all fields for an empty list.
+            return [];
+        }
+        if (method_exists(\core\user::class, 'get_user_details')) {
+            // Moodle 5.3 and later, user_get_user_details() is deprecated there.
+            $details = \core\user::get_user_details($user, $course, $fields);
+        } else {
+            require_once($CFG->dirroot . '/user/lib.php');
+            $details = user_get_user_details($user, $course, $fields);
+        }
+        return $details ?? [];
+    }
+
+    /**
+     * Format one profile field for the course staff header.
+     *
+     * Textarea values are stored unfiltered, so they are cleaned with format_text()
+     * in the profile owner's user context before the template renders them.
+     * Other field types use display_data(), which applies format_string() or
+     * format_text() for that type.
+     *
+     * @param \profile_field_base $formfield Field with this user's data loaded.
+     * @param \context $context User context of the field owner.
+     * @return string HTML safe to render.
+     */
+    private static function format_user_profile_field($formfield, \context $context): string {
+        $datatype = $formfield->field->datatype ?? '';
+        if ($datatype === 'textarea') {
+            $format = $formfield->dataformat ?? FORMAT_MOODLE;
+            if ($format === '') {
+                $format = FORMAT_MOODLE;
+            }
+            return format_text((string) ($formfield->data ?? ''), (int) $format, [
+                'context' => $context,
+                'overflowdiv' => true,
+            ]);
+        }
+        return (string) $formfield->display_data();
+    }
 
     /**
      * Bulk preload all section background images for a course.
@@ -309,6 +364,19 @@ class helper {
     }
 
     /**
+     * Split a text into its words.
+     *
+     * Any white space separates two words, including the non-breaking spaces the editor stores as &nbsp;.
+     * Digits and non-ASCII letters belong to the words, unlike in str_word_count().
+     *
+     * @param string $str Text, as returned by format_string().
+     * @return string[] The words.
+     */
+    public static function get_words(string $str): array {
+        return preg_split('/(?:\s|\x{00A0}|&nbsp;|&#160;|&#xa0;)+/iu', $str, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+    }
+
+    /**
      * Cut the Course content.
      *
      * @param string $str String to trim.
@@ -316,29 +384,60 @@ class helper {
      * @return string
      */
     public static function modcontent_trim_char(string $str, int $n = 25): string {
-        if (str_word_count($str) < $n) {
+        $words = self::get_words($str);
+        if (count($words) <= $n) {
             return $str;
         }
-        $arrstr = explode(" ", $str);
-        $slicearr = array_slice($arrstr, 0, $n);
-        $strarr = implode(" ", $slicearr);
-        $strarr .= '...';
-        return $strarr;
+        return implode(' ', array_slice($words, 0, $n)) . '...';
     }
 
     /**
-     * Check if Designer Pro is installed.
+     * Oldest Designer Pro (local_designer) version this format works with: Pro 1.7 R5.
+     *
+     * Raise it whenever a function, constant or class shared with Pro changes.
+     */
+    public const MIN_PRO_VERSION = 2026050201;
+
+    /**
+     * Release name shown in the "Designer Pro is outdated" notice.
+     */
+    public const MIN_PRO_RELEASE = '1.8';
+
+    /**
+     * Check if a usable Designer Pro is installed.
+     *
+     * Pro only counts as installed when its installed version is at least MIN_PRO_VERSION.
+     * An older Pro (for example while only the format has been updated) is ignored,
+     * so that Designer courses and Site administration keep working until Pro is updated too.
      *
      * @return bool
      */
     public static function has_pro(): bool {
-        static $result;
-        if ($result === null) {
-            // Check if local_designer plugin exists by checking for its helper class.
-            $result = array_key_exists('designer', core_component::get_plugin_list('local'));
-        }
+        return self::pro_present() && !self::pro_outdated();
+    }
 
-        return $result;
+    /**
+     * Check if the Designer Pro code is present, regardless of its version.
+     *
+     * @return bool
+     */
+    public static function pro_present(): bool {
+        return array_key_exists('designer', core_component::get_plugin_list('local'));
+    }
+
+    /**
+     * Check if Designer Pro is present but older than the version this format needs.
+     *
+     * Uses the installed (database) version, so a Pro whose new code isn't upgraded yet also counts as outdated.
+     *
+     * @return bool
+     */
+    public static function pro_outdated(): bool {
+        if (!self::pro_present()) {
+            return false;
+        }
+        $version = get_config('local_designer', 'version');
+        return !$version || (int) $version < self::MIN_PRO_VERSION;
     }
 
     /**
@@ -486,9 +585,126 @@ class helper {
     }
 
     /**
-     * Check the video time plugin in designer course format selected courses.
+     * Per-request cache of the Video Time records the course page needs, indexed by course id.
      *
-     * @param object $course Course object.
+     * @var array
+     */
+    protected static $videotimerecords = [];
+
+    /**
+     * Preload, once per request and course, the Video Time related records the course page needs.
+     *
+     * Every Video Time activity on the course page used to fetch its own videotime, videotimeplugin_pro and
+     * videotime_vimeo_video record, i.e. three to four queries per activity. On a course with 100+ videos that is
+     * several hundred queries, and the videotime_vimeo_video lookup by link is not indexed, so on sites with a
+     * large Vimeo library each of those is a full table scan (DES-962). Loading the records for the whole course
+     * in three queries removes that cost. Tables that do not exist (plugin or subplugin not installed) yield
+     * empty arrays.
+     *
+     * @param int $courseid Course id.
+     * @return array ['instances' => [instanceid => videotime record],
+     *                'pro' => [instanceid => videotimeplugin_pro record],
+     *                'vimeo' => [link => videotime_vimeo_video record (id, link, duration)]]
+     */
+    public static function preload_videotime_records(int $courseid): array {
+        global $DB;
+
+        if (isset(self::$videotimerecords[$courseid])) {
+            return self::$videotimerecords[$courseid];
+        }
+
+        $records = ['instances' => [], 'pro' => [], 'vimeo' => []];
+        $dbman = $DB->get_manager();
+
+        if ($dbman->table_exists('videotime')) {
+            $records['instances'] = $DB->get_records('videotime', ['course' => $courseid]);
+        }
+
+        if (!empty($records['instances'])) {
+            [$insql, $params] = $DB->get_in_or_equal(array_keys($records['instances']), SQL_PARAMS_NAMED, 'vt');
+
+            if ($dbman->table_exists('videotimeplugin_pro')) {
+                $prorecords = $DB->get_records_select('videotimeplugin_pro', "videotime $insql", $params);
+                foreach ($prorecords as $prorecord) {
+                    $records['pro'][$prorecord->videotime] = $prorecord;
+                }
+            }
+
+            $links = [];
+            foreach ($records['instances'] as $instance) {
+                if (!empty($instance->vimeo_url)) {
+                    $links[$instance->vimeo_url] = true;
+                }
+            }
+            if (!empty($links) && $dbman->table_exists('videotime_vimeo_video')) {
+                [$linksql, $linkparams] = $DB->get_in_or_equal(array_keys($links), SQL_PARAMS_NAMED, 'lnk');
+                $videos = $DB->get_records_select(
+                    'videotime_vimeo_video',
+                    "link $linksql",
+                    $linkparams,
+                    '',
+                    'id, link, duration'
+                );
+                foreach ($videos as $video) {
+                    $records['vimeo'][$video->link] = $video;
+                }
+            }
+        }
+
+        self::$videotimerecords[$courseid] = $records;
+        return $records;
+    }
+
+    /**
+     * Get the videotime record of an activity from the per-request course cache.
+     *
+     * @param int $courseid Course id.
+     * @param int $instanceid Video Time instance id.
+     * @return stdClass|null
+     */
+    public static function get_videotime_instance(int $courseid, int $instanceid): ?stdClass {
+        return self::preload_videotime_records($courseid)['instances'][$instanceid] ?? null;
+    }
+
+    /**
+     * Get the videotimeplugin_pro record of an activity from the per-request course cache.
+     *
+     * @param int $courseid Course id.
+     * @param int $instanceid Video Time instance id.
+     * @return stdClass|null
+     */
+    public static function get_videotime_pro_record(int $courseid, int $instanceid): ?stdClass {
+        return self::preload_videotime_records($courseid)['pro'][$instanceid] ?? null;
+    }
+
+    /**
+     * Get the Vimeo library record (id, link, duration) for a video link from the per-request course cache.
+     *
+     * @param int $courseid Course id.
+     * @param string $link Video URL as stored in the videotime instance.
+     * @return stdClass|null
+     */
+    public static function get_videotime_vimeo_video(int $courseid, string $link): ?stdClass {
+        return self::preload_videotime_records($courseid)['vimeo'][$link] ?? null;
+    }
+
+    /**
+     * Forget the preloaded Video Time records (for tests, or after changing Video Time activities in the request).
+     *
+     * @param int|null $courseid Course id, or null to clear every course.
+     */
+    public static function reset_videotime_records(?int $courseid = null): void {
+        if ($courseid === null) {
+            self::$videotimerecords = [];
+        } else {
+            unset(self::$videotimerecords[$courseid]);
+        }
+    }
+
+    /**
+     * Course has videotime activity.
+     *
+     * @param stdClass $course
      * @return bool
      */
     public static function course_has_videotime($course): bool {
