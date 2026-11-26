@@ -566,7 +566,10 @@ final class lib_test extends \advanced_testcase {
         $this->resetAfterTest();
         $studentrole = $DB->get_record('role', ['shortname' => 'student']);
         $user = $this->getDataGenerator()->create_user();
-        $course = $this->getDataGenerator()->create_course(['format' => 'designer', 'enablecompletion' => 1]);
+        // The progress from the completion criteria, which is the default. Designer Pro stores the option.
+        $course = $this->getDataGenerator()->create_course([
+            'format' => 'designer', 'enablecompletion' => 1, 'calcourseprogress' => DESIGNER_PROGRESS_CRITERIA,
+        ]);
         $course1 = $this->getDataGenerator()->create_course(['format' => 'designer', 'enablecompletion' => 1]);
         $assign1 = $this->getDataGenerator()->create_module('assign', ['course' => $course->id], ['completion' => 1]);
         $assign2 = $this->getDataGenerator()->create_module('assign', ['course' => $course1->id], ['completion' => 1]);
