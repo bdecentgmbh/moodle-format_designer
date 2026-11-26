@@ -105,7 +105,12 @@
     {{/sections}}
 </div>
 {{#js}}
-require(['core_courseformat/local/courseindex/courseindex'], function(component) {
-    component.init('#course-index');
+require(['core_courseformat/local/courseindex/courseindex', 'core_courseformat/courseeditor'], function(CourseIndex, editor) {
+    // Create the component as its init() does. Moodle 4.x init() expects an element id,
+    // Moodle 5.x a query selector, so pass the element itself to work on both.
+    return new CourseIndex({
+        element: document.getElementById('course-index'),
+        reactive: editor.getCurrentCourseEditor(),
+    });
 });
 {{/js}}

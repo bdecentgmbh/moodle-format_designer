@@ -1201,6 +1201,15 @@ span.section-collapse-icon:before {
     margin: 0;
     flex-wrap: wrap;
 }
+/* The cards list is a flex row of its own rather than a Bootstrap 4 card-deck: card-deck is deprecated in Moodle 5,
+   its 15px card margins there leave no room for the cards of a full row, and its deprecation marker (a ::before
+   pseudo-element) would take a cell of the row. Like card-deck, the list is a row from the sm breakpoint. */
+@media (min-width: 576px) {
+    .format-designer .designer .section .content ul.section.card-layout {
+        display: flex;
+        flex-flow: row wrap;
+    }
+}
 .format-designer .designer .section .content .section.card-layout li.activity .activity-block.designer {
     height: 100%;
 }
@@ -1226,9 +1235,17 @@ span.section-collapse-icon:before {
     flex: auto;
 }
 /* Card width setting "Keep the column width": the cards of a short row stay at their column width
-   instead of growing (flex: auto above, flex: 1 0 0% from Bootstrap's card-deck) to fill the row. */
+   instead of growing (flex: auto above) to fill the row. */
 body.format-designer-cards-keep-width .designer .section .content .section.card-layout li.activity {
     flex-grow: 0;
+}
+/* Kanban columns are only 400-550px wide, too narrow for the section's column setting, which is meant for a
+   full-width section: one card per row there (as before DES-956 on Moodle 5). More specific than the column widths
+   of Designer Pro. Section 0 above the board keeps its columns. */
+.format-designer .course-content ul.designer.kanban-board .kanban-board-activities li.section .content
+.section.card-layout li.activity {
+    width: 100%;
+    margin-right: 0;
 }
 .format-designer .designer .section .content .section.card-layout li.activity.subsection .section {
     min-width: auto;

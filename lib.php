@@ -252,8 +252,6 @@ class format_designer extends \core_courseformat\base {
      * @return null|moodle_url
      */
     public function get_view_url($section, $options = []) {
-        global $CFG;
-
         $course = $this->get_course();
         $url = new moodle_url('/course/view.php', ['id' => $course->id]);
         $sr = null;
@@ -266,7 +264,6 @@ class format_designer extends \core_courseformat\base {
             $sectionno = $section->section;
         } else {
             $sectionno = $section;
-            $section = $this->get_section($sectionno);
         }
 
         if ($sectionno !== null) {
@@ -282,9 +279,8 @@ class format_designer extends \core_courseformat\base {
             }
 
             if ($usercoursedisplay == COURSE_DISPLAY_MULTIPAGE) {
-                $url->param('section', $sectionno);
-                $url->param('sectionid', $section->id);
-                $url->param('sesskey', sesskey());
+                // The section page of core, the same page the course index and the section navigation link to.
+                return new moodle_url('/course/section.php', ['id' => $this->get_section($sectionno)->id]);
             } else {
                 $url->set_anchor('section-' . $sectionno);
             }
@@ -378,7 +374,8 @@ class format_designer extends \core_courseformat\base {
             // The general section is empty to find the navigation node for it we need to get its ID.
             $section = $modinfo->get_section_info(0);
             $generalsection = $node->get($section->id, navigation_node::TYPE_SECTION);
-            if ($generalsection) {
+            // Keep it on its own section page, the breadcrumb ends with it there.
+            if ($generalsection && $this->get_sectionid() != $section->id) {
                 // We found the node - now remove it.
                 $generalsection->remove();
             }
@@ -2126,6 +2123,9 @@ function format_designer_extend_navigation_course($navigation, $course, $context
     $format = course_get_format($COURSE);
     $course = $format->get_course();
 
+    // The section of a section page. The section page of core sets it, old links to the course page pass its number.
+    $sectionnum = $format->get_sectionnum() ?? optional_param('section', null, PARAM_INT);
+
     // Include the designer section js.
     $ispopupactivities = isset($course->popupactivities) && $course->popupactivities;
     $isvideotime = \format_designer\helper::course_has_videotime($course);
@@ -2135,9 +2135,19 @@ function format_designer_extend_navigation_course($navigation, $course, $context
         'popupactivities' => $ispopupactivities,
         'isvideotime' => $isvideotime,
         'issubpanel' => \format_designer\helper::is_support_subpanel(),
-        'sectionreturn' => optional_param('section', 0, PARAM_INT),
+        'sectionreturn' => $sectionnum,
     ];
     $PAGE->requires->js_call_amd('format_designer/designer_section', 'init', $jsparams);
+
+    // Include popups on the course page and the section pages. Popups reload the content of a section page by the section id.
+    $coursepages = ['course-view-' . $course->format, 'course-view-section-' . $course->format];
+    if (
+        $ispopupactivities && in_array($PAGE->pagetype, $coursepages) && !$PAGE->user_is_editing() &&
+        \format_designer\helper::popup_installed()
+    ) {
+        $sectionid = ($sectionnum !== null) ? $format->get_section($sectionnum)?->id : null;
+        $PAGE->requires->js_call_amd('format_popups/popups', 'init', [$context->id, $course->id, $sectionid ?? 0]);
+    }
 
     $isaddsecondary = ($navigation->children->count() <= 1 && $PAGE->context->contextlevel == CONTEXT_MODULE) &&
     (\format_designer\helper::course_has_heroactivity($course) || $course->secondarymenutocourse);
@@ -2469,8 +2479,9 @@ function format_designer_extend_navigation_course($navigation, $course, $context
                         parent.setAttribute('data-forceintomoremenu', 'false');
                         secondarynav.insertBefore(parent, secondarynav.children[0]);
                     }
-                    window.dispatchEvent(new Event('resize')); // Dispatch the resize event to create more menu.
                 }
+                // Let core's more menu recalculate which items fit, now that the items have moved.
+                window.dispatchEvent(new Event('resize'));
                 return true;
             });
         });
@@ -2492,4 +2503,71 @@ function format_designer_editsetting_style($page) {
         $style .= '}';
         echo html_writer::tag('style', $style, []);
     }
+}
+
+/**
+ * Get the Designer options cache.
+ *
+ * Kept for Designer Pro 1.6, whose event observers still call it while only the format is updated.
+ *
+ * @deprecated since Designer 1.7, use \format_designer\helper::get_cache_object()
+ * @return cache_application|cache_session|cache_store
+ */
+function format_designer_get_cache_object() {
+    return \format_designer\helper::get_cache_object();
+}
+
+/**
+ * Check if a usable Designer Pro is installed.
+ *
+ * Kept for Designer Pro 1.6, which still calls it while only the format is updated.
+ *
+ * @deprecated since Designer 1.7, use \format_designer\helper::has_pro()
+ * @return bool
+ */
+function format_designer_has_pro() {
+    return \format_designer\helper::has_pro();
+}
+
+/**
+ * Get the Designer Pro activity layouts.
+ *
+ * Kept for Designer Pro 1.6, which still calls it while only the format is updated.
+ *
+ * @deprecated since Designer 1.7, use \format_designer\helper::get_pro_layouts()
+ * @return array List of the available Pro layouts.
+ */
+function format_designer_get_pro_layouts() {
+    return \format_designer\helper::get_pro_layouts();
+}
+
+/**
+ * Get the section background image URL.
+ *
+ * Kept for Designer Pro 1.6, which still calls it while only the format is updated.
+ *
+ * @deprecated since Designer 1.7, use \format_designer\helper::get_section_background_image()
+ * @param \section_info $section Section info.
+ * @param stdClass $course Course record.
+ * @param course_modinfo $modinfo Course module info.
+ * @return string Section background image URL.
+ */
+function format_designer_get_section_background_image($section, $course, $modinfo) {
+    return \format_designer\helper::get_section_background_image($section, $course, $modinfo);
+}
+
+/**
+ * Get the CSS for a Designer colour option that may hold a custom value.
+ *
+ * Kept for Designer Pro 1.6, which still calls it while only the format is updated.
+ *
+ * @deprecated since Designer 1.7, use \format_designer\helper::fill_custom_values()
+ * @param stdClass $data Options data.
+ * @param string $name Option name.
+ * @param string $custom Name of the option that holds the custom value.
+ * @param string $csselement CSS property.
+ * @return string CSS rule.
+ */
+function format_designer_fill_custom_values($data, $name, $custom, $csselement) {
+    return \format_designer\helper::fill_custom_values($data, $name, $custom, $csselement);
 }
