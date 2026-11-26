@@ -116,4 +116,32 @@ final class helper_test extends \advanced_testcase {
         $this->assertSame('background: #123456;', format_designer_fill_custom_values($data, 'bg', 'bgcustom', 'background'));
         $this->assertSame('', format_designer_fill_custom_values($data, 'empty', 'bgcustom', 'background'));
     }
+
+    /**
+     * Links to the section edit page bring the user back without the sr parameter that Moodle 5.3 deprecates (DES-967).
+     */
+    public function test_section_return_params(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course(['format' => 'designer', 'numsections' => 2]);
+        $format = course_get_format($course);
+        $section = $format->get_section(2);
+        $hasreturnoptions = method_exists($format, 'get_return_options');
+
+        // On the course page.
+        $params = helper::section_return_params($format, $section, null);
+        if ($hasreturnoptions) {
+            $this->assertEquals(['returnoptions' => ['pagesectionid' => 0]], $params);
+        } else {
+            $this->assertSame([], $params);
+        }
+
+        // On the section page of section 2.
+        $format->set_sectionid($section->id);
+        $params = helper::section_return_params($format, $section, 2);
+        if ($hasreturnoptions) {
+            $this->assertEquals(['returnoptions' => ['pagesectionid' => $section->id, 'sr' => 2]], $params);
+        } else {
+            $this->assertSame(['sr' => 2], $params);
+        }
+    }
 }
